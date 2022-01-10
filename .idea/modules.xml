@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/rpzh-common-core.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/rpzh-common-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-db/rpzh-common-db.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-db/rpzh-common-db.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/rpzh-common-log.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/rpzh-common-log.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/rpzh-gateway-a.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/rpzh-gateway-a.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/rpzh-gateway-b.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/rpzh-gateway-b.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/rpzh-log-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/rpzh-log-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/rpzh-maintain.iml" filepath="$PROJECT_DIR$/.idea/rpzh-maintain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-parent.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-system/rpzh-system.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-system/rpzh-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/rpzh-system-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/rpzh-system-api.iml" />
+    </modules>
+  </component>
+</project>

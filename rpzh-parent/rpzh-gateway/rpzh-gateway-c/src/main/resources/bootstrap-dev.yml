@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: rpzh-gateway
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  cloud:
+    gateway:
+      globalcors: #全局配置
+        corsConfigurations:
+          '[/**]': # 匹配所有请求
+            allowedOrigins: "*" #跨域处理 允许所有的跨域
+            allowedMethods: # 支持的方法,允许跨域的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      routes:
+        #系统微服务
+        - id: rpzh-system-routes
+          uri: lb://rpzh-system   #负载均衡调用系统微服务
+          predicates:
+            - Path=/api/username/**,/api/dept/**,/api/menu/**,/api/role/**,/api/repair/**,/api/dtu/**,/api/nb/**,/api/report/**,/api/iotCard/**,/api/mqtt/**,/api/rfid/**,/api/terminal/**
+          filters: #将请求中的路径第一个去除,用于隐藏真实的路径
+            - StripPrefix=1        #对齐
+            - name: RequestRateLimiter      #局部限流过滤器,请求数量限流,名字不能更改
+              args:
+                key-resolver: "#{@ipKeyResolver}"            #与启动类ipKeyResolver对应,不可更改,用户身份识别唯一标识符
+                redis-rate-limiter.replenishRate: 10          #每秒的请求数量
+                redis-rate-limiter.burstCapacity: 50          #允许的并发数量
+        #登录认证微服务
+        - id: rpzh-auth-routes
+          uri: lb://rpzh-oauth   #负载均衡调用登录认证微服务
+          predicates:
+            - Path=/api/user/**
+          filters: #将请求中的路径第一个去除,用于隐藏真实的路径
+            - StripPrefix=1        #对齐
+            - name: RequestRateLimiter      #局部限流过滤器,请求数量限流,名字不能更改
+              args:
+                key-resolver: "#{@ipKeyResolver}"            #与启动类ipKeyResolver对应,不可更改,用户身份识别唯一标识符
+                redis-rate-limiter.replenishRate: 10          #每秒的请求数量
+                redis-rate-limiter.burstCapacity: 50          #允许的并发数量
+    nacos: # 注册中心地址
+      discovery:
+        server-addr: 127.0.0.1:8877
+      config: # 配置中心地址
+        server-addr: 127.0.0.1:8877
+        # 配置文件格式
+        file-extension: yml
+server:
+  port: 7003
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    web:
+      exposure:
+        include: true
