@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.MenuDao">
+<select id="findMenuCount" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM tb_menu
+  WHERE menu_name = #{menuName} and parent_id = #{parentId}
+</select>
+<insert id="insertMenu" parameterType="com.rpzh.dto.MenuDto">
+  INSERT INTO tb_menu
+  (
+  <if test="menuDto.menuName != null and menuDto.menuName != ''">
+   `menu_name`,
+  </if>
+  <if test="menuDto.parentId != null">
+   `parent_id`,
+  </if>
+  <if test="menuDto.orderNum != null and menuDto.orderNum != ''">
+  `order_num`,
+  </if>
+  <if test="menuDto.component != null and menuDto.component != ''">
+  `component`,
+  </if>
+   <if test="menuDto.path != null and menuDto.path != ''">
+  `path`,
+  </if>
+  <if test="menuDto.menuType != null and menuDto.menuType != ''">
+  `menu_type`,
+  </if>
+  <if test="menuDto.status != null">
+  `status`,
+  </if>
+   <if test="menuDto.perms !=null and menuDto.perms != ''">
+  `perms`,
+  </if>
+   <if test="menuDto.icon != null and menuDto.icon != ''">
+  `icon`,
+   </if>
+   `create_by`,`create_time`,
+   <if test="menuDto.remark != null and menuDto.remark != ''">
+   `remark`,
+   </if>
+   update_time
+   )
+   VALUES
+  (
+  <if test="menuDto.menuName != null and menuDto.menuName != ''">
+   #{menuDto.menuName},
+  </if>
+  <if test="menuDto.parentId != null">
+   #{menuDto.parentId},
+  </if>
+  <if test="menuDto.orderNum != null and menuDto.orderNum != ''">
+  #{menuDto.orderNum},
+  </if>
+  <if test="menuDto.component != null and menuDto.component != ''">
+  #{menuDto.component},
+  </if>
+  <if test="menuDto.path != null and menuDto.path != ''">
+  #{menuDto.path},
+  </if>
+  <if test="menuDto.menuType != null and menuDto.menuType != ''">
+  #{menuDto.menuType},
+  </if>
+  <if test="menuDto.visible != null">
+  #{menuDto.visible},
+  </if>
+  <if test="menuDto.status != null">
+  #{menuDto.status},
+  </if>
+  <if test="menuDto.perms !=null and menuDto.perms != ''">
+  #{menuDto.perms},
+  </if>
+  <if test="menuDto.icon != null and menuDto.icon != ''">
+  #{menuDto.icon},
+  </if>
+  <if test="menuDto.createBy != null and menuDto.createBy != ''">
+  #{menuDto.createBy},
+  </if>
+  <if test="menuDto.createtime != null and menuDto.createtime != ''">
+  #{menuDto.createtime},
+  </if>
+  <if test="menuDto.remark != null and menuDto.remark != ''">
+  #{menuDto.remark},
+  </if>
+  sysdate()
+ )
+</insert>
+<select id="findParentMenuName" resultType="java.lang.String">
+  SELECT menu_name
+  FROM tb_menu
+  WHERE menu_id =  #{parentId}
+</select>
+<select id="findSonMenu" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM tb_menu
+  WHERE parent_id =  #{menuId}
+</select>
+<select id="findMenuRole" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM tb_role_menu
+  WHERE menu_id = #{menuId}
+</select>
+<delete id="deleteMenu">
+  DELETE
+  FROM tb_menu
+  WHERE menu_id = #{menuId}
+</delete>
+<select id="findMenuList" resultType="java.lang.String">
+  SELECT menu_name
+  FROM tb_menu
+  WHERE parent_id = #{parentId} and menu_id &lt;&gt; #{menuId}
+</select>
+<select id="findMenuSonList" resultType="java.lang.String">
+  SELECT menu_name
+  FROM tb_menu
+  WHERE parent_id = #{menuId}
+</select>
+<update id="updateMenu">
+  update tb_menu
+		<set>
+			<if test="menuDto.menuName != null and menuDto.menuName != ''">
+			menu_name = #{menuDto.menuName},
+			</if>
+			<if test="menuDto.parentId != null">
+			parent_id = #{menuDto.parentId},
+			</if>
+			<if test="menuDto.orderNum != null and menuDto.orderNum != ''">
+			order_num = #{menuDto.orderNum},
+			</if>
+			<if test="menuDto.component != null">
+			component = #{menuDto.component},
+			</if>
+			<if test="menuDto.menuType != null and menuDto.menuType != ''">
+			menu_type = #{menuDto.menuType},
+			</if>
+			<if test="menuDto.visible != null">
+			visible = #{menuDto.visible},
+			</if>
+			<if test="menuDto.status != null">
+			status = #{menuDto.status},
+			</if>
+			<if test="menuDto.perms !=null">
+			perms = #{menuDto.perms},
+			</if>
+			<if test="menuDto.icon !=null and menuDto.icon != ''">
+			icon = #{menuDto.icon},
+			</if>
+			<if test="menuDto.remark != null and menuDto.remark != ''">
+			remark = #{menuDto.remark},
+			</if>
+			<if test="menuDto.updateBy != null and menuDto.updateBy != ''">
+			update_by = #{menuDto.updateBy},
+			</if>
+			<if test="menuDto.updatetime != null and menuDto.updatetime != ''">
+			update_time = #{menuDto.updatetime}
+			</if>
+		</set>
+		where menu_id = #{menuDto.menuId}
+</update>
+<select id="findRole" resultType="java.lang.String">
+  SELECT role_key
+  FROM tb_role t1
+  LEFT JOIN tb_user_role t2 on t1.role_id = t2.role_id
+  LEFT JOIN tb_user t3 on t2.user_id = t3.user_id
+  WHERE t3.username = #{username}
+</select>
+<select id="findAllMenu" resultType="com.rpzh.pojo.Menu">
+  SELECT menu_id as menuId, menu_name as menuName, parent_id as parentId, order_num as orderNum, path as path, component as component,
+   is_frame as isFrame, is_cache as isCache, menu_type as menuType, visible as visible, status as status, ifnull(perms,'') as perms,
+   icon as icon, create_time as createtime
+  FROM tb_menu
+  <where>
+	 <if test="menuDto.menuName != null and menuDto.menuName != ''">
+	 	AND menu_name like concat('%', #{menuDto.menuName}, '%')
+	 </if>
+	 <if test="menuDto.visible != null and menuDto.visible != ''">
+		AND visible = #{menuDto.visible}
+	   </if>
+	 <if test="menuDto.status != null and menuDto.status != ''">
+	   AND status = #{menuDto.status}
+	 </if>
+  </where>
+  order by parent_id, order_num
+</select>
+<select id="findUserSpecificMenu" resultType="com.rpzh.pojo.Menu">
+  SELECT DISTINCT t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName, t1.path as path,
+  t1.component as component, t1.visible as visible, t1.status as status, ifnull(t1.perms,'') as perms,
+  t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType, t1.icon as icon,
+  t1.order_num as orderNum, t1.create_time as createtime
+  FROM tb_menu t1
+  LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+  LEFT JOIN tb_user_role t3 on t3.role_id = t2.role_id
+  LEFT JOIN tb_user t4 on t4.user_id = t3.user_id
+  WHERE t4.username = #{menuDto.username}
+  <where>
+	<if test="menuDto.menuName != null and menuDto.menuName != ''">
+		AND menu_name like concat('%', #{menuDto.menuName}, '%')
+	</if>
+	<if test="menuDto.visible != null and menuDto.visible != ''">
+		AND visible = #{menuDto.visible}
+	</if>
+	<if test="menuDto.status != null and menuDto.status != ''">
+		AND status = #{menuDto.status}
+	</if>
+  </where>
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="findAllMenuRouters" resultType="com.rpzh.pojo.Menu">
+  SELECT DISTINCT t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+  t1.path as path, t1.component as component,
+  t1.visible as visible, t1.status as status,
+  ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+  t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime,(SELECT menu_name FROM tb_menu WHERE menu_id = parentId) as parentName
+  FROM tb_menu t1
+  WHERE t1.menu_type in ('M', 'C')
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="findUserRoutersMenu" resultType="com.rpzh.pojo.Menu">
+   SELECT DISTINCT  t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+   t1.path as path, t1.component as component,
+   t1.visible as visible, t1.status as status,
+   ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+   t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime,(SELECT menu_name FROM tb_menu WHERE menu_id = parentId) as parentName
+   FROM tb_menu t1
+   LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+   LEFT JOIN tb_user_role t3 on t2.role_id = t3.role_id
+   LEFT JOIN tb_role t4 on t3.role_id = t4.role_id
+   LEFT JOIN tb_user t5 on t3.user_id = t5.user_id
+   WHERE t5.username = #{username} and t1.menu_type in ('M', 'C')  AND t4.status = 0
+   order by t1.parent_id, t1.order_num
+</select>
+<select id="findAllMenus" resultType="com.rpzh.pojo.Menu">
+  SELECT DISTINCT t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+  t1.visible as visible, t1.status as status, t1.menu_type as menuType
+  FROM tb_menu t1
+  WHERE t1.menu_type in ('M', 'C') and t1.status = 1
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="findUserMenu" resultType="com.rpzh.pojo.Menu">
+   SELECT DISTINCT  t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName, t1.status as status,
+   t1.menu_type as menuType,
+   t1.order_num as orderNum
+   FROM tb_menu t1
+   LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+   LEFT JOIN tb_user_role t3 on t2.role_id = t3.role_id
+   LEFT JOIN tb_role t4 on t3.role_id = t4.role_id
+   LEFT JOIN tb_user t5 on t3.user_id = t5.user_id
+   WHERE t5.username = #{username} and t1.menu_type in ('M', 'C') and t1.status = 0  AND t4.status = 0
+   order by t1.parent_id, t1.order_num
+</select>
+<select id="getOneRouters" resultType="java.lang.Integer">
+  SELECT t1.menu_id as menuId
+  FROM tb_menu t1
+  LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+  LEFT JOIN tb_role t3 on t2.role_id = t3.role_id
+  WHERE t3.role_id = #{roleId}
+</select>
+<select id="searchMenuList" resultType="com.rpzh.vo.MenuVo">
+  SELECT DISTINCT t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+  t1.path as path, t1.component as component,
+  t1.visible as visible, t1.status as status,
+  ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+  t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime
+  FROM tb_menu t1
+  WHERE t1.menu_type in ('M', 'C') and t1.status = 1
+  <if test="menuDto.menuName != null and menuDto.menuName != ''">
+     AND t1.menu_name like concat('%', #{menuDto.menuName}, '%')
+  </if>
+  <if test="menuDto.status != null and menuDto.status != ''">
+    AND t1.status = #{menuDto.status}
+  </if>
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="searchUserMenuList" resultType="com.rpzh.vo.MenuVo">
+   SELECT DISTINCT  t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+   t1.path as path, t1.component as component,
+   t1.visible as visible, t1.status as status,
+   ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+   t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime
+   FROM tb_menu t1
+   LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+   LEFT JOIN tb_user_role t3 on t2.role_id = t3.role_id
+   LEFT JOIN tb_role t4 on t3.role_id = t4.role_id
+   LEFT JOIN tb_user t5 on t3.user_id = t5.user_id
+   WHERE t5.username = #{menuDto.username} and t1.menu_type in ('M', 'C') and t1.status = 1  AND t4.status = 0
+   <if test="menuDto.menuName != null and menuDto.menuName != ''">
+     AND t1.menu_name like concat('%', #{menuDto.menuName}, '%')
+   </if>
+   <if test="menuDto.status != null and menuDto.status != ''">
+    AND t1.status = #{menuDto.status}
+   </if>
+   order by t1.parent_id, t1.order_num
+</select>
+<update id="changeMenuStatus">
+  UPDATE tb_menu
+  SET `status` = #{menuDto.status}
+  WHERE menu_id = #{menuDto.menuId}
+</update>
+<select id="findAllMenuStatuTrue" resultType="com.rpzh.pojo.Menu">
+ SELECT DISTINCT t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+  t1.path as path, t1.component as component,
+  t1.visible as visible, t1.status as status,
+  ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+  t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime
+  FROM tb_menu t1
+  WHERE t1.menu_type in ('M', 'C') AND t1.status = 1
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="findUserRoutersMenuStatuTrue" resultType="com.rpzh.pojo.Menu">
+  SELECT DISTINCT  t1.menu_id as menuId, t1.parent_id as parentId, t1.menu_name as menuName,
+  t1.path as path, t1.component as component,
+  t1.visible as visible, t1.status as status,
+  ifnull(t1.perms,'') as perms, t1.is_frame as isFrame, t1.is_cache as isCache, t1.menu_type as menuType,
+  t1.icon as icon, t1.order_num as orderNum, t1.create_time as createtime
+  FROM tb_menu t1
+  LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+  LEFT JOIN tb_user_role t3 on t2.role_id = t3.role_id
+  LEFT JOIN tb_role t4 on t3.role_id = t4.role_id
+  LEFT JOIN tb_user t5 on t3.user_id = t5.user_id
+  WHERE t5.username = #{username} and t1.menu_type in ('M', 'C') and t1.status = 1  AND t4.status = 1
+  order by t1.parent_id, t1.order_num
+</select>
+<select id="findParentSon" resultType="java.lang.Integer">
+  SELECT menu_id as menuId
+  FROM tb_menu
+  WHERE parent_id = #{menuId1}
+</select>
+<select id="findAdminRole" resultType="java.lang.Integer">
+  SELECT t1.role_id
+  FROM `tb_role` t1
+  left JOIN tb_user_role t2 on t2.role_id = t1.role_id
+  left JOIN tb_user t3 on t3.user_id = t2.user_id
+  WHERE t3.username = #{username}
+</select>
+</mapper>

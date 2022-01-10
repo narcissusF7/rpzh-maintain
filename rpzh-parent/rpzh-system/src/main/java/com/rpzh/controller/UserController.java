@@ -8,6 +8,9 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.User;
 import com.rpzh.service.UserService;
 import com.rpzh.vo.UserVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/username")
 @CrossOrigin
+@Api(value = "用户管理", tags = "用户管理", description = "用户管理")
 public class UserController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
@@ -36,6 +40,7 @@ public class UserController {
      * @param id
      * @return
      */
+    @ApiOperation(value = "查询用户信息,登录时查看用户密码", tags = "用户管理")
     @RequestMapping(value = {"/{id}"})
     public Result<User> findById(@PathVariable(value = "id") String id){
         //调用UserService实现根据主键查询User
@@ -48,6 +53,7 @@ public class UserController {
      * @param userDto
      * @return
      */
+    @ApiOperation(value = "新增用户", tags = "用户管理")
     @PostMapping("/addUser")
     public Result addUser(@RequestBody UserDto userDto){
         Long[] roleIds = userDto.getRoleIds();
@@ -64,20 +70,21 @@ public class UserController {
      * @param userDto
      * @return
      */
+    @ApiOperation(value = "分页搜索查询用户", tags = "用户管理")
     @PostMapping("/findAllUserList")
-    public Result<PageInfo> findAllUserList(UserDto userDto){
+    public Result<PageInfo> findAllUserList(@RequestBody UserDto userDto){
         PageInfo<UserVo> pageInfo = userService.findAllUserList(userDto);
         return new Result<PageInfo>(true, StatusCode.OK,"查询成功",pageInfo);
     }
-
 
     /**
      * 修改用户的状态
      * @param userDto
      * @return
      */
+    @ApiOperation(value = "修改用户的状态", tags = "用户管理")
     @PostMapping("/changeUserStatus")
-    public Result changeUserStatus(UserDto userDto){
+    public Result changeUserStatus(@RequestBody UserDto userDto){
         Integer changeFlag = userService.changeUserStatus(userDto);
         return new Result(true, StatusCode.OK, "修改状态成功");
     }
@@ -88,7 +95,8 @@ public class UserController {
      * @return
      */
     @PostMapping("/editUser")
-    public Result editUser(UserDto userDto){
+    @ApiOperation(value = "修改用户", tags = "用户管理")
+    public Result editUser(@RequestBody UserDto userDto){
         //获取角色
         Long[] roleIds = userDto.getRoleIds();
         if (roleIds.length == 0){
@@ -105,6 +113,7 @@ public class UserController {
      * @param userId
      * @return
      */
+    @ApiOperation(value = "删除用户", tags = "用户管理")
     @GetMapping("/deleteUser")
     public Result deleteUser(Long[] userId){
         Integer deleteFlag = userService.deleteUser(userId);
@@ -118,6 +127,7 @@ public class UserController {
      * @param newpassWord
      * @return
      */
+    @ApiOperation(value = "普通用户修改密码", tags = "用户管理")
     @GetMapping("/editPassWord")
     public Result editPassWord(String username, String newpassWord, String notarizePassword){
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord) || ToolUtil.isEmpty(notarizePassword)){
@@ -135,8 +145,9 @@ public class UserController {
      * 获取用户的角色权限
      * @return
      */
+    @ApiOperation(value = "获取用户的角色权限", tags = "用户管理")
     @GetMapping("/getUserRole")
-    public String getUserRole(String username){
+    public String getUserRole(@ApiParam(name = "username", value = "用户账号") String username){
        String roles = userService.getUserRole(username);
        return roles;
     }
@@ -147,6 +158,7 @@ public class UserController {
      * @param newpassWord
      * @return
      */
+    @ApiOperation(value = "超级管理员可以修改所有人密码", tags = "用户管理")
     @GetMapping("/adminUpdatePassWord")
     public Result adminUpdatePassWord(String username, String newpassWord){
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord)){
@@ -162,6 +174,7 @@ public class UserController {
      * @param userId
      * @return
      */
+    @ApiOperation(value = "修改用户时返回用户信息", tags = "用户管理")
     @RequestMapping("/findUserByUpdate")
     public Result findUserByUpdate(Long userId){
         List<Integer> roidList = userService.findUserByUpdate(userId);
@@ -172,6 +185,7 @@ public class UserController {
      * 查询个人信息
      * @return
      */
+    @ApiOperation(value = "查询个人信息", tags = "用户管理")
     @GetMapping("/findOneUserMessage")
     public Result findOneUserMessage(){
         UserVo userVo = userService.findOneUserMessage();
@@ -184,6 +198,7 @@ public class UserController {
      * @param
      * @return
      */
+    @ApiOperation(value = "个人中心修改用户信息", tags = "用户管理")
     @PostMapping("/changeUserMessage")
     public Result changeUserMessage(UserDto userDto){
         Integer changeFlage = userService.changeUserMessage(userDto);

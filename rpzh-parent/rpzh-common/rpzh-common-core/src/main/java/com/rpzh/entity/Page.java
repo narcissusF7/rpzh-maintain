@@ -1,5 +1,8 @@
 package com.rpzh.entity;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -8,23 +11,29 @@ import java.util.List;
  * @Author liubc成
  * @create 2021/3/29 15:25
  */
+@ApiModel(description = "分页工具类")
 public class Page <T> implements Serializable {
 
     // 页数（第几页）
+    @ApiModelProperty(notes = "页数（第几页）")
     private long currentpage;
 
     // 查询数据库里面对应的数据有多少条
+    @ApiModelProperty(notes = "查询数据库里面对应的数据有多少条")
     private long total;// 从数据库查处的总记录数
 
     // 每页查5条
+    @ApiModelProperty(notes = "每页查询条数")
     private int size;
 
     // 下页
+    @ApiModelProperty(notes = "下一页")
     private int next;
 
     private List<T> list;
 
     // 最后一页
+    @ApiModelProperty(notes = "最后一页")
     private int last;
 
     private int lpage;

@@ -1,5 +1,9 @@
 package com.rpzh.entity;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,8 +11,11 @@ import java.util.List;
  * @Author liubc成
  * @create 2021/3/29 15:27
  */
-public class PageResult<T>  {
+@ApiModel(description = "分页对象")
+public class PageResult<T> implements Serializable {
+    @ApiModelProperty(notes = "总记录数")
     private Long total;//总记录数
+    @ApiModelProperty(notes = "记录")
     private List<T> rows;//记录
 
     public PageResult(Long total, List<T> rows) {

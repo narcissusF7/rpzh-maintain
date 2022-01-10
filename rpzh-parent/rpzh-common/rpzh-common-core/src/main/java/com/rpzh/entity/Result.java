@@ -1,5 +1,6 @@
 package com.rpzh.entity;
 
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -8,16 +9,15 @@ import io.swagger.annotations.ApiModelProperty;
  * @Author liubc成
  * @create 2021/3/29 15:31
  */
-@ApiModel(description = "Result",value = "Result")
+@ApiModel(description = "通用返回响应结果对象", value = "result")
 public class Result<T> {
-    @ApiModelProperty(value="执行是否成功,true:成功,false:失败",required = true)
+    @ApiModelProperty(notes = "是否成功,flase:失败,true:成功", required = true)
     private boolean flag;//是否成功
-    @ApiModelProperty(value="返回状态码,20000:成功,20001:失败,20002:用户名或密码错误,20003:权限不足,20004:远程调用失败,20005:重复操作,20006:没有对应的数据",required = true)
+    @ApiModelProperty(notes = "响应结果的错误信息状态码,200表示成功,20001表示错误", required = true)
     private Integer code;//返回码
-
-    @ApiModelProperty(value="提示信息",required = true)
+    @ApiModelProperty(notes = "返回消息", required = true)
     private String message;//返回消息
-    @ApiModelProperty(value="逻辑数据",required = true)
+    @ApiModelProperty(notes = "返回数据", required = true)
     private T data;//返回数据
 
     public Result(boolean flag, Integer code, String message, Object data) {

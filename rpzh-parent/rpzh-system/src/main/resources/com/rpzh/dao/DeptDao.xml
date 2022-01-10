@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.DeptDao">
+<select id="findAllDept" resultType="com.rpzh.pojo.Dept">
+  SELECT t1.dept_id as deptId ,t1.parent_id as parentId,t1.ancestors as ancestors,t1.dept_name as deptName,
+  t1.order_num as orderNum,t1.leader as leader,t1.phone as phone,t1.email as email,t1.status as status, t1.del_flag as delFlag,
+  t1.create_by as createBy,t1.create_time as createTime,t1.update_by as updateBy ,t1.update_time as updateTime,t2.dept_name as parentName
+  FROM `tb_dept` t1
+  LEFT JOIN tb_dept t2 on t1.parent_id = t2.dept_id
+  WHERE t1.del_flag = '1'
+  <if test="deptDto.deptName != null and deptDto.deptName != ''">
+	  AND t1.dept_name like concat('%', #{deptDto.deptName}, '%')
+  </if>
+  <if test="deptDto.status != null and deptDto.status != ''">
+	  AND t1.status = #{deptDto.status}
+  </if>
+</select>
+<select id="findOneDept" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM `tb_dept`
+  WHERE parent_id = #{parentId} and dept_name = #{deptName}
+</select>
+<insert id="addDept">
+  INSERT INTO tb_dept
+  (
+  parent_id,ancestors,dept_name,order_num,
+ <if test="deptDto.leader != null and deptDto.leader != ''">
+  leader,
+ </if>
+ <if test="deptDto.phone != null and deptDto.phone != ''">
+  phone,
+ </if>
+ <if test="deptDto.email != null and deptDto.email != ''">
+ email,
+ </if>
+  create_by,create_time,
+  update_time
+  )
+  VALUES
+  (
+  <if test="deptDto.parentId != null and deptDto.parentId != 0">
+  #{deptDto.parentId},
+  </if>
+ <if test="deptDto.ancestors != null and deptDto.ancestors != ''">
+  #{deptDto.ancestors},
+ </if>
+ <if test="deptDto.deptName != null and deptDto.deptName != ''">
+ #{deptDto.deptName},
+ </if>
+ <if test="deptDto.orderNum != null and deptDto.orderNum != ''">
+ #{deptDto.orderNum},
+ </if>
+ <if test="deptDto.leader != null and deptDto.leader != ''">
+ #{deptDto.leader},
+ </if>
+ <if test="deptDto.phone != null and deptDto.phone != ''">
+ #{deptDto.phone},
+ </if>
+ <if test="deptDto.email != null and deptDto.email != ''">
+ #{deptDto.email},
+ </if>
+  #{deptDto.createBy},
+  #{deptDto.createTime},
+  sysdate()
+  )
+</insert>
+<select id="findAncestors" resultType="java.lang.String">
+  SELECT ancestors
+  FROM `tb_dept`
+  WHERE dept_id = #{deptId}
+</select>
+<select id="findDepts" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM `tb_dept`
+  WHERE parent_id = #{deptId}
+</select>
+<select id="findUser" resultType="java.lang.Integer">
+  	SELECT count(*)
+	FROM tb_dept t1
+	LEFT JOIN tb_user_dept t2 on t1.dept_id = t2.dept_id
+	WHERE t2.dept_id = #{deptId}
+</select>
+<delete id="deleteDeptByDeptId">
+  DELETE
+  FROM `tb_dept`
+  WHERE dept_id = #{deptId}
+</delete>
+<select id="findDeptNameByParentId" resultType="java.lang.String">
+  SELECT dept_name
+  FROM `tb_dept`
+  WHERE dept_id = #{parentId}
+</select>
+<select id="findAllDeptByDeptId" resultType="java.lang.String">
+  SELECT dept_name
+  FROM `tb_dept`
+  WHERE parent_id = #{deptId}
+</select>
+<update id="updateDept">
+  UPDATE `tb_dept`
+ 	<set>
+		<if test="deptDto.parentId != null">
+		   parent_id = #{deptDto.parentId},
+		</if>
+		<if test="deptDto.ancestors != null and deptDto.ancestors != ''">
+		   ancestors = #{deptDto.ancestors},
+		</if>
+		<if test="deptDto.deptName != null and deptDto.deptName != ''">
+		   dept_name = #{deptDto.deptName},
+		</if>
+		<if test="deptDto.orderNum != null and deptDto.orderNum != ''">
+		   order_num = #{deptDto.orderNum},
+		</if>
+		<if test="deptDto.leader != null">
+		   leader = #{deptDto.leader},
+		</if>
+		<if test="deptDto.phone != null">
+		   phone = #{deptDto.phone},
+		</if>
+		<if test="deptDto.email != null">
+		   email = #{deptDto.email},
+		</if>
+		<if test="deptDto.status != null and deptDto.status != ''">
+		   status = #{deptDto.status},
+		</if>
+		<if test="deptDto.updateBy != null and deptDto.updateBy != ''">
+		   update_by = #{deptDto.updateBy},
+		</if>
+		<if test="deptDto.updateTime != null">
+		   update_time = #{deptDto.updateTime}
+		</if>
+ 	</set>
+ 	WHERE dept_id = #{deptDto.deptId}
+</update>
+<select id="findDeptNameNoContainThis" resultType="java.lang.String">
+  SELECT dept_name
+  FROM `tb_dept`
+  WHERE parent_id = #{parentId} AND dept_id &lt;&gt; #{deptId}
+</select>
+<select id="searchDept" resultType="com.rpzh.pojo.Dept">
+  SELECT dept_id as deptId ,parent_id as parentId,ancestors as ancestors,dept_name as deptName,
+  order_num as orderNum,leader as leader,phone as phone,email as email,status as status,del_flag as delFlag,
+  create_by as createBy,create_time as createTime,update_by as updateBy ,update_time as updateTime
+  FROM `tb_dept`
+  WHERE del_flag = '1'
+  <if test="deptDto.deptName != null and deptDto.deptName != ''">
+	  AND dept_name like concat('%', #{deptDto.deptName}, '%')
+  </if>
+  <if test="deptDto.status != null and deptDto.status != ''">
+	  AND status = #{deptDto.status}
+  </if>
+</select>
+<update id="changeDeptStutas">
+  UPDATE tb_dept
+  SET `status` = #{deptDto.status}
+  WHERE dept_id = #{deptDto.deptId}
+</update>
+<select id="findParentSonDeptId" resultType="java.lang.Integer">
+  SELECT dept_id as deptId
+  FROM tb_dept
+  WHERE parent_id = #{deptId1}
+</select>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.RoleDao">
+<select id="findRoleExist" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM `tb_role`
+  WHERE role_key = #{roleKey} and del_flag = '0'
+</select>
+<select id="findRoleNameExist" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM `tb_role`
+  WHERE role_name = #{roleName} and del_flag = '0'
+</select>
+<insert id="addRole">
+  INSERT INTO tb_role
+  (`role_name`, `role_key`, `role_sort`,
+  <if test="roleDto.status != null and roleDto.status != ''"> `status`,</if>
+   `create_by`, `create_time`,
+  <if test="roleDto.remark != null and roleDto.remark != ''">`remark`,</if>
+  update_time
+  )
+  VALUES
+  (
+  <if test="roleDto.roleName != null and roleDto.roleName != ''">
+    #{roleDto.roleName},
+  </if>
+  <if test="roleDto.roleKey != null and roleDto.roleKey != ''">
+   #{roleDto.roleKey},
+  </if>
+  <if test="roleDto.roleSort != null">
+  #{roleDto.roleSort},
+  </if>
+  <if test="roleDto.status != null and roleDto.status != ''">
+   #{roleDto.status},
+  </if>
+  <if test="roleDto.createBy != null and roleDto.createBy != ''">
+  #{roleDto.createBy},
+  </if>
+  <if test="roleDto.createTime != null and roleDto.createTime != ''">
+  #{roleDto.createTime},
+  </if>
+  <if test="roleDto.remark != null and roleDto.remark != ''">
+  #{roleDto.remark},
+  </if>
+  sysdate()
+)
+</insert>
+<select id="findRoleId" resultType="java.lang.Integer">
+  SELECT role_id
+  FROM tb_role
+  WHERE role_key = #{roleDto.roleKey} and del_flag = '0'
+</select>
+<insert id="insertRoleMenu">
+  INSERT INTO
+  tb_role_menu
+  (`role_id`, `menu_id`)
+  VALUES
+  <foreach collection="menuIds" item="menuId" separator=",">
+   ( #{roleId},#{menuId})
+  </foreach>
+</insert>
+<select id="findAllRole" resultType="com.rpzh.vo.RoleVo">
+  SELECT role_id as roleId,role_name as roleName,role_key as roleKey,role_sort as roleSort,
+  status as status,create_time as createtime,remark
+  FROM tb_role
+  WHERE del_flag = 0
+  <if test="roleDto.roleName != null and roleDto.roleName != ''">
+	AND role_name like concat('%', #{roleDto.roleName}, '%')
+ </if>
+  <if test="roleDto.status != null and roleDto.status != ''">
+	AND status = #{roleDto.status}
+  </if>
+   <if test="roleDto.roleKey != null and roleDto.roleKey != ''">
+	AND role_key like concat('%', #{roleDto.roleKey}, '%')
+   </if>
+   order by role_sort
+</select>
+<select id="countUserRoleByRoleId" resultType="int">
+  SELECT count(1)
+  FROM tb_user_role
+  WHERE role_id=#{roleId}
+</select>
+<select id="selectRoleById" resultType="java.lang.String">
+ SELECT role_name
+ FROM tb_role
+ WHERE role_id = #{roleId}
+</select>
+<delete id="deleteRoleMenu">
+  DELETE FROM tb_role_menu where role_id in
+  <foreach collection="roleId" item="roleId" open="(" separator="," close=")">
+ 	#{roleId}
+  </foreach>
+</delete>
+<update id="deleteRoleByIds">
+  update tb_role set del_flag = '2' where role_id in
+  <foreach collection="roleId" item="roleId" open="(" separator="," close=")">
+  	#{roleId}
+  </foreach>
+</update>
+<select id="findRoleKey" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM tb_role
+  WHERE role_key = #{roleKey} and role_id &lt;&gt; #{roleId}
+</select>
+<select id="findRoleName" resultType="java.lang.Integer">
+  SELECT count(*)
+  FROM tb_role
+  WHERE role_name = #{roleName} and role_id &lt;&gt; #{roleId}
+</select>
+<update id="updateRole">
+   UPDATE tb_role
+   <set>
+ 	<if test="roleDto.roleName != null and roleDto.roleName != ''">role_name = #{roleDto.roleName},</if>
+ 	<if test="roleDto.roleKey != null and roleDto.roleKey != ''">role_key = #{roleDto.roleKey},</if>
+ 	<if test="roleDto.roleSort != null and roleDto.roleSort != ''">role_sort = #{roleDto.roleSort},</if>
+ 	<if test="roleDto.dataScope != null and roleDto.dataScope != ''">data_scope = #{roleDto.dataScope},</if>
+ 	<if test="roleDto.status != null and roleDto.status != ''">status = #{roleDto.status},</if>
+ 	<if test="roleDto.remark != null">remark = #{roleDto.remark},</if>
+ 	<if test="roleDto.updateBy != null and roleDto.updateBy != ''">update_by = #{roleDto.updateBy},</if>
+ 	update_time = sysdate()
+  </set>
+ 	WHERE role_id = #{roleDto.roleId}
+</update>
+<delete id="deleteMenuRole">
+  DELETE
+  FROM tb_role_menu
+  WHERE role_id = #{roleId}
+</delete>
+<update id="updateAdminRole">
+ UPDATE tb_role
+   <set>
+ 	<if test="roleDto.roleKey != null and roleDto.roleKey != ''">role_key = #{roleDto.roleKey},</if>
+ 	<if test="roleDto.roleSort != null and roleDto.roleSort != ''">role_sort = #{roleDto.roleSort},</if>
+ 	<if test="roleDto.dataScope != null and roleDto.dataScope != ''">data_scope = #{roleDto.dataScope},</if>
+ 	<if test="roleDto.status != null and roleDto.status != ''">status = #{roleDto.status},</if>
+ 	<if test="roleDto.remark != null">remark = #{roleDto.remark},</if>
+ 	<if test="roleDto.updateBy != null and roleDto.updateBy != ''">update_by = #{roleDto.updateBy},</if>
+ 	update_time = sysdate()
+  </set>
+ 	WHERE role_id = #{roleDto.roleId}
+</update>
+</mapper>
