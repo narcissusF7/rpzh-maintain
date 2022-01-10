@@ -190,13 +190,4 @@ public class UserController {
         return new Result(true, StatusCode.OK, "修改个人信息成功");
     }
 
-    /**
-     * seata分布式事务测试
-     * @return
-     */
-    @GetMapping("/seataTest")
-    public Result seataTest(){
-        int flag = userService.seataTest();
-        return new Result(true, StatusCode.OK, "测试成功");
-    }
 }

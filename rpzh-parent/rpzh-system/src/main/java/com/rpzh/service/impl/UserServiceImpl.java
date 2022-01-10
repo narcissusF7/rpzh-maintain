@@ -380,19 +380,4 @@ import java.util.regex.Pattern;
         return changeFlag;
     }
 
-    /**
-     * seata测试
-     *
-     * @return
-     */
-    @Override
-    @Transactional
-    public int seataTest() {
-        int id = 10;
-       /* String s = null;
-        s.length();*/
-        int flag = userDao.seataTest(id);
-        return flag;
-    }
-
 }

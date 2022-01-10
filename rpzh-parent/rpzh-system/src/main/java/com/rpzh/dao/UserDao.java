@@ -241,10 +241,4 @@ public interface UserDao {
      */
     List<Integer> findIsAdminRole(@Param("adminUsername") String adminUsername);
 
-    /**
-     * seata分布式事务测试
-     * @param id
-     * @return
-     */
-    int seataTest(@Param("id") int id);
 }

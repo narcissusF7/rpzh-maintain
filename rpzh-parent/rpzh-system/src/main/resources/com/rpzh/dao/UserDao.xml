@@ -237,8 +237,4 @@
   left JOIN tb_user t3 on t3.user_id = t2.user_id
   WHERE t3.username = #{adminUsername}
 </select>
-<delete id="seataTest">
-DELETE FROM seata_test
-WHERE id = #{id}
-</delete>
 </mapper>

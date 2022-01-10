@@ -99,9 +99,4 @@ public interface UserService {
      */
     Integer changeUserMessage(UserDto userDto);
 
-    /**
-     * seata测试
-     * @return
-     */
-    int seataTest();
 }
