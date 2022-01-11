@@ -9,7 +9,7 @@ import java.net.URLEncoder;
 
 /**
  * cookie工具类
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 14:59
  */
 public class CookieTools {

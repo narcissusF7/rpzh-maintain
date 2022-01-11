@@ -84,7 +84,7 @@ public class OauthController {
             return new Result(false, StatusCode.ERROR, "验证码不能为空",map);
         }*/
         //生产环境放开,仅仅测试使用
-       /* if (!(verificationCode.equals(redisCode))){
+        /*if (!(verificationCode.equals(redisCode))){
             return new Result(false, StatusCode.ERROR, "验证码错误请重新输入",map);
         }*/
         Integer checkErrorTimes = loginService.checkErrorTimes(username);

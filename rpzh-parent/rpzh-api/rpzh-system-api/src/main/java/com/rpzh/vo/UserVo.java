@@ -1,5 +1,7 @@
 package com.rpzh.vo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -10,70 +12,94 @@ import java.util.List;
  * 用户信息返回
  */
 @Data
+@ApiModel(description = "用户信息返回")
 public class UserVo {
+
     //用户id
+    @ApiModelProperty(notes = "用户id")
     private Integer userId;
 
     //部门id
+    @ApiModelProperty(notes = "部门id")
     private Integer deptId;
 
     //部门名称
+    @ApiModelProperty(notes = "部门名称")
     private String deptname;
 
     //用户账号
+    @ApiModelProperty(notes = "用户账号")
     private String username;
 
     //用户密码
+    @ApiModelProperty(notes = "用户密码")
     private String password;
 
     //用户昵称
+    @ApiModelProperty(notes = "用户昵称")
     private String nickname;
 
     //用户类型
+    @ApiModelProperty(notes = "用户类型")
     private String userType;
 
     //用户邮箱
+    @ApiModelProperty(notes = "用户邮箱")
     private String email;
 
     //手机号码
+    @ApiModelProperty(notes = "手机号码")
     private String phonenumber;
 
     //用户性别,0:女,1:男 2:未知
+    @ApiModelProperty(notes = "用户性别,0:女,1:男 2:未知")
     private String sex;
 
     //头像地址
+    @ApiModelProperty(notes = "头像地址")
     private String avatar;
 
     //账号状态0:停用,1:正常
+    @ApiModelProperty(notes = "账号状态0:停用,1:正常")
     private String status;
 
     //删除标志:0:删除,1:存在
+    @ApiModelProperty(notes = "删除标志:0:删除,1:存在")
     private String delFlag;
 
     //最后登录ip
+    @ApiModelProperty(notes = "最后登录ip")
     private String loginIp;
 
     //最后登录时间
+    @ApiModelProperty(notes = "最后登录时间")
     private String loginDate;
 
     //创建者
+    @ApiModelProperty(notes = "创建者")
     private String createBy;
 
     //创建时间
+    @ApiModelProperty(notes = "创建时间")
     private String createtime;
 
     //更新者
+    @ApiModelProperty(notes = "更新者")
     private String updateBy;
 
     //更新时间
+    @ApiModelProperty(notes = "更新时间")
     private String updateTime;
 
     //角色组
+    @ApiModelProperty(notes = "角色组")
     private List<String> roleIds;
 
     //角色名称
+    @ApiModelProperty(notes = "角色名称")
     private List<String> roleNames;
 
     //备注
+    @ApiModelProperty(notes = "备注")
     private String remark;
 }

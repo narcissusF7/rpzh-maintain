@@ -1,0 +1,38 @@
+server:
+  port: 16908
+spring:
+  application:
+    name: rpzh-temp
+  cloud:
+    nacos:  # 注册中心地址
+      discovery:
+        server-addr: localhost:8877
+      config: # 配置中心地址
+        server-addr: localhost:8877
+        # 配置文件格式
+        file-extension: yml
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    #hikari:
+    #max-lifetime: 1800000       #在连接池中的存活时间  Yl123456
+    url: jdbc:mysql://47.57.226.159:3306/rpzh-co2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: Yl123456
+  redis:
+    host: 127.0.0.1
+    port: 6379
+logging:
+  level:
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+# mqtt 连接配置
+mqtt:
+  host: tcp://183.250.89.188
+  port: 7426
+  qos: 0
+  timeout: 2000
+  keepalive: 20
+  rx-topic: carbon/#
+  tx-topic: applicationserver/#
+  client-id: rpiot-client-co2
+  username: admin
+  password: admin1234.

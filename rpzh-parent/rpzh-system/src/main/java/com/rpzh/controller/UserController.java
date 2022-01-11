@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 
@@ -55,7 +54,7 @@ public class UserController {
      */
     @ApiOperation(value = "新增用户", tags = "用户管理")
     @PostMapping("/addUser")
-    public Result addUser(@RequestBody UserDto userDto){
+    public Result addUser(UserDto userDto){
         Long[] roleIds = userDto.getRoleIds();
         if (ToolUtil.isEmpty(roleIds)){
             return new Result(false, StatusCode.ERROR, "添加用户失败,请选择角色");
@@ -72,7 +71,7 @@ public class UserController {
      */
     @ApiOperation(value = "分页搜索查询用户", tags = "用户管理")
     @PostMapping("/findAllUserList")
-    public Result<PageInfo> findAllUserList(@RequestBody UserDto userDto){
+    public Result<PageInfo> findAllUserList(UserDto userDto){
         PageInfo<UserVo> pageInfo = userService.findAllUserList(userDto);
         return new Result<PageInfo>(true, StatusCode.OK,"查询成功",pageInfo);
     }
@@ -84,7 +83,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改用户的状态", tags = "用户管理")
     @PostMapping("/changeUserStatus")
-    public Result changeUserStatus(@RequestBody UserDto userDto){
+    public Result changeUserStatus(UserDto userDto){
         Integer changeFlag = userService.changeUserStatus(userDto);
         return new Result(true, StatusCode.OK, "修改状态成功");
     }
@@ -96,7 +95,7 @@ public class UserController {
      */
     @PostMapping("/editUser")
     @ApiOperation(value = "修改用户", tags = "用户管理")
-    public Result editUser(@RequestBody UserDto userDto){
+    public Result editUser(UserDto userDto){
         //获取角色
         Long[] roleIds = userDto.getRoleIds();
         if (roleIds.length == 0){

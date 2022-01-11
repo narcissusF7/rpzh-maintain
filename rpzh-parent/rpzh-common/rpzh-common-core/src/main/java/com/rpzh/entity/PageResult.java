@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * 分页结果工具类
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:27
  */
 @ApiModel(description = "分页对象")

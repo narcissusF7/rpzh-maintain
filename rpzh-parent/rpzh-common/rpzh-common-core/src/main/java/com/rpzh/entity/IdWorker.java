@@ -7,7 +7,7 @@ import java.net.NetworkInterface;
 /**
  * 分布式系统主键生成
  *
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:05
  */
 public class IdWorker {

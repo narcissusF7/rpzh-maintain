@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 
 /**
  * 密码加密
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 14:56
  */
 public class BCrypt {

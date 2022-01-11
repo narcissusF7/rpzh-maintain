@@ -8,10 +8,9 @@ import com.rpzh.pojo.Dept;
 import com.rpzh.service.DeptService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public class DeptController {
      * @return
      */
     @PostMapping("/findAllDept")
-    @ApiOperation(value = "查询所有的部门", tags = "部门管理")
+    @ApiOperation(value = "查询所有的部门")
     public Result<Dept> findAllDept(DeptDto deptDto) {
         List<Dept> deptList = deptService.findAllDept(deptDto);
         return new Result<Dept>(true, StatusCode.OK, "查询成功", deptList);
@@ -46,6 +45,7 @@ public class DeptController {
      * @return
      */
     @PostMapping("/addDept")
+    @ApiOperation(value = "增加部门")
     public Result<String> addDept(DeptDto deptDto) {
         //获取上级部门id
         Integer parentId = deptDto.getParentId();
@@ -72,8 +72,8 @@ public class DeptController {
      * @return
      */
     @GetMapping("/deleteDept")
-    @PreAuthorize("hasAnyAuthority('system:dept:deleteDept')")
-    public Result deleteDept(Integer deptId) {
+    @ApiOperation(value = "删除部门")
+    public Result deleteDept(@ApiParam(name = "deptId", value = "部门id" ,required = true) @RequestParam(value = "deptId", required = false) Integer deptId) {
         //根据部门id判断部门是否存在下级部门
         Integer sum = deptService.findDepts(deptId);
         if (sum > 0) {
@@ -93,8 +93,8 @@ public class DeptController {
      * 修改部门
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('system:dept:editDept')")
     @PostMapping("/editDept")
+    @ApiOperation(value = "修改部门")
     public Result editDept(DeptDto deptDto) {
         //获取部门id
         Integer deptId = deptDto.getDeptId();
@@ -146,6 +146,7 @@ public class DeptController {
      * @return
      */
     @RequestMapping("/changeDeptStutas")
+    @ApiOperation(value = "修改部门的状态")
     public Result changeDeptStutas(DeptDto deptDto){
         Integer changeFlag = deptService.changeDeptStutas(deptDto);
         return new Result(true, StatusCode.OK, "修改部门的状态成功");
@@ -157,6 +158,7 @@ public class DeptController {
      * @return
      */
     @RequestMapping("/searchDept")
+    @ApiOperation(value = "搜索部门")
     public Result searchDept(DeptDto deptDto){
         List<Dept> deptList = deptService.searchDept(deptDto);
         return new Result(true, StatusCode.OK, "搜索部门成功", deptList);

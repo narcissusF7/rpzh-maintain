@@ -8,6 +8,7 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.RoleService;
 import com.rpzh.vo.RoleVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/addRole")
+    @ApiOperation(value = "增加角色")
     public Result addRole(RoleDto roleDto) {
         //获取角色标识
         String roleKey = roleDto.getRoleKey();
@@ -70,6 +72,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/findAllRole")
+    @ApiOperation(value = "分页查询所有的角色信息")
     public Result<PageInfo> findAllRole(RoleDto roleDto) {
         PageInfo<RoleVo> pageInfo = roleService.findAllRole(roleDto);
         return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
@@ -81,6 +84,7 @@ public class RoleController {
      * @return
      */
     @GetMapping("/delectRole")
+    @ApiOperation(value = "批量删除角色")
     //@PreAuthorize("hasAnyAuthority('system:role:delectRole')")
     public Result delectRole(Long[] roleId){
         Integer delFlag = roleService.delectRole(roleId);
@@ -93,6 +97,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/editRole")
+    @ApiOperation(value = "修改角色")
     public Result editRole(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();
@@ -134,6 +139,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/changeStatus")
+    @ApiOperation(value = "修改角色的状态")
     public Result changeStatus(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();
@@ -151,6 +157,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/dataScope")
+    @ApiOperation(value = "修改角色权限范围")
     public Result dataScope(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();

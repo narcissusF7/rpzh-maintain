@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * 分页工具类
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:25
  */
 @ApiModel(description = "分页工具类")

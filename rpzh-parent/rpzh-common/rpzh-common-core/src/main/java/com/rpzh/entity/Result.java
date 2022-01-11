@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 返回结果集实体类
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:31
  */
 @ApiModel(description = "通用返回响应结果对象", value = "result")

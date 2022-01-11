@@ -2,7 +2,7 @@ package com.rpzh.entity;
 
 /**
  * 返回结果集状态码
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:32
  */
 public class StatusCode {

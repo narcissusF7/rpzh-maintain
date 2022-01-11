@@ -15,6 +15,11 @@
     <modules>
         <module>rpzh-system-api</module>
         <module>rpzh-log-api</module>
+        <module>rpzh-carbon-api</module>
+        <module>rpzh-humiture-api</module>
+        <module>rpzh-oxygen-api</module>
+        <module>rpzh-temp-api</module>
+        <module>rpzh-function-api</module>
     </modules>
 
 </project>

@@ -1,0 +1,30 @@
+server:
+  port: 16900
+spring:
+  application:
+    name: rpzh-carbon
+  cloud:
+    nacos:  # 注册中心地址
+      discovery:
+        server-addr: 192.168.3.5:8877
+      config: # 配置中心地址
+        server-addr: 192.168.3.5:8877
+        # 配置文件格式
+        file-extension: yml
+        namespace: b8051268-881b-49ce-a431-dddf1ec3a212 # 开发环境  指定 具体的namespace
+        group: DEFAULT_GROUP # 组
+logging:
+  level:
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+# mqtt 连接配置
+mqtt:
+  host: tcp://183.250.89.188
+  port: 7426
+  qos: 0
+  timeout: 2000
+  keepalive: 20
+  rx-topic: gateway/#
+  tx-topic: applicationserver/#
+  client-id: rpiot-client-2
+  username: admin
+  password: admin1234.

@@ -8,6 +8,7 @@ import com.rpzh.pojo.Menu;
 import com.rpzh.service.MenuService;
 import com.rpzh.vo.MenuVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,7 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/list")
+    @ApiOperation(value = "获取菜单列表")
     public Result menuList(){
         List<Menu> menuList = menuService.SelectMenuList();
         //构建前端所需要的菜单
@@ -46,7 +48,8 @@ public class MenuController {
      * @return
      */
     @PostMapping("/addMenu")
-    public Result addMenu(@RequestBody MenuDto menuDto){
+    @ApiOperation(value = "新增菜单")
+    public Result addMenu(MenuDto menuDto){
         String path = menuDto.getPath();
         if (ToolUtil.isEmpty(path)){
             return new Result(false, StatusCode.ERROR, "地址不能为空");
@@ -82,8 +85,8 @@ public class MenuController {
      * @param menuId
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('system:menu:deleteMenu')")
     @GetMapping("/deleteMenu")
+    @ApiOperation(value = "删除菜单")
     public Result deleteMenu(Long menuId){
         //查询是否存在子菜单
         Integer menuCount = menuService.findSonMenu(menuId);
@@ -107,7 +110,8 @@ public class MenuController {
      */
     //@PreAuthorize("hasAnyAuthority('system:menu:editMenu')")
     @PostMapping("/editMenu")
-    public Result editMenu(@RequestBody MenuDto menuDto){
+    @ApiOperation(value = "修改菜单")
+    public Result editMenu(MenuDto menuDto){
         //获取父菜单名称
         String parentName = menuDto.getParentName();
         //获取修改的菜单名称
@@ -147,6 +151,7 @@ public class MenuController {
      * @return
      */
     @PostMapping("/findAllMenu")
+    @ApiOperation(value = "查询所有的菜单新增菜单时返回")
     public Result findAllMenu(){
         List<Menu> menuList = menuService.findAllMenus();
         return new Result(true, StatusCode.OK, "查询菜单成功",menuList);
@@ -158,6 +163,7 @@ public class MenuController {
      * @return
      */
     @GetMapping("/getRouters")
+    @ApiOperation(value = "获取路由菜单,加载首页菜单列表树")
     public Result getRouters(){
         List<Menu> menuList = menuService.getRouters();
         //构建前端所需要的菜单
@@ -170,6 +176,7 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/getOneRouters")
+    @ApiOperation(value = "修改菜单时返回")
     public Result getOneRouters(String roleId){
         List<Integer> menuIdList = menuService.getOneRouters(roleId);
         return new Result(true, StatusCode.OK, "查询菜单列表成功",menuIdList);
@@ -181,7 +188,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/searchMenuList")
-    public Result searchMenuList(@RequestBody MenuDto menuDto){
+    @ApiOperation(value = "搜索菜单")
+    public Result searchMenuList(MenuDto menuDto){
         List<MenuVo> menuVoList = menuService.searchMenuList(menuDto);
         return new Result(true, StatusCode.OK, "搜索菜单成功",menuVoList);
     }
@@ -192,7 +200,8 @@ public class MenuController {
      * @return
      */
     @RequestMapping("/changeMenuStatus")
-    public Result changeMenuStatus(@RequestBody MenuDto menuDto){
+    @ApiOperation(value = "修改菜单状态")
+    public Result changeMenuStatus(MenuDto menuDto){
         Integer changeFlag = menuService.changeMenuStatus(menuDto);
         return new Result(true, StatusCode.OK, "修改菜单状态成功");
     }

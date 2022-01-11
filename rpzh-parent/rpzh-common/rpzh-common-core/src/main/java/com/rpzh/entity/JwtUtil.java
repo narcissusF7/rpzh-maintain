@@ -11,7 +11,7 @@ import java.util.Date;
 
 /**
  * jwt令牌工具类
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:11
  */
 public class JwtUtil {

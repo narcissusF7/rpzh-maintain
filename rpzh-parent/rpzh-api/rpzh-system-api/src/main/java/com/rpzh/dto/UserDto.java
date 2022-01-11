@@ -1,5 +1,6 @@
 package com.rpzh.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import java.util.Date;
  * 用户管理前端传参
  */
 @Data
+@ApiModel(description = "用户管理传参")
 public class UserDto implements Serializable {
 
     //用户id

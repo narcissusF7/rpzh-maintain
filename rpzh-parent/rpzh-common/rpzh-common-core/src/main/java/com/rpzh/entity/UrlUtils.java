@@ -2,7 +2,7 @@ package com.rpzh.entity;
 
 /**
  * 去除URL中指定的参数
- * @Author liubc成
+ * @Author liubc
  * @create 2021/3/29 15:33
  */
 public class UrlUtils {

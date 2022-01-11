@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 /**
- * @Author liubc成
+ * @Author liubc
  * @create 2021/5/18 17:03
  * 高频方法工具类
  */

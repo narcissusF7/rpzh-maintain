@@ -14,6 +14,8 @@
         <module>rpzh-common</module>
         <module>rpzh-gateway</module>
         <module>rpzh-log</module>
+        <module>rpzh-function</module>
+        <module>rpzh-device</module>
     </modules>
     <packaging>pom</packaging>
     <description>养护系统父工程</description>
