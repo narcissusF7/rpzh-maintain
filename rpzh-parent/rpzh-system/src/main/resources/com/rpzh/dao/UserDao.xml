@@ -2,7 +2,26 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.UserDao">
 <select id="findById" resultType="com.rpzh.pojo.User">
-  SELECT * FROM tb_user
+  SELECT
+	`user_id` AS userId,
+	`username` AS username,
+	`password` AS PASSWORD,
+	`nick_name` AS nickname,
+	`email` AS email,
+	`phonenumber` AS phonenumber,
+	`sex` AS sex,
+	`avatar` AS avatar,
+	`status` AS STATUS,
+	`del_flag` AS delFlag,
+	`login_ip` AS loginIp,
+	`login_date` AS loginDate,
+	`create_by` AS createBy,
+	`create_time` AS createtime,
+	`update_by` AS updateBy,
+	`update_time` AS updateTime,
+	`remark` AS remark
+  FROM
+	tb_user
   WHERE username = #{id} and status = 1 and del_flag = 1
 </select>
 <select id="findUserNameCount" resultType="java.lang.Integer">
