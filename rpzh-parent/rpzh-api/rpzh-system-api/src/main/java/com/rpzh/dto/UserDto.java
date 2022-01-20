@@ -40,6 +40,10 @@ public class UserDto implements Serializable {
     @ApiModelProperty(notes = "用户密码")
     private String password;
 
+    //用户密码,RocketMq同步用户使用
+    @ApiModelProperty(notes = "未加密用户密码")
+    private String noEncryPassWord;
+
     //用户名称
     @ApiModelProperty(notes = "用户名称")
     private String nickName;

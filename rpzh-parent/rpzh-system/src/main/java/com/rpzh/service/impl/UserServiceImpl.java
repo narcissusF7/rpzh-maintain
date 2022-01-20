@@ -93,6 +93,8 @@ import java.util.regex.Pattern;
         //密码加密
         String passWord = new BCryptPasswordEncoder().encode(password);
         userDto.setPassword(passWord);
+        //未加密的密码,用于Mq同步用户数据
+        userDto.setNoEncryPassWord(password);
         //添加用户
         Integer insertUserFlag = userDao.addUser(userDto);
         //根据用户账号查询用户id

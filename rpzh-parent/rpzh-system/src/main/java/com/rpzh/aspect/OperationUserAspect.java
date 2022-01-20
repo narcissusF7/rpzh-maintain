@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.rpzh.annotation.OperationUserLog;
 import com.rpzh.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -11,13 +12,19 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,6 +40,14 @@ import java.util.Map;
 @Component
 public class OperationUserAspect {
 
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    //mq主题
+    @Value("${rocketmq.topic}")
+    private String topic;
+
+    //private final String topic = "UserManageTopic";
 
     /**
      * 配置切入点
@@ -71,10 +86,17 @@ public class OperationUserAspect {
         if (controllerLog == null) {
             return;
         }
+        //放到mq中的数据,系统修改用户时,在mq中丢一条消息
+        Map<String,String> map = new HashMap<>();
         int type = controllerLog.businessUserType().ordinal();
-        System.out.println("类型:"+type);
+        //System.out.println("类型:"+type);
+        map.put("type", type+"");
         String params = argsArrayToString(joinPoint.getArgs());
-        System.out.println("切面数据:"+params);
+        //System.out.println("切面数据:"+params);
+        map.put("data", params);
+        //系统标识,标识是哪个系统发送的消息,养护系统发送
+        map.put("system","maintain");
+        rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
         if (e != null) {
             log.error("系统用户同步失败:" + e.getMessage());
         } else {

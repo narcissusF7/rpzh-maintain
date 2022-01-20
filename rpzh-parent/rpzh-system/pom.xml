@@ -28,7 +28,13 @@
             <artifactId>rpzh-common-db</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
+        <!--rocketmq同步用户数据-->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <!--2.1.0对应的mq是4.6.x-->
+            <version>2.1.0</version>
+        </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
