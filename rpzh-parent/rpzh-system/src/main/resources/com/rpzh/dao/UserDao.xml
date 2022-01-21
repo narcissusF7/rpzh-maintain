@@ -27,7 +27,7 @@
 <select id="findUserNameCount" resultType="java.lang.Integer">
   SELECT count(*)
   FROM tb_user
-  WHERE username = #{userName}
+  WHERE username = #{userName} and del_flag = 1
 </select>
 <insert id="addUser">
    INSERT INTO tb_user(
@@ -256,4 +256,9 @@
   left JOIN tb_user t3 on t3.user_id = t2.user_id
   WHERE t3.username = #{adminUsername}
 </select>
+<update id="mqChangeUserStatus">
+ UPDATE tb_user
+ SET status = #{userDto.status}
+ WHERE username = #{userDto.userName}
+</update>
 </mapper>

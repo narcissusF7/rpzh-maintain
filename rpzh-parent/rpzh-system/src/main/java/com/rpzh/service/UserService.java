@@ -99,4 +99,11 @@ public interface UserService {
      */
     Integer changeUserMessage(UserDto userDto);
 
+
+    /**
+     * mq修改用户状态
+     * @param userDto
+     * @return
+     */
+    Integer mqChangeUserStatus(UserDto userDto);
 }

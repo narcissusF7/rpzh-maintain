@@ -49,13 +49,23 @@ public class RocketMqListener implements RocketMQListener<String> {
                     userDto.setRemark((String) addMap.get("remark"));
                     userDto.setUserName((String) addMap.get("userName"));
                     userDto.setCreateBy((String) addMap.get("createBy"));
-                    userDto.setPassword((String) addMap.get("password"));
+                    userDto.setPassword((String) addMap.get("noEncryPassWord"));
                     userDto.setEmail((String) addMap.get("email"));
                     userDto.setStatus((String) addMap.get("status"));
+                    Integer deptId = (Integer) addMap.get("deptId");
+                    userDto.setDeptId(deptId.longValue());
                     Integer insertFlag = userService.addUser(userDto);
                     log.info("养护系统添加用户成功");
                     break;
-                case "2":
+                case "3":
+                    Map statusMap = JSONObject.parseObject(data, Map.class);
+                    Integer userId = (Integer) statusMap.get("userId");
+                    userDto.setUserId(userId.longValue());
+                    userDto.setStatus((String) statusMap.get("status"));
+                    userDto.setUserName((String) statusMap.get("userName"));
+                    Integer flag = userService.mqChangeUserStatus(userDto);
+                    log.info("养护系统修改用户状态成功");
+                    break;
             }
         }
     }

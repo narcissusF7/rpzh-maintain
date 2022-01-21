@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * @create 2021/3/30 16:32
  */
 @Service
- public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
 
     @Autowired
@@ -60,34 +60,38 @@ import java.util.regex.Pattern;
         String nickName = userDto.getNickName();
         //获取用户密码
         String password = userDto.getPassword();
-        if (ToolUtil.isEmpty(userName) || ToolUtil.isEmpty(nickName) || ToolUtil.isEmpty(password)){
+        if (ToolUtil.isEmpty(userName) || ToolUtil.isEmpty(nickName) || ToolUtil.isEmpty(password)) {
             throw new RuntimeException("用户账号,用户密码,用户名称不能为空");
         }
-        String template="[A-Za-z0-9]+";//用户账号只能含有字母和数字
+        String template = "[A-Za-z0-9]+";//用户账号只能含有字母和数字
         boolean matches = userName.matches(template);
-        if (!matches){
+        if (!matches) {
             throw new RuntimeException("用户账号只能包含字母和数字");
         }
         Pattern p = Pattern.compile("[\u4e00-\u9fa5]");//密码中不能含有中文
         Matcher m = p.matcher(password);
-        if (m.find()){
+        if (m.find()) {
             throw new RuntimeException("密码中不能含有中文");
         }
-        //获取用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
-        //获取用户名
-        String username = userInfo.get("username");
-        userDto.setCreateBy(username);
+        //获取创建用户,Mq收到消息后,不会携带令牌,无法通过令牌获取用户信息
+        String createBy = userDto.getCreateBy();
+        if (ToolUtil.isEmpty(createBy)) {
+            //获取用户信息,手动创建用户时,从令牌中获取创建用户的信息
+            Map<String, String> userInfo = TokenDecode.getUserInfo();
+            //获取用户名
+            String username = userInfo.get("username");
+            userDto.setCreateBy(username);
+        }
         //获取用户手机号
         String phonenumber = userDto.getPhonenumber();
         //查看手机号是否唯一
         Integer phoneCount = userDao.findCountPhoneNumber(phonenumber);
-        if (phoneCount > 0){
+        if (phoneCount > 0) {
             throw new RuntimeException("手机号已经存在");
         }
         //查询用户账号是否存在
         Integer usernameCount = userDao.findUserNameCount(userName);
-        if (usernameCount > 0){
+        if (usernameCount > 0) {
             throw new RuntimeException("该账号已经存在,不允许添加");
         }
         //密码加密
@@ -102,13 +106,13 @@ import java.util.regex.Pattern;
         //获取部门id
         Long deptId = userDto.getDeptId();
         //将用户id,部门id插入到用户部门关联表中
-        if (ToolUtil.isNotEmpty(deptId)){
-            Integer userDept = userDao.insertUserDept(userId,deptId);
+        if (ToolUtil.isNotEmpty(deptId)) {
+            Integer userDept = userDao.insertUserDept(userId, deptId);
         }
         //获取角色
         Long[] roleIds = userDto.getRoleIds();
         //将用户id ,角色id插入到用户角色关联表
-        if (ToolUtil.isNotEmpty(roleIds)){
+        if (ToolUtil.isNotEmpty(roleIds)) {
             Integer userRoleFlag = userDao.insertUserRole(userId, roleIds);
         }
         return insertUserFlag;
@@ -139,7 +143,7 @@ import java.util.regex.Pattern;
     @Override
     @Transactional
     public Integer deleteUser(Long[] userId) {
-        if (ToolUtil.isEmpty(userId)){
+        if (ToolUtil.isEmpty(userId)) {
             throw new RuntimeException("请选择删除的用户");
         }
         //获取登录用户信息
@@ -150,10 +154,10 @@ import java.util.regex.Pattern;
         Long userid = userDao.findUserId(username);
         for (int i = 0; i < userId.length; i++) {
             Long aLong = userId[i];
-            if (userid.equals(aLong)){
-                throw new RuntimeException("不能删除自己账号"+username);
+            if (userid.equals(aLong)) {
+                throw new RuntimeException("不能删除自己账号" + username);
             }
-            if (1 == aLong){
+            if (1 == aLong) {
                 //超级管理员不允许操作
                 throw new RuntimeException("超级管理员用户不允许删除");
             }
@@ -177,18 +181,18 @@ import java.util.regex.Pattern;
         //获取用户id
         Long userId = userDto.getUserId();
         //判断是否是超级管理员
-        if (1 == userId){
+        if (1 == userId) {
             //超级管理员只允许修改昵称,部门,手机号,邮箱,性别
             Integer updateAdminFlag = userDao.updateAdmin(userDto);
             //删除用户部门关联表
             Integer deleteUserDeptFlag = userDao.deleteUserDept(userId);
             //添加用户部门关联
-            if (ToolUtil.isNotEmpty(userDto.getDeptId())){
+            if (ToolUtil.isNotEmpty(userDto.getDeptId())) {
                 Integer addUserDeptFlag = userDao.addUserDept(userDto);
             }
             return updateAdminFlag;
 
-        }else {
+        } else {
             //获取登录用户信息
             Map<String, String> userInfo = TokenDecode.getUserInfo();
             //查看用户账号
@@ -199,7 +203,7 @@ import java.util.regex.Pattern;
             //删除用户部门关联表
             Integer deleteUserDeptFlag = userDao.deleteUserDept(userId);
             //添加用户部门关联
-            if (ToolUtil.isNotEmpty(userDto.getDeptId())){
+            if (ToolUtil.isNotEmpty(userDto.getDeptId())) {
                 Integer addUserDeptFlag = userDao.addUserDept(userDto);
             }
             //删除用户角色关联表
@@ -207,7 +211,7 @@ import java.util.regex.Pattern;
             //获取角色
             Long[] roleIds = userDto.getRoleIds();
             //添加用户角色关联表
-            Integer addUserRoleFlag = userDao.addUserRole(userId,roleIds);
+            Integer addUserRoleFlag = userDao.addUserRole(userId, roleIds);
             return updateCommonUserFlag;
         }
     }
@@ -220,14 +224,14 @@ import java.util.regex.Pattern;
      * @return
      */
     @Override
-    public Integer editPassWord(String username,String newpassWord) {
+    public Integer editPassWord(String username, String newpassWord) {
         //密码加密
         String passWord = new BCryptPasswordEncoder().encode(newpassWord);
-        Integer updatePasswordFlag = userDao.editPassWord(username,passWord);
+        Integer updatePasswordFlag = userDao.editPassWord(username, passWord);
         //获取当前时间
         DateTime dateTime = DateUtil.dateNew(new Date());
         //修改更新时间
-        int updateTime = userDao.updateTime(username,dateTime);
+        int updateTime = userDao.updateTime(username, dateTime);
         return updatePasswordFlag;
     }
 
@@ -255,18 +259,19 @@ import java.util.regex.Pattern;
             }
         }
         Iterator<String> iterator = set.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             String next = iterator.next();
             strRole = strRole + next + ",";
         }
-        if (strRole.length() > 0){
-            strRole = strRole.substring(0, strRole.length()-1);
+        if (strRole.length() > 0) {
+            strRole = strRole.substring(0, strRole.length() - 1);
         }
         return strRole;
     }
 
     /**
      * 超级管理员可以修改所有人密码
+     *
      * @param username
      * @param newpassWord
      * @return
@@ -280,28 +285,28 @@ import java.util.regex.Pattern;
         String adminUsername = userInfo.get("username");
         //查看是否是管理员
         List<Integer> list = userDao.findIsAdminRole(adminUsername);
-        if (ToolUtil.isEmpty(list)){
+        if (ToolUtil.isEmpty(list)) {
             throw new RuntimeException("你无权操作,不允许访问");
         }
         int flag = 0;
         for (int i = 0; i < list.size(); i++) {
             Integer roleId = list.get(i);
-            if (roleId == 1){
+            if (roleId == 1) {
                 flag = 1;
             }
         }
-        if (flag == 0){
+        if (flag == 0) {
             throw new RuntimeException("你无权操作,不允许访问");
         }
         //密码加密
         String passWord = new BCryptPasswordEncoder().encode(newpassWord);
-        Integer adminUpdatePassWordFlag = userDao.adminUpdatePassWord(username,passWord);
+        Integer adminUpdatePassWordFlag = userDao.adminUpdatePassWord(username, passWord);
         //修改密码后,当前用户的错误次数改为0
         int updateErrorTimes = userDao.updateErrorTimes(username);
         //获取当前时间
         DateTime dateTime = DateUtil.dateNew(new Date());
         //修改更新时间
-        int updateTime = userDao.updateTime(username,dateTime);
+        int updateTime = userDao.updateTime(username, dateTime);
         return adminUpdatePassWordFlag;
     }
 
@@ -315,11 +320,11 @@ import java.util.regex.Pattern;
     public Integer changeUserStatus(UserDto userDto) {
         //获取用户信息
         Long userId = userDto.getUserId();
-        if (ToolUtil.isEmpty(userId) || ToolUtil.isEmpty(userDto.getStatus())){
+        if (ToolUtil.isEmpty(userId) || ToolUtil.isEmpty(userDto.getStatus())) {
             throw new RuntimeException("参数错误");
         }
         //不允许修改超级管理员角色
-        if (userId == 1){
+        if (userId == 1) {
             throw new RuntimeException("不允许修改超级管理员用户");
         }
         //获取登录用户信息
@@ -328,7 +333,7 @@ import java.util.regex.Pattern;
         String username = userInfo.get("username");
         //根据用户账号查询用户的id
         Long userid = userDao.findUserId(username);
-        if (userId.equals(userid)){
+        if (userId.equals(userid)) {
             throw new RuntimeException("不允许修改自己账号状态");
         }
         Integer changeFlage = userDao.changeUserStatus(userDto);
@@ -380,6 +385,18 @@ import java.util.regex.Pattern;
         userDto.setUserName(username);
         Integer changeFlag = userDao.changeUserMessage(userDto);
         return changeFlag;
+    }
+
+    /**
+     * mq修改用户状态
+     *
+     * @param userDto
+     * @return
+     */
+    @Override
+    public Integer mqChangeUserStatus(UserDto userDto) {
+        Integer flag = userDao.mqChangeUserStatus(userDto);
+        return flag;
     }
 
 }

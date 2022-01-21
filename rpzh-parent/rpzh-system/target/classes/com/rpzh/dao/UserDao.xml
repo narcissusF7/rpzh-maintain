@@ -2,13 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.UserDao">
 <select id="findById" resultType="com.rpzh.pojo.User">
-  SELECT * FROM tb_user
+  SELECT
+	`user_id` AS userId,
+	`username` AS username,
+	`password` AS PASSWORD,
+	`nick_name` AS nickname,
+	`email` AS email,
+	`phonenumber` AS phonenumber,
+	`sex` AS sex,
+	`avatar` AS avatar,
+	`status` AS STATUS,
+	`del_flag` AS delFlag,
+	`login_ip` AS loginIp,
+	`login_date` AS loginDate,
+	`create_by` AS createBy,
+	`create_time` AS createtime,
+	`update_by` AS updateBy,
+	`update_time` AS updateTime,
+	`remark` AS remark
+  FROM
+	tb_user
   WHERE username = #{id} and status = 1 and del_flag = 1
 </select>
 <select id="findUserNameCount" resultType="java.lang.Integer">
   SELECT count(*)
   FROM tb_user
-  WHERE username = #{userName}
+  WHERE username = #{userName} and del_flag = 1
 </select>
 <insert id="addUser">
    INSERT INTO tb_user(
@@ -237,4 +256,9 @@
   left JOIN tb_user t3 on t3.user_id = t2.user_id
   WHERE t3.username = #{adminUsername}
 </select>
+<update id="mqChangeUserStatus">
+ UPDATE tb_user
+ SET status = #{userDto.status}
+ WHERE username = #{userDto.userName}
+</update>
 </mapper>

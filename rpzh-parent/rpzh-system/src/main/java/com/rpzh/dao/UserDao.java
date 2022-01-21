@@ -241,4 +241,10 @@ public interface UserDao {
      */
     List<Integer> findIsAdminRole(@Param("adminUsername") String adminUsername);
 
+    /**
+     * mq修改
+     * @param userDto
+     * @return
+     */
+    Integer mqChangeUserStatus(@Param("userDto") UserDto userDto);
 }
