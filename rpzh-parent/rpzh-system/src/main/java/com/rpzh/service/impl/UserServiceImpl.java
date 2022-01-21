@@ -10,6 +10,7 @@ import com.rpzh.dto.UserDto;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.User;
 import com.rpzh.service.UserService;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +33,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+    @Resource
+    private RedisUtil redisUtil;
+
+    private final String accountId = "ACCOUNT_ID_";
 
 
     /**
@@ -42,6 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(String id) {
         User user = userDao.findById(id);
+        redisUtil.set(accountId + user.getUsername(), user.getNickname() + "(" + user.getUsername() + ")");
         return user;
     }
 
