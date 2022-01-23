@@ -261,4 +261,22 @@
  SET status = #{userDto.status}
  WHERE username = #{userDto.userName}
 </update>
+<update id="mqDeleteUser">
+  UPDATE tb_user set del_flag = '0' where username in
+   <foreach collection="userNames" item="userName" open="(" separator="," close=")">
+     #{userName}
+   </foreach>
+</update>
+<delete id="deleteMqUserConnectRole">
+  delete from tb_user_role where user_id in
+   <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+     #{userId}
+   </foreach>
+</delete>
+<delete id="deleteMqUserConnectDept">
+ delete from tb_user_dept where user_id in
+  <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+    #{userId}
+  </foreach>
+</delete>
 </mapper>

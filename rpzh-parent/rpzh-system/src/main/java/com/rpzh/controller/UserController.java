@@ -114,13 +114,14 @@ public class UserController {
 
     /**
      *删除用户
-     * @param userId
+     * @param userDto
      * @return
      */
     @ApiOperation(value = "删除用户", tags = "用户管理")
     @OperationUserLog(title = "删除用户",businessUserType = BesinessUserType.DELETE)
-    @GetMapping("/deleteUser")
-    public Result deleteUser(Long[] userId){
+    @PostMapping("/deleteUser")
+    public Result deleteUser(UserDto userDto){
+        Long[] userId = userDto.getUserIds();
         Integer deleteFlag = userService.deleteUser(userId);
         return new Result(true, StatusCode.OK, "删除用户成功");
     }

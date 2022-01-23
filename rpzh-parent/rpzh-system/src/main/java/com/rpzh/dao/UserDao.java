@@ -247,4 +247,25 @@ public interface UserDao {
      * @return
      */
     Integer mqChangeUserStatus(@Param("userDto") UserDto userDto);
+
+    /**
+     * mq删除用户
+     * @param userNames
+     * @return
+     */
+    Integer mqDeleteUser(@Param("userNames") List<String> userNames);
+
+    /**
+     * mq删除关联表
+     * @param userIds
+     * @return
+     */
+    Integer deleteMqUserConnectRole(@Param("userIds") List<Integer> userIds);
+
+    /**
+     * mq删除关联表
+     * @param userIds
+     * @return
+     */
+    Integer deleteMqUserConnectDept(@Param("userIds") List<Integer> userIds);
 }

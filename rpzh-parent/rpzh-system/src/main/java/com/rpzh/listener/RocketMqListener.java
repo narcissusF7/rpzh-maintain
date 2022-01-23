@@ -11,6 +11,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,6 +66,13 @@ public class RocketMqListener implements RocketMQListener<String> {
                     userDto.setUserName((String) statusMap.get("userName"));
                     Integer flag = userService.mqChangeUserStatus(userDto);
                     log.info("养护系统修改用户状态成功");
+                    break;
+                case "4":
+                    Map deleteMap = JSONObject.parseObject(data, Map.class);
+                    List<Integer> userIds = (List<Integer>) deleteMap.get("userIds");
+                    List<String> userNames = (List<String>)deleteMap.get("userNames");
+                    Integer updateFlag = userService.mqDeleteUser(userNames,userIds);
+                    log.info("养护系统删除用户成功");
                     break;
             }
         }

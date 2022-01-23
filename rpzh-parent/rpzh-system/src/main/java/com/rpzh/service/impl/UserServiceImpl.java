@@ -406,4 +406,21 @@ public class UserServiceImpl implements UserService {
         return flag;
     }
 
+    /**
+     * mq删除用户
+     *
+     * @param userNames
+     * @param userIds
+     * @return
+     */
+    @Override
+    @Transactional
+    public Integer mqDeleteUser(List<String> userNames, List<Integer> userIds) {
+        Integer updateFlag = userDao.mqDeleteUser(userNames);
+        //删除关联表
+        Integer deleteUserRoleFlag = userDao.deleteMqUserConnectRole(userIds);
+        Integer deleteUserDeptFlag = userDao.deleteMqUserConnectDept(userIds);
+        return updateFlag;
+    }
+
 }
