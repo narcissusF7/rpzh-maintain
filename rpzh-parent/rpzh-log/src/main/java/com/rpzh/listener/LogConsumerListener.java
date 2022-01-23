@@ -11,6 +11,7 @@ import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.json.JSONArray;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -54,8 +55,11 @@ public class LogConsumerListener implements RocketMQListener<String> {
         String account = userInfo.get("username");
         // 获得名称
         String name = redisUtil.get(accountId + account).toString();
-        // 获得日志类型
-        String logType = gatherTables.getExplain() + sqlType.getExplain();
-
+        JSONArray data = new JSONArray(dataObj);
+        JSONArray old = new JSONArray(jsonObject.get("old"));
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("new",data);
+        jsonData.put("old",old);
+        redisUtil.set("log_info",jsonData.toJSONString());
     }
 }
