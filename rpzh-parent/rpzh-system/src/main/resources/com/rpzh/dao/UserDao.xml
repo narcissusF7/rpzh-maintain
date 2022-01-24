@@ -279,4 +279,21 @@
     #{userId}
   </foreach>
 </delete>
+<update id="mqUpdateUser">
+  UPDATE tb_user
+    <set>
+      <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
+      <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
+      <if test="userDto.updateBy != null and userDto.updateBy != ''">update_by = #{userDto.updateBy},</if>
+      <if test="userDto.email != null ">email = #{userDto.email},</if>
+      <if test="userDto.avatar != null">avatar=#{userDto.avatar},</if>
+      <if test="userDto.status != null and userDto.status != ''">status = #{userDto.status},</if>
+      <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
+      <if test="userDto.password != null">password = #{userDto.password},</if>
+      <if test="userDto.delFlag != null and userDto.delFlag != ''">del_flag = #{userDto.delFlag},</if>
+      <if test="userDto.remark != null">remark = #{userDto.remark},</if>
+      update_time = sysdate()
+    </set>
+  WHERE username = #{userDto.userName}
+</update>
 </mapper>

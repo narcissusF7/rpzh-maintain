@@ -268,4 +268,11 @@ public interface UserDao {
      * @return
      */
     Integer deleteMqUserConnectDept(@Param("userIds") List<Integer> userIds);
+
+    /**
+     * Mq修改用户信息
+     * @param userDto
+     * @return
+     */
+    Integer mqUpdateUser(@Param("userDto") UserDto userDto);
 }

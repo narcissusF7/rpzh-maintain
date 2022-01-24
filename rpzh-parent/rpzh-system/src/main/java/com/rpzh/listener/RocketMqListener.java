@@ -16,13 +16,14 @@ import java.util.Map;
 
 /**
  * 监听RocketMq消息,用于同步不同系统用户信息
+ *
  * @Author liubc
  * @create 2022/1/20 9:27
  * @Description: good good study,day day up
  */
 @Slf4j
 @Component
-@RocketMQMessageListener(consumerGroup = "MyConsumerGroup", topic = "UserManageTopic",consumeMode= ConsumeMode.CONCURRENTLY,messageModel = MessageModel.BROADCASTING)
+@RocketMQMessageListener(consumerGroup = "MyConsumerGroup", topic = "UserManageTopic", consumeMode = ConsumeMode.CONCURRENTLY, messageModel = MessageModel.BROADCASTING)
 public class RocketMqListener implements RocketMQListener<String> {
 
     @Autowired
@@ -38,10 +39,10 @@ public class RocketMqListener implements RocketMQListener<String> {
         //获取哪个系统发送的消息
         String system = map.get("system").toString();
         UserDto userDto = new UserDto();
-        log.info("养护系统收到消息 : "+ data+",类型:"+type+",发送系统为:"+system);
+        log.info("养护系统收到消息 : " + data + ",类型:" + type + ",发送系统为:" + system);
         //如果是养护系统发送的消息不做处理
-        if (!"maintain".equals(system)){
-            switch (type){
+        if (!"maintain".equals(system)) {
+            switch (type) {
                 case "1"://添加用户,角色需要每个系统单独配置
                     Map addMap = JSONObject.parseObject(data, Map.class);
                     userDto.setNickName((String) addMap.get("nickName"));
@@ -58,7 +59,22 @@ public class RocketMqListener implements RocketMQListener<String> {
                     Integer insertFlag = userService.addUser(userDto);
                     log.info("养护系统添加用户成功");
                     break;
-                case "3":
+                case "2"://修改用户信息,角色,部门需要各个系统单独修改
+                    Map updateMap = JSONObject.parseObject(data, Map.class);
+                    Integer upateUserId = (Integer) updateMap.get("userId");
+                    userDto.setUserId(upateUserId.longValue());
+                    userDto.setNickName((String) updateMap.get("nickName"));
+                    userDto.setSex((String) updateMap.get("sex"));
+                    userDto.setPhonenumber((String) updateMap.get("phonenumber"));
+                    userDto.setRemark((String) updateMap.get("remark"));
+                    userDto.setUserName((String) updateMap.get("userName"));
+                    userDto.setUpdateBy((String) updateMap.get("updateBy"));
+                    userDto.setEmail((String) updateMap.get("email"));
+                    userDto.setStatus((String) updateMap.get("status"));
+                    Integer integer = userService.updateUser(userDto);
+                    log.info("养护系统修改用户信息成功");
+                    break;
+                case "3"://修改用户状态同步
                     Map statusMap = JSONObject.parseObject(data, Map.class);
                     Integer userId = (Integer) statusMap.get("userId");
                     userDto.setUserId(userId.longValue());
@@ -67,11 +83,11 @@ public class RocketMqListener implements RocketMQListener<String> {
                     Integer flag = userService.mqChangeUserStatus(userDto);
                     log.info("养护系统修改用户状态成功");
                     break;
-                case "4":
+                case "4"://删除用户同步
                     Map deleteMap = JSONObject.parseObject(data, Map.class);
                     List<Integer> userIds = (List<Integer>) deleteMap.get("userIds");
-                    List<String> userNames = (List<String>)deleteMap.get("userNames");
-                    Integer updateFlag = userService.mqDeleteUser(userNames,userIds);
+                    List<String> userNames = (List<String>) deleteMap.get("userNames");
+                    Integer updateFlag = userService.mqDeleteUser(userNames, userIds);
                     log.info("养护系统删除用户成功");
                     break;
             }

@@ -416,4 +416,19 @@ public class UserServiceImpl implements UserService {
         return updateFlag;
     }
 
+    /**
+     * Mq修改信息
+     *
+     * @param userDto
+     * @return
+     */
+    @Override
+    public Integer updateUser(UserDto userDto) {
+        String updateBy = userDto.getUpdateBy();
+        userDto.setUpdateBy(updateBy);
+        //修改用户
+        Integer updateCommonUserFlag = userDao.mqUpdateUser(userDto);
+        return updateCommonUserFlag;
+    }
+
 }

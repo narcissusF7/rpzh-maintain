@@ -114,4 +114,11 @@ public interface UserService {
      * @return
      */
     Integer mqDeleteUser(List<String> userNames, List<Integer> userIds);
+
+    /**
+     * Mq修改信息
+     * @param userDto
+     * @return
+     */
+    Integer updateUser(UserDto userDto);
 }
