@@ -179,9 +179,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<Menu> getRouters() {
         //获取用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //标记:前端测试用例,后期注释放开
+        //Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户名
-        String username = userInfo.get("username");
+        //String username = userInfo.get("username");
+        String username = "rpzh";
         //根据用户名账号查询用户的角色
         List<Integer> adminRoleList = menuDao.findAdminRole(username);
         boolean flag = false;

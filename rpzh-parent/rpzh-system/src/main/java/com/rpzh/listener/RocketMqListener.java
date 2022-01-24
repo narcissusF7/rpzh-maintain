@@ -90,6 +90,17 @@ public class RocketMqListener implements RocketMQListener<String> {
                     Integer updateFlag = userService.mqDeleteUser(userNames, userIds);
                     log.info("养护系统删除用户成功");
                     break;
+                case "5"://普通用户在用户中心修改密码
+                    String[] usernameAndPassword = data.split(" ");
+                    //账号
+                    String username = usernameAndPassword[0];
+                    //新的密码
+                    String newpassWord = usernameAndPassword[1];
+                    //确认密码
+                    String notarizePassword = usernameAndPassword[2];
+                    Integer updatePassword = userService.editPassWord(username, newpassWord);
+                    log.info("养护系统用户修改个人密码成功");
+                    break;
             }
         }
     }

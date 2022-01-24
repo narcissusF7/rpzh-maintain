@@ -134,7 +134,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "普通用户修改密码", tags = "用户管理")
-    @OperationUserLog(title = "新增用户",businessUserType = BesinessUserType.PASSWORD)
+    @OperationUserLog(title = "普通用户修改密码",businessUserType = BesinessUserType.PASSWORD)
     @GetMapping("/editPassWord")
     public Result editPassWord(String username, String newpassWord, String notarizePassword){
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord) || ToolUtil.isEmpty(notarizePassword)){
