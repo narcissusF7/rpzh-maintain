@@ -378,11 +378,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Integer changeUserMessage(UserDto userDto) {
-        //获取登录用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
-        //获取用户账号
-        String username = userInfo.get("username");
-        userDto.setUserName(username);
+        //mq发送消息时,不会携带令牌,无法通过令牌获取用户账号
+        if (ToolUtil.isEmpty(userDto.getUserName())){
+            //获取登录用户信息
+            Map<String, String> userInfo = TokenDecode.getUserInfo();
+            //获取用户账号
+            String username = userInfo.get("username");
+            userDto.setUserName(username);
+        }
         Integer changeFlag = userDao.changeUserMessage(userDto);
         return changeFlag;
     }
@@ -429,6 +432,27 @@ public class UserServiceImpl implements UserService {
         //修改用户
         Integer updateCommonUserFlag = userDao.mqUpdateUser(userDto);
         return updateCommonUserFlag;
+    }
+
+    /**
+     * 管理员通过Mq修改用户密码
+     *
+     * @param usernameAdmin
+     * @param newpassWordAdmin
+     * @return
+     */
+    @Override
+    public Integer adminMqUpdatePassWord(String usernameAdmin, String newpassWordAdmin) {
+        //密码加密
+        String passWord = new BCryptPasswordEncoder().encode(newpassWordAdmin);
+        Integer adminUpdatePassWordFlag = userDao.adminUpdatePassWord(usernameAdmin, passWord);
+        //修改密码后,当前用户的错误次数改为0
+        int updateErrorTimes = userDao.updateErrorTimes(usernameAdmin);
+        //获取当前时间
+        DateTime dateTime = DateUtil.dateNew(new Date());
+        //修改更新时间
+        int updateTime = userDao.updateTime(usernameAdmin, dateTime);
+        return adminUpdatePassWordFlag;
     }
 
 }

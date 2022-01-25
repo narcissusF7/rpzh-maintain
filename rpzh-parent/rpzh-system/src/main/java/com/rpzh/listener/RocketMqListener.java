@@ -101,6 +101,26 @@ public class RocketMqListener implements RocketMQListener<String> {
                     Integer updatePassword = userService.editPassWord(username, newpassWord);
                     log.info("养护系统用户修改个人密码成功");
                     break;
+                case "6"://管理员修改所有人的密码
+                    String[] changePassword = data.split(" ");
+                    //账号
+                    String usernameAdmin = changePassword[0];
+                    //新的密码
+                    String newpassWordAdmin = changePassword[1];
+                    Integer adminUpdatePassWordFlag = userService.adminMqUpdatePassWord(usernameAdmin,newpassWordAdmin);
+                    log.info("养护系统管理员修改密码成功");
+                    break;
+                case "7"://修改个人信息
+                    Map updataPersonMap = JSONObject.parseObject(data, Map.class);
+                    //用户昵称
+                    userDto.setNickName((String) updataPersonMap.get("nickName"));
+                    userDto.setSex((String) updataPersonMap.get("sex"));
+                    userDto.setPhonenumber((String) updataPersonMap.get("phonenumber"));
+                    userDto.setUserName((String) updataPersonMap.get("userName"));
+                    userDto.setEmail((String) updataPersonMap.get("email"));
+                    Integer changeFlage = userService.changeUserMessage(userDto);
+                    log.info("养护系统修改个人中心信息成功");
+                    break;
             }
         }
     }
