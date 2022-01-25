@@ -71,8 +71,8 @@ public class OauthServiceImpl implements OauthService {
         ResponseEntity<Map> exchange = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), Map.class);
         Map<String,String> result = exchange.getBody();
 
-        System.out.println(exchange);
-        System.out.println(result);
+        //System.out.println(exchange);
+        //System.out.println(result);
         String access_token = result.get("access_token");
         String refresh_token = result.get("refresh_token");
         String jti = result.get("jti");

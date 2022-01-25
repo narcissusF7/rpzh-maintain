@@ -15,7 +15,7 @@ spring:
         file-extension: yml
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://120.24.91.199:3306/tabac_maintenance_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
     password: root
 logging:
@@ -41,3 +41,8 @@ hystrix:
           thread:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
+rocketmq:
+  name-server: 192.168.3.36:9876
+  topic: UserManageTopic # mq主题
+  producer:
+    group: springBootGroup

@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author liubc成
@@ -19,6 +20,14 @@ public class UserDto implements Serializable {
     //用户id
     @ApiModelProperty(notes = "用户id")
     private Long userId;
+
+    //用户id
+    @ApiModelProperty(notes = "用户id集合")
+    private Long[] userIds;
+
+    //用户id
+    @ApiModelProperty(notes = "用户id集合")
+    private List<String> userNames;
 
     //部门id
     @ApiModelProperty(notes = "部门id")
@@ -39,6 +48,10 @@ public class UserDto implements Serializable {
     //用户密码
     @ApiModelProperty(notes = "用户密码")
     private String password;
+
+    //用户密码,RocketMq同步用户使用
+    @ApiModelProperty(notes = "未加密用户密码")
+    private String noEncryPassWord;
 
     //用户名称
     @ApiModelProperty(notes = "用户名称")

@@ -1,10 +1,12 @@
 package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.annotation.OperationUserLog;
 import com.rpzh.dto.UserDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.BesinessUserType;
 import com.rpzh.pojo.User;
 import com.rpzh.service.UserService;
 import com.rpzh.vo.UserVo;
@@ -53,6 +55,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "新增用户", tags = "用户管理")
+    @OperationUserLog(title = "新增用户",businessUserType = BesinessUserType.INSERT)
     @PostMapping("/addUser")
     public Result addUser(UserDto userDto){
         Long[] roleIds = userDto.getRoleIds();
@@ -82,6 +85,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "修改用户的状态", tags = "用户管理")
+    @OperationUserLog(title = "修改用户的状态",businessUserType = BesinessUserType.UPDATESTATUS)
     @PostMapping("/changeUserStatus")
     public Result changeUserStatus(UserDto userDto){
         Integer changeFlag = userService.changeUserStatus(userDto);
@@ -94,6 +98,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/editUser")
+    @OperationUserLog(title = "修改用户",businessUserType = BesinessUserType.UPDATE)
     @ApiOperation(value = "修改用户", tags = "用户管理")
     public Result editUser(UserDto userDto){
         //获取角色
@@ -109,12 +114,14 @@ public class UserController {
 
     /**
      *删除用户
-     * @param userId
+     * @param userDto
      * @return
      */
     @ApiOperation(value = "删除用户", tags = "用户管理")
-    @GetMapping("/deleteUser")
-    public Result deleteUser(Long[] userId){
+    @OperationUserLog(title = "删除用户",businessUserType = BesinessUserType.DELETE)
+    @PostMapping("/deleteUser")
+    public Result deleteUser(UserDto userDto){
+        Long[] userId = userDto.getUserIds();
         Integer deleteFlag = userService.deleteUser(userId);
         return new Result(true, StatusCode.OK, "删除用户成功");
     }
@@ -127,6 +134,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "普通用户修改密码", tags = "用户管理")
+    @OperationUserLog(title = "普通用户修改密码",businessUserType = BesinessUserType.PASSWORD)
     @GetMapping("/editPassWord")
     public Result editPassWord(String username, String newpassWord, String notarizePassword){
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord) || ToolUtil.isEmpty(notarizePassword)){
@@ -158,6 +166,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "超级管理员可以修改所有人密码", tags = "用户管理")
+    @OperationUserLog(title = "超级管理员修改密码",businessUserType = BesinessUserType.ADMINPASSWORD)
     @GetMapping("/adminUpdatePassWord")
     public Result adminUpdatePassWord(String username, String newpassWord){
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord)){
@@ -198,6 +207,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "个人中心修改用户信息", tags = "用户管理")
+    @OperationUserLog(title = "个人中心修改用户信息",businessUserType = BesinessUserType.PERSONALUPDATE)
     @PostMapping("/changeUserMessage")
     public Result changeUserMessage(UserDto userDto){
         Integer changeFlage = userService.changeUserMessage(userDto);

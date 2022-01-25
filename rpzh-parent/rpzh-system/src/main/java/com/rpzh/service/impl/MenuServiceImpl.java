@@ -179,9 +179,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<Menu> getRouters() {
         //获取用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //标记:前端测试用例,后期注释放开
+        //Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户名
-        String username = userInfo.get("username");
+        //String username = userInfo.get("username");
+        String username = "rpzh";
         //根据用户名账号查询用户的角色
         List<Integer> adminRoleList = menuDao.findAdminRole(username);
         boolean flag = false;
@@ -274,10 +276,11 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     public List<MenuVo> searchMenuList(MenuDto menuDto) {
-        //获取用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户信息,前端测试用例,生产环境放开,这是第三处
+        //Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户名
-        String username = userInfo.get("username");
+        //String username = userInfo.get("username");
+        String username = "rpzh";
         menuDto.setUsername(username);
         //根据用户名账号查询用户的角色
         List<Integer> adminRoleList = menuDao.findAdminRole(username);
@@ -330,9 +333,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<Menu> SelectMenuList() {
         //获取用户信息
-        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //标记:前端测试用例,后期注释放开
+        //Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户名
-        String username = userInfo.get("username");
+        //String username = userInfo.get("username");
+        String username = "rpzh";//这行是测试用例
         //根据用户名账号查询用户的角色
         List<Integer> adminRoleList = menuDao.findAdminRole(username);
         boolean flag = false;

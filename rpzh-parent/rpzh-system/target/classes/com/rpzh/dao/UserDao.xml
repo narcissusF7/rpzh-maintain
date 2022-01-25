@@ -2,13 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.UserDao">
 <select id="findById" resultType="com.rpzh.pojo.User">
-  SELECT * FROM tb_user
+  SELECT
+	`user_id` AS userId,
+	`username` AS username,
+	`password` AS PASSWORD,
+	`nick_name` AS nickname,
+	`email` AS email,
+	`phonenumber` AS phonenumber,
+	`sex` AS sex,
+	`avatar` AS avatar,
+	`status` AS STATUS,
+	`del_flag` AS delFlag,
+	`login_ip` AS loginIp,
+	`login_date` AS loginDate,
+	`create_by` AS createBy,
+	`create_time` AS createtime,
+	`update_by` AS updateBy,
+	`update_time` AS updateTime,
+	`remark` AS remark
+  FROM
+	tb_user
   WHERE username = #{id} and status = 1 and del_flag = 1
 </select>
 <select id="findUserNameCount" resultType="java.lang.Integer">
   SELECT count(*)
   FROM tb_user
-  WHERE username = #{userName}
+  WHERE username = #{userName} and del_flag = 1
 </select>
 <insert id="addUser">
    INSERT INTO tb_user(
@@ -237,4 +256,44 @@
   left JOIN tb_user t3 on t3.user_id = t2.user_id
   WHERE t3.username = #{adminUsername}
 </select>
+<update id="mqChangeUserStatus">
+ UPDATE tb_user
+ SET status = #{userDto.status}
+ WHERE username = #{userDto.userName}
+</update>
+<update id="mqDeleteUser">
+  UPDATE tb_user set del_flag = '0' where username in
+   <foreach collection="userNames" item="userName" open="(" separator="," close=")">
+     #{userName}
+   </foreach>
+</update>
+<delete id="deleteMqUserConnectRole">
+  delete from tb_user_role where user_id in
+   <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+     #{userId}
+   </foreach>
+</delete>
+<delete id="deleteMqUserConnectDept">
+ delete from tb_user_dept where user_id in
+  <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+    #{userId}
+  </foreach>
+</delete>
+<update id="mqUpdateUser">
+  UPDATE tb_user
+    <set>
+      <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
+      <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
+      <if test="userDto.updateBy != null and userDto.updateBy != ''">update_by = #{userDto.updateBy},</if>
+      <if test="userDto.email != null ">email = #{userDto.email},</if>
+      <if test="userDto.avatar != null">avatar=#{userDto.avatar},</if>
+      <if test="userDto.status != null and userDto.status != ''">status = #{userDto.status},</if>
+      <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
+      <if test="userDto.password != null">password = #{userDto.password},</if>
+      <if test="userDto.delFlag != null and userDto.delFlag != ''">del_flag = #{userDto.delFlag},</if>
+      <if test="userDto.remark != null">remark = #{userDto.remark},</if>
+      update_time = sysdate()
+    </set>
+  WHERE username = #{userDto.userName}
+</update>
 </mapper>
