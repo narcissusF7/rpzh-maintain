@@ -122,6 +122,50 @@ public class OauthController {
 
     }
 
+    /**
+     * 不同系统之间跳转登录
+     * @param username 用户名
+     * @param password  密码
+     * @return
+     */
+    @RequestMapping("/maintainLogin")
+    public Result maintainLogin(String username, String password) {
+        AuthToken authToken = null;
+        Map<String, String> map = new HashMap<>();
+        map.put("username",username);
+        Integer checkErrorTimes = loginService.checkErrorTimes(username);
+        if (ToolUtil.isEmpty(checkErrorTimes)){
+            return new Result(false, StatusCode.ERROR, "用户名或密码错误",map);
+        }
+        if (checkErrorTimes > 6){
+            return new Result(false, StatusCode.ERROR, "用户已经被冻结,请联系管理员",map);
+        }
+        //查询当前用户密码更新时间
+        String updateTime = loginService.checkUpdateTime(username);
+        Date date1 = DateUtil.parse(updateTime);
+        long betweenDay = DateUtil.between(date1, new Date(), DateUnit.DAY);
+        if (betweenDay > 90){
+            return new Result(false, StatusCode.ERROR, "你的密码已经过期,请联系管理员",map);
+        }
+        try {
+            authToken = oauthService.login(username, password, clientId, clientSecret);
+            //登录成功后错误次数赋值为0
+            int clearError = loginService.clearError(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //连续错误6次禁止登录,每次错误加1
+            int count = loginService.addErrorTimes(username);
+            return new Result(false, StatusCode.ERROR, "用户名或密码错误",map);
+        }
+        String accessToken = "bearer " + authToken.getAccessToken();
+        map.put("jwt", accessToken);
+        //将token存入到cookie中
+        //CookieUtil.addCookie(response,cookieDomain,"/","Authorization",accessToken,cookieMaxAge,false);
+        if (betweenDay > 60){
+            return new Result(true, StatusCode.OK, "登录成功,你的密码即将过期,请及时修改", map);
+        }
+        return new Result(true, StatusCode.OK, "登录成功", map);
+    }
 
     /**
      * 登录时生成验证码
