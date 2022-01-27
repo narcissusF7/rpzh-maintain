@@ -16,7 +16,7 @@ import java.util.Enumeration;
  * feign远程调用过滤器,服务间调用验证
  */
 @Configuration
-public class FeignInterceptor implements RequestInterceptor {
+public class  FeignInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {

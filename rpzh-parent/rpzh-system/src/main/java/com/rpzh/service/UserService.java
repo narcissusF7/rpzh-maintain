@@ -114,4 +114,19 @@ public interface UserService {
      * @return
      */
     Integer mqDeleteUser(List<String> userNames, List<Integer> userIds);
+
+    /**
+     * Mq修改信息
+     * @param userDto
+     * @return
+     */
+    Integer updateUser(UserDto userDto);
+
+    /**
+     * 管理员通过Mq修改用户密码
+     * @param usernameAdmin
+     * @param newpassWordAdmin
+     * @return
+     */
+    Integer adminMqUpdatePassWord(String usernameAdmin, String newpassWordAdmin);
 }

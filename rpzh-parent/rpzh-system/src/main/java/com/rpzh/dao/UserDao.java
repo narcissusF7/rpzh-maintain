@@ -154,7 +154,7 @@ public interface UserDao {
     List<String> findRole(@Param("role") String role);
 
     /**
-     * 超级管理员修改密码
+     * 超级管理员mq发送消息修改密码
      * @param username
      * @param passWord
      * @return
@@ -192,7 +192,7 @@ public interface UserDao {
 
 
     /**
-     *
+     *个人中心修改用户信息
      * @param userDto
      * @return
      */
@@ -268,4 +268,11 @@ public interface UserDao {
      * @return
      */
     Integer deleteMqUserConnectDept(@Param("userIds") List<Integer> userIds);
+
+    /**
+     * Mq修改用户信息
+     * @param userDto
+     * @return
+     */
+    Integer mqUpdateUser(@Param("userDto") UserDto userDto);
 }
