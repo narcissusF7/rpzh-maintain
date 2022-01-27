@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -118,6 +119,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "删除用户", tags = "用户管理")
+    @PreAuthorize("hasAnyAuthority('system:user:delete1')")
     @OperationUserLog(title = "删除用户",businessUserType = BesinessUserType.DELETE)
     @PostMapping("/deleteUser")
     public Result deleteUser(UserDto userDto){
