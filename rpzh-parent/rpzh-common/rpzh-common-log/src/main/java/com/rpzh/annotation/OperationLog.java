@@ -18,8 +18,14 @@ public @interface OperationLog {
      * 模块
      */
     String title() default "";
+
     /**
      * 操作类型
      */
     BusinessType businessType() default BusinessType.OTHER;
+
+    /**
+     * mapper 名称
+     */
+    Class<?> mapper();
 }

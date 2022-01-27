@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.mapper.LoginLogMapper">
+    <insert id="insertLoginLog">
+        insert into tb_login_log(
+        <if test="username != null and username != ''">
+            username
+        </if>
+        <if test="loginIp != null and loginIp != ''">
+            ,login_ip
+        </if>
+        <if test="loginAddress != null and loginAddress != ''">
+            ,login_address
+        </if>
+        <if test="browserType != null and browserType != ''">
+            ,browser_type
+        </if>
+        <if test="os != null and os != ''">
+            ,os
+        </if>
+        <if test="loginStatus != null">
+            ,login_status
+        </if>
+        <if test="operatingInformation != null and operatingInformation != ''">
+            ,operating_information
+        </if>
+        <if test="errorInfo != null and errorInfo != ''">
+            ,error_info
+        </if>
+        <if test="classMethodName != null and classMethodName != ''">
+            ,class_method_name
+        </if>
+        <if test="requestMethod != null and requestMethod != ''">
+            ,request_method
+        </if>
+        <if test="returnInfo != null and returnInfo != ''">
+            ,return_info
+        </if>)
+            value (
+        <if test="username != null and username != ''">
+            #{username}
+        </if>
+        <if test="loginIp != null and loginIp != ''">
+            ,#{loginIp}
+        </if>
+        <if test="loginAddress != null and loginAddress != ''">
+            ,#{loginAddress}
+        </if>
+        <if test="browserType != null and browserType != ''">
+            ,#{browserType}
+        </if>
+        <if test="os != null and os != ''">
+            ,#{os}
+        </if>
+        <if test="loginStatus != null">
+            ,#{loginStatus}
+        </if>
+        <if test="operatingInformation != null and operatingInformation != ''">
+            ,#{operatingInformation}
+        </if>
+        <if test="errorInfo != null and errorInfo != ''">
+            ,#{errorInfo}
+        </if>
+        <if test="classMethodName != null and classMethodName != ''">
+            ,#{classMethodName}
+        </if>
+        <if test="requestMethod != null and requestMethod != ''">
+            ,#{requestMethod}
+        </if>
+        <if test="returnInfo != null and returnInfo != ''">
+            ,#{returnInfo}
+        </if>
+        )
+    </insert>
+</mapper>

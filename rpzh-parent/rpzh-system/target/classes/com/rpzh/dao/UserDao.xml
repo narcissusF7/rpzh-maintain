@@ -1,284 +1,316 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.UserDao">
-<select id="findById" resultType="com.rpzh.pojo.User">
-  SELECT
-	`user_id` AS userId,
-	`username` AS username,
-	`password` AS PASSWORD,
-	`nick_name` AS nickname,
-	`email` AS email,
-	`phonenumber` AS phonenumber,
-	`sex` AS sex,
-	`avatar` AS avatar,
-	`status` AS STATUS,
-	`del_flag` AS delFlag,
-	`login_ip` AS loginIp,
-	`login_date` AS loginDate,
-	`create_by` AS createBy,
-	`create_time` AS createtime,
-	`update_by` AS updateBy,
-	`update_time` AS updateTime,
-	`remark` AS remark
-  FROM
-	tb_user
-  WHERE username = #{id} and status = 1 and del_flag = 1
-</select>
-<select id="findUserNameCount" resultType="java.lang.Integer">
-  SELECT count(*)
-  FROM tb_user
-  WHERE username = #{userName} and del_flag = 1
-</select>
-<insert id="addUser">
-   INSERT INTO tb_user(
- 	<if test="userDto.userName != null and userDto.userName != ''">username,</if>
-    <if test="userDto.nickName != null and userDto.nickName != ''">nick_name,</if>
- 	<if test="userDto.email != null and userDto.email != ''">email,</if>
- 	<if test="userDto.avatar != null and userDto.avatar != ''">avatar,</if>
- 	<if test="userDto.phonenumber != null and userDto.phonenumber != ''">phonenumber,</if>
-    <if test="userDto.sex != null and userDto.sex != ''">sex,</if>
- 	<if test="userDto.password != null and userDto.password != ''">password,</if>
- 	<if test="userDto.status != null and userDto.status != ''">status,</if>
- 	<if test="userDto.createBy != null and userDto.createBy != ''">create_by,</if>
-    <if test="userDto.remark != null and userDto.remark != ''">remark,</if>
- 	create_time,
- 	update_time
- 	)values(
- 	<if test="userDto.userName != null and userDto.userName != ''">#{userDto.userName},</if>
- 	<if test="userDto.nickName != null and userDto.nickName != ''">#{userDto.nickName},</if>
- 	<if test="userDto.email != null and userDto.email != ''">#{userDto.email},</if>
- 	<if test="userDto.avatar != null and userDto.avatar != ''">#{userDto.avatar},</if>
- 	<if test="userDto.phonenumber != null and userDto.phonenumber != ''">#{userDto.phonenumber},</if>
- 	<if test="userDto.sex != null and userDto.sex != ''">#{userDto.sex},</if>
- 	<if test="userDto.password != null and userDto.password != ''">#{userDto.password},</if>
-    <if test="userDto.status != null and userDto.status != ''">#{userDto.status},</if>
- 	<if test="userDto.createBy != null and userDto.createBy != ''">#{userDto.createBy},</if>
-    <if test="userDto.remark != null and userDto.remark != ''">#{userDto.remark},</if>
- 	sysdate(),
- 	sysdate()
- 		)
-</insert>
-<select id="findCountPhoneNumber" resultType="java.lang.Integer">
-  SELECT count(*)
-  FROM tb_user
-  WHERE phonenumber = #{phonenumber} and del_flag = 1
-</select>
-<select id="findUserByUserName" resultType="java.lang.Integer">
-  SELECT user_id
-  FROM tb_user
-  WHERE username = #{userName} and del_flag = 1
-</select>
-<insert id="insertUserDept">
-   INSERT INTO
-   tb_user_dept
-   (`user_id`, `dept_id`)
-   VALUES
-   (#{userId}, #{deptId})
-</insert>
-<insert id="insertUserRole">
-  INSERT INTO
-  tb_user_role
-  (`user_id`, `role_id`)
-  VALUES
-  <foreach collection="roleIds" item="roleId" separator=",">
-  ( #{userId},#{roleId})
-  </foreach>
-</insert>
-<select id="findAllUserList" resultType="com.rpzh.vo.UserVo">
-  SELECT t1.user_id as userId,t1.username as username,t1.nick_name as nickname,t1.phonenumber as phonenumber,t1.create_time as createtime,
-  t1.status as status,t3.dept_name as deptname,t3.dept_id as deptId,t1.sex as sex,t1.remark as remark,t1.email as email
-  FROM tb_user t1
-  LEFT JOIN tb_user_dept t2 on t1.user_id = t2.user_id
-  LEFT JOIN tb_dept t3 on t2.dept_id = t3.dept_id
-  WHERE t1.del_flag = 1
-  <if test="userDto.nickName != null and userDto.nickName != ''">
-	AND t1.nick_name like concat('%', #{userDto.nickName}, '%')
-  </if>
-  <if test="userDto.status != null and userDto.status != ''">
-	AND t1.status = #{userDto.status}
-  </if>
-  <if test="userDto.phonenumber != null and userDto.phonenumber != ''">
-	AND t1.phonenumber like concat('%', #{userDto.phonenumber}, '%')
-  </if>
-  <if test="userDto.deptId != null">
-    AND (t3.dept_id = #{userDto.deptId} OR t3.dept_id IN ( SELECT t3.dept_id FROM tb_dept t3 WHERE find_in_set(#{userDto.deptId}, ancestors) ))
- </if>
-</select>
-<update id="updateUser">
-  UPDATE tb_user set del_flag = '0' where user_id in
-  <foreach collection="userId" item="userId" open="(" separator="," close=")">
-  	#{userId}
-  </foreach>
-</update>
-<update id="updateAdmin">
-  UPDATE tb_user
-  <set>
-  <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
-  <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
-  <if test="userDto.email != null ">email = #{userDto.email},</if>
-  <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
-  update_time = sysdate()
-  </set>
-  WHERE user_id = #{userDto.userId}
-</update>
-<delete id="deleteUserDept">
-  DELETE
-  FROM tb_user_dept
-  WHERE user_id = #{userId}
-</delete>
-<insert id="addUserDept">
- INSERT INTO tb_user_dept
- (user_id,dept_id)
- VALUES
- (#{userDto.userId},#{userDto.deptId})
-</insert>
-<update id="updateCommonUser">
-  UPDATE tb_user
-  <set>
-  <if test="userDto.userName != null and userDto.userName != ''">username = #{userDto.userName},</if>
-  <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
-  <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
-  <if test="userDto.updateBy != null and userDto.updateBy != ''">update_by = #{userDto.updateBy},</if>
-  <if test="userDto.email != null ">email = #{userDto.email},</if>
-  <if test="userDto.status != null and userDto.status != ''">status = #{userDto.status},</if>
-  <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
-  <if test="userDto.remark != null">remark = #{userDto.remark},</if>
-  update_time = sysdate()
-  </set>
-  WHERE user_id = #{userDto.userId}
-</update>
-<delete id="deleteUserRole">
-  DELETE
-  FROM tb_user_role
-  WHERE user_id = #{userId}
-</delete>
-<insert id="addUserRole">
-  INSERT INTO
-  tb_user_role
-  (`user_id`, `role_id`)
-  VALUES
-  <foreach collection="roleIds" item="roleId" separator=",">
-   ( #{userId},#{roleId})
-  </foreach>
-</insert>
-<update id="editPassWord">
-  UPDATE tb_user
-  SET password = #{passWord}
-  WHERE username = #{username}
-</update>
-<select id="findUserRole" resultType="java.lang.String">
-  SELECT t1.role_key
-  FROM tb_role t1
-  LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
-  LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
-  WHERE t3.username = #{username}
-</select>
-<select id="findRole" resultType="java.lang.String">
-  SELECT t1.perms
-  FROM tb_menu t1
-  LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
-  LEFT JOIN tb_role t3 on t2.role_id = t3.role_id
-  WHERE role_key = #{role}
-</select>
-<update id="adminUpdatePassWord">
-  UPDATE tb_user
-  SET password = #{passWord}
-  WHERE username = #{username}
-</update>
-<update id="changeUserStatus">
- UPDATE tb_user
- SET status = #{userDto.status}
- WHERE user_id = #{userDto.userId}
-</update>
-<select id="findUserByUpdate" resultType="java.lang.Integer">
-  SELECT t1.role_id as roleId
-  FROM tb_role t1
-  LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
-  LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
-  WHERE t3.user_id = #{userId}
-</select>
-<select id="findOneUserMessage" resultType="com.rpzh.vo.UserVo">
-  SELECT t1.username as username,t1.nick_name as nickname,t1.email as email,t1.phonenumber as phonenumber,t1.sex as sex,t1.create_time as createtime,t3.dept_name as deptname
-  FROM tb_user t1
-  LEFT JOIN tb_user_dept t2 on t1.user_id = t2.user_id
-  LEFT JOIN tb_dept t3 on t3.dept_id = t2.dept_id
-  WHERE t1.username = #{username}
-</select>
-<select id="findRoleNameList" resultType="java.lang.String">
-  SELECT t1.role_name as roleName
-  FROM tb_role t1
-  LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
-  LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
-  WHERE t3.username = #{username}
-</select>
-<update id="changeUserMessage">
-  UPDATE tb_user
-  <set>
-  <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
-  <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
-  <if test="userDto.email != null ">email = #{userDto.email},</if>
-  <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
-  update_time = sysdate()
-  </set>
-  WHERE username = #{userDto.userName}
-</update>
-<select id="findUserId" resultType="java.lang.Long">
-  SELECT user_id
-  FROM `tb_user`
-  WHERE username =  #{username}
-</select>
-<delete id="deleteUserConnectRole">
-   delete from tb_user_role where user_id in
-  <foreach collection="userId" item="userid" open="(" separator="," close=")">
-  	#{userid}
-  </foreach>
-</delete>
-<delete id="deleteUserConnectDept">
-   delete from tb_user_dept where user_id in
-  <foreach collection="userId" item="userid" open="(" separator="," close=")">
-  	#{userid}
-  </foreach>
-</delete>
-<update id="updateErrorTimes">
-  UPDATE tb_user
-  set error_times = 0
-  WHERE username = #{username}
-</update>
-<update id="updateTime">
-  UPDATE tb_user
-  set update_time = #{dateTime}
-  WHERE username = #{username}
-</update>
-<select id="findIsAdminRole" resultType="java.lang.Integer">
-  SELECT t1.role_id
-  FROM `tb_role` t1
-  left JOIN tb_user_role t2 on t2.role_id = t1.role_id
-  left JOIN tb_user t3 on t3.user_id = t2.user_id
-  WHERE t3.username = #{adminUsername}
-</select>
-<update id="mqChangeUserStatus">
- UPDATE tb_user
- SET status = #{userDto.status}
- WHERE username = #{userDto.userName}
-</update>
-<update id="mqDeleteUser">
-  UPDATE tb_user set del_flag = '0' where username in
-   <foreach collection="userNames" item="userName" open="(" separator="," close=")">
-     #{userName}
-   </foreach>
-</update>
-<delete id="deleteMqUserConnectRole">
-  delete from tb_user_role where user_id in
-   <foreach collection="userIds" item="userId" open="(" separator="," close=")">
-     #{userId}
-   </foreach>
-</delete>
-<delete id="deleteMqUserConnectDept">
- delete from tb_user_dept where user_id in
-  <foreach collection="userIds" item="userId" open="(" separator="," close=")">
-    #{userId}
-  </foreach>
-</delete>
+    <select id="findById" resultType="com.rpzh.pojo.User">
+        SELECT `user_id`     AS userId,
+               `username`    AS username,
+               `password`    AS PASSWORD,
+               `nick_name`   AS nickname,
+               `email`       AS email,
+               `phonenumber` AS phonenumber,
+               `sex`         AS sex,
+               `avatar`      AS avatar,
+               `status`      AS STATUS,
+               `del_flag`    AS delFlag,
+               `login_ip`    AS loginIp,
+               `login_date`  AS loginDate,
+               `create_by`   AS createBy,
+               `create_time` AS createtime,
+               `update_by`   AS updateBy,
+               `update_time` AS updateTime,
+               `remark`      AS remark
+        FROM tb_user
+        WHERE username = #{id}
+          and status = 1
+          and del_flag = 1
+    </select>
+    <select id="findUserNameCount" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tb_user
+        WHERE username = #{userName}
+          and del_flag = 1
+    </select>
+    <insert id="addUser">
+        INSERT INTO tb_user(
+        <if test="userDto.userName != null and userDto.userName != ''">username,</if>
+        <if test="userDto.nickName != null and userDto.nickName != ''">nick_name,</if>
+        <if test="userDto.email != null and userDto.email != ''">email,</if>
+        <if test="userDto.avatar != null and userDto.avatar != ''">avatar,</if>
+        <if test="userDto.phonenumber != null and userDto.phonenumber != ''">phonenumber,</if>
+        <if test="userDto.sex != null and userDto.sex != ''">sex,</if>
+        <if test="userDto.password != null and userDto.password != ''">password,</if>
+        <if test="userDto.status != null and userDto.status != ''">status,</if>
+        <if test="userDto.createBy != null and userDto.createBy != ''">create_by,</if>
+        <if test="userDto.remark != null and userDto.remark != ''">remark,</if>
+        create_time,
+        update_time
+        )values(
+        <if test="userDto.userName != null and userDto.userName != ''">#{userDto.userName},</if>
+        <if test="userDto.nickName != null and userDto.nickName != ''">#{userDto.nickName},</if>
+        <if test="userDto.email != null and userDto.email != ''">#{userDto.email},</if>
+        <if test="userDto.avatar != null and userDto.avatar != ''">#{userDto.avatar},</if>
+        <if test="userDto.phonenumber != null and userDto.phonenumber != ''">#{userDto.phonenumber},</if>
+        <if test="userDto.sex != null and userDto.sex != ''">#{userDto.sex},</if>
+        <if test="userDto.password != null and userDto.password != ''">#{userDto.password},</if>
+        <if test="userDto.status != null and userDto.status != ''">#{userDto.status},</if>
+        <if test="userDto.createBy != null and userDto.createBy != ''">#{userDto.createBy},</if>
+        <if test="userDto.remark != null and userDto.remark != ''">#{userDto.remark},</if>
+        sysdate(),
+        sysdate()
+        )
+    </insert>
+    <select id="findCountPhoneNumber" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tb_user
+        WHERE phonenumber = #{phonenumber}
+          and del_flag = 1
+    </select>
+    <select id="findUserByUserName" resultType="java.lang.Integer">
+        SELECT user_id
+        FROM tb_user
+        WHERE username = #{userName}
+          and del_flag = 1
+    </select>
+    <insert id="insertUserDept">
+        INSERT INTO tb_user_dept
+            (`user_id`, `dept_id`)
+        VALUES (#{userId}, #{deptId})
+    </insert>
+    <insert id="insertUserRole">
+        INSERT INTO
+        tb_user_role
+        (`user_id`, `role_id`)
+        VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            ( #{userId},#{roleId})
+        </foreach>
+    </insert>
+    <select id="findAllUserList" resultType="com.rpzh.vo.UserVo">
+        SELECT t1.user_id as userId,t1.username as username,t1.nick_name as nickname,t1.phonenumber as
+        phonenumber,t1.create_time as createtime,
+        t1.status as status,t3.dept_name as deptname,t3.dept_id as deptId,t1.sex as sex,t1.remark as remark,t1.email as
+        email
+        FROM tb_user t1
+        LEFT JOIN tb_user_dept t2 on t1.user_id = t2.user_id
+        LEFT JOIN tb_dept t3 on t2.dept_id = t3.dept_id
+        WHERE t1.del_flag = 1
+        <if test="userDto.nickName != null and userDto.nickName != ''">
+            AND t1.nick_name like concat('%', #{userDto.nickName}, '%')
+        </if>
+        <if test="userDto.status != null and userDto.status != ''">
+            AND t1.status = #{userDto.status}
+        </if>
+        <if test="userDto.phonenumber != null and userDto.phonenumber != ''">
+            AND t1.phonenumber like concat('%', #{userDto.phonenumber}, '%')
+        </if>
+        <if test="userDto.deptId != null">
+            AND (t3.dept_id = #{userDto.deptId} OR t3.dept_id IN ( SELECT t3.dept_id FROM tb_dept t3 WHERE
+            find_in_set(#{userDto.deptId}, ancestors) ))
+        </if>
+    </select>
+    <update id="updateUser">
+        UPDATE tb_user set del_flag = '0' where user_id in
+        <foreach collection="userId" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </update>
+    <update id="updateAdmin">
+        UPDATE tb_user
+        <set>
+            <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
+            <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
+            <if test="userDto.email != null ">email = #{userDto.email},</if>
+            <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
+            update_time = sysdate()
+        </set>
+        WHERE user_id = #{userDto.userId}
+    </update>
+    <delete id="deleteUserDept">
+        DELETE
+        FROM tb_user_dept
+        WHERE user_id = #{userId}
+    </delete>
+    <insert id="addUserDept">
+        INSERT INTO tb_user_dept
+            (user_id, dept_id)
+        VALUES (#{userDto.userId}, #{userDto.deptId})
+    </insert>
+    <update id="updateCommonUser">
+        UPDATE tb_user
+        <set>
+            <if test="userDto.userName != null and userDto.userName != ''">username = #{userDto.userName},</if>
+            <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
+            <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
+            <if test="userDto.updateBy != null and userDto.updateBy != ''">update_by = #{userDto.updateBy},</if>
+            <if test="userDto.email != null ">email = #{userDto.email},</if>
+            <if test="userDto.status != null and userDto.status != ''">status = #{userDto.status},</if>
+            <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
+            <if test="userDto.remark != null">remark = #{userDto.remark},</if>
+            update_time = sysdate()
+        </set>
+        WHERE user_id = #{userDto.userId}
+    </update>
+    <delete id="deleteUserRole">
+        DELETE
+        FROM tb_user_role
+        WHERE user_id = #{userId}
+    </delete>
+    <insert id="addUserRole">
+        INSERT INTO
+        tb_user_role
+        (`user_id`, `role_id`)
+        VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            ( #{userId},#{roleId})
+        </foreach>
+    </insert>
+    <update id="editPassWord">
+        UPDATE tb_user
+        SET password = #{passWord}
+        WHERE username = #{username}
+    </update>
+    <select id="findUserRole" resultType="java.lang.String">
+        SELECT t1.role_key
+        FROM tb_role t1
+                 LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
+                 LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
+        WHERE t3.username = #{username}
+    </select>
+    <select id="findRole" resultType="java.lang.String">
+        SELECT t1.perms
+        FROM tb_menu t1
+                 LEFT JOIN tb_role_menu t2 on t1.menu_id = t2.menu_id
+                 LEFT JOIN tb_role t3 on t2.role_id = t3.role_id
+        WHERE role_key = #{role}
+    </select>
+    <update id="adminUpdatePassWord">
+        UPDATE tb_user
+        SET password = #{passWord}
+        WHERE username = #{username}
+    </update>
+    <update id="changeUserStatus">
+        UPDATE tb_user
+        SET status = #{userDto.status}
+        WHERE user_id = #{userDto.userId}
+    </update>
+    <select id="findUserByUpdate" resultType="java.lang.Integer">
+        SELECT t1.role_id as roleId
+        FROM tb_role t1
+                 LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
+                 LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
+        WHERE t3.user_id = #{userId}
+    </select>
+    <select id="findOneUserMessage" resultType="com.rpzh.vo.UserVo">
+        SELECT t1.username    as username,
+               t1.nick_name   as nickname,
+               t1.email       as email,
+               t1.phonenumber as phonenumber,
+               t1.sex         as sex,
+               t1.create_time as createtime,
+               t3.dept_name   as deptname
+        FROM tb_user t1
+                 LEFT JOIN tb_user_dept t2 on t1.user_id = t2.user_id
+                 LEFT JOIN tb_dept t3 on t3.dept_id = t2.dept_id
+        WHERE t1.username = #{username}
+    </select>
+    <select id="findRoleNameList" resultType="java.lang.String">
+        SELECT t1.role_name as roleName
+        FROM tb_role t1
+                 LEFT JOIN tb_user_role t2 on t2.role_id = t1.role_id
+                 LEFT JOIN tb_user t3 on t3.user_id = t2.user_id
+        WHERE t3.username = #{username}
+    </select>
+    <update id="changeUserMessage">
+        UPDATE tb_user
+        <set>
+            <if test="userDto.nickName != null and userDto.nickName != ''">nick_name = #{userDto.nickName},</if>
+            <if test="userDto.phonenumber != null ">phonenumber = #{userDto.phonenumber},</if>
+            <if test="userDto.email != null ">email = #{userDto.email},</if>
+            <if test="userDto.sex != null and userDto.sex != ''">sex = #{userDto.sex},</if>
+            update_time = sysdate()
+        </set>
+        WHERE username = #{userDto.userName}
+    </update>
+    <select id="findUserId" resultType="java.lang.Long">
+        SELECT user_id
+        FROM `tb_user`
+        WHERE username = #{username}
+    </select>
+    <delete id="deleteUserConnectRole">
+        delete from tb_user_role where user_id in
+        <foreach collection="userId" item="userid" open="(" separator="," close=")">
+            #{userid}
+        </foreach>
+    </delete>
+    <delete id="deleteUserConnectDept">
+        delete from tb_user_dept where user_id in
+        <foreach collection="userId" item="userid" open="(" separator="," close=")">
+            #{userid}
+        </foreach>
+    </delete>
+    <update id="updateErrorTimes">
+        UPDATE tb_user
+        set error_times = 0
+        WHERE username = #{username}
+    </update>
+    <update id="updateTime">
+        UPDATE tb_user
+        set update_time = #{dateTime}
+        WHERE username = #{username}
+    </update>
+    <select id="findIsAdminRole" resultType="java.lang.Integer">
+        SELECT t1.role_id
+        FROM `tb_role` t1
+                 left JOIN tb_user_role t2 on t2.role_id = t1.role_id
+                 left JOIN tb_user t3 on t3.user_id = t2.user_id
+        WHERE t3.username = #{adminUsername}
+    </select>
+    <select id="logFindById" resultType="com.rpzh.pojo.User">
+        SELECT `user_id`     AS userId,
+               `username`    AS username,
+               `password`    AS PASSWORD,
+               `nick_name`   AS nickname,
+               `email`       AS email,
+               `phonenumber` AS phonenumber,
+               `sex`         AS sex,
+               `avatar`      AS avatar,
+               `status`      AS STATUS,
+               `del_flag`    AS delFlag,
+               `login_ip`    AS loginIp,
+               `login_date`  AS loginDate,
+               `create_by`   AS createBy,
+               `create_time` AS createtime,
+               `update_by`   AS updateBy,
+               `update_time` AS updateTime,
+               `remark`      AS remark
+        FROM tb_user
+        WHERE user_id = #{id}
+          and status = 1
+          and del_flag = 1
+    </select>
+    <update id="mqChangeUserStatus">
+        UPDATE tb_user
+        SET status = #{userDto.status}
+        WHERE username = #{userDto.userName}
+    </update>
+    <update id="mqDeleteUser">
+        UPDATE tb_user set del_flag = '0' where username in
+        <foreach collection="userNames" item="userName" open="(" separator="," close=")">
+            #{userName}
+        </foreach>
+    </update>
+    <delete id="deleteMqUserConnectRole">
+        delete from tb_user_role where user_id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+    <delete id="deleteMqUserConnectDept">
+        delete from tb_user_dept where user_id in
+        <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
 <update id="mqUpdateUser">
   UPDATE tb_user
     <set>

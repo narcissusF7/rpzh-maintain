@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @ToString
-public class LogOperation {
+public class LogOperation implements Serializable {
     private Long id;
     /**
      * 操作人
@@ -63,5 +64,13 @@ public class LogOperation {
      * 返回信息
      */
     private String logReturnInfo;
+    /**
+     * 旧的字段json
+     */
+    private String logOldFieldJson;
+    /**
+     * 新的字段json
+     */
+    private String logNewFieldJson;
 
 }

@@ -23,6 +23,12 @@ public interface UserDao {
      * @return
      */
     User findById(String id);
+    /**
+     * 登录查询用户
+     * @param id
+     * @return
+     */
+    User logFindById(String id);
 
     /**
      * 查询用户是否存在

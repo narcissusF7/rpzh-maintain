@@ -1,28 +1,40 @@
 package com.rpzh.aspect;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
 import com.rpzh.annotation.OperationLog;
 import com.rpzh.entity.IpAddress;
 import com.rpzh.entity.LogOperation;
+import com.rpzh.entity.Result;
 import com.rpzh.enums.BusinessStatus;
+import com.rpzh.enums.BusinessType;
+import com.rpzh.service.AsyncLogService;
 import com.rpzh.util.IpUtil;
 import com.rpzh.util.ServletUtils;
+import com.rpzh.util.SpringContextHolder;
 import com.rpzh.util.StringUtils;
 import io.swagger.models.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -35,13 +47,16 @@ import java.util.Objects;
  */
 @Aspect
 @Slf4j
+@Component
 public class OperationAspect {
 
-   /* @Resource
-    private AsyncLogService asyncLogService;*/
-
+    @Resource
+    private AsyncLogService asyncLogService;
 
     private static final String LOCALHOST = "127.0.0.1";
+
+    private final String accountId = "ACCOUNT_ID_";
+
 
     /**
      * @description 配置登录日志切入点
@@ -56,62 +71,120 @@ public class OperationAspect {
     /**
      * 操作成功操作
      *
-     * @param joinPoint  切点
-     * @param jsonResult 数据
+     * @param point 链接点
      */
-    @AfterReturning(pointcut = "operationLogPointCut()", returning = "jsonResult")
-    public void doAfterReturning(JoinPoint joinPoint, Object jsonResult) throws Exception {
-        operation(joinPoint, null, jsonResult);
+    @Around(value = "operationLogPointCut()")
+    public Object doAroundReturning(ProceedingJoinPoint point) throws Throwable {
+        return operation(point);
     }
 
-    /**
-     * 拦截异常操作
-     *
-     * @param joinPoint 切点
-     * @param e         异常
-     */
-    @AfterThrowing(value = "operationLogPointCut()", throwing = "e")
-    public void doAfterThrowing(JoinPoint joinPoint, Exception e) throws Exception {
-        operation(joinPoint, e, null);
-    }
-
-    private void operation(final JoinPoint joinPoint, final Exception e, Object jsonResult) throws Exception {
+    private Object operation(ProceedingJoinPoint point) throws Throwable {
         // 获得注解
-        OperationLog controllerLog = getAnnotationLog(joinPoint);
+        OperationLog controllerLog = getAnnotationLog(point);
         if (controllerLog == null) {
-            return;
+            return null;
         }
+        // 修改前的数据
+        Object oldData = new Object();
+        //设置返回的数据
+        Result result = null;
+        // 获取操作类型
+        BusinessType businessType = controllerLog.businessType();
+        // 设置日志类
         LogOperation operationLog = new LogOperation();
+        // mapper
+        Class<?> mapper = controllerLog.mapper();
+
+        switch (businessType) {
+            case INSERT:
+                break;
+            case UPDATE:
+                // 获得id , 查询条件
+                Object[] args = point.getArgs();
+                Object arg = args[0];
+                Object getId = ReflectUtil.invoke(arg, "getId");
+                Object bean = SpringContextHolder.getBean(mapper);
+                // 获得修改前的数据
+                oldData = ReflectUtil.invoke(bean,
+                        "logFindById", getId.toString());
+                //如果发生异常不继续执行
+                try {
+                    //执行方法
+                    result = (Result) point.proceed(args);
+                    //如果没有成功删除直接返回
+                    if (result.getCode() == 0) {
+                        return 0;
+                    }
+                    // 获得修改后的数据
+                    Object newData = ReflectUtil.invoke(bean,
+                            "logFindById", getId.toString());
+                    // 获取旧的所有方法
+                    Method[] oldMethods = ReflectUtil.getMethods(oldData.getClass());
+
+                    JSONObject oldJson = new JSONObject();
+                    JSONObject newJson = new JSONObject();
+                    for (Method oldMethod : oldMethods) {
+                        String methodName = oldMethod.getName();
+                        if ("get".equals(methodName.substring(0, 3))) {
+                            Object oldInvoke = ReflectUtil.invoke(oldData, methodName);
+                            String oldd = null;
+                            String neww = null;
+                            if (oldInvoke != null) {
+                                oldd = oldInvoke.toString();
+                            }
+                            Object nweInvoke = ReflectUtil.invoke(newData, methodName);
+                            if (nweInvoke != null) {
+                                neww = nweInvoke.toString();
+                            }
+                            // 如果不等于就代表更改过,存起来
+                            if (!Objects.equals(oldd, neww)) {
+                                String field = methodName.substring(3);
+                                oldJson.put(field, oldd);
+                                newJson.put(field, neww);
+                            }
+                        }
+                    }
+                    operationLog.setLogOldFieldJson(oldJson.toString());
+                    operationLog.setLogNewFieldJson(newJson.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //异常登录失败
+                    operationLog.setLogStatus(BusinessStatus.FAIL.ordinal() == 0);
+                    operationLog.setLogErrorInfo(StringUtils.substring(e.getMessage(), 0, 2000));
+                    log.error(" ErrorAndException:   " + e.getMessage());
+                }
+                break;
+            case DELETE:
+                break;
+        }
+
         //获得ip地址
         String ipAddr = IpUtil.getIpAddress(Objects.requireNonNull(ServletUtils.getRequest()));
         operationLog.setLogIp(ipAddr);
         if (LOCALHOST.equals(ipAddr)) {
-            operationLog.setLogIp("本地IP");
+            operationLog.setLogAddress("本地IP");
         } else {
             //设置ip地理位置
-            operationLog.setLogIp(IpAddress.guideGetCityCode(ipAddr));
+            operationLog.setLogAddress(IpAddress.guideGetCityCode(ipAddr));
         }
+
         //操作状态
         operationLog.setLogStatus(BusinessStatus.SUCCESS.ordinal() == 1);
         // 设置方法名称
-        String className = joinPoint.getTarget().getClass().getName();
-        String methodName = joinPoint.getSignature().getName();
+        String className = point.getTarget().getClass().getName();
+        String methodName = point.getSignature().getName();
         operationLog.setLogClassMethodName(className + "." + methodName + "()");
         //设置请求参数
-        setRequestValue(joinPoint, operationLog);
+        setRequestValue(point, operationLog);
         //设置操作类型
         operationLog.setLogType(controllerLog.title());
         //设置返回信息
-        operationLog.setLogReturnInfo(JSON.toJSONString(jsonResult));
+        operationLog.setLogReturnInfo(com.alibaba.fastjson.JSONObject.toJSONString(point.proceed()));
         operationLog.setLogRequestUrl(Objects.requireNonNull(ServletUtils.getRequest()).getServletPath());
-        if (e != null) {
-            //异常登录失败
-            operationLog.setLogStatus(BusinessStatus.FAIL.ordinal() == 0);
-            operationLog.setLogErrorInfo(StringUtils.substring(e.getMessage(), 0, 2000));
-            log.error(" ErrorAndException:   " + e.getMessage());
-        } else {
-            log.info("  OperationInfo:    " + operationLog);
-        }
+        //设置日志记录时间
+        operationLog.setLogTime(DateUtil.date());
+        asyncLogService.saveOperationLog(operationLog);
+        return result;
     }
 
     /**

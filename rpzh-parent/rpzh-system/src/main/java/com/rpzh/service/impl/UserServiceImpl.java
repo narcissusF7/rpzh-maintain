@@ -53,6 +53,17 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * 用户登录
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public User logFindById(String id) {
+        return userDao.logFindById(id);
+    }
+
+    /**
      * 添加用户
      *
      * @param userDto
@@ -204,7 +215,7 @@ public class UserServiceImpl implements UserService {
             Map<String, String> userInfo = TokenDecode.getUserInfo();
             //查看用户账号
             String username = userInfo.get("username");
-            userDto.setUpdateBy(username);
+            userDto.setUpdateBy("qq");
             //修改普通用户
             Integer updateCommonUserFlag = userDao.updateCommonUser(userDto);
             //删除用户部门关联表
