@@ -1,11 +1,14 @@
 package com.rpzh.controller;
 
+import com.rpzh.annotation.OperationLog;
 import com.rpzh.dto.MenuDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.BusinessType;
 import com.rpzh.pojo.Menu;
 import com.rpzh.service.MenuService;
+import com.rpzh.service.RoleService;
 import com.rpzh.vo.MenuVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +52,7 @@ public class MenuController {
      */
     @PostMapping("/addMenu")
     @ApiOperation(value = "新增菜单")
+    @OperationLog(mapper = MenuService.class, businessType = BusinessType.INSERT, title = "菜单管理")
     public Result addMenu(MenuDto menuDto){
         String path = menuDto.getPath();
         if (ToolUtil.isEmpty(path)){
@@ -87,6 +91,7 @@ public class MenuController {
      */
     @GetMapping("/deleteMenu")
     @ApiOperation(value = "删除菜单")
+    @OperationLog(mapper = MenuService.class, businessType = BusinessType.DELETE, title = "菜单管理")
     public Result deleteMenu(Long menuId){
         //查询是否存在子菜单
         Integer menuCount = menuService.findSonMenu(menuId);
@@ -111,6 +116,7 @@ public class MenuController {
     //@PreAuthorize("hasAnyAuthority('system:menu:editMenu')")
     @PostMapping("/editMenu")
     @ApiOperation(value = "修改菜单")
+    @OperationLog(mapper = MenuService.class, businessType = BusinessType.UPDATE, title = "菜单管理")
     public Result editMenu(MenuDto menuDto){
         //获取父菜单名称
         String parentName = menuDto.getParentName();
@@ -201,6 +207,7 @@ public class MenuController {
      */
     @RequestMapping("/changeMenuStatus")
     @ApiOperation(value = "修改菜单状态")
+    @OperationLog(mapper = MenuService.class, businessType = BusinessType.UPDATE, title = "菜单管理")
     public Result changeMenuStatus(MenuDto menuDto){
         Integer changeFlag = menuService.changeMenuStatus(menuDto);
         return new Result(true, StatusCode.OK, "修改菜单状态成功");

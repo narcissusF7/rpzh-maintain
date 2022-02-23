@@ -64,6 +64,7 @@ public class UserController {
     @ApiOperation(value = "新增用户", tags = "用户管理")
     @OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.INSERT)
     @PostMapping("/addUser")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.INSERT, title = "用户管理")
     public Result addUser(UserDto userDto) {
         Long[] roleIds = userDto.getRoleIds();
         if (ToolUtil.isEmpty(roleIds)) {
@@ -96,6 +97,7 @@ public class UserController {
     @ApiOperation(value = "修改用户的状态", tags = "用户管理")
     @OperationUserLog(title = "修改用户的状态", businessUserType = BesinessUserType.UPDATESTATUS)
     @PostMapping("/changeUserStatus")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result changeUserStatus(UserDto userDto) {
         Integer changeFlag = userService.changeUserStatus(userDto);
         return new Result(true, StatusCode.OK, "修改状态成功");
@@ -110,7 +112,7 @@ public class UserController {
     @PostMapping("/editUser")
     @OperationUserLog(title = "修改用户", businessUserType = BesinessUserType.UPDATE)
     @ApiOperation(value = "修改用户", tags = "用户管理")
-    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "修改用户")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result editUser(UserDto userDto) {
         //获取角色
         Long[] roleIds = userDto.getRoleIds();
@@ -132,6 +134,7 @@ public class UserController {
     @ApiOperation(value = "删除用户", tags = "用户管理")
     @OperationUserLog(title = "删除用户", businessUserType = BesinessUserType.DELETE)
     @PostMapping("/deleteUser")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.DELETE, title = "用户管理")
     public Result deleteUser(UserDto userDto) {
         Long[] userId = userDto.getUserIds();
         Integer deleteFlag = userService.deleteUser(userId);
@@ -149,6 +152,7 @@ public class UserController {
     @ApiOperation(value = "普通用户修改密码", tags = "用户管理")
     @OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.PASSWORD)
     @GetMapping("/editPassWord")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result editPassWord(String username, String newpassWord, String notarizePassword) {
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord) || ToolUtil.isEmpty(notarizePassword)) {
             return new Result(false, StatusCode.ERROR, "请输入账号密码");
@@ -183,6 +187,7 @@ public class UserController {
     @ApiOperation(value = "超级管理员可以修改所有人密码", tags = "用户管理")
     @OperationUserLog(title = "超级管理员修改密码", businessUserType = BesinessUserType.ADMINPASSWORD)
     @GetMapping("/adminUpdatePassWord")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result adminUpdatePassWord(String username, String newpassWord) {
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord)) {
             return new Result(false, StatusCode.ERROR, "请输入密码");
@@ -227,6 +232,7 @@ public class UserController {
     @ApiOperation(value = "个人中心修改用户信息", tags = "用户管理")
     @OperationUserLog(title = "个人中心修改用户信息", businessUserType = BesinessUserType.PERSONALUPDATE)
     @PostMapping("/changeUserMessage")
+    @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result changeUserMessage(UserDto userDto) {
         Integer changeFlage = userService.changeUserMessage(userDto);
         return new Result(true, StatusCode.OK, "修改个人信息成功");

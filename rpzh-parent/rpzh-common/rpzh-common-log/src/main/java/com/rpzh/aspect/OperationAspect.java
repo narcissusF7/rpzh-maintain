@@ -94,14 +94,19 @@ public class OperationAspect {
         LogOperation operationLog = new LogOperation();
         // mapper
         Class<?> mapper = controllerLog.mapper();
-
+        // 获得id , 查询条件
+        Object[] args = point.getArgs();
+        Object arg = args[0];
+        Object operationContent = ReflectUtil.invoke(arg, "findOperationContent");
         switch (businessType) {
             case INSERT:
+                operationLog.setLogSysModule("生成");
+                operationLog.setLogOperationRecord("添加" + operationContent);
                 break;
             case UPDATE:
-                // 获得id , 查询条件
-                Object[] args = point.getArgs();
-                Object arg = args[0];
+                operationLog.setLogSysModule("修改");
+                operationLog.setLogOperationRecord("修改" + operationContent);
+
                 Object getId = ReflectUtil.invoke(arg, "getId");
                 Object bean = SpringContextHolder.getBean(mapper);
                 // 获得修改前的数据
@@ -155,6 +160,8 @@ public class OperationAspect {
                 }
                 break;
             case DELETE:
+                operationLog.setLogSysModule("删除");
+                operationLog.setLogOperationRecord("删除" + operationContent);
                 break;
         }
 
@@ -176,7 +183,7 @@ public class OperationAspect {
         operationLog.setLogClassMethodName(className + "." + methodName + "()");
         //设置请求参数
         setRequestValue(point, operationLog);
-        //设置操作类型
+        //设置系统模块
         operationLog.setLogType(controllerLog.title());
         //设置返回信息
         operationLog.setLogReturnInfo(com.alibaba.fastjson.JSONObject.toJSONString(point.proceed()));

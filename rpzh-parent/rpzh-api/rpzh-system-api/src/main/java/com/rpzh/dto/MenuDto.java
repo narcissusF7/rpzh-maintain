@@ -13,6 +13,10 @@ import lombok.Data;
 @ApiModel(description = "菜单管理传参")
 public class MenuDto {
 
+    public String findOperationContent() {
+        return menuName;
+    }
+
     //菜单ID
     @ApiModelProperty(notes = "菜单ID")
     private Long menuId;

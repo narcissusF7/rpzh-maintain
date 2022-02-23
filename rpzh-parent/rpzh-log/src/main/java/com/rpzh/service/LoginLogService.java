@@ -1,5 +1,7 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.LoginLogDto;
 import com.rpzh.entity.LogLogin;
 
 /**
@@ -20,4 +22,10 @@ public interface LoginLogService {
      */
     int insertLoginLog(LogLogin loginLog);
 
+    /**
+     * 查询登录日志
+     * @param loginLogDto
+     * @return
+     */
+    PageInfo<LogLogin> findAllLoginLog(LoginLogDto loginLogDto);
 }

@@ -1,8 +1,11 @@
 package com.rpzh.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,12 +24,19 @@ public class LogOperation implements Serializable {
      */
     private String logRecorder;
     /**
+     * 系统模块
+     */
+    private String logSysModule;
+    /**
      * 日志类型
      */
     private String logType;
     /**
      * 操作时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date logTime;
     /**
      * 请求地址
@@ -64,6 +74,10 @@ public class LogOperation implements Serializable {
      * 返回信息
      */
     private String logReturnInfo;
+    /**
+     * 日志操作记录
+     */
+    private String logOperationRecord;
     /**
      * 旧的字段json
      */

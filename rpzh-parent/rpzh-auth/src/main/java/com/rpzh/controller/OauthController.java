@@ -4,6 +4,7 @@ import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import com.rpzh.annotation.LoginLogging;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -71,6 +72,7 @@ public class OauthController {
      * @return
      */
     @RequestMapping("/login")
+    @LoginLogging
     public Result login(String username, String password, String uuidCode, String verificationCode) {
         if (ToolUtil.isEmpty(uuidCode)){
             throw new RuntimeException("uuidCode不能为空");

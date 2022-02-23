@@ -15,6 +15,11 @@ import java.util.List;
 @ApiModel(description = "角色管理传参")
 public class RoleDto {
 
+    public String findOperationContent() {
+        return roleName;
+    }
+
+
     //角色id
     @ApiModelProperty(notes = "角色id")
     private Long roleId;

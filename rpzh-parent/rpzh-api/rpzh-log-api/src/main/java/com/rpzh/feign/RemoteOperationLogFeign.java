@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @create 2022-01-26 09:01
  * @description 操作日志Feign调用
  */
-@FeignClient(name = "rpzh-log", path = "/operationlog",fallback = RemoteOperationLogFeignImpl.class)
+@FeignClient(name = "rpzh-log", path = "/operationlog",fallback  = RemoteOperationLogFeignImpl.class)
 public interface RemoteOperationLogFeign {
 
     /**

@@ -1,11 +1,14 @@
 package com.rpzh.controller;
 
+import com.rpzh.annotation.OperationLog;
 import com.rpzh.dto.DeptDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.BusinessType;
 import com.rpzh.pojo.Dept;
 import com.rpzh.service.DeptService;
+import com.rpzh.service.MenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,6 +49,7 @@ public class DeptController {
      */
     @PostMapping("/addDept")
     @ApiOperation(value = "增加部门")
+    @OperationLog(mapper = DeptService.class, businessType = BusinessType.INSERT, title = "部门管理")
     public Result<String> addDept(DeptDto deptDto) {
         //获取上级部门id
         Integer parentId = deptDto.getParentId();
@@ -73,6 +77,7 @@ public class DeptController {
      */
     @GetMapping("/deleteDept")
     @ApiOperation(value = "删除部门")
+    @OperationLog(mapper = DeptService.class, businessType = BusinessType.DELETE, title = "部门管理")
     public Result deleteDept(@ApiParam(name = "deptId", value = "部门id" ,required = true) @RequestParam(value = "deptId", required = false) Integer deptId) {
         //根据部门id判断部门是否存在下级部门
         Integer sum = deptService.findDepts(deptId);
@@ -95,6 +100,7 @@ public class DeptController {
      */
     @PostMapping("/editDept")
     @ApiOperation(value = "修改部门")
+    @OperationLog(mapper = DeptService.class, businessType = BusinessType.UPDATE, title = "部门管理")
     public Result editDept(DeptDto deptDto) {
         //获取部门id
         Integer deptId = deptDto.getDeptId();
@@ -147,6 +153,7 @@ public class DeptController {
      */
     @RequestMapping("/changeDeptStutas")
     @ApiOperation(value = "修改部门的状态")
+    @OperationLog(mapper = DeptService.class, businessType = BusinessType.UPDATE, title = "部门管理")
     public Result changeDeptStutas(DeptDto deptDto){
         Integer changeFlag = deptService.changeDeptStutas(deptDto);
         return new Result(true, StatusCode.OK, "修改部门的状态成功");

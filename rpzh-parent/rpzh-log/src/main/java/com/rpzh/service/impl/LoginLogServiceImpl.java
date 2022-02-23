@@ -1,11 +1,15 @@
 package com.rpzh.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.LoginLogDto;
 import com.rpzh.entity.LogLogin;
 import com.rpzh.mapper.LoginLogMapper;
 import com.rpzh.service.LoginLogService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author wbl
@@ -33,4 +37,19 @@ public class LoginLogServiceImpl implements LoginLogService {
         return loginLogMapper.insertLoginLog(loginLog);
     }
 
+    /**
+     * 查询登录日志
+     *
+     * @param loginLogDto
+     * @return
+     */
+    @Override
+    public PageInfo<LogLogin> findAllLoginLog(LoginLogDto loginLogDto) {
+        int page = loginLogDto.getPage();
+        int size = loginLogDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<LogLogin> loginLogVoList = loginLogMapper.findAllLoginLog(loginLogDto);
+        return new PageInfo<>(loginLogVoList);
+    }
 }

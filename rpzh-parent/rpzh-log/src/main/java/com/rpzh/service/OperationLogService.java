@@ -1,6 +1,10 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.OperationLogDto;
 import com.rpzh.entity.LogOperation;
+import com.rpzh.entity.LogSystemModule;
+import com.rpzh.entity.PageResult;
 
 /**
  * @author wbl
@@ -18,5 +22,14 @@ public interface OperationLogService {
      * @date 2021/6/10 9:06
      */
     int insertOperationLog(LogOperation operationLog);
+    /**
+     * @param operationLogDto 日志查询条件信息
+     * @return int
+     * @description 添加一条操作日志
+     * @author wbl
+     * @date 2021/6/10 9:06
+     */
+    PageInfo<LogOperation> findOperationLog(OperationLogDto operationLogDto);
 
+    LogSystemModule findSystemModule();
 }
