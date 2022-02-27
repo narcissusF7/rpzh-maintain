@@ -13,6 +13,10 @@ import lombok.Data;
 @ApiModel(description = "部门管理传参")
 public class DeptDto {
 
+    public String findOperationContent() {
+        return deptName;
+    }
+
     //部门id
     @ApiModelProperty(notes = "部门id")
     private Integer deptId;

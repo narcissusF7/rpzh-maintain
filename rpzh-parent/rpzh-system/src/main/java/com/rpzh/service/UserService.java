@@ -21,6 +21,13 @@ public interface UserService {
     User findById(String id);
 
     /**
+     * 用户登录
+     * @param id
+     * @return
+     */
+    User logFindById(String id);
+
+    /**
      * 添加用户
      * @param userDto
      * @return

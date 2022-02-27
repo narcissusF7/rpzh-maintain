@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.mapper.LoginLogMapper">
+    <insert id="insertLoginLog">
+        insert into log_login(
+        <if test="loginLog.username != null and loginLog.username != ''">
+            username
+        </if>
+        <if test="loginLog.loginIp != null and loginLog.loginIp != ''">
+            ,login_ip
+        </if>
+        <if test="loginLog.loginAddress != null and loginLog.loginAddress != ''">
+            ,login_address
+        </if>
+        <if test="loginLog.browserType != null and loginLog.browserType != ''">
+            ,browser_type
+        </if>
+        <if test="loginLog.os != null and loginLog.os != ''">
+            ,os
+        </if>
+        <if test="loginLog.loginStatus != null">
+            ,login_status
+        </if>
+        <if test="loginLog.operatingInformation != null and loginLog.operatingInformation != ''">
+            ,operating_information
+        </if>
+        <if test="loginLog.errorInfo != null and loginLog.errorInfo != ''">
+            ,error_info
+        </if>
+        <if test="loginLog.classMethodName != null and loginLog.classMethodName != ''">
+            ,class_method_name
+        </if>
+        <if test="loginLog.requestMethod != null and loginLog.requestMethod != ''">
+            ,request_method
+        </if>
+        <if test="loginLog.returnInfo != null and loginLog.returnInfo != ''">
+            ,return_info
+        </if>)
+        value (
+        <if test="loginLog.username != null and loginLog.username != ''">
+            #{loginLog.username}
+        </if>
+        <if test="loginLog.loginIp != null and loginLog.loginIp != ''">
+            ,#{loginLog.loginIp}
+        </if>
+        <if test="loginLog.loginAddress != null and loginLog.loginAddress != ''">
+            ,#{loginLog.loginAddress}
+        </if>
+        <if test="loginLog.browserType != null and loginLog.browserType != ''">
+            ,#{loginLog.browserType}
+        </if>
+        <if test="loginLog.os != null and loginLog.os != ''">
+            ,#{loginLog.os}
+        </if>
+        <if test="loginLog.loginStatus != null">
+            ,#{loginLog.loginStatus}
+        </if>
+        <if test="loginLog.operatingInformation != null and loginLog.operatingInformation != ''">
+            ,#{loginLog.operatingInformation}
+        </if>
+        <if test="loginLog.errorInfo != null and loginLog.errorInfo != ''">
+            ,#{loginLog.errorInfo}
+        </if>
+        <if test="loginLog.classMethodName != null and loginLog.classMethodName != ''">
+            ,#{loginLog.classMethodName}
+        </if>
+        <if test="loginLog.requestMethod != null and loginLog.requestMethod != ''">
+            ,#{loginLog.requestMethod}
+        </if>
+        <if test="loginLog.returnInfo != null and loginLog.returnInfo != ''">
+            ,#{loginLog.returnInfo}
+        </if>
+        )
+    </insert>
+    <select id="findAllLoginLog" resultType="com.rpzh.entity.LogLogin">
+        SELECT id as id, username as username,login_ip as loginIp,login_address as longinAddress,
+        login_status as loginStatus, IFNULL(error_Info,'登录成功') as operatingInformation ,login_time as loginTime
+        FROM log_login
+        WHERE 1 = 1
+        <if test="loginLogDto.loginAddress != null and loginLogDto.loginAddress != ''">
+            AND login_ip like concat('%', #{loginLogDto.loginAddress}, '%')
+        </if>
+        <if test="loginLogDto.username != null and loginLogDto.username != ''">
+            AND username like concat('%', #{loginLogDto.username}, '%')
+        </if>
+        <if test="loginLogDto.status != null and loginLogDto.status != ''">
+            AND login_status = #{loginLogDto.status}
+        </if>
+        <if test="loginLogDto.startTime != null and loginLogDto.startTime != ''">
+            AND login_time &gt;= #{loginLogDto.startTime}
+        </if>
+        <if test="loginLogDto.endTime != null and loginLogDto.endTime != ''">
+            AND login_time &lt;= #{loginLogDto.endTime}
+        </if>
+        ORDER BY loginTime DESC
+    </select>
+</mapper>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.WarehouseDao">
+<select id="findNameCount" resultType="int">
+  SELECT count(*)
+  FROM tb_warehouse
+  WHERE name = #{name}
+</select>
+<insert id="addWarehouse">
+  INSERT INTO tb_warehouse
+  (
+  <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>
+  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time,</if>
+  <if test="warehouseDto.code != null and warehouseDto.code != ''">code,</if>
+  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">use_volume, </if>
+  <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">use_volume_unit, </if>
+  <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area, </if>
+  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit,</if>
+  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">is_automation,</if>
+  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> is_statistics,</if>
+  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using,</if>
+  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark,</if>
+  <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''"> created_time,</if>
+  <if test="warehouseDto.username != null and warehouseDto.username != ''">created_user,</if>
+  <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">pid_route,</if>
+  <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">site_name,</if>
+  last_updated_time
+  )
+ VALUES
+ (
+  <if test="warehouseDto.name != null and warehouseDto.name != ''">#{warehouseDto.name},</if>
+  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">#{warehouseDto.buildTime},</if>
+  <if test="warehouseDto.code != null and warehouseDto.code != ''">#{warehouseDto.code},</if>
+  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">#{warehouseDto.useVolume},</if>
+   <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">#{warehouseDto.useVolumeUnit},</if>
+   <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''">#{warehouseDto.useArea}, </if>
+  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> #{warehouseDto.useAreaUnit},</if>
+  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">#{warehouseDto.isAutomation},</if>
+  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> #{warehouseDto.isStatistics},</if>
+  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''">#{warehouseDto.isUsing},</if>
+  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> #{warehouseDto.remark},</if>
+  <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''">#{warehouseDto.createdTime},</if>
+  <if test="warehouseDto.username != null and warehouseDto.username != ''">#{warehouseDto.username},</if>
+  <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">#{warehouseDto.pidRoute},</if>
+  <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">#{warehouseDto.siteName},</if>
+  sysdate()
+ )
+</insert>
+<select id="findWareName" resultType="java.lang.String">
+  SELECT name
+  FROM tb_warehouse
+  WHERE name = #{name} and id != #{id}
+  limit 1
+</select>
+<update id="updateWarehouse">
+  UPDATE tb_warehouse
+  <set>
+  <if test="warehouseDto.name != null and warehouseDto.name != ''">name =  #{warehouseDto.name},</if>
+  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time = #{warehouseDto.buildTime},</if>
+  <if test="warehouseDto.code != null and warehouseDto.code != ''">code = #{warehouseDto.code},</if>
+  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''"> use_volume =  #{warehouseDto.useVolume},</if>
+  <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''"> use_volume_unit =  #{warehouseDto.useVolumeUnit},</if>
+  <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area =  #{warehouseDto.useArea},</if>
+  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit = #{warehouseDto.useAreaUnit},</if>
+  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''"> is_automation =  #{warehouseDto.isAutomation},</if>
+  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''">  is_statistics = #{warehouseDto.isStatistics},</if>
+  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using =  #{warehouseDto.isUsing},</if>
+  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark =  #{warehouseDto.remark},</if>
+  <if test="warehouseDto.username != null and warehouseDto.username != ''"> last_updated_user = #{warehouseDto.username},</if>
+  last_updated_time = sysdate()
+  </set>
+  WHERE
+  id = #{warehouseDto.id}
+</update>
+<select id="findCodeCount" resultType="int">
+  SELECT count(*)
+  FROM `tb_warehouse`
+  WHERE code = #{code}
+</select>
+<select id="findWareCode" resultType="java.lang.String">
+  SELECT code
+  FROM tb_warehouse
+  WHERE code = #{code} and id != #{id}
+  limit 1
+</select>
+<select id="findWarehouse" resultType="com.rpzh.vo.WarehouseVo">
+  SELECT id as id,name as name,build_time as buildTime,code as code,use_volume as useVolume,use_area as useArea,use_area_unit as useAreaUnit,is_automation as isAutomation,is_statistics as isStatistics,is_using as isUsing,
+  remark as remark,
+  created_time as createdTime,created_user as createdUser,
+  last_updated_time as lastUpdatedTime,last_updated_user as lastUpdatedUser,created_user_id as createdUserId,pid_route as pidRoute,site_name as siteName
+  FROM tb_warehouse
+  WHERE id = #{warehouseId}
+</select>
+<insert id="addBuilding">
+  INSERT INTO tb_building
+  (
+  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no,</if>
+  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> use_volume,</if>
+  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> use_volume_unit,</if>
+  <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> use_area,</if>
+  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit,</if>
+  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> building_orientation,</if>
+  <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark,</if>
+  <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> created_time,</if>
+  <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> created_user,</if>
+  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id,</if>
+  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">pid_route,</if>
+  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">building_name,</if>
+  <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> site_name,</if>
+  last_updated_time
+  )
+  VALUES
+  	(
+  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">#{buildingDto.buildingNo},</if>
+  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> #{buildingDto.useVolume},</if>
+  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> #{buildingDto.useVolumeUnit},</if>
+  <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> #{buildingDto.useArea},</if>
+  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> #{buildingDto.useAreaUnit},</if>
+  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> #{buildingDto.buildingOrientation},</if>
+  <if test="buildingDto.remark != null and buildingDto.remark != ''"> #{buildingDto.remark},</if>
+  <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> #{buildingDto.createdTime},</if>
+  <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> #{buildingDto.createdUser},</if>
+  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> #{buildingDto.warehouseId},</if>
+  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">#{buildingDto.pidRoute},</if>
+  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">#{buildingDto.buildingName},</if>
+  <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> #{buildingDto.siteName},</if>
+  sysdate()
+  	)
+</insert>
+<update id="updateBuilding">
+  UPDATE tb_building
+  <set>
+  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no =  #{buildingDto.buildingNo},</if>
+  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''">use_volume =  #{buildingDto.useVolume},</if>
+  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''">use_volume_unit=  #{buildingDto.useVolumeUnit},</if>
+  <if test="buildingDto.useArea != null and buildingDto.useArea != ''">use_area = #{buildingDto.useArea},</if>
+  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit = #{buildingDto.useAreaUnit},</if>
+  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''">building_orientation = #{buildingDto.buildingOrientation},</if>
+  <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark = #{buildingDto.remark},</if>
+  <if test="buildingDto.updateUser != null and buildingDto.updateUser != ''">last_updated_user =  #{buildingDto.updateUser},</if>
+  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id =  #{buildingDto.warehouseId},</if>
+  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''"> pid_route = #{buildingDto.pidRoute},</if>
+  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''"> building_name  =  #{buildingDto.buildingName},</if>
+  <if test="buildingDto.siteName != null and buildingDto.siteName != ''">site_name  =  #{buildingDto.siteName},</if>
+   last_updated_time = sysdate()
+  </set>
+  WHERE id = #{buildingDto.id}
+</update>
+<select id="findBuilding" resultType="com.rpzh.vo.BuildingVo">
+  SELECT
+  `id` as id,
+  `building_no` as buildingNo,
+  `use_volume` as useVolume,
+  `use_volume_unit` as useVolumeUnit,
+  `use_area` as useArea,
+  `use_area_unit` as useAreaUnit,
+  `building_orientation` as buildingOrientation,
+  `remark` as remark,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `warehouse_id` as warehouseId,
+  `pid_route` as pidRoute,
+  `building_name` as buildingName,
+  `site_name` as siteName
+  FROM tb_building
+  WHERE id = #{buildingId}
+</select>
+<insert id="addFloor">
+  INSERT INTO tb_floor
+  (
+  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no,</if>
+  <if test="floorDto.isPartition != null and floorDto.isPartition != ''">is_partition,</if>
+  <if test="floorDto.remark != null and floorDto.remark != ''">remark,</if>
+  <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  created_user,</if>
+  <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id,</if>
+  <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route,</if>
+  <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name,</if>
+  <if test="floorDto.siteName != null and floorDto.siteName != ''"> site_name,</if>
+   created_time,
+   last_updated_time
+  )
+  VALUES
+  	(
+  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> #{floorDto.floorNo},</if>
+  <if test="floorDto.isPartition != null and floorDto.isPartition != ''">#{floorDto.isPartition},</if>
+  <if test="floorDto.remark != null and floorDto.remark != ''">#{floorDto.remark},</if>
+  <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  #{floorDto.createdUser},</if>
+  <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> #{floorDto.buildingId},</if>
+  <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> #{floorDto.pidRoute},</if>
+  <if test="floorDto.floorName != null and floorDto.floorName != ''"> #{floorDto.floorName},</if>
+  <if test="floorDto.siteName != null and floorDto.siteName != ''"> #{floorDto.siteName},</if>
+   sysdate(),
+   sysdate()
+  	)
+</insert>
+<update id="updateFloor">
+  UPDATE tb_floor
+  <set>
+  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no = #{floorDto.floorNo},</if>
+ <if test="floorDto.isPartition != null and floorDto.isPartition != ''"> is_partition= #{floorDto.isPartition},</if>
+ <if test="floorDto.remark != null and floorDto.remark != ''">remark =  #{floorDto.remark},</if>
+ <if test="floorDto.updateUser != null and floorDto.updateUser != ''"> last_updated_user =  #{floorDto.updateUser},</if>
+ <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id =  #{floorDto.buildingId},</if>
+ <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route =  #{floorDto.pidRoute},</if>
+ <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name =  #{floorDto.floorName},</if>
+ <if test="floorDto.siteName != null and floorDto.siteName != ''">site_name =  #{floorDto.siteName},</if>
+ last_updated_time = sysdate()
+  </set>
+  WHERE id = #{floorDto.id}
+</update>
+</mapper>

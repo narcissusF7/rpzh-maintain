@@ -17,6 +17,15 @@ import java.util.List;
 @ApiModel(description = "用户管理传参")
 public class UserDto implements Serializable {
 
+    public Long getId() {
+        return userId;
+    }
+
+    public String findOperationContent() {
+        return userName;
+    }
+
+
     //用户id
     @ApiModelProperty(notes = "用户id")
     private Long userId;

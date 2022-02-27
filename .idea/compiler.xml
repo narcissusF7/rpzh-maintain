@@ -7,28 +7,28 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="rpzh-auth" />
-        <module name="rpzh-carbon" />
-        <module name="rpzh-carbon-api" />
-        <module name="rpzh-common-core" />
-        <module name="rpzh-common-db" />
-        <module name="rpzh-common-log" />
         <module name="rpzh-function" />
-        <module name="rpzh-function-api" />
-        <module name="rpzh-gateway-a" />
-        <module name="rpzh-gateway-b" />
-        <module name="rpzh-gateway-c" />
+        <module name="rpzh-carbon-api" />
         <module name="rpzh-humiture" />
-        <module name="rpzh-humiture-api" />
-        <module name="rpzh-log" />
-        <module name="rpzh-log-api" />
-        <module name="rpzh-moisture" />
+        <module name="rpzh-gateway-a" />
+        <module name="rpzh-function-api" />
         <module name="rpzh-oxygen" />
+        <module name="rpzh-log-api" />
         <module name="rpzh-oxygen-api" />
-        <module name="rpzh-system" />
-        <module name="rpzh-system-api" />
-        <module name="rpzh-temp" />
         <module name="rpzh-temp-api" />
+        <module name="rpzh-temp" />
+        <module name="rpzh-gateway-b" />
+        <module name="rpzh-carbon" />
+        <module name="rpzh-gateway-c" />
+        <module name="rpzh-system-api" />
+        <module name="rpzh-humiture-api" />
+        <module name="rpzh-system" />
+        <module name="rpzh-common-log" />
+        <module name="rpzh-moisture" />
+        <module name="rpzh-common-core" />
+        <module name="rpzh-auth" />
+        <module name="rpzh-log" />
+        <module name="rpzh-common-db" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

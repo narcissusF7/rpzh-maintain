@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.rpzh.service.AsyncLogService,\
+  com.rpzh.aspect.OperationAspect,\
+  com.rpzh.aspect.LoggingAspect

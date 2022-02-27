@@ -11,5 +11,16 @@
 
     <artifactId>rpzh-log-api</artifactId>
     <description>日志微服务的api工程</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-openfeign-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rpzh</groupId>
+            <artifactId>rpzh-common-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

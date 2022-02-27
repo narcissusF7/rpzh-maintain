@@ -1,10 +1,12 @@
 package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.annotation.OperationLog;
 import com.rpzh.dto.RoleDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.BusinessType;
 import com.rpzh.service.RoleService;
 import com.rpzh.vo.RoleVo;
 import io.swagger.annotations.Api;
@@ -39,6 +41,7 @@ public class RoleController {
      */
     @PostMapping("/addRole")
     @ApiOperation(value = "增加角色")
+    @OperationLog(mapper = RoleService.class, businessType = BusinessType.INSERT, title = "角色管理")
     public Result addRole(RoleDto roleDto) {
         //获取角色标识
         String roleKey = roleDto.getRoleKey();
@@ -86,6 +89,7 @@ public class RoleController {
     @GetMapping("/delectRole")
     @ApiOperation(value = "批量删除角色")
     //@PreAuthorize("hasAnyAuthority('system:role:delectRole')")
+    @OperationLog(mapper = RoleService.class, businessType = BusinessType.DELETE, title = "角色管理")
     public Result delectRole(Long[] roleId){
         Integer delFlag = roleService.delectRole(roleId);
         return new Result(true, StatusCode.OK, "删除角色成功");
@@ -98,6 +102,7 @@ public class RoleController {
      */
     @PostMapping("/editRole")
     @ApiOperation(value = "修改角色")
+    @OperationLog(mapper = RoleService.class, businessType = BusinessType.UPDATE, title = "角色管理")
     public Result editRole(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();
@@ -140,6 +145,7 @@ public class RoleController {
      */
     @PostMapping("/changeStatus")
     @ApiOperation(value = "修改角色的状态")
+    @OperationLog(mapper = RoleService.class, businessType = BusinessType.UPDATE, title = "角色管理")
     public Result changeStatus(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();
@@ -158,6 +164,7 @@ public class RoleController {
      */
     @PostMapping("/dataScope")
     @ApiOperation(value = "修改角色权限范围")
+    @OperationLog(mapper = RoleService.class, businessType = BusinessType.UPDATE, title = "角色管理")
     public Result dataScope(RoleDto roleDto){
         //获取角色id
         Long roleId = roleDto.getRoleId();

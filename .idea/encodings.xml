@@ -1,32 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" addBOMForNewFiles="with NO BOM">
+  <component name="Encoding">
     <file url="file://$PROJECT_DIR$/rpzh-parent" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-temp-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-auth" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-db" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-function" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-log" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-system" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/resources" charset="UTF-8" />
   </component>
 </project>
