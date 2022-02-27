@@ -13,11 +13,9 @@ spring:
         file-extension: yml
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    #hikari:
-    #max-lifetime: 1800000       #在连接池中的存活时间  Yl123456
-    url: jdbc:mysql://47.57.226.159:3306/rpzh-co2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
-    password: Yl123456
+    password: root
   redis:
     host: 127.0.0.1
     port: 6379
