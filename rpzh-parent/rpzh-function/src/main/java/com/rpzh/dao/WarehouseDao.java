@@ -1,9 +1,9 @@
 package com.rpzh.dao;
 
-import com.rpzh.dto.BuildingDto;
-import com.rpzh.dto.FloorDto;
-import com.rpzh.dto.WarehouseDto;
+import com.rpzh.dto.*;
 import com.rpzh.vo.BuildingVo;
+import com.rpzh.vo.FloorVo;
+import com.rpzh.vo.WareAreaVo;
 import com.rpzh.vo.WarehouseVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -101,4 +101,109 @@ public interface WarehouseDao {
      * @return
      */
     int updateFloor(@Param("floorDto") FloorDto floorDto);
+
+    /**
+     * 查询楼层信息
+     * @param floorId
+     * @return
+     */
+    FloorVo findFloor(@Param("floorId") Integer floorId);
+
+    /**
+     * 新增分区
+     * @param wareAreaDto
+     * @return
+     */
+    int addWarearea(@Param("wareAreaDto") WareAreaDto wareAreaDto);
+
+    /**
+     * 修改分析
+     * @param wareAreaDto
+     * @return
+     */
+    int updateWarearea(@Param("wareAreaDto") WareAreaDto wareAreaDto);
+
+    /**
+     * 查询分区信息
+     * @param areaId
+     * @return
+     */
+    WareAreaVo findWareArea(@Param("areaId") Integer areaId);
+
+    /**
+     * 新增垛位
+     * @param stackDto
+     * @return
+     */
+    int addStack(@Param("stackDto") StackDto stackDto);
+
+    /**
+     * 修改垛位
+     * @param stackDto
+     * @return
+     */
+    int updateStack(@Param("stackDto") StackDto stackDto);
+
+    /**
+     * 删除仓库
+     * @param warehouseNodeId
+     * @return
+     */
+    int delWarehose(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查看楼栋数量
+     * @param warehouseNodeId
+     * @return
+     */
+    int findBuildingCount(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查看楼层数量
+     * @param warehouseNodeId
+     * @return
+     */
+    int findFloorCount(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 删除楼栋
+     * @param warehouseNodeId
+     * @return
+     */
+    int delBuilding(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查看分区
+     * @param warehouseNodeId
+     * @return
+     */
+    int findWareAreaCount(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 删除楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    int delFloor(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询垛位
+     * @param warehouseNodeId
+     * @return
+     */
+    int findStackCount(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 删除
+     * @param warehouseNodeId
+     * @return
+     */
+    int delWareArea(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 删除垛位
+     * @param warehouseNodeId
+     * @return
+     */
+    int delStack(@Param("warehouseNodeId") Integer warehouseNodeId);
 }
