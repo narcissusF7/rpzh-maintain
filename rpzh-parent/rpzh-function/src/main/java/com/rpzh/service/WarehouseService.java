@@ -1,8 +1,6 @@
 package com.rpzh.service;
 
-import com.rpzh.dto.BuildingDto;
-import com.rpzh.dto.FloorDto;
-import com.rpzh.dto.WarehouseDto;
+import com.rpzh.dto.*;
 
 /**
  * 仓库管理
@@ -82,4 +80,95 @@ public interface WarehouseService {
      * @return
      */
     int updateFloor(FloorDto floorDto);
+
+    /**
+     * 新增分区
+     * @param wareAreaDto
+     * @return
+     */
+    int addWarearea(WareAreaDto wareAreaDto);
+
+    /**
+     * 修改分区
+     * @param wareAreaDto
+     * @return
+     */
+    int updateWarearea(WareAreaDto wareAreaDto);
+
+    /**
+     * 新增垛位
+     * @param stackDto
+     * @return
+     */
+    int addStack(StackDto stackDto);
+
+    /**
+     * 修改垛位
+     * @param stackDto
+     * @return
+     */
+    int updateStack(StackDto stackDto);
+
+    /**
+     * 删除仓库
+     * @param warehouseNodeId
+     * @return
+     */
+    int delWarehose(Integer warehouseNodeId);
+
+    /**
+     * 查看是否存在楼栋
+     * @param warehouseNodeId
+     * @return
+     */
+    int findBuildingCount(Integer warehouseNodeId);
+
+    /**
+     * 查看楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    int findFloorCount(Integer warehouseNodeId);
+
+    /**
+     * 删除楼栋
+     * @param warehouseNodeId
+     * @return
+     */
+    int delBuilding(Integer warehouseNodeId);
+
+    /**
+     * 查看分区
+     * @param warehouseNodeId
+     * @return
+     */
+    int findWareAreaCount(Integer warehouseNodeId);
+
+    /**
+     * 删除楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    int delFloor(Integer warehouseNodeId);
+
+    /**
+     * 查看垛位
+     * @param warehouseNodeId
+     * @return
+     */
+    int findStackCount(Integer warehouseNodeId);
+
+    /**
+     * 删除分区
+     * @param warehouseNodeId
+     * @return
+     */
+    int delWareArea(Integer warehouseNodeId);
+
+    /**
+     * 删除垛位
+     * @param warehouseNodeId
+     * @return
+     */
+    int delStack(Integer warehouseNodeId);
 }

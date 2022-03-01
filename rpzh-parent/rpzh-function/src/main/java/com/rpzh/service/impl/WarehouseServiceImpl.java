@@ -2,15 +2,16 @@ package com.rpzh.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.rpzh.dao.WarehouseDao;
-import com.rpzh.dto.BuildingDto;
-import com.rpzh.dto.FloorDto;
-import com.rpzh.dto.WarehouseDto;
+import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.BuildingVo;
+import com.rpzh.vo.FloorVo;
+import com.rpzh.vo.WareAreaVo;
 import com.rpzh.vo.WarehouseVo;
+import com.sun.org.apache.regexp.internal.RE;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -203,5 +204,194 @@ public class WarehouseServiceImpl implements WarehouseService {
         int updateFlag = warehouseDao.updateFloor(floorDto);
         return updateFlag;
     }
+
+    /**
+     * 新增分区
+     * @param wareAreaDto
+     * @return
+     */
+    @Override
+    public int addWarearea(WareAreaDto wareAreaDto) {
+        //查询楼层信息
+        FloorVo floorVo = warehouseDao.findFloor(wareAreaDto.getFloorId());
+        wareAreaDto.setPidRoute(floorVo.getPidRoute() + ",[" + WarehouseNodeType.FLOOR_NODE.getType() + ":" + floorVo.getId() + "]");
+        wareAreaDto.setSiteName(floorVo.getSiteName() + wareAreaDto.getAreaName());
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        wareAreaDto.setCreatedUser(username);
+        int addFlag = warehouseDao.addWarearea(wareAreaDto);
+        return addFlag;
+    }
+
+    /**
+     * 修改分区
+     *
+     * @param wareAreaDto
+     * @return
+     */
+    @Override
+    public int updateWarearea(WareAreaDto wareAreaDto) {
+        //查询楼层信息
+        FloorVo floorVo = warehouseDao.findFloor(wareAreaDto.getFloorId());
+        wareAreaDto.setPidRoute(floorVo.getPidRoute() + ",[" + WarehouseNodeType.FLOOR_NODE.getType() + ":" + floorVo.getId() + "]");
+        wareAreaDto.setSiteName(floorVo.getSiteName() + wareAreaDto.getAreaName());
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        wareAreaDto.setUpdateUser(username);
+        int updateFlag = warehouseDao.updateWarearea(wareAreaDto);
+        return updateFlag;
+    }
+
+    /**
+     * 新增垛位
+     *
+     * @param stackDto
+     * @return
+     */
+    @Override
+    public int addStack(StackDto stackDto) {
+        //查询分区信息
+        WareAreaVo wareAreaVo = warehouseDao.findWareArea(stackDto.getAreaId());
+        stackDto.setPidRoute(wareAreaVo.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + wareAreaVo.getId() + "]");
+        stackDto.setSiteName(wareAreaVo.getSiteName() + stackDto.getNameCn());
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        stackDto.setCreatedUser(username);
+        int addFlag = warehouseDao.addStack(stackDto);
+        return addFlag;
+    }
+
+    /**
+     * 修改垛位
+     *
+     * @param stackDto
+     * @return
+     */
+    @Override
+    public int updateStack(StackDto stackDto) {
+        //查询分区信息
+        WareAreaVo wareAreaVo = warehouseDao.findWareArea(stackDto.getAreaId());
+        stackDto.setPidRoute(wareAreaVo.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + wareAreaVo.getId() + "]");
+        stackDto.setSiteName(wareAreaVo.getSiteName() + stackDto.getNameCn());
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        stackDto.setUpdateUser(username);
+        int updateFlag = warehouseDao.updateStack(stackDto);
+        return updateFlag;
+    }
+
+    /**
+     * 删除仓库
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int delWarehose(Integer warehouseNodeId) {
+        int delWarehose = warehouseDao.delWarehose(warehouseNodeId);
+        return delWarehose;
+    }
+
+    /**
+     * 查看是否存在楼栋
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int findBuildingCount(Integer warehouseNodeId) {
+        int buildCount = warehouseDao.findBuildingCount(warehouseNodeId);
+        return buildCount;
+    }
+
+    /**
+     * 查看楼层
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int findFloorCount(Integer warehouseNodeId) {
+        int count = warehouseDao.findFloorCount(warehouseNodeId);
+        return count;
+    }
+
+    /**
+     * 删除楼栋
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int delBuilding(Integer warehouseNodeId) {
+        int delFlag = warehouseDao.delBuilding(warehouseNodeId);
+        return delFlag;
+    }
+
+    /**
+     * 查看分区
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int findWareAreaCount(Integer warehouseNodeId) {
+        int count = warehouseDao.findWareAreaCount(warehouseNodeId);
+        return count;
+    }
+
+    /**
+     * 删除楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int delFloor(Integer warehouseNodeId) {
+        int delFlag = warehouseDao.delFloor(warehouseNodeId);
+        return delFlag;
+    }
+
+    /**
+     * 查看垛位
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int findStackCount(Integer warehouseNodeId) {
+        int count = warehouseDao.findStackCount(warehouseNodeId);
+        return count;
+    }
+
+    /**
+     * 删除分区
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int delWareArea(Integer warehouseNodeId) {
+        int delWareArea = warehouseDao.delWareArea(warehouseNodeId);
+        return delWareArea;
+    }
+
+    /**
+     * 删除垛位
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public int delStack(Integer warehouseNodeId) {
+        int delStack = warehouseDao.delStack(warehouseNodeId);
+        return delStack;
+    }
+
 
 }

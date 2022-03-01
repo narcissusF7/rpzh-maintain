@@ -210,4 +210,156 @@
   </set>
   WHERE id = #{floorDto.id}
 </update>
+<select id="findFloor" resultType="com.rpzh.vo.FloorVo">
+  SELECT
+  `id` as id,
+  `floor_no` as floorNo,
+  `is_partition` as isPartition,
+  `remark` as remark,
+  `created_time` as createdTime,
+  `pid_route` as pidRoute,
+  `floor_name` as floorName,
+  `site_name` as siteName
+   FROM `tb_floor`
+   WHERE id = #{floorId}
+</select>
+<insert id="addWarearea">
+  INSERT INTO tb_ware_area
+  (
+  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no, </if>
+  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark,  </if>
+  <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> created_user,</if>
+  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id,</if>
+  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route,</if>
+  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name,</if>
+  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name,</if>
+  created_time,
+  last_updated_time
+   )
+  VALUES
+  	(
+  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> #{wareAreaDto.areaNo}, </if>
+  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> #{wareAreaDto.remark},  </if>
+  <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> #{wareAreaDto.createdUser},</if>
+  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> #{wareAreaDto.floorId},</if>
+  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> #{wareAreaDto.pidRoute},</if>
+  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> #{wareAreaDto.areaName},</if>
+  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> #{wareAreaDto.siteName},</if>
+   sysdate(),
+   sysdate()
+  	)
+</insert>
+<update id="updateWarearea">
+  UPDATE tb_ware_area
+  <set>
+  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no = #{wareAreaDto.areaNo},</if>
+  <if test="wareAreaDto.updateUser != null and wareAreaDto.updateUser != ''"> last_updated_user =#{wareAreaDto.updateUser},</if>
+  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id =#{wareAreaDto.floorId},</if>
+  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route =#{wareAreaDto.pidRoute},</if>
+  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name = #{wareAreaDto.areaName},</if>
+  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name = #{wareAreaDto.siteName},</if>
+  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark = #{wareAreaDto.remark},</if>
+  last_updated_time = sysdate()
+   </set>
+  WHERE id = #{wareAreaDto.id}
+  </update>
+<select id="findWareArea" resultType="com.rpzh.vo.WareAreaVo">
+  SELECT
+  `id` as id,
+  `area_no` as areaNo,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `floor_id` as floorId,
+  `pid_route` as pidRoute,
+  `area_name` as areaName,
+  `site_name` as siteName,
+  `remark` as remark
+   FROM `tb_ware_area`
+  WHERE id = #{areaId}
+</select>
+<insert id="addStack">
+  INSERT INTO tb_stack
+  (
+  <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no, </if>
+  <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn, </if>
+  <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> created_user, </if>
+  <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id, </if>
+  <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route, </if>
+  <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name, </if>
+  <if test="stackDto.remark != null and stackDto.remark != ''"> remark, </if>
+  created_time,
+  last_updated_time
+  )
+  VALUES
+  (
+  <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> #{stackDto.stackNo}, </if>
+  <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> #{stackDto.nameCn}, </if>
+  <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> #{stackDto.createdUser}, </if>
+  <if test="stackDto.areaId != null and stackDto.areaId != ''"> #{stackDto.areaId}, </if>
+  <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> #{stackDto.pidRoute}, </if>
+  <if test="stackDto.siteName != null and stackDto.siteName != ''"> #{stackDto.siteName}, </if>
+  <if test="stackDto.remark != null and stackDto.remark != ''"> #{stackDto.remark}, </if>
+   sysdate(),
+   sysdate()
+  )
+</insert>
+<update id="updateStack">
+  UPDATE tb_stack
+  <set>
+ <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no = #{stackDto.stackNo}, </if>
+ <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn =  #{stackDto.nameCn}, </if>
+ <if test="stackDto.updateUser != null and stackDto.updateUser != ''"> last_updated_user =  #{stackDto.updateUser}, </if>
+ <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id =  #{stackDto.areaId}, </if>
+ <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route =  #{stackDto.pidRoute}, </if>
+ <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name =  #{stackDto.siteName}, </if>
+ <if test="stackDto.remark != null and stackDto.remark != ''"> remark =  #{stackDto.remark}, </if>
+ last_updated_time = sysdate()
+  </set>
+  WHERE id = #{stackDto.id}
+</update>
+<delete id="delWarehose">
+  DELETE
+  FROM tb_warehouse
+  WHERE id = #{warehouseNodeId}
+</delete>
+<select id="findBuildingCount" resultType="int">
+  SELECT count(1)
+  FROM tb_building
+  WHERE warehouse_id = #{warehouseNodeId}
+</select>
+<select id="findFloorCount" resultType="int">
+  SELECT count(1)
+  FROM tb_floor
+  WHERE building_id = #{warehouseNodeId}
+</select>
+<delete id="delBuilding">
+  DELETE
+  FROM tb_building
+  WHERE id = #{warehouseNodeId}
+</delete>
+<select id="findWareAreaCount" resultType="int">
+  SELECT count(1)
+  FROM tb_ware_area
+  WHERE floor_id = #{warehouseNodeId}
+</select>
+<delete id="delFloor">
+  DELETE
+  FROM tb_floor
+  WHERE id = #{warehouseNodeId}
+</delete>
+<select id="findStackCount" resultType="int">
+  SELECT count(1)
+  FROM tb_stack
+  WHERE area_id = #{warehouseNodeId}
+</select>
+<delete id="delWareArea">
+  DELETE
+  FROM tb_ware_area
+  WHERE id = #{warehouseNodeId}
+</delete>
+<delete id="delStack">
+  DELETE
+  FROM tb_stack
+  WHERE id = #{warehouseNodeId}
+</delete>
 </mapper>
