@@ -110,6 +110,8 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.2.12.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.20" level="project" />
+    <orderEntry type="library" name="Maven: com.github.pagehelper:pagehelper:5.2.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.jsqlparser:jsqlparser:4.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.xiaoymin:knife4j-spring-boot-starter:2.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.github.xiaoymin:knife4j-spring-boot-autoconfigure:2.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.github.xiaoymin:knife4j-spring:2.0.2" level="project" />

@@ -1,16 +1,12 @@
 package com.rpzh.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
-import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.FloorVo;
-import com.rpzh.vo.WarehouseVo;
-import com.sun.org.apache.regexp.internal.RE;
-import org.apache.poi.ss.usermodel.Footer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,8 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-import java.util.Map;
 
 /**
  * 仓库管理
@@ -334,5 +328,12 @@ public class WarehouseController {
     }
 
 
-
+    /**
+     *获取垛位列表
+     * @return
+     */
+    @PostMapping("/getStackPage")
+    public Result<PageInfo> getStackPage(){
+        return null;
+    }
 }
