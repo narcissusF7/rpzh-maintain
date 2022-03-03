@@ -5,14 +5,15 @@ import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
+import com.rpzh.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 /**
@@ -271,6 +272,7 @@ public class WarehouseController {
 
     /**
      * 删除仓库
+     *
      * @param delDto
      * @return
      */
@@ -329,11 +331,51 @@ public class WarehouseController {
 
 
     /**
-     *获取垛位列表
+     * 获取垛位列表
+     * @param stackDto
      * @return
      */
     @PostMapping("/getStackPage")
-    public Result<PageInfo> getStackPage(){
-        return null;
+    public Result<PageInfo> getStackPage(StackDto stackDto) {
+        if (ToolUtil.isEmpty(stackDto.getWareareaId())){
+            return new Result<>(false, StatusCode.ERROR, "区域id不能为空");
+        }
+        PageInfo<StackVo> pageInfo = warehouseService.getStackPage(stackDto);
+        return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
+    }
+
+    /**
+     * 加载仓库页面列表树
+     *
+     * @param warehouseNodeId   仓库节点id
+     * @param warehouseNodeType 仓库类型
+     * @return
+     */
+    @PostMapping("/warehouseTree")
+    public Result warehouseTree(Integer warehouseNodeId, String warehouseNodeType) {
+        if (ToolUtil.isEmpty(warehouseNodeId)) {
+            return new Result(false, StatusCode.ERROR, "仓库节点id不能为空");
+        }
+        if (ToolUtil.isEmpty(warehouseNodeType)) {
+            return new Result(false, StatusCode.ERROR, "仓库类型不能为空");
+        }
+        //01：仓库, 02: 楼号, 03:楼层，04：分区，05：垛位）
+        switch (warehouseNodeType) {
+            case "01"://查询仓库
+                List<WarehouseVo> warehouseVoList = warehouseService.findAllWarehouse();
+                return new Result(true, StatusCode.OK, "查询仓库信息成功", warehouseVoList);
+            case "02"://查询楼号
+                List<BuildingVo> buildingVoList = warehouseService.findBuildingById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询楼号信息成功", buildingVoList);
+            case "03"://查询楼层
+                List<FloorVo> floorVoList = warehouseService.findFloorById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询楼层成功", floorVoList);
+            case "04"://查询分区
+                List<WareAreaVo> wareAreaVoList = warehouseService.findWareAreaById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询分区成功", wareAreaVoList);
+            default:
+                break;
+        }
+        return new Result(true, StatusCode.OK, "查询成功");
     }
 }

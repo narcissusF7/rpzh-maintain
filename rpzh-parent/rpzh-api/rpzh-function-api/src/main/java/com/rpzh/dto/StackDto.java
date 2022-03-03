@@ -1,6 +1,5 @@
 package com.rpzh.dto;
 
-import com.sun.istack.internal.NotNull;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -44,6 +43,17 @@ public class StackDto {
 
     //更新人
     private String updateUser;
+
+    //区域id
+    private Integer wareareaId;
+
+    //分页开始页面
+    @ApiModelProperty(notes = "分页开始页")
+    private int page;
+
+    //分页每页显示
+    @ApiModelProperty(notes = "分页每页显示")
+    private int size;
 
     //备注
     @ApiModelProperty("备注")

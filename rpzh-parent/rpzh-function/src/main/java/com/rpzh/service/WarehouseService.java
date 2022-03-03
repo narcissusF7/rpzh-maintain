@@ -1,6 +1,10 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.*;
+import com.rpzh.vo.*;
+
+import java.util.List;
 
 /**
  * 仓库管理
@@ -171,4 +175,38 @@ public interface WarehouseService {
      * @return
      */
     int delStack(Integer warehouseNodeId);
+
+    /**
+     * 仓库列表树中查询所有的仓库
+     * @return
+     */
+    List<WarehouseVo> findAllWarehouse();
+
+    /**
+     * 查询所有的楼栋
+     * @param warehouseNodeId
+     * @return
+     */
+    List<BuildingVo> findBuildingById(Integer warehouseNodeId);
+
+    /**
+     * 查询楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    List<FloorVo> findFloorById(Integer warehouseNodeId);
+
+    /**
+     * 查询分区
+     * @param warehouseNodeId
+     * @return
+     */
+    List<WareAreaVo> findWareAreaById(Integer warehouseNodeId);
+
+    /**
+     * 查询垛位
+     *
+     * @return
+     */
+    PageInfo<StackVo> getStackPage(StackDto stackDto);
 }

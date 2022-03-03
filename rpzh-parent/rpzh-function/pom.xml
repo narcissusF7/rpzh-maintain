@@ -69,6 +69,12 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.rpzh</groupId>
+            <artifactId>rpzh-common-db</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!--文档api-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>

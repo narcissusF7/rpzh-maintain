@@ -1,12 +1,11 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.*;
-import com.rpzh.vo.BuildingVo;
-import com.rpzh.vo.FloorVo;
-import com.rpzh.vo.WareAreaVo;
-import com.rpzh.vo.WarehouseVo;
+import com.rpzh.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 仓库管理
@@ -206,4 +205,38 @@ public interface WarehouseDao {
      * @return
      */
     int delStack(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 仓库列表树中查询所有的仓库
+     * @return
+     */
+    List<WarehouseVo> findAllWarehouse();
+
+    /**
+     * 查询楼栋
+     * @param warehouseNodeId
+     * @return
+     */
+    List<BuildingVo> findBuildingById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    List<FloorVo> findFloorById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询分区
+     * @param warehouseNodeId
+     * @return
+     */
+    List<WareAreaVo> findWareAreaById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询垛位
+     * @param
+     * @return
+     */
+    List<StackVo> getStackPage(@Param("stackDto") StackDto stackDto);
 }

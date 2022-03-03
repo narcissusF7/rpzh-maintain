@@ -1,16 +1,15 @@
 package com.rpzh.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
 import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.BuildingVo;
-import com.rpzh.vo.FloorVo;
-import com.rpzh.vo.WareAreaVo;
-import com.rpzh.vo.WarehouseVo;
+import com.rpzh.vo.*;
 import com.sun.org.apache.regexp.internal.RE;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -391,6 +391,66 @@ public class WarehouseServiceImpl implements WarehouseService {
     public int delStack(Integer warehouseNodeId) {
         int delStack = warehouseDao.delStack(warehouseNodeId);
         return delStack;
+    }
+
+    /**
+     * 仓库列表树中查询所有的仓库
+     * @return
+     */
+    @Override
+    public List<WarehouseVo> findAllWarehouse() {
+        List<WarehouseVo> warehouseVoList = warehouseDao.findAllWarehouse();
+        return warehouseVoList;
+    }
+
+    /**
+     * 查询所有的楼栋
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public List<BuildingVo> findBuildingById(Integer warehouseNodeId) {
+        List<BuildingVo> buildingVoList = warehouseDao.findBuildingById(warehouseNodeId);
+        return buildingVoList;
+    }
+
+    /**
+     * 查询楼层
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public List<FloorVo> findFloorById(Integer warehouseNodeId) {
+        List<FloorVo> floorVoList = warehouseDao.findFloorById(warehouseNodeId);
+        return floorVoList;
+    }
+
+    /**
+     * 查询分区
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public List<WareAreaVo> findWareAreaById(Integer warehouseNodeId) {
+        List<WareAreaVo> wareAreaVoList = warehouseDao.findWareAreaById(warehouseNodeId);
+        return wareAreaVoList;
+    }
+
+    /**
+     * 查询垛位
+     *
+     *
+     * @return
+     */
+    @Override
+    public PageInfo<StackVo> getStackPage(StackDto stackDto) {
+        int page = stackDto.getPage();
+        int size = stackDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<StackVo> stackVoList = warehouseDao.getStackPage(stackDto);
+        return new PageInfo<StackVo>(stackVoList);
     }
 
 
