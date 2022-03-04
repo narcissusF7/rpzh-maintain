@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.NodeDao">
+<insert id="addNode">
+  INSERT INTO tb_node (
+  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> node_id,</if>
+  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> node_type,</if>
+  <if test="nodeDto.status != null and nodeDto.status != ''"> status,</if>
+ <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> gather_site,</if>
+ <if test="nodeDto.stack != null and nodeDto.stack != ''"> stack,</if>
+ <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">created_user,</if>
+ <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type,</if>
+  last_updated_time,
+  created_time
+  )
+  VALUES
+    (
+  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> #{nodeDto.nodeId},</if>
+  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> #{nodeDto.nodeType},</if>
+  <if test="nodeDto.status != null and nodeDto.status != ''"> #{nodeDto.status},</if>
+  <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> #{nodeDto.gatherSite},</if>
+  <if test="nodeDto.stack != null and nodeDto.stack != ''">#{nodeDto.stack},</if>
+  <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
+  <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
+  sysdate(),
+  sysdate()
+    )
+</insert>
+<select id="findNodeID" resultType="java.lang.String">
+  SELECT node_id
+  FROM tb_node
+  WHERE node_id = #{nodeId} and id != #{id}
+  limit 1
+</select>
+<update id="updateNode">
+  UPDATE tb_node
+  <set>
+  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> node_id = #{nodeDto.nodeId},</if>
+  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> node_type = #{nodeDto.nodeType},</if>
+  <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> gather_site = #{nodeDto.gatherSite},</if>
+  <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''"> last_updated_user = #{nodeDto.lastUpdatedUser},</if>
+  <if test="nodeDto.siteType != null and nodeDto.siteType != ''"> site_type = #{nodeDto.siteType},</if>
+  <if test="nodeDto.siteId != null and nodeDto.siteId != ''"> site_id = #{nodeDto.siteId},</if>
+  <if test="nodeDto.siteX != null and nodeDto.siteX != ''"> site_x = #{nodeDto.siteX},</if>
+  <if test="nodeDto.siteY != null and nodeDto.siteY != ''"> site_y = #{nodeDto.siteY},</if>
+  <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''"> site_z = #{nodeDto.siteZ},</if>
+  <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''"> site_route = #{nodeDto.siteRoute},</if>
+  last_updated_time = sysdate()
+  </set>
+  WHERE id = #{nodeDto.id}
+</update>
+</mapper>
