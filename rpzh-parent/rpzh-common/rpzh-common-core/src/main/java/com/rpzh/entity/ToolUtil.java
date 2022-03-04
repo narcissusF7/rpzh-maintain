@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -554,16 +556,20 @@ public class ToolUtil {
         return false;
     }
 
-
-
+    public static <T> T sqlBeanTransition(Object dtoOrVo, T pojo) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Constructor<?> constructor = pojo.getClass().getConstructor(dtoOrVo.getClass());
+        pojo = (T) constructor.newInstance(dtoOrVo);
+        return pojo;
+    }
 
 
     /**
      * 是否已经过超过几分钟
+     *
      * @param date 需要判断的时间
      * @return
      */
-    public static boolean isLongerthanMinute(Date date,int numTime){
+    public static boolean isLongerthanMinute(Date date, int numTime) {
 
         /*Calendar cal = Calendar.getInstance();
 
@@ -572,15 +578,15 @@ public class ToolUtil {
         cal1.add(Calendar.MINUTE, +numTime);
 
         return cal1.compareTo(cal) == 1?false:true;*/
-        Calendar dateOne=Calendar.getInstance();
-        Calendar dateTwo=Calendar.getInstance();
+        Calendar dateOne = Calendar.getInstance();
+        Calendar dateTwo = Calendar.getInstance();
         dateOne.setTime(new Date());    //设置为当前系统时间
         dateTwo.setTime(date);    //获取数据库中的时间
-        long timeOne=dateOne.getTimeInMillis();
-        long timeTwo=dateTwo.getTimeInMillis();
-        long minute=(timeOne-timeTwo)/(1000*60);//转化minute
+        long timeOne = dateOne.getTimeInMillis();
+        long timeTwo = dateTwo.getTimeInMillis();
+        long minute = (timeOne - timeTwo) / (1000 * 60);//转化minute
         //判断账户锁定时间是否大于30分钟
-        if(minute<numTime){
+        if (minute < numTime) {
             //小于30分钟，锁定用户
             return false;
         }

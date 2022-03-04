@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.MaintainPlanDao">
+    <resultMap id="BaseResultMap" type="pojo.MaintainPlan">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="alarm_value_setting_id" jdbcType="INTEGER" property="alarmValueSettingId"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="expire_time" jdbcType="TIMESTAMP" property="expireTime"/>
+        <result column="is_end" jdbcType="INTEGER" property="isEnd"/>
+        <result column="is_change" jdbcType="INTEGER" property="isChange"/>
+        <result column="approver_opinion" jdbcType="VARCHAR" property="approverOpinion"/>
+        <result column="approver_time" jdbcType="TIMESTAMP" property="approverTime"/>
+        <result column="approver_name" jdbcType="VARCHAR" property="approverName"/>
+        <result column="approver_id" jdbcType="INTEGER" property="approverId"/>
+        <result column="approve_status" jdbcType="INTEGER" property="approveStatus"/>
+        <result column="last_updated_user_id" jdbcType="INTEGER" property="lastUpdatedUserId"/>
+        <result column="created_user_id" jdbcType="INTEGER" property="createdUserId"/>
+        <result column="last_updated_user" jdbcType="VARCHAR" property="lastUpdatedUser"/>
+        <result column="last_updated_time" jdbcType="TIMESTAMP" property="lastUpdatedTime"/>
+        <result column="created_user" jdbcType="VARCHAR" property="createdUser"/>
+        <result column="maintain_stage_data" jdbcType="OTHER" property="maintainStageData"/>
+        <result column="maintain_count" jdbcType="DOUBLE" property="maintainCount"/>
+        <result column="oxygen_reduction_days" jdbcType="INTEGER" property="oxygenReductionDays"/>
+        <result column="aftercare_date_end" jdbcType="TIMESTAMP" property="aftercareDateEnd"/>
+        <result column="aftercare_date_start" jdbcType="TIMESTAMP" property="aftercareDateStart"/>
+        <result column="maintain_days" jdbcType="INTEGER" property="maintainDays"/>
+        <result column="maintain_stage" jdbcType="VARCHAR" property="maintainStage"/>
+        <result column="apply_num" jdbcType="VARCHAR" property="applyNum"/>
+        <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime"/>
+        <result column="principal_name" jdbcType="VARCHAR" property="principalName"/>
+        <result column="principal_id" jdbcType="INTEGER" property="principalId"/>
+        <result column="site_type" jdbcType="VARCHAR" property="siteType"/>
+        <result column="year" jdbcType="VARCHAR" property="year"/>
+        <result column="site_name" jdbcType="VARCHAR" property="siteName"/>
+        <result column="site_id" jdbcType="INTEGER" property="siteId"/>
+        <result column="warehouse_build_time" jdbcType="TIMESTAMP" property="warehouseBuildTime"/>
+        <result column="material_batch_num" jdbcType="VARCHAR" property="materialBatchNum"/>
+        <result column="material_name" jdbcType="VARCHAR" property="materialName"/>
+        <result column="material_code" jdbcType="VARCHAR" property="materialCode"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, create_time, alarm_value_setting_id, `status`, remark, grade, content, expire_time,
+    is_end, is_change, approver_opinion, approver_time, approver_name, approver_id, approve_status,
+    last_updated_user_id, created_user_id, last_updated_user, last_updated_time, created_user,
+    maintain_stage_data, maintain_count, oxygen_reduction_days, aftercare_date_end, aftercare_date_start,
+    maintain_days, maintain_stage, apply_num, apply_time, principal_name, principal_id,
+    site_type, `year`, site_name, site_id, warehouse_build_time, material_batch_num,
+    material_name, material_code
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_maintain_plan
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findMaintainPlanInfo" resultType="vo.MaintainPlanVo">
+        select material_batch_num as materialBatchNum,
+        material_name as materialName,
+        maintain_stage as maintainStage,
+        site_name as siteName,
+        apply_time as applyTime
+        from tb_maintain_plan
+        <where>
+            1=1
+            <if test="maintainPlanDto.materialBatchNum!=null and maintainPlanDto.materialBatchNum!=''">
+                and material_batch_num = #{maintainPlanDto.materialBatchNum}
+            </if>
+            <if test="maintainPlanDto.tobaccoName!=null and maintainPlanDto.tobaccoName!=''">
+                and material_name = #{maintainPlanDto.tobaccoName}
+            </if>
+            <if test="maintainPlanDto.siteName!=null and maintainPlanDto.siteName!=''">
+                and site_name = #{maintainPlanDto.siteName}
+            </if>
+            <if test="maintainPlanDto.dateOfApplyFor!=null and maintainPlanDto.dateOfApplyFor!=''">
+                and apply_time = #{maintainPlanDto.dateOfApplyFor}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tb_maintain_plan
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="pojo.MaintainPlan" useGeneratedKeys="true">
+        insert into tb_maintain_plan (create_time, alarm_value_setting_id,
+                                      `status`, remark, grade,
+                                      content, expire_time, is_end,
+                                      is_change, approver_opinion, approver_time,
+                                      approver_name, approver_id, approve_status,
+                                      last_updated_user_id, created_user_id, last_updated_user,
+                                      last_updated_time, created_user, maintain_stage_data,
+                                      maintain_count, oxygen_reduction_days, aftercare_date_end,
+                                      aftercare_date_start, maintain_days, maintain_stage,
+                                      apply_num, apply_time, principal_name,
+                                      principal_id, site_type, `year`,
+                                      site_name, site_id, warehouse_build_time,
+                                      material_batch_num, material_name, material_code)
+        values (#{createTime,jdbcType=TIMESTAMP}, #{alarmValueSettingId,jdbcType=INTEGER},
+                #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{grade,jdbcType=VARCHAR},
+                #{content,jdbcType=VARCHAR}, #{expireTime,jdbcType=TIMESTAMP}, #{isEnd,jdbcType=INTEGER},
+                #{isChange,jdbcType=INTEGER}, #{approverOpinion,jdbcType=VARCHAR}, #{approverTime,jdbcType=TIMESTAMP},
+                #{approverName,jdbcType=VARCHAR}, #{approverId,jdbcType=INTEGER}, #{approveStatus,jdbcType=INTEGER},
+                #{lastUpdatedUserId,jdbcType=INTEGER}, #{createdUserId,jdbcType=INTEGER},
+                #{lastUpdatedUser,jdbcType=VARCHAR},
+                #{lastUpdatedTime,jdbcType=TIMESTAMP}, #{createdUser,jdbcType=VARCHAR},
+                #{maintainStageData,jdbcType=OTHER},
+                #{maintainCount,jdbcType=DOUBLE}, #{oxygenReductionDays,jdbcType=INTEGER},
+                #{aftercareDateEnd,jdbcType=TIMESTAMP},
+                #{aftercareDateStart,jdbcType=TIMESTAMP}, #{maintainDays,jdbcType=INTEGER},
+                #{maintainStage,jdbcType=VARCHAR},
+                #{applyNum,jdbcType=VARCHAR}, #{applyTime,jdbcType=TIMESTAMP}, #{principalName,jdbcType=VARCHAR},
+                #{principalId,jdbcType=INTEGER}, #{siteType,jdbcType=VARCHAR}, #{year,jdbcType=VARCHAR},
+                #{siteName,jdbcType=VARCHAR}, #{siteId,jdbcType=INTEGER}, #{warehouseBuildTime,jdbcType=TIMESTAMP},
+                #{materialBatchNum,jdbcType=VARCHAR}, #{materialName,jdbcType=VARCHAR},
+                #{materialCode,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="pojo.MaintainPlan"
+            useGeneratedKeys="true">
+        insert into tb_maintain_plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="alarmValueSettingId != null">
+                alarm_value_setting_id,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="expireTime != null">
+                expire_time,
+            </if>
+            <if test="isEnd != null">
+                is_end,
+            </if>
+            <if test="isChange != null">
+                is_change,
+            </if>
+            <if test="approverOpinion != null">
+                approver_opinion,
+            </if>
+            <if test="approverTime != null">
+                approver_time,
+            </if>
+            <if test="approverName != null">
+                approver_name,
+            </if>
+            <if test="approverId != null">
+                approver_id,
+            </if>
+            <if test="approveStatus != null">
+                approve_status,
+            </if>
+            <if test="lastUpdatedUserId != null">
+                last_updated_user_id,
+            </if>
+            <if test="createdUserId != null">
+                created_user_id,
+            </if>
+            <if test="lastUpdatedUser != null">
+                last_updated_user,
+            </if>
+            <if test="lastUpdatedTime != null">
+                last_updated_time,
+            </if>
+            <if test="createdUser != null">
+                created_user,
+            </if>
+            <if test="maintainStageData != null">
+                maintain_stage_data,
+            </if>
+            <if test="maintainCount != null">
+                maintain_count,
+            </if>
+            <if test="oxygenReductionDays != null">
+                oxygen_reduction_days,
+            </if>
+            <if test="aftercareDateEnd != null">
+                aftercare_date_end,
+            </if>
+            <if test="aftercareDateStart != null">
+                aftercare_date_start,
+            </if>
+            <if test="maintainDays != null">
+                maintain_days,
+            </if>
+            <if test="maintainStage != null">
+                maintain_stage,
+            </if>
+            <if test="applyNum != null">
+                apply_num,
+            </if>
+            <if test="applyTime != null">
+                apply_time,
+            </if>
+            <if test="principalName != null">
+                principal_name,
+            </if>
+            <if test="principalId != null">
+                principal_id,
+            </if>
+            <if test="siteType != null">
+                site_type,
+            </if>
+            <if test="year != null">
+                `year`,
+            </if>
+            <if test="siteName != null">
+                site_name,
+            </if>
+            <if test="siteId != null">
+                site_id,
+            </if>
+            <if test="warehouseBuildTime != null">
+                warehouse_build_time,
+            </if>
+            <if test="materialBatchNum != null">
+                material_batch_num,
+            </if>
+            <if test="materialName != null">
+                material_name,
+            </if>
+            <if test="materialCode != null">
+                material_code,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="alarmValueSettingId != null">
+                #{alarmValueSettingId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="expireTime != null">
+                #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isEnd != null">
+                #{isEnd,jdbcType=INTEGER},
+            </if>
+            <if test="isChange != null">
+                #{isChange,jdbcType=INTEGER},
+            </if>
+            <if test="approverOpinion != null">
+                #{approverOpinion,jdbcType=VARCHAR},
+            </if>
+            <if test="approverTime != null">
+                #{approverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approverName != null">
+                #{approverName,jdbcType=VARCHAR},
+            </if>
+            <if test="approverId != null">
+                #{approverId,jdbcType=INTEGER},
+            </if>
+            <if test="approveStatus != null">
+                #{approveStatus,jdbcType=INTEGER},
+            </if>
+            <if test="lastUpdatedUserId != null">
+                #{lastUpdatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdUserId != null">
+                #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="lastUpdatedUser != null">
+                #{lastUpdatedUser,jdbcType=VARCHAR},
+            </if>
+            <if test="lastUpdatedTime != null">
+                #{lastUpdatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdUser != null">
+                #{createdUser,jdbcType=VARCHAR},
+            </if>
+            <if test="maintainStageData != null">
+                #{maintainStageData,jdbcType=OTHER},
+            </if>
+            <if test="maintainCount != null">
+                #{maintainCount,jdbcType=DOUBLE},
+            </if>
+            <if test="oxygenReductionDays != null">
+                #{oxygenReductionDays,jdbcType=INTEGER},
+            </if>
+            <if test="aftercareDateEnd != null">
+                #{aftercareDateEnd,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aftercareDateStart != null">
+                #{aftercareDateStart,jdbcType=TIMESTAMP},
+            </if>
+            <if test="maintainDays != null">
+                #{maintainDays,jdbcType=INTEGER},
+            </if>
+            <if test="maintainStage != null">
+                #{maintainStage,jdbcType=VARCHAR},
+            </if>
+            <if test="applyNum != null">
+                #{applyNum,jdbcType=VARCHAR},
+            </if>
+            <if test="applyTime != null">
+                #{applyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="principalName != null">
+                #{principalName,jdbcType=VARCHAR},
+            </if>
+            <if test="principalId != null">
+                #{principalId,jdbcType=INTEGER},
+            </if>
+            <if test="siteType != null">
+                #{siteType,jdbcType=VARCHAR},
+            </if>
+            <if test="year != null">
+                #{year,jdbcType=VARCHAR},
+            </if>
+            <if test="siteName != null">
+                #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="siteId != null">
+                #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="warehouseBuildTime != null">
+                #{warehouseBuildTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="materialBatchNum != null">
+                #{materialBatchNum,jdbcType=VARCHAR},
+            </if>
+            <if test="materialName != null">
+                #{materialName,jdbcType=VARCHAR},
+            </if>
+            <if test="materialCode != null">
+                #{materialCode,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="pojo.MaintainPlan">
+        update tb_maintain_plan
+        <set>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="alarmValueSettingId != null">
+                alarm_value_setting_id = #{alarmValueSettingId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isEnd != null">
+                is_end = #{isEnd,jdbcType=INTEGER},
+            </if>
+            <if test="isChange != null">
+                is_change = #{isChange,jdbcType=INTEGER},
+            </if>
+            <if test="approverOpinion != null">
+                approver_opinion = #{approverOpinion,jdbcType=VARCHAR},
+            </if>
+            <if test="approverTime != null">
+                approver_time = #{approverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approverName != null">
+                approver_name = #{approverName,jdbcType=VARCHAR},
+            </if>
+            <if test="approverId != null">
+                approver_id = #{approverId,jdbcType=INTEGER},
+            </if>
+            <if test="approveStatus != null">
+                approve_status = #{approveStatus,jdbcType=INTEGER},
+            </if>
+            <if test="lastUpdatedUserId != null">
+                last_updated_user_id = #{lastUpdatedUserId,jdbcType=INTEGER},
+            </if>
+            <if test="createdUserId != null">
+                created_user_id = #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="lastUpdatedUser != null">
+                last_updated_user = #{lastUpdatedUser,jdbcType=VARCHAR},
+            </if>
+            <if test="lastUpdatedTime != null">
+                last_updated_time = #{lastUpdatedTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdUser != null">
+                created_user = #{createdUser,jdbcType=VARCHAR},
+            </if>
+            <if test="maintainStageData != null">
+                maintain_stage_data = #{maintainStageData,jdbcType=OTHER},
+            </if>
+            <if test="maintainCount != null">
+                maintain_count = #{maintainCount,jdbcType=DOUBLE},
+            </if>
+            <if test="oxygenReductionDays != null">
+                oxygen_reduction_days = #{oxygenReductionDays,jdbcType=INTEGER},
+            </if>
+            <if test="aftercareDateEnd != null">
+                aftercare_date_end = #{aftercareDateEnd,jdbcType=TIMESTAMP},
+            </if>
+            <if test="aftercareDateStart != null">
+                aftercare_date_start = #{aftercareDateStart,jdbcType=TIMESTAMP},
+            </if>
+            <if test="maintainDays != null">
+                maintain_days = #{maintainDays,jdbcType=INTEGER},
+            </if>
+            <if test="maintainStage != null">
+                maintain_stage = #{maintainStage,jdbcType=VARCHAR},
+            </if>
+            <if test="applyNum != null">
+                apply_num = #{applyNum,jdbcType=VARCHAR},
+            </if>
+            <if test="applyTime != null">
+                apply_time = #{applyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="principalName != null">
+                principal_name = #{principalName,jdbcType=VARCHAR},
+            </if>
+            <if test="principalId != null">
+                principal_id = #{principalId,jdbcType=INTEGER},
+            </if>
+            <if test="siteType != null">
+                site_type = #{siteType,jdbcType=VARCHAR},
+            </if>
+            <if test="year != null">
+                `year` = #{year,jdbcType=VARCHAR},
+            </if>
+            <if test="siteName != null">
+                site_name = #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="siteId != null">
+                site_id = #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="warehouseBuildTime != null">
+                warehouse_build_time = #{warehouseBuildTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="materialBatchNum != null">
+                material_batch_num = #{materialBatchNum,jdbcType=VARCHAR},
+            </if>
+            <if test="materialName != null">
+                material_name = #{materialName,jdbcType=VARCHAR},
+            </if>
+            <if test="materialCode != null">
+                material_code = #{materialCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="pojo.MaintainPlan">
+        update tb_maintain_plan
+        set create_time            = #{createTime,jdbcType=TIMESTAMP},
+            alarm_value_setting_id = #{alarmValueSettingId,jdbcType=INTEGER},
+            `status`               = #{status,jdbcType=INTEGER},
+            remark                 = #{remark,jdbcType=VARCHAR},
+            grade                  = #{grade,jdbcType=VARCHAR},
+            content                = #{content,jdbcType=VARCHAR},
+            expire_time            = #{expireTime,jdbcType=TIMESTAMP},
+            is_end                 = #{isEnd,jdbcType=INTEGER},
+            is_change              = #{isChange,jdbcType=INTEGER},
+            approver_opinion       = #{approverOpinion,jdbcType=VARCHAR},
+            approver_time          = #{approverTime,jdbcType=TIMESTAMP},
+            approver_name          = #{approverName,jdbcType=VARCHAR},
+            approver_id            = #{approverId,jdbcType=INTEGER},
+            approve_status         = #{approveStatus,jdbcType=INTEGER},
+            last_updated_user_id   = #{lastUpdatedUserId,jdbcType=INTEGER},
+            created_user_id        = #{createdUserId,jdbcType=INTEGER},
+            last_updated_user      = #{lastUpdatedUser,jdbcType=VARCHAR},
+            last_updated_time      = #{lastUpdatedTime,jdbcType=TIMESTAMP},
+            created_user           = #{createdUser,jdbcType=VARCHAR},
+            maintain_stage_data    = #{maintainStageData,jdbcType=OTHER},
+            maintain_count         = #{maintainCount,jdbcType=DOUBLE},
+            oxygen_reduction_days  = #{oxygenReductionDays,jdbcType=INTEGER},
+            aftercare_date_end     = #{aftercareDateEnd,jdbcType=TIMESTAMP},
+            aftercare_date_start   = #{aftercareDateStart,jdbcType=TIMESTAMP},
+            maintain_days          = #{maintainDays,jdbcType=INTEGER},
+            maintain_stage         = #{maintainStage,jdbcType=VARCHAR},
+            apply_num              = #{applyNum,jdbcType=VARCHAR},
+            apply_time             = #{applyTime,jdbcType=TIMESTAMP},
+            principal_name         = #{principalName,jdbcType=VARCHAR},
+            principal_id           = #{principalId,jdbcType=INTEGER},
+            site_type              = #{siteType,jdbcType=VARCHAR},
+            `year`                 = #{year,jdbcType=VARCHAR},
+            site_name              = #{siteName,jdbcType=VARCHAR},
+            site_id                = #{siteId,jdbcType=INTEGER},
+            warehouse_build_time   = #{warehouseBuildTime,jdbcType=TIMESTAMP},
+            material_batch_num     = #{materialBatchNum,jdbcType=VARCHAR},
+            material_name          = #{materialName,jdbcType=VARCHAR},
+            material_code          = #{materialCode,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+</mapper>
