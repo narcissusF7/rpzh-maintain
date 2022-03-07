@@ -5,42 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2a376d1-7dfb-4308-a961-04ff5258e0bb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/dto/LoginLogDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/dto/OperationLogDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/entity/LogSystemModule.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/mapper/SystemModuleMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources/com/rpzh/mapper/SystemModuleMapper.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/free-mybatis-generator-config.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/dto/MaintainPlanDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/pojo/AlarmValueSetting.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/pojo/MaintainPlan.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/vo/MaintainPlanVo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/controller/MaintainPlanController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/dao/AlarmValueSettingDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/dao/MaintainPlanDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/MaintainPlanService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/MaintainPlanServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/com/rpzh/dao/MaintainPlanDao.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java/com/rpzh/feign/RemoteLoginLogFeign.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java/com/rpzh/feign/RemoteLoginLogFeign.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java/com/rpzh/feign/RemoteOperationLogFeign.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java/com/rpzh/feign/RemoteOperationLogFeign.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/DeptDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/DeptDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/MenuDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/MenuDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/RoleDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/RoleDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/UserDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/src/main/java/com/rpzh/dto/UserDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/java/com/rpzh/controller/OauthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/java/com/rpzh/controller/OauthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/aspect/LoggingAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/aspect/LoggingAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/aspect/OperationAspect.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/aspect/OperationAspect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/entity/LogOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/entity/LogOperation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/resources/META-INF/spring.factories" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/resources/META-INF/spring.factories" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/resources/bootstrap-local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/target/classes/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/target/classes/bootstrap-local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/controller/LoginLogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/controller/LoginLogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/rpzh-function-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/rpzh-function-api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/src/main/java/com/rpzh/entity/ToolUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/src/main/java/com/rpzh/entity/ToolUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/rpzh-function.iml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/rpzh-function.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/RpzhFunctionApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/RpzhFunctionApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-local.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/controller/OperationLogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/controller/OperationLogController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/mapper/LoginLogMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/mapper/LoginLogMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/mapper/OperationLogMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/mapper/OperationLogMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/LoginLogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/LoginLogService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/OperationLogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/OperationLogService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/impl/LoginLogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/impl/LoginLogServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/impl/OperationLogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/service/impl/OperationLogServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources/com/rpzh/mapper/LoginLogMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources/com/rpzh/mapper/LoginLogMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/DeptController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/DeptController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/MenuController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/RoleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/RoleController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/java/com/rpzh/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,8 +53,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -85,6 +73,17 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/MaintainPlanService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/MaintainPlanServiceImpl.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/dao/MaintainPlanDao.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/controller/MaintainPlanController.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/com/rpzh/dao/MaintainPlanDao.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/resources/com/rpzh/dao/DeptDao.xml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/dto/MaintainPlanDto.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/RpzhFunctionApplication.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/entity/LogLogin.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -188,6 +187,9 @@
     <option name="height" value="938" />
   </component>
   <component name="ProjectId" id="23uTBB4IjFac7kLA8x3fRaSoDJj" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -203,6 +205,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql" />
     <property name="RequestMappingsPanelOrder0" value="0" />
     <property name="RequestMappingsPanelOrder1" value="1" />
     <property name="RequestMappingsPanelWidth0" value="75" />
@@ -253,7 +256,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.RpzhLogApplication">
+  <component name="RunManager" selected="Spring Boot.RpzhFunctionApplication">
     <configuration name="RpzhAuthApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="rpzh-auth" />
       <extension name="coverage">
@@ -263,6 +266,20 @@
         </pattern>
       </extension>
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhAuthApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RpzhCarbonApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-carbon" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhCarbonApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RpzhFunctionApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-function" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhFunctionApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -293,6 +310,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="RpzhHumitureApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-humiture" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhHumitureApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="RpzhLogApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="rpzh-log" />
       <extension name="coverage">
@@ -302,6 +326,20 @@
         </pattern>
       </extension>
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhLogApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RpzhMoistureApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-moisture" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhMoistureApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RpzhOxygenApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-oxygen" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhOxygenApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -319,7 +357,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="RpzhTempApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="rpzh-temp" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.rpzh.RpzhTempApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
+      <item itemvalue="Spring Boot.RpzhFunctionApplication" />
+      <item itemvalue="Spring Boot.RpzhCarbonApplication" />
+      <item itemvalue="Spring Boot.RpzhMoistureApplication" />
+      <item itemvalue="Spring Boot.RpzhTempApplication" />
+      <item itemvalue="Spring Boot.RpzhOxygenApplication" />
+      <item itemvalue="Spring Boot.RpzhHumitureApplication" />
       <item itemvalue="Spring Boot.RpzhAuthApplication" />
       <item itemvalue="Spring Boot.RpzhLogApplication" />
       <item itemvalue="Spring Boot.RpzhGatewayApplicationA" />
@@ -369,7 +420,17 @@
       <workItem from="1645231641478" duration="1040000" />
       <workItem from="1645327695994" duration="4167000" />
       <workItem from="1645490980097" duration="3568000" />
-      <workItem from="1645577123222" duration="1245000" />
+      <workItem from="1645577123222" duration="1920000" />
+      <workItem from="1645667080385" duration="1157000" />
+      <workItem from="1645751047659" duration="4906000" />
+      <workItem from="1645836685292" duration="10240000" />
+      <workItem from="1645922772239" duration="11692000" />
+      <workItem from="1646011123565" duration="17591000" />
+      <workItem from="1646099877887" duration="13491000" />
+      <workItem from="1646126002353" duration="4993000" />
+      <workItem from="1646182112871" duration="12708000" />
+      <workItem from="1646268473752" duration="7770000" />
+      <workItem from="1646361221626" duration="4757000" />
     </task>
     <task id="LOCAL-00001" summary="日志">
       <created>1642736129921</created>
@@ -392,7 +453,14 @@
       <option name="project" value="LOCAL" />
       <updated>1643273997216</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="日志">
+      <created>1645597085794</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1645597085794</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">

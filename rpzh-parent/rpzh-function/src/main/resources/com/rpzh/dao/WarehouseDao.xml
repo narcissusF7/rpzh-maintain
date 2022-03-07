@@ -362,4 +362,98 @@
   FROM tb_stack
   WHERE id = #{warehouseNodeId}
 </delete>
+<select id="findAllWarehouse" resultType="com.rpzh.vo.WarehouseVo">
+  SELECT
+  `id` as id,
+  `name` as name,
+  `build_time` as buildTime,
+  `code` as code,
+  `use_volume` as useVolume,
+  `use_volume_unit` as useVolumeUnit,
+  `use_area` as useArea,
+  `use_area_unit` as useAreaUnit,
+  `is_automation` as isAutomation,
+  `is_statistics` as isStatistics,
+  `is_using` as isUsing,
+  `remark` as remark,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `pid_route` as pidRoute,
+  `site_name` as siteName
+  FROM tb_warehouse
+</select>
+<select id="findBuildingById" resultType="com.rpzh.vo.BuildingVo">
+  SELECT
+  `id` as id,
+  `building_no` as buildingNo,
+  `use_volume` as useVolume,
+  `use_volume_unit` as useVolumeUnit,
+  `use_area` as useArea,
+  `use_area_unit` as useAreaUnit,
+  `building_orientation` as buildingOrientation,
+  `remark` as remark,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `warehouse_id` as warehouseId,
+  `pid_route` as pidRoute,
+  `building_name` as buildingName,
+  `site_name` as siteName
+  FROM `tb_building`
+  WHERE warehouse_id = #{warehouseNodeId}
+</select>
+<select id="findFloorById" resultType="com.rpzh.vo.FloorVo">
+  SELECT
+  `id` as id,
+  `floor_no` as floorNo,
+  `is_partition` as isPartition,
+  `remark` as remark,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `building_id` as buildingId,
+  `pid_route` as pidRoute,
+  `floor_name` as floorName,
+  `site_name` as siteName
+  FROM tb_floor
+  WHERE building_id = #{warehouseNodeId}
+</select>
+<select id="findWareAreaById" resultType="com.rpzh.vo.WareAreaVo">
+  SELECT
+  `id` as id,
+  `area_no` as areaNo,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `floor_id` as floorId,
+  `pid_route` as pidRoute,
+  `area_name` as areaName,
+  `site_name` as siteName,
+  `remark` as remark
+  FROM `tb_ware_area`
+  WHERE floor_id = #{warehouseNodeId}
+</select>
+<select id="getStackPage" resultType="com.rpzh.vo.StackVo">
+  SELECT
+  `id` as id,
+  `stack_no` as stackNo,
+  `name_cn` as nameCn,
+  `created_time` as createdTime,
+  `created_user` as createdUser,
+  `last_updated_time` as lastUpdatedTime,
+  `last_updated_user` as lastUpdatedUser,
+  `area_id` as areaId,
+  `pid_route` as pidRoute,
+  `site_name` as siteName,
+  `material_code` as materialCode,
+  `year` as year,
+  `remark` as remark
+  FROM `tb_stack`
+  WHERE area_id = #{stackDto.wareareaId}
+</select>
 </mapper>

@@ -1,6 +1,5 @@
 package com.rpzh.dto;
 
-import com.sun.istack.internal.NotNull;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
