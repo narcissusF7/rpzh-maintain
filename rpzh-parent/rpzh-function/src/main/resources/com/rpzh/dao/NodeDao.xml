@@ -49,4 +49,56 @@
   </set>
   WHERE id = #{nodeDto.id}
 </update>
+<delete id="deleteNode">
+  DELETE
+  FROM tb_node
+  WHERE id in
+  <foreach collection="ids" item="id" open="(" separator="," close=")">
+  #{id}
+  </foreach>
+</delete>
+<select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
+  SELECT
+  `id` as id,
+  `node_id` as nodeId,
+  `node_type` as nodeType,
+  `created_time` as createTime ,
+  `status` as status ,
+  `gather_site` as gatherSite,
+  `stack` as stack ,
+  `site_type` as siteType ,
+  `site_id` as siteId ,
+  `site_x` as siteX,
+  `site_y` as siteY ,
+  `site_z` as siteZ,
+  `into_stack_time` as intoStackTime ,
+  `site_route` as siteRoute ,
+  `maintain_stage_id` as maintainStageId
+  FROM tb_node
+  <where>
+   <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
+      and node_id like concat('%', #{nodeDto.nodeId}, '%')
+   </if>
+  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
+      and node_type = #{nodeDto.nodeType}
+  </if>
+  <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
+      and site_id = #{nodeDto.siteId}
+  </if>
+  <if test="nodeDto.status != null and nodeDto.status != ''">
+      and status = #{nodeDto.status}
+  </if>
+  <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
+      and into_stack_time &gt;= #{nodeDto.startTime}
+  </if>
+  <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
+      and into_stack_time &lt;= #{nodeDto.endTime}
+  </if>
+  </where>
+</select>
+<select id="findNodeCountById" resultType="int">
+  SELECT count(1)
+  FROM tb_node
+  WHERE node_id = #{nodeId}
+</select>
 </mapper>

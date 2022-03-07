@@ -1,8 +1,11 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.NodeDto;
+import com.rpzh.vo.NodeVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 节点管理
@@ -33,4 +36,25 @@ public interface NodeDao {
      * @return
      */
     int updateNode(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     * 删除节点
+     * @param ids
+     * @return
+     */
+    int deleteNode(@Param("ids") List<Integer> ids);
+
+    /**
+     * 查询节点列表
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findAllNodeList(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     * 根据设备id查询设备数量
+     * @param nodeId
+     * @return
+     */
+    int findNodeCountById(@Param("nodeId") String nodeId);
 }

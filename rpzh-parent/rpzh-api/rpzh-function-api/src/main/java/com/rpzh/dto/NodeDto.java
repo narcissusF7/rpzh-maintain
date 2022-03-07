@@ -1,6 +1,9 @@
 package com.rpzh.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 节点管理前端传参
@@ -13,6 +16,8 @@ public class NodeDto {
 
     //主键id
     private Integer id;
+
+    private List<Integer> ids;
 
     //设备id
     private String nodeId;
@@ -38,7 +43,7 @@ public class NodeDto {
     //位置路径
     private String siteRoute;
 
-    //状态,0:解垛,1:入垛
+    //状态,0:解垛,1:入垛,2:未使用
     private String status;
 
     //创建时间
@@ -59,11 +64,23 @@ public class NodeDto {
     //传输数据
     private String transferData;
 
+    //开始时间
+    private String startTime;
+
+    //结束时间
+    private String endTime;
+
     //垛位
     private String stack;
 
     //04:仓间,05非仓间
     private String siteType;
+
+    //分页开始页面
+    private int page;
+
+    //分页每页显示
+    private int size;
 
     //采集位置id
     private Integer siteId;

@@ -1,6 +1,10 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.vo.NodeVo;
+
+import java.util.List;
 
 /**
  * @Author liubc
@@ -29,4 +33,25 @@ public interface NodeService {
      * @return
      */
     int updateNode(NodeDto nodeDto);
+
+    /**
+     * 删除节点
+     * @param ids
+     * @return
+     */
+    int deleteNode(List<Integer> ids);
+
+    /**
+     * 查询节点列表
+     * @param nodeDto
+     * @return
+     */
+    PageInfo<NodeVo> findAllNodeList(NodeDto nodeDto);
+
+    /**
+     * 根据设备id查询设备数量
+     * @param nodeId
+     * @return
+     */
+    int findNodeCountById(String nodeId);
 }
