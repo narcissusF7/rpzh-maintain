@@ -60,4 +60,7 @@ public class BuildingVo {
 
     //位置名称
     private String siteName;
+
+    //楼栋类型
+    private String buildingType;
 }

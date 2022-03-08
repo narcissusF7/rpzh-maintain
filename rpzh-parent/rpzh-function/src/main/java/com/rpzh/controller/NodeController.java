@@ -82,7 +82,6 @@ public class NodeController {
         return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-
     /**
      * 删除节点
      * @param
@@ -97,4 +96,5 @@ public class NodeController {
         int delFlag = nodeService.deleteNode(ids);
         return new Result(true, StatusCode.OK, "删除节点成功");
     }
+
 }

@@ -22,7 +22,7 @@ public class FloorVo {
     private String floorName;
 
     //是否分区
-    private Boolean isPartition;
+    private String isPartition;
 
     //楼ID
     private Integer buildingId;
@@ -44,6 +44,9 @@ public class FloorVo {
 
     //创建人ID
     private Integer createdUserId;
+
+    //楼层类型
+    private String floorType;
 
     //最后更新时间
     private String lastUpdatedTime;

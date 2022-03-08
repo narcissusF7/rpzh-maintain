@@ -22,6 +22,9 @@ spring:
 logging:
   level:
     io.swagger.models.parameters.AbstractSerializableParameter: error
+    root: info
+    org.springframework: info
+    com.rpzh.dao: DEBUG  #sql日志打印
 # mqtt 连接配置
 mqtt:
   host: tcp://183.250.89.188

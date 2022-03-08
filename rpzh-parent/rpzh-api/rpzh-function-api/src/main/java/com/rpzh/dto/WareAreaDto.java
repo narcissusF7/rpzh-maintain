@@ -29,6 +29,9 @@ public class WareAreaDto {
     //@NotNull(message = "楼层ID不允许为空")
     private Integer floorId;
 
+    //分区类型
+    private String  wareAreaType;
+
     //创建人
     private String createdUser;
 

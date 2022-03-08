@@ -51,6 +51,9 @@ public class StackVo {
     //最后更新人ID
     private Integer lastUpdatedUserId;
 
+    //垛位类型
+    private String stackType;
+
     //物料代码
     private String materialCode;
 

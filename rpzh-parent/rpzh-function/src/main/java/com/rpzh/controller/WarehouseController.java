@@ -122,6 +122,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
+        //获取仓库类型
+        String wareType = warehouseService.findWareType(warehouseId);
+        buildingDto.setBuildingType(wareType);
         int addFlag = warehouseService.addBuilding(buildingDto);
         return new Result(true, StatusCode.OK, "新增楼号成功");
     }
@@ -137,6 +140,13 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingDto.getId())) {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
         }
+        //获取仓库类型
+        Integer warehouseId = buildingDto.getWarehouseId();
+        if (ToolUtil.isEmpty(warehouseId)) {
+            return new Result(false, StatusCode.ERROR, "仓库id不能为空");
+        }
+        String wareType = warehouseService.findWareType(warehouseId);
+        buildingDto.setBuildingType(wareType);
         int updateFlag = warehouseService.updateBuilding(buildingDto);
         return new Result(true, StatusCode.OK, "修改楼栋信息成功");
     }
@@ -163,6 +173,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingId)) {
             return new Result(false, StatusCode.ERROR, "楼号id不能为空");
         }
+        //获取楼栋类型
+        String buildType = warehouseService.findBuildType(buildingId);
+        floorDto.setFloorType(buildType);
         int addFlag = warehouseService.addFloor(floorDto);
         return new Result(true, StatusCode.OK, "新增楼层成功");
     }
@@ -183,6 +196,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingId)) {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
         }
+        //获取楼栋类型
+        String buildType = warehouseService.findBuildType(buildingId);
+        floorDto.setFloorType(buildType);
         int updateFlag = warehouseService.updateFloor(floorDto);
         return new Result(true, StatusCode.OK, "修改楼层成功");
     }
@@ -203,6 +219,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(floorId)) {
             return new Result(false, StatusCode.ERROR, "楼层id不能为空");
         }
+        //查询楼层类型
+        String floorType = warehouseService.findFloorType(floorId);
+        wareAreaDto.setWareAreaType(floorType);
         int addFlag = warehouseService.addWarearea(wareAreaDto);
         return new Result(true, StatusCode.OK, "新增分区成功");
     }
@@ -219,6 +238,13 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(id)) {
             return new Result(false, StatusCode.ERROR, "请选择一个分区");
         }
+        Integer floorId = wareAreaDto.getFloorId();
+        if (ToolUtil.isEmpty(floorId)) {
+            return new Result(false, StatusCode.ERROR, "楼层id不能为空");
+        }
+        //查询楼层类型
+        String floorType = warehouseService.findFloorType(floorId);
+        wareAreaDto.setWareAreaType(floorType);
         int updateFlag = warehouseService.updateWarearea(wareAreaDto);
         return new Result(true, StatusCode.OK, "修改分区成功");
     }
@@ -244,6 +270,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(areaId)) {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
+        //查看分区类型
+        String wareAreaType = warehouseService.findWareAreaType(areaId);
+        stackDto.setStackType(wareAreaType);
         int addFlag = warehouseService.addStack(stackDto);
         return new Result(true, StatusCode.OK, "新增垛位成功");
     }
@@ -265,6 +294,9 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(areaId)) {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
+        //查看分区类型
+        String wareAreaType = warehouseService.findWareAreaType(areaId);
+        stackDto.setStackType(wareAreaType);
         int updateFlag = warehouseService.updateStack(stackDto);
         return new Result(true, StatusCode.OK, "修改垛位成功");
     }
@@ -332,12 +364,13 @@ public class WarehouseController {
 
     /**
      * 获取垛位列表
+     *
      * @param stackDto
      * @return
      */
     @PostMapping("/getStackPage")
     public Result<PageInfo> getStackPage(StackDto stackDto) {
-        if (ToolUtil.isEmpty(stackDto.getWareareaId())){
+        if (ToolUtil.isEmpty(stackDto.getWareareaId())) {
             return new Result<>(false, StatusCode.ERROR, "区域id不能为空");
         }
         PageInfo<StackVo> pageInfo = warehouseService.getStackPage(stackDto);
@@ -362,7 +395,7 @@ public class WarehouseController {
         //01：仓库, 02: 楼号, 03:楼层，04：分区，05：垛位）
         switch (warehouseNodeType) {
             case "01"://查询仓库
-                List<WarehouseVo> warehouseVoList = warehouseService.findAllWarehouse();
+                List<WarehouseVo> warehouseVoList = warehouseService.findAllWarehouse(warehouseNodeId);
                 return new Result(true, StatusCode.OK, "查询仓库信息成功", warehouseVoList);
             case "02"://查询楼号
                 List<BuildingVo> buildingVoList = warehouseService.findBuildingById(warehouseNodeId);
@@ -377,5 +410,40 @@ public class WarehouseController {
                 break;
         }
         return new Result(true, StatusCode.OK, "查询成功");
+    }
+
+    /**
+     * 获取仓库信息
+     *
+     * @param warehouseNodeId   仓库节点ID
+     * @param warehouseNodeType 仓库节点类型（01：仓库, 02: 楼号, 03:楼层，04：分区，05：垛位）
+     * @return
+     */
+    @PostMapping("/warehouseInfo")
+    public Result warehouseInfo(Integer warehouseNodeId, String warehouseNodeType) {
+        if (ToolUtil.isEmpty(warehouseNodeId)) {
+            return new Result(false, StatusCode.ERROR, "仓库id不能为空");
+        }
+        if (ToolUtil.isEmpty(warehouseNodeType)) {
+            return new Result(false, StatusCode.ERROR, "仓库类型不能为空");
+        }
+        switch (warehouseNodeType) {
+            case "01"://查询仓库信息
+                WarehouseVo warehouseVo = warehouseService.findWarehouseById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询仓库信息成功", warehouseVo);
+            case "02"://查询楼栋信息
+                BuildingVo buildingVo = warehouseService.findBuildById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询楼栋信息成功", buildingVo);
+            case "03"://查询楼层信息
+                FloorVo floorVo = warehouseService.findOneFloor(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询楼层信息成功",floorVo);
+            case "04"://查询分区信息
+                WareAreaVo wareAreaVo = warehouseService.findWareAreaByOne(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询分区信息成功", wareAreaVo);
+            case "05"://查询垛位信息
+                StackVo stackVo = warehouseService.findStackById(warehouseNodeId);
+                return new Result(true, StatusCode.OK, "查询垛位信息成功", stackVo);
+        }
+        return null;
     }
 }

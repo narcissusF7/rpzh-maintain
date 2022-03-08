@@ -37,6 +37,9 @@ public class WarehouseDto extends BasePojo {
     @ApiModelProperty("仓库编码")
     private String code;
 
+    //仓库类型
+    private String wareType;
+
     //可堆货容积
     @ApiModelProperty("可堆货容积")
     private BigDecimal useVolume;

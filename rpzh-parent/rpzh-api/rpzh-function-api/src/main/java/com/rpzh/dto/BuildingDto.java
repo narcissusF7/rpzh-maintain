@@ -72,6 +72,9 @@ public class BuildingDto {
     //位置名称
     private String siteName;
 
+    //楼栋类型
+    private String buildingType;
+
     //备注
     @ApiModelProperty("备注")
     private String remark;
