@@ -201,10 +201,10 @@ public interface WarehouseDao {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
-    int delStack(@Param("warehouseNodeId") Integer warehouseNodeId);
+    int delStack(@Param("stackIds") List<String> stackIds);
 
     /**
      * 仓库列表树中查询所有的仓库

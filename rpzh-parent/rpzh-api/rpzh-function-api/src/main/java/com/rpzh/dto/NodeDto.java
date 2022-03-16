@@ -28,6 +28,12 @@ public class NodeDto {
     // 05：无线包芯水分传感器，06：磷化氢传感器
     private String nodeType;
 
+    //替换之前的id
+    private String beforeNodeId;
+
+    //替换之后的id
+    private String afterNodeId;
+
     //采集位置
     private String gatherSite;
 

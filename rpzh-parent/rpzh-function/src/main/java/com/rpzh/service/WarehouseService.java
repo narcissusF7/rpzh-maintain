@@ -171,10 +171,10 @@ public interface WarehouseService {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
-    int delStack(Integer warehouseNodeId);
+    int delStack(List<String> stackIds);
 
     /**
      * 仓库列表树中查询所有的仓库

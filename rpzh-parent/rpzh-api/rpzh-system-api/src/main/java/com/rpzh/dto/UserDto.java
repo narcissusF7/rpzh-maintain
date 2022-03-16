@@ -106,6 +106,12 @@ public class UserDto implements Serializable {
     @ApiModelProperty(notes = "创建人")
     private String createBy;
 
+    //开始时间
+    private String startTime;
+
+    //结束时间
+    private String endTime;
+
     //备注
     @ApiModelProperty(notes = "备注")
     private String remark;

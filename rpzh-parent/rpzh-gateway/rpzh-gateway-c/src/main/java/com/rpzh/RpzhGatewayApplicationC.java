@@ -53,7 +53,7 @@ public class RpzhGatewayApplicationC {
             public Mono<String> resolve(ServerWebExchange exchange) {
                 //获取远程客户端IP
                 String hostName = exchange.getRequest().getRemoteAddress().getAddress().getHostAddress();
-                System.out.println("用户请求的ip地址:"+hostName);
+                //System.out.println("用户请求的ip地址:"+hostName);
                 return Mono.just(hostName);
             }
         };

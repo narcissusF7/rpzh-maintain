@@ -311,10 +311,10 @@ public class WarehouseController {
     @PostMapping("/del")
     public Result del(DelDto delDto) {
         Integer warehouseNodeId = delDto.getWarehouseNodeId();
-        if (ToolUtil.isEmpty(warehouseNodeId)) {
+        String warehouseNodeType = delDto.getWarehouseNodeType();
+        if (ToolUtil.isEmpty(warehouseNodeId) && !"05".equals(warehouseNodeType)) {
             return new Result(false, StatusCode.ERROR, "请选择一个仓库");
         }
-        String warehouseNodeType = delDto.getWarehouseNodeType();
         if (ToolUtil.isEmpty(warehouseNodeType)) {
             return new Result(false, StatusCode.ERROR, "请选择仓库类型");
         }
@@ -353,7 +353,11 @@ public class WarehouseController {
                 int delWareArea = warehouseService.delWareArea(warehouseNodeId);
                 return new Result(true, StatusCode.OK, "删除分区成功");
             case "05"://删除垛位
-                int delStack = warehouseService.delStack(warehouseNodeId);
+                List<String> stackIds = delDto.getStackIds();
+                if (ToolUtil.isEmpty(stackIds)){
+                    return new Result(false, StatusCode.ERROR, "请选择一个垛位");
+                }
+                int delStack = warehouseService.delStack(stackIds);
                 return new Result(true, StatusCode.OK, "删除垛位成功");
             default:
                 break;

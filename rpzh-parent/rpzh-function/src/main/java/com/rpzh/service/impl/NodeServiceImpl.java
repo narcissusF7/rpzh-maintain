@@ -9,6 +9,7 @@ import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.stream.events.NotationDeclaration;
 import java.util.List;
@@ -109,5 +110,26 @@ public class NodeServiceImpl implements NodeService {
     public int findNodeCountById(String nodeId) {
         int count = nodeDao.findNodeCountById(nodeId);
         return count;
+    }
+
+    /**
+     * 替换设备id
+     *
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    @Transactional
+    public int replaceNodeId(NodeDto nodeDto) {
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        nodeDto.setLastUpdatedUser(username);
+        //插入设备替换日志
+        int insertFlag = nodeDao.insertReplaceNodeIdLog(nodeDto);
+        //设备替换,注意:后面要加修改历史数据的设备替换
+        int updateFlag = nodeDao.replaceNodeId(nodeDto);
+        return updateFlag;
     }
 }

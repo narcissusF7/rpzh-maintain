@@ -375,7 +375,10 @@
 <delete id="delStack">
   DELETE
   FROM tb_stack
-  WHERE id = #{warehouseNodeId}
+  WHERE id in
+  <foreach collection="stackIds" item="id" open="(" separator="," close=")">
+  #{id}
+  </foreach>
 </delete>
 <select id="findAllWarehouse" resultType="com.rpzh.vo.WarehouseVo">
   SELECT

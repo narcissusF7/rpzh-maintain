@@ -54,4 +54,11 @@ public interface NodeService {
      * @return
      */
     int findNodeCountById(String nodeId);
+
+    /**
+     * 替换设备id
+     * @param nodeDto
+     * @return
+     */
+    int replaceNodeId(NodeDto nodeDto);
 }

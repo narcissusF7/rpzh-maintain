@@ -57,4 +57,18 @@ public interface NodeDao {
      * @return
      */
     int findNodeCountById(@Param("nodeId") String nodeId);
+
+    /**
+     * 替换设备id
+     * @param nodeDto
+     * @return
+     */
+    int replaceNodeId(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     * 设备替换日志插入
+     * @param nodeDto
+     * @return
+     */
+    int insertReplaceNodeIdLog(@Param("nodeDto") NodeDto nodeDto);
 }

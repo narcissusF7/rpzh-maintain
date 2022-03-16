@@ -101,4 +101,27 @@
   FROM tb_node
   WHERE node_id = #{nodeId}
 </select>
+<update id="replaceNodeId">
+  UPDATE tb_node
+  SET node_id = #{nodeDto.afterNodeId}
+  WHERE node_id = #{nodeDto.beforeNodeId}
+</update>
+<insert id="insertReplaceNodeIdLog">
+  INSERT INTO tb_node_replace_history
+  (
+  before_node_id,
+  after_node_id,
+  replace_location,
+  username,
+  create_time
+   )
+  VALUES
+  (
+   #{nodeDto.beforeNodeId},
+   #{nodeDto.afterNodeId},
+   #{nodeDto.gatherSite},
+   #{nodeDto.lastUpdatedUser},
+   sysdate()
+   )
+</insert>
 </mapper>

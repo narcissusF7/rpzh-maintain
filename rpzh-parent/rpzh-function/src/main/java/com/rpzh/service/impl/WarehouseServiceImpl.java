@@ -384,12 +384,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
     @Override
-    public int delStack(Integer warehouseNodeId) {
-        int delStack = warehouseDao.delStack(warehouseNodeId);
+    public int delStack(List<String> stackIds) {
+        int delStack = warehouseDao.delStack(stackIds);
         return delStack;
     }
 
