@@ -35,6 +35,9 @@ public class WarehouseVo {
     //可堆货容积
     private BigDecimal useVolume;
 
+    //仓库类型
+    private String wareType;
+
     //可堆货容积单位
     private String useVolumeUnit;
 

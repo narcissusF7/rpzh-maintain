@@ -171,16 +171,16 @@ public interface WarehouseService {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
-    int delStack(Integer warehouseNodeId);
+    int delStack(List<String> stackIds);
 
     /**
      * 仓库列表树中查询所有的仓库
      * @return
      */
-    List<WarehouseVo> findAllWarehouse();
+    List<WarehouseVo> findAllWarehouse(Integer warehouseNodeId);
 
     /**
      * 查询所有的楼栋
@@ -209,4 +209,67 @@ public interface WarehouseService {
      * @return
      */
     PageInfo<StackVo> getStackPage(StackDto stackDto);
+
+    /**
+     * 查询仓库信息
+     * @param warehouseNodeId
+     * @return
+     */
+    WarehouseVo findWarehouseById(Integer warehouseNodeId);
+
+    /**
+     * 查询楼栋信息
+     * @param warehouseNodeId
+     * @return
+     */
+    BuildingVo findBuildById(Integer warehouseNodeId);
+
+    /**
+     * 查询楼层信息
+     * @param warehouseNodeId
+     * @return
+     */
+    FloorVo findOneFloor(Integer warehouseNodeId);
+
+    /**
+     * 查询分区信息
+     * @param warehouseNodeId
+     * @return
+     */
+    WareAreaVo findWareAreaByOne(Integer warehouseNodeId);
+
+    /**
+     * 查询垛位信息成功
+     * @param warehouseNodeId
+     * @return
+     */
+    StackVo findStackById(Integer warehouseNodeId);
+
+    /**
+     * 获取仓库类型
+     * @param warehouseId
+     * @return
+     */
+    String findWareType(Integer warehouseId);
+
+    /**
+     * 获取楼栋类型
+     * @param buildingId
+     * @return
+     */
+    String findBuildType(String buildingId);
+
+    /**
+     * 查询楼层类型
+     * @param floorId
+     * @return
+     */
+    String findFloorType(Integer floorId);
+
+    /**
+     * 查看分区类型
+     * @param areaId
+     * @return
+     */
+    String findWareAreaType(Integer areaId);
 }

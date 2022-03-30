@@ -97,6 +97,12 @@
         <if test="userDto.nickName != null and userDto.nickName != ''">
             AND t1.nick_name like concat('%', #{userDto.nickName}, '%')
         </if>
+        <if test="userDto.startTime != null and userDto.startTime != ''">
+            AND t1.create_time &gt;= #{userDto.startTime}
+        </if>
+        <if test="userDto.endTime != null and userDto.endTime != ''">
+            AND t1.create_time &lt;= #{userDto.endTime}
+        </if>
         <if test="userDto.status != null and userDto.status != ''">
             AND t1.status = #{userDto.status}
         </if>

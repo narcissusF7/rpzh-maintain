@@ -53,6 +53,8 @@ public class WareAreaVo {
     //最后更新人ID
     private Integer lastUpdatedUserId;
 
+    //分区类型
+    private String  wareAreaType;
 
     private Map<String,String> data;
 }

@@ -384,12 +384,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
     @Override
-    public int delStack(Integer warehouseNodeId) {
-        int delStack = warehouseDao.delStack(warehouseNodeId);
+    public int delStack(List<String> stackIds) {
+        int delStack = warehouseDao.delStack(stackIds);
         return delStack;
     }
 
@@ -398,8 +398,8 @@ public class WarehouseServiceImpl implements WarehouseService {
      * @return
      */
     @Override
-    public List<WarehouseVo> findAllWarehouse() {
-        List<WarehouseVo> warehouseVoList = warehouseDao.findAllWarehouse();
+    public List<WarehouseVo> findAllWarehouse(Integer warehouseNodeId) {
+        List<WarehouseVo> warehouseVoList = warehouseDao.findAllWarehouse(warehouseNodeId);
         return warehouseVoList;
     }
 
@@ -451,6 +451,114 @@ public class WarehouseServiceImpl implements WarehouseService {
         PageHelper.startPage(page, size);
         List<StackVo> stackVoList = warehouseDao.getStackPage(stackDto);
         return new PageInfo<StackVo>(stackVoList);
+    }
+
+    /**
+     * 查询仓库信息
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public WarehouseVo findWarehouseById(Integer warehouseNodeId) {
+        WarehouseVo warehouseVo = warehouseDao.findWarehouseById(warehouseNodeId);
+        return warehouseVo;
+    }
+
+    /**
+     * 查询楼栋信息
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public BuildingVo findBuildById(Integer warehouseNodeId) {
+        BuildingVo buildingVo = warehouseDao.findBuildById(warehouseNodeId);
+        return buildingVo;
+    }
+
+    /**
+     * 查询楼层信息
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public FloorVo findOneFloor(Integer warehouseNodeId) {
+        FloorVo floorVo = warehouseDao.findOneFloor(warehouseNodeId);
+        return floorVo;
+    }
+
+    /**
+     * 查询分区信息
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public WareAreaVo findWareAreaByOne(Integer warehouseNodeId) {
+        WareAreaVo wareAreaVo = warehouseDao.findWareAreaByOne(warehouseNodeId);
+        return wareAreaVo;
+    }
+
+    /**
+     * 查询垛位信息成功
+     *
+     * @param warehouseNodeId
+     * @return
+     */
+    @Override
+    public StackVo findStackById(Integer warehouseNodeId) {
+        StackVo stackVo = warehouseDao.findStackById(warehouseNodeId);
+        return stackVo;
+    }
+
+    /**
+     * 获取仓库类型
+     *
+     * @param warehouseId
+     * @return
+     */
+    @Override
+    public String findWareType(Integer warehouseId) {
+        String wareType = warehouseDao.findWareType(warehouseId);
+        return wareType;
+    }
+
+    /**
+     * 获取楼栋类型
+     *
+     * @param buildingId
+     * @return
+     */
+    @Override
+    public String findBuildType(String buildingId) {
+        String buildType = warehouseDao.findBuildType(buildingId);
+        return buildType;
+    }
+
+    /**
+     * 查询楼层类型
+     *
+     * @param floorId
+     * @return
+     */
+    @Override
+    public String findFloorType(Integer floorId) {
+        String floorType = warehouseDao.findFloorType(floorId);
+        return floorType;
+    }
+
+    /**
+     * 查看分区类型
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public String findWareAreaType(Integer areaId) {
+        String wareAreaType = warehouseDao.findWareAreaType(areaId);
+        return wareAreaType;
     }
 
 

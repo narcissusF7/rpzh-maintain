@@ -2,6 +2,7 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -10,6 +11,8 @@ import com.rpzh.vo.NodeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -82,7 +85,6 @@ public class NodeController {
         return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-
     /**
      * 删除节点
      * @param
@@ -97,4 +99,44 @@ public class NodeController {
         int delFlag = nodeService.deleteNode(ids);
         return new Result(true, StatusCode.OK, "删除节点成功");
     }
+
+
+    /**
+     * 设备id替换
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/replaceNodeId")
+    public Result replaceNodeId(NodeDto nodeDto){
+        String beforeNodeId = nodeDto.getBeforeNodeId();
+        if (ToolUtil.isEmpty(beforeNodeId)){
+            return new Result(false, StatusCode.ERROR, "请选择需要替换的设备id");
+        }
+        String afterNodeId = nodeDto.getAfterNodeId();
+        if (ToolUtil.isEmpty(afterNodeId)){
+            return new Result(false, StatusCode.ERROR, "请输入替换之后的设备id");
+        }
+        String gatherSite = nodeDto.getGatherSite();
+        if (ToolUtil.isEmpty(gatherSite)){
+            return new Result(false, StatusCode.ERROR, "采集位置不能为空");
+        }
+        int updateFlag = nodeService.replaceNodeId(nodeDto);
+        return new Result(true, StatusCode.OK, "设备替换成功");
+    }
+
+
+    /**
+     * 设备导入模板下载
+     * @param response
+     * @return
+     */
+    @RequestMapping("/downloadTemplate")
+    public Result downloadTemplate(HttpServletResponse response) {
+        String downloadFilePath = "/template/node/node.xlsx";//被下载的文件在服务器中的路径,
+        String fileName = "设备导入模板";//被下载文件的名称
+        InputStream inputStream = this.getClass().getResourceAsStream(downloadFilePath);
+        ExcelUtils.outFile(inputStream, response, fileName, "xlsx");
+        return null;
+    }
+
 }

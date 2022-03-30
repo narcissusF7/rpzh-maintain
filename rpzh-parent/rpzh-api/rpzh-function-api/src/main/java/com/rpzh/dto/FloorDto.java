@@ -46,6 +46,9 @@ public class FloorDto {
     //@NotNull(message = "楼号ID不允许为空")
     private String buildingId;
 
+    //楼层类型
+    private String floorType;
+
     //备注
     @ApiModelProperty("备注")
     private String remark;

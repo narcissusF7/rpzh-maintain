@@ -201,16 +201,16 @@ public interface WarehouseDao {
 
     /**
      * 删除垛位
-     * @param warehouseNodeId
+     * @param
      * @return
      */
-    int delStack(@Param("warehouseNodeId") Integer warehouseNodeId);
+    int delStack(@Param("stackIds") List<String> stackIds);
 
     /**
      * 仓库列表树中查询所有的仓库
      * @return
      */
-    List<WarehouseVo> findAllWarehouse();
+    List<WarehouseVo> findAllWarehouse(@Param("warehouseNodeId") Integer warehouseNodeId);
 
     /**
      * 查询楼栋
@@ -239,4 +239,67 @@ public interface WarehouseDao {
      * @return
      */
     List<StackVo> getStackPage(@Param("stackDto") StackDto stackDto);
+
+    /**
+     * 查询仓库信息
+     * @param warehouseNodeId
+     * @return
+     */
+    WarehouseVo findWarehouseById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询楼栋信息
+     * @param warehouseNodeId
+     * @return
+     */
+    BuildingVo findBuildById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询楼层信息
+     * @param warehouseNodeId
+     * @return
+     */
+    FloorVo findOneFloor(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询分区信息
+     * @param warehouseNodeId
+     * @return
+     */
+    WareAreaVo findWareAreaByOne(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询垛位信息
+     * @param warehouseNodeId
+     * @return
+     */
+    StackVo findStackById(@Param("warehouseNodeId") Integer warehouseNodeId);
+
+    /**
+     * 查询仓库类型
+     * @param warehouseId
+     * @return
+     */
+    String findWareType(@Param("warehouseId") Integer warehouseId);
+
+    /**
+     * 获取楼栋类型
+     * @param buildingId
+     * @return
+     */
+    String findBuildType(@Param("buildingId") String buildingId);
+
+    /**
+     * 查询楼层类型
+     * @param floorId
+     * @return
+     */
+    String findFloorType(@Param("floorId")  Integer floorId);
+
+    /**
+     * 查看分区类型
+     * @param areaId
+     * @return
+     */
+    String findWareAreaType(@Param("areaId") Integer areaId);
 }

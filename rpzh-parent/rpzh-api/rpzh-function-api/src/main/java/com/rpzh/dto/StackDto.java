@@ -55,6 +55,9 @@ public class StackDto {
     @ApiModelProperty(notes = "分页每页显示")
     private int size;
 
+    //垛位类型
+    private String stackType;
+
     //备注
     @ApiModelProperty("备注")
     private String remark;
