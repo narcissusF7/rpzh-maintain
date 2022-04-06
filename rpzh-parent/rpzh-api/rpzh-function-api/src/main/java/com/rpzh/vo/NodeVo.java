@@ -75,4 +75,12 @@ public class NodeVo {
     //养护计划
     private Integer maintainStageId;
 
+    //替换之前设备id
+    private String beforeNodeId;
+
+    //替换之后设备id
+    private String afterNodeId;
+
+    //替换的位置
+    private String replaceLocation;
 }
