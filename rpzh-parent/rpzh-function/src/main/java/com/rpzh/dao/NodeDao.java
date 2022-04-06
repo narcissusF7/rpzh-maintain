@@ -71,4 +71,25 @@ public interface NodeDao {
      * @return
      */
     int insertReplaceNodeIdLog(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     * 设备替换日志查询
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findNodeReplaceLog(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     * 设备解垛
+     * @param id
+     * @return
+     */
+    int unbindStack(@Param("id") Integer id);
+
+    /**
+     *
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findNoEnterStack(@Param("nodeDto") NodeDto nodeDto);
 }

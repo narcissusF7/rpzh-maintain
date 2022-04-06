@@ -61,4 +61,25 @@ public interface NodeService {
      * @return
      */
     int replaceNodeId(NodeDto nodeDto);
+
+    /**
+     * 设备替换日志查询
+     * @param nodeDto
+     * @return
+     */
+    PageInfo<NodeVo> findNodeReplaceLog(NodeDto nodeDto);
+
+    /**
+     * 设备解垛
+     * @param nodeDto
+     * @return
+     */
+    int unbindStack(NodeDto nodeDto);
+
+    /**
+     * 查询未入垛设备
+     * @param nodeDto
+     * @return
+     */
+    PageInfo<NodeVo> findNoEnterStack(NodeDto nodeDto);
 }

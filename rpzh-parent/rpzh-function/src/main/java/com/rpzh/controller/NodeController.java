@@ -10,7 +10,6 @@ import com.rpzh.service.NodeService;
 import com.rpzh.vo.NodeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.List;
@@ -102,7 +101,7 @@ public class NodeController {
 
 
     /**
-     * 设备id替换
+     * 设备id替换,历史数据模块完成以后,需要完善历史模块的设备id替换
      * @param nodeDto
      * @return
      */
@@ -122,6 +121,60 @@ public class NodeController {
         }
         int updateFlag = nodeService.replaceNodeId(nodeDto);
         return new Result(true, StatusCode.OK, "设备替换成功");
+    }
+
+
+    /**
+     * 设备替换日志
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/findNodeReplaceLog")
+    public Result<PageInfo> findNodeReplaceLog(NodeDto nodeDto){
+        String nodeId = nodeDto.getNodeId();
+        if (ToolUtil.isEmpty(nodeId)){
+            return new Result(false, StatusCode.ERROR, "设备id不能为空");
+        }
+        PageInfo<NodeVo> pageInfo = nodeService.findNodeReplaceLog(nodeDto);
+        return new Result(true, StatusCode.OK, "查询成功",pageInfo);
+    }
+
+    /**
+     * 查询设备未入垛列表
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/findNoEnterStack")
+    public Result<PageInfo> findNoEnterStack(NodeDto nodeDto){
+        PageInfo<NodeVo> pageInfo = nodeService.findNoEnterStack(nodeDto);
+        return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
+    }
+
+    /**
+     *设备入垛
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/enterStack")
+    public Result enterStack(NodeDto nodeDto){
+
+        return null;
+    }
+
+
+    /**
+     *设备解垛
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/unbindStack")
+    public Result unbindStack(NodeDto nodeDto){
+        Integer id = nodeDto.getId();
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+        }
+        int updateFlag = nodeService.unbindStack(nodeDto);
+        return new Result(true, StatusCode.OK, "解垛成功");
     }
 
 

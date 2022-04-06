@@ -128,8 +128,51 @@ public class NodeServiceImpl implements NodeService {
         nodeDto.setLastUpdatedUser(username);
         //插入设备替换日志
         int insertFlag = nodeDao.insertReplaceNodeIdLog(nodeDto);
-        //设备替换,注意:后面要加修改历史数据的设备替换
+        //设备替换,注意:后面要加修改历史数据的设备替换,此处需要添加feign调用,修改历史数据中的设备id
         int updateFlag = nodeDao.replaceNodeId(nodeDto);
         return updateFlag;
+    }
+
+    /**
+     * 设备替换日志查询
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    public PageInfo<NodeVo> findNodeReplaceLog(NodeDto nodeDto) {
+        int page = nodeDto.getPage();
+        int size = nodeDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<NodeVo> nodeVoList = nodeDao.findNodeReplaceLog(nodeDto);
+        return new PageInfo<NodeVo>(nodeVoList);
+    }
+
+    /**
+     * 设备解垛
+     *
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    public int unbindStack(NodeDto nodeDto) {
+        int updateFlag = nodeDao.unbindStack(nodeDto.getId());
+        return updateFlag;
+    }
+
+    /**
+     * 查询未入垛设备
+     *
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    public PageInfo<NodeVo> findNoEnterStack(NodeDto nodeDto) {
+        int page = nodeDto.getPage();
+        int size = nodeDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<NodeVo> nodeVoList = nodeDao.findNoEnterStack(nodeDto);
+        return new PageInfo<NodeVo>(nodeVoList);
     }
 }
