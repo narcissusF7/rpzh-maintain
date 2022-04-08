@@ -87,9 +87,34 @@ public interface NodeDao {
     int unbindStack(@Param("id") Integer id);
 
     /**
-     *
+     *查询未入垛
      * @param nodeDto
      * @return
      */
     List<NodeVo> findNoEnterStack(@Param("nodeDto") NodeDto nodeDto);
+
+    /**
+     *
+     * @param id
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    int enterStack(@Param("id")Integer id,@Param("x")Integer x, @Param("y")Integer y,
+                   @Param("z")Integer z,@Param("stack")String stack,@Param("siteId")Integer siteId);
+
+    /**
+     * 判断设备是否存在
+     * @param nodeId
+     * @return
+     */
+    int findNodeIdCount(@Param("nodeId") String nodeId);
+
+    /**
+     * 批量导入成功
+     * @param nodeVoList
+     * @return
+     */
+    int exportNode(@Param("nodeVoList")List<NodeVo> nodeVoList);
 }

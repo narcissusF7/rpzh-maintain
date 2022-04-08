@@ -1,9 +1,14 @@
 package com.rpzh.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.Result;
+import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeVo;
@@ -12,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.stream.events.NotationDeclaration;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -174,5 +181,67 @@ public class NodeServiceImpl implements NodeService {
         PageHelper.startPage(page, size);
         List<NodeVo> nodeVoList = nodeDao.findNoEnterStack(nodeDto);
         return new PageInfo<NodeVo>(nodeVoList);
+    }
+
+    /**
+     * 设备入垛
+     * @param data
+     * @return
+     */
+    @Override
+    public int enterStack(String data) {
+        List<Map> list = JSONObject.parseObject(data, List.class);
+        int updateFlag = 0;
+        for (int i = 0; i < list.size(); i++) {
+            Map map = list.get(i);
+            Integer id = (Integer) map.get("id");
+            Integer x = (Integer) map.get("x");
+            Integer y = (Integer) map.get("y");
+            Integer z = (Integer) map.get("z");
+            String stack = (String) map.get("stack");
+            Integer siteId = (Integer) map.get("siteId");
+            updateFlag = nodeDao.enterStack(id,x,y,z,stack,siteId);
+        }
+        return updateFlag;
+    }
+
+    /**
+     * 批量导入设备
+     *
+     * @param nodeDate
+     * @param nodeType
+     * @return
+     */
+    @Override
+    public Result exportNode(List<Map<Integer, String>> nodeDate, String nodeType) {
+        //获取时间
+        String dateTime = DateUtil.dateNew(new Date()).toString();
+        //存放数据
+        List<NodeVo> nodeVoList = new ArrayList<>();
+        for (int i = 0; i < nodeDate.size(); i++) {
+            NodeVo nodeVo = new NodeVo();
+            //记录行数,用于返回
+            int row = 2 + i;
+            //获取每一行数据
+            Map<Integer, String> integerStringMap = nodeDate.get(i);
+            //获取设备id
+            String nodeId = integerStringMap.get(0).trim();
+            if (ToolUtil.isEmpty(nodeId)){
+                return new Result(false, StatusCode.ERROR, "第" + row + "行设备id不能为空");
+            }else {
+                nodeVo.setNodeId(nodeId);
+            }
+            //判断设备是否已经存在
+            int nodeIdCount = nodeDao.findNodeIdCount(nodeId);
+            if (nodeIdCount > 0){
+                return new Result(false, StatusCode.ERROR, "第" + row + "行设备id:" + nodeId + "已经存在,禁止添加");
+            }
+            //设置节点类型
+            nodeVo.setNodeType(nodeType);
+            nodeVo.setCreateTime(dateTime);
+            nodeVoList.add(nodeVo);
+        }
+        int addFlag = nodeDao.exportNode(nodeVoList);
+        return new Result(true,StatusCode.OK,"批量导入成功");
     }
 }

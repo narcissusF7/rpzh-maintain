@@ -2,9 +2,11 @@ package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.Result;
 import com.rpzh.vo.NodeVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author liubc
@@ -82,4 +84,19 @@ public interface NodeService {
      * @return
      */
     PageInfo<NodeVo> findNoEnterStack(NodeDto nodeDto);
+
+    /**
+     * 设备入垛
+     * @param data
+     * @return
+     */
+    int enterStack(String data);
+
+    /**
+     * 批量导入设备
+     * @param nodeDate
+     * @param nodeType
+     * @return
+     */
+    Result exportNode(List<Map<Integer, String>> nodeDate, String nodeType);
 }
