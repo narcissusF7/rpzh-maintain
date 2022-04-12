@@ -194,12 +194,13 @@ public class NodeServiceImpl implements NodeService {
         int updateFlag = 0;
         for (int i = 0; i < list.size(); i++) {
             Map map = list.get(i);
-            Integer id = (Integer) map.get("id");
-            Integer x = (Integer) map.get("x");
-            Integer y = (Integer) map.get("y");
-            Integer z = (Integer) map.get("z");
+            //Integer id = map.get("id").toString();
+            int id = Integer.parseInt(map.get("id").toString());
+            Integer x = Integer.parseInt(map.get("x").toString());
+            Integer y = Integer.parseInt(map.get("y").toString());
+            Integer z = Integer.parseInt(map.get("z").toString());
             String stack = (String) map.get("stack");
-            Integer siteId = (Integer) map.get("siteId");
+            Integer siteId = Integer.parseInt(map.get("siteId").toString());
             updateFlag = nodeDao.enterStack(id,x,y,z,stack,siteId);
         }
         return updateFlag;
@@ -243,5 +244,30 @@ public class NodeServiceImpl implements NodeService {
         }
         int addFlag = nodeDao.exportNode(nodeVoList);
         return new Result(true,StatusCode.OK,"批量导入成功");
+    }
+
+
+    /**
+     * 查询设备类型
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    public String findNodeType(NodeDto nodeDto) {
+        String nodeId = nodeDto.getNodeId();
+        String nodeType = nodeDao.findNodeType(nodeId);
+        return nodeType;
+    }
+
+    /**
+     * 模糊查询设备id
+     *
+     * @param nodeDto
+     * @return
+     */
+    @Override
+    public List<NodeVo> findVagueNode(NodeDto nodeDto) {
+        List<NodeVo> nodeVoList = nodeDao.findVagueNode(nodeDto);
+        return nodeVoList;
     }
 }

@@ -124,10 +124,10 @@ public class NodeController {
         if (ToolUtil.isEmpty(afterNodeId)) {
             return new Result(false, StatusCode.ERROR, "请输入替换之后的设备id");
         }
-        String gatherSite = nodeDto.getGatherSite();
-        if (ToolUtil.isEmpty(gatherSite)) {
+        //String gatherSite = nodeDto.getGatherSite();
+        /*if (ToolUtil.isEmpty(gatherSite)) {
             return new Result(false, StatusCode.ERROR, "采集位置不能为空");
-        }
+        }*/
         int updateFlag = nodeService.replaceNodeId(nodeDto);
         return new Result(true, StatusCode.OK, "设备替换成功");
     }
@@ -237,4 +237,31 @@ public class NodeController {
         return null;
     }
 
+    /**
+     * 模糊查询设备id
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/findVagueNode")
+    public Result findVagueNode(NodeDto nodeDto){
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
+            return new Result(false, StatusCode.ERROR, "请输入节点id");
+        }
+        List<NodeVo> nodeList = nodeService.findVagueNode(nodeDto);
+        return new Result(true, StatusCode.OK, "查询成功", nodeList);
+    }
+
+    /**
+     * 根据id查询设备类型
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/findNodeType")
+    public Result findNodeType(NodeDto nodeDto){
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
+            return new Result(false, StatusCode.ERROR, "请输入一个设备");
+        }
+        String nodeType = nodeService.findNodeType(nodeDto);
+        return new Result(true, StatusCode.OK, "查询成功", nodeType);
+    }
 }

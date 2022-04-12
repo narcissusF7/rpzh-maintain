@@ -117,4 +117,18 @@ public interface NodeDao {
      * @return
      */
     int exportNode(@Param("nodeVoList")List<NodeVo> nodeVoList);
+
+    /**
+     * 查询设备类型
+     * @param nodeId
+     * @return
+     */
+    String findNodeType(@Param("nodeId")String nodeId);
+
+    /**
+     * 模糊查询设备id
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findVagueNode(@Param("nodeDto")NodeDto nodeDto);
 }

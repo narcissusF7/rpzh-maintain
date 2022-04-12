@@ -163,7 +163,8 @@
   site_id = #{siteId},
   site_x = #{x},
   site_y = #{y},
-  site_z = #{z}
+  site_z = #{z},
+  status = '1'
   WHERE id = #{id}
 </update>
 <select id="findNodeIdCount" resultType="int">
@@ -179,4 +180,15 @@
   (#{nodeVo.nodeId},#{nodeVo.nodeType},#{nodeVo.createTime})
   </foreach>
 </insert>
+<select id="findNodeType" resultType="java.lang.String">
+  SELECT node_type as nodeType
+  FROM tb_node
+  WHERE node_id = #{nodeId}
+  LIMIT 1
+</select>
+<select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
+  SELECT node_id as nodeId,id
+  FROM tb_node
+  WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}, '%')
+</select>
 </mapper>

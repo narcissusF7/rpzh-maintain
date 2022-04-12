@@ -99,4 +99,19 @@ public interface NodeService {
      * @return
      */
     Result exportNode(List<Map<Integer, String>> nodeDate, String nodeType);
+
+
+    /**
+     * 查询设备类型
+     * @param nodeDto
+     * @return
+     */
+    String findNodeType(NodeDto nodeDto);
+
+    /**
+     * 模糊查询设备id
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findVagueNode(NodeDto nodeDto);
 }
