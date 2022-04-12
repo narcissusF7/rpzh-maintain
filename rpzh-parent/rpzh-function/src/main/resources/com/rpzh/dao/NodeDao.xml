@@ -143,7 +143,7 @@
 	`id` = #{id}
 </update>
 <select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
-  SELECT node_id as nodeId, node_type as nodeType,stack as stack
+  SELECT id , node_id as nodeId, node_type as nodeType,stack as stack
   FROM tb_node
   WHERE status != '1'
   <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
@@ -155,5 +155,40 @@
   <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
       and site_id = #{nodeDto.siteId}
   </if>
+</select>
+<update id="enterStack">
+  UPDATE tb_node
+  SET
+  stack = #{stack},
+  site_id = #{siteId},
+  site_x = #{x},
+  site_y = #{y},
+  site_z = #{z},
+  status = '1'
+  WHERE id = #{id}
+</update>
+<select id="findNodeIdCount" resultType="int">
+  SELECT count(*)
+  FROM tb_node
+  WHERE node_id = #{nodeId}
+</select>
+<insert id="exportNode">
+  INSERT INTO tb_node
+  (node_id,node_type,created_time)
+  VALUES
+  <foreach collection="nodeVoList" item="nodeVo" separator=",">
+  (#{nodeVo.nodeId},#{nodeVo.nodeType},#{nodeVo.createTime})
+  </foreach>
+</insert>
+<select id="findNodeType" resultType="java.lang.String">
+  SELECT node_type as nodeType
+  FROM tb_node
+  WHERE node_id = #{nodeId}
+  LIMIT 1
+</select>
+<select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
+  SELECT node_id as nodeId,id
+  FROM tb_node
+  WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}, '%')
 </select>
 </mapper>

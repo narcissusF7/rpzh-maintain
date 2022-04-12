@@ -2,9 +2,11 @@ package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.Result;
 import com.rpzh.vo.NodeVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author liubc
@@ -82,4 +84,34 @@ public interface NodeService {
      * @return
      */
     PageInfo<NodeVo> findNoEnterStack(NodeDto nodeDto);
+
+    /**
+     * 设备入垛
+     * @param data
+     * @return
+     */
+    int enterStack(String data);
+
+    /**
+     * 批量导入设备
+     * @param nodeDate
+     * @param nodeType
+     * @return
+     */
+    Result exportNode(List<Map<Integer, String>> nodeDate, String nodeType);
+
+
+    /**
+     * 查询设备类型
+     * @param nodeDto
+     * @return
+     */
+    String findNodeType(NodeDto nodeDto);
+
+    /**
+     * 模糊查询设备id
+     * @param nodeDto
+     * @return
+     */
+    List<NodeVo> findVagueNode(NodeDto nodeDto);
 }
