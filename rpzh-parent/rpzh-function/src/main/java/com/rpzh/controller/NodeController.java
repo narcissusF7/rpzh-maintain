@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 节点管理
+ * 节点管理蓝思科技代付款
  *
  * @Author liubc
  * @create 2022/3/3 9:39
@@ -34,7 +34,7 @@ public class NodeController {
     private NodeService nodeService;
 
     /**
-     * 添加节点
+     * 添加节点测试
      *
      * @param nodeDto
      * @return
