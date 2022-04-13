@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 节点管理蓝思科技代付款
+ * 节点管理
  *
  * @Author liubc
  * @create 2022/3/3 9:39
- * @Description: good good study,day day up
+ * @Description: good good study,day day up   /node/deleteNode
  */
 @RestController
 @RequestMapping("/node")
@@ -116,6 +116,10 @@ public class NodeController {
      */
     @PostMapping("/replaceNodeId")
     public Result replaceNodeId(NodeDto nodeDto) {
+        Integer id = nodeDto.getId();
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+        }
         String beforeNodeId = nodeDto.getBeforeNodeId();
         if (ToolUtil.isEmpty(beforeNodeId)) {
             return new Result(false, StatusCode.ERROR, "请选择需要替换的设备id");
@@ -141,9 +145,9 @@ public class NodeController {
      */
     @PostMapping("/findNodeReplaceLog")
     public Result<PageInfo> findNodeReplaceLog(NodeDto nodeDto) {
-        String nodeId = nodeDto.getNodeId();
-        if (ToolUtil.isEmpty(nodeId)) {
-            return new Result(false, StatusCode.ERROR, "设备id不能为空");
+        Integer id = nodeDto.getId();
+        if (ToolUtil.isEmpty(id)){
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         PageInfo<NodeVo> pageInfo = nodeService.findNodeReplaceLog(nodeDto);
         return new Result(true, StatusCode.OK, "查询成功", pageInfo);

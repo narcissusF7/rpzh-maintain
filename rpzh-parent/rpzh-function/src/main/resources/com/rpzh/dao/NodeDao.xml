@@ -114,6 +114,7 @@
   after_node_id,
   replace_location,
   username,
+  original_id,
   create_time
    )
   VALUES
@@ -122,6 +123,7 @@
    #{nodeDto.afterNodeId},
    #{nodeDto.gatherSite},
    #{nodeDto.lastUpdatedUser},
+   #{nodeDto.id},
    sysdate()
    )
 </insert>
@@ -129,7 +131,7 @@
   SELECT id,before_node_id as beforeNodeId,after_node_id as afterNodeId,create_time as createTime,
   replace_location as replaceLocation,username as createdUser
   FROM tb_node_replace_history
-  WHERE after_node_id = #{nodeDto.nodeId}
+  WHERE original_id = #{nodeDto.id}
 </select>
 <update id="unbindStack">
   UPDATE tb_node
