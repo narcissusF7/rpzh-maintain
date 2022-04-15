@@ -2,7 +2,6 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.annotation.OperationLog;
-import com.rpzh.annotation.OperationUserLog;
 import com.rpzh.dao.UserDao;
 import com.rpzh.dto.UserDto;
 import com.rpzh.entity.Result;
@@ -62,7 +61,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "新增用户", tags = "用户管理")
-    @OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.INSERT)
+    //@OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.INSERT)
     @PostMapping("/addUser")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.INSERT, title = "用户管理")
     public Result addUser(UserDto userDto) {
@@ -95,7 +94,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "修改用户的状态", tags = "用户管理")
-    @OperationUserLog(title = "修改用户的状态", businessUserType = BesinessUserType.UPDATESTATUS)
+   // @OperationUserLog(title = "修改用户的状态", businessUserType = BesinessUserType.UPDATESTATUS)
     @PostMapping("/changeUserStatus")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result changeUserStatus(UserDto userDto) {
@@ -110,7 +109,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/editUser")
-    @OperationUserLog(title = "修改用户", businessUserType = BesinessUserType.UPDATE)
+    //@OperationUserLog(title = "修改用户", businessUserType = BesinessUserType.UPDATE)
     @ApiOperation(value = "修改用户", tags = "用户管理")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result editUser(UserDto userDto) {
@@ -132,7 +131,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "删除用户", tags = "用户管理")
-    @OperationUserLog(title = "删除用户", businessUserType = BesinessUserType.DELETE)
+    //@OperationUserLog(title = "删除用户", businessUserType = BesinessUserType.DELETE)
     @PostMapping("/deleteUser")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.DELETE, title = "用户管理")
     public Result deleteUser(UserDto userDto) {
@@ -150,7 +149,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "普通用户修改密码", tags = "用户管理")
-    @OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.PASSWORD)
+    //@OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.PASSWORD)
     @GetMapping("/editPassWord")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result editPassWord(String username, String newpassWord, String notarizePassword) {
@@ -185,7 +184,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "超级管理员可以修改所有人密码", tags = "用户管理")
-    @OperationUserLog(title = "超级管理员修改密码", businessUserType = BesinessUserType.ADMINPASSWORD)
+    //@OperationUserLog(title = "超级管理员修改密码", businessUserType = BesinessUserType.ADMINPASSWORD)
     @GetMapping("/adminUpdatePassWord")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result adminUpdatePassWord(String username, String newpassWord) {
@@ -230,7 +229,7 @@ public class UserController {
      * @return
      */
     @ApiOperation(value = "个人中心修改用户信息", tags = "用户管理")
-    @OperationUserLog(title = "个人中心修改用户信息", businessUserType = BesinessUserType.PERSONALUPDATE)
+    //@OperationUserLog(title = "个人中心修改用户信息", businessUserType = BesinessUserType.PERSONALUPDATE)
     @PostMapping("/changeUserMessage")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result changeUserMessage(UserDto userDto) {
