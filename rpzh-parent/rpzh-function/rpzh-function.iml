@@ -24,6 +24,9 @@
     <orderEntry type="library" name="Maven: org.apache.poi:poi:3.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.16" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.cloud:spring-cloud-alibaba-commons:2.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.nacos:nacos-client:1.4.1" level="project" />

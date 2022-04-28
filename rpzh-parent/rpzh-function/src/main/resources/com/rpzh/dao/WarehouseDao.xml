@@ -474,8 +474,6 @@
   `area_id` as areaId,
   `pid_route` as pidRoute,
   `site_name` as siteName,
-  `material_code` as materialCode,
-  `year` as year,
   `remark` as remark
   FROM `tb_stack`
   WHERE area_id = #{stackDto.wareareaId}
