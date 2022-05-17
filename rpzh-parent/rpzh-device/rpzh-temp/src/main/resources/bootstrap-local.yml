@@ -2,13 +2,13 @@ server:
   port: 16908
 spring:
   application:
-    name: rpzh-temp
+    name: rpzh-maintain-temp
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: localhost:8877
+        server-addr: localhost:8866
       config: # 配置中心地址
-        server-addr: localhost:8877
+        server-addr: localhost:8866
         # 配置文件格式
         file-extension: yml
   datasource:
