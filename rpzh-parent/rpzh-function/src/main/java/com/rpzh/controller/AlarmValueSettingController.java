@@ -6,8 +6,8 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.service.AlarmValueSettingService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.vo.AlarmValueSettingVo;
-import io.swagger.annotations.ApiImplicitParam;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
@@ -18,11 +18,13 @@ import javax.annotation.Resource;
  * @Description: 功能
  */
 @RestController
+@CrossOrigin
 @RequestMapping("/maintain/alarmValueSetting")
 public class AlarmValueSettingController {
     @Resource
     private AlarmValueSettingService alarmValueSettingService;
-    @GetMapping(value = "/findAlarmValueSettingInfo")
+
+    @PostMapping(value = "/findAlarmValueSettingInfo")
     public Result findMaintainPlanInfo(AlarmValueSettingDto alarmValueSettingDto) {
         String materialCodeYear = alarmValueSettingDto.getMaterialCodeYear();
         String phases = alarmValueSettingDto.getPhases();

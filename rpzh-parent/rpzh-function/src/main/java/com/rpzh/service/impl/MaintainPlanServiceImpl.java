@@ -54,7 +54,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingDto alarmValueSettingDto = maintainPlanDto.getAlarmValueSettingDto();
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(new Date());
-        Integer alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
+        Integer alarmValueSettingId = alarmValueSettingDto.getAlarmValueSettingId();
         alarmValueSettingDto.setMaterialCodeYear(maintainPlanDto.getMaterialCodeYear());
         if(alarmValueSettingId!=null){
             alarmValueSettingDto.setUpdateUser(createUser);

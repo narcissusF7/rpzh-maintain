@@ -22,6 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/maintain/material")
+@CrossOrigin
 @Slf4j
 public class MaterialController {
     @Resource
@@ -35,28 +36,34 @@ public class MaterialController {
      * @param stackId
      * @return
      */
-    @GetMapping(value = "/getMaterialInfoBySiteId")
+    @PostMapping(value = "/getMaterialInfoBySiteId")
     public Result getMaterialInfoBySiteId(Integer stackId){
-        Integer stackIdCount = maintainPlanService.isExistStackId(stackId);
-        if(stackIdCount>0){
-            return new Result(false, StatusCode.ERROR, "该垛位已存在养护计划!");
+        if(stackId == null){
+            return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
         }
         MaterialVo materialVo = materialService.getMaterialInfoBySiteId(stackId);
         return new Result(true, StatusCode.OK, "查询成功!", materialVo);
     }
 
-    @GetMapping(value = "/findMaterialCode")
-    public Result findMaterialCode(Integer siteId){
-        List<String> materialCode = materialService.findMaterialCode(siteId);
-        if(materialCode.size()>0) {
-            return new Result(true, StatusCode.OK, "查询成功!", materialCode);
+    @PostMapping(value = "/findMaterialCode")
+    public Result findMaterialCode(Integer stackId){
+        if(stackId == null){
+            return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
         }
-        return new Result(false, StatusCode.ERROR, "该垛位暂无物料代码,请重新选择垛位!", materialCode);
+        Integer stackIdCount = maintainPlanService.isExistStackId(stackId);
+        if(stackIdCount>0){
+            return new Result(false, StatusCode.EXISTERROR, "该垛位已存在养护计划!");
+        }
+        List<String> materialCode = materialService.findMaterialCode(stackId);
+        if(materialCode.size()>0) {
+            return new Result(true, StatusCode.OK, "查询物料代码成功!", materialCode);
+        }
+        return new Result(false, StatusCode.ERROR, "该垛位暂无物料代码,请重新选择垛位!");
     }
 
-    @GetMapping(value = "/findYear")
-    public Result findYear(Integer siteId,String materialCode){
-        List<String> tobaccoYear = materialService.findYear(siteId,materialCode);
-        return new Result(true, StatusCode.OK, "查询成功!", tobaccoYear);
+    @PostMapping(value = "/findYear")
+    public Result findYear(Integer stackId,String materialCode){
+        List<String> tobaccoYear = materialService.findYear(stackId,materialCode);
+        return new Result(true, StatusCode.OK, "查询烟叶年份成功!", tobaccoYear);
     }
 }

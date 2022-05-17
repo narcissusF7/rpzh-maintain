@@ -119,4 +119,5 @@ public class AlarmValueSettingDto {
      */
     private String materialCodeYear;
 
+    private Integer alarmValueSettingId;
 }

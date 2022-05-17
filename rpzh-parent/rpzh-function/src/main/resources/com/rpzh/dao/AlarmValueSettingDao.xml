@@ -117,6 +117,7 @@
            <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">core_temp_high_env_temp_two=#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
            <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">core_temp_high_env_temp_three=#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
            <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases=#{alarmValueSettingDto.phases},</if>
+           <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name={alarmValueSettingDto.earlyWarningRuleName},</if>
            <if test="alarmValueSettingDto.updateUser != null and alarmValueSettingDto.updateUser != ''">update_user=#{alarmValueSettingDto.updateUser},</if>
            updated_time=#{alarmValueSettingDto.updatedTime}
        </set>

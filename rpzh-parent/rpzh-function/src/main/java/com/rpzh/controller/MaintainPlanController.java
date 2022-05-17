@@ -1,7 +1,6 @@
 package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -12,8 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +19,7 @@ import com.rpzh.vo.MaintainPlanVo;
 import javax.annotation.Resource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -147,7 +145,7 @@ public class MaintainPlanController {
      * @updateUser zyq
      */
     @ApiOperation(value = "养护计划列表", tags = "养护计划列表")
-    @GetMapping(value = "/findMaintainPlanInfo")
+    @PostMapping(value = "/findMaintainPlanInfo")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jwt", value = "令牌",paramType = "请求头"),
             @ApiImplicitParam(name = "stackName", value = "仓库位置名称", required = false),
@@ -191,7 +189,7 @@ public class MaintainPlanController {
      * @createUser wbl
      */
     @ApiOperation(value = "根据养护id查询养护详情/更改养护计划时回显", tags = "根据养护id查询养护详情/更改养护计划时回显")
-    @GetMapping("/findMaintainPlanById")
+    @PostMapping("/findMaintainPlanById")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jwt", value = "令牌",paramType = "请求头"),
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true)
@@ -268,7 +266,7 @@ public class MaintainPlanController {
      * @return
      */
     @ApiOperation(value = "养护统计报表", tags = "养护统计报表")
-    @GetMapping(value = "/findMaintainCountReport")
+    @PostMapping(value = "/findMaintainCountReport")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jwt", value = "令牌",paramType = "请求头"),
             @ApiImplicitParam(name = "stackName", value = "仓库位置名称", required = false),
@@ -312,7 +310,7 @@ public class MaintainPlanController {
      * @return
      */
     @ApiOperation(value = "历史汇总单", tags = "历史汇总单")
-    @GetMapping(value = "/findMaintainHistoryCollect")
+    @PostMapping(value = "/findMaintainHistoryCollect")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jwt", value = "令牌",paramType = "请求头"),
             @ApiImplicitParam(name = "stackName", value = "仓库位置名称", required = false),
@@ -366,7 +364,7 @@ public class MaintainPlanController {
      * @return
      */
     @ApiOperation(value = "养护到期汇总中的详情", tags = "养护到期汇总中的详情")
-    @GetMapping("/findMaintainPlanDetails")
+    @PostMapping("/findMaintainPlanDetails")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "jwt", value = "令牌",paramType = "请求头"),
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true)
@@ -438,9 +436,21 @@ public class MaintainPlanController {
     }
 
     @ApiOperation(value = "养护到期汇总列表", tags = "养护到期汇总列表")
-    @GetMapping("/findExpireCollectTable")
+    @PostMapping("/findExpireCollectTable")
     public Result findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
         PageInfo<MaintainPlanVo> maintainPlan = maintainPlanService.findExpireCollectTable(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "养护到期汇总列表查询成功",maintainPlan);
+    }
+
+    @PostMapping("/getPhases")
+    public Result getPhases(String maintenceStyle) {
+        List<String> phases = new ArrayList<>();
+        phases.add("养护阶段");
+        phases.add("充氮杀虫阶段");
+        phases.add("磷化铝杀虫阶段");
+        if("机械调控方式".equals(maintenceStyle)){
+            phases.add("充氮保质阶段");
+        }
+        return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 }

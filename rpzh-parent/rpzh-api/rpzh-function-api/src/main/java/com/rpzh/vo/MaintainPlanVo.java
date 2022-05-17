@@ -79,4 +79,6 @@ public class MaintainPlanVo {
 
     @ApiModelProperty(notes = "养护阶段集合")
     private List<MaintainPlanVo> maintainPlanVos;
+
+    private String materialCodeYear;
 }
