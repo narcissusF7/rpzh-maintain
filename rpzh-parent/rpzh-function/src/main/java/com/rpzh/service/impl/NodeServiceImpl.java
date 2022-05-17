@@ -280,8 +280,8 @@ public class NodeServiceImpl implements NodeService {
      * @return
      */
     @Override
-    public List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime) {
-        List<NodeVo> list = nodeDao.testFindNode(nodeId,nodeType,createTime);
+    public List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime,String startTime,String endTime) {
+        List<NodeVo> list = nodeDao.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
         return list;
     }
 }

@@ -122,5 +122,5 @@ public interface NodeService {
      * @param createTime
      * @return
      */
-    List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime);
+    List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime,String startTime,String endTime);
 }

@@ -62,13 +62,30 @@ public class TestContrller {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "nodeId", value = "设备id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "nodeType", value = "设备类型", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "createTime", value = "创建时间",dataType = "String")
     })
     @ApiOperation(value = "测试用例方法2")
     public Result<NodeVo> two(String nodeId,String nodeType,String createTime,String startTime,String endTime){
-        List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime);
+        List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
         return new Result<NodeVo>(true, StatusCode.OK, "测试方法2",list);
+    }
+
+    /**
+     *测试用例方法3
+     * @param nodeDto
+     * @return
+     */
+    @PostMapping("/three")
+    @ApiOperation(value = "测试用例方法3")
+    public Result<NodeVo> three(NodeDto nodeDto){
+        String nodeId = nodeDto.getNodeId();
+        String nodeType = nodeDto.getNodeType();
+        String createTime = nodeDto.getCreateTime();
+        String startTime = nodeDto.getStartTime();
+        String endTime = nodeDto.getEndTime();
+        List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
+        return new Result<NodeVo>(true, StatusCode.OK, "测试方法3",list);
     }
 }

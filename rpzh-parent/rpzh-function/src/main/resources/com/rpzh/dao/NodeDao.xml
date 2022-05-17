@@ -220,6 +220,12 @@
   <if test="createTime != null and createTime != ''">
       and into_stack_time &gt;= #{createTime}
   </if>
+  <if test="startTime != null and startTime != ''">
+      and created_time &gt;= #{startTime}
+  </if>
+  <if test="endTime != null and endTime != ''">
+      and created_time &lt;= #{endTime}
+  </if>
   </where>
 </select>
 </mapper>
