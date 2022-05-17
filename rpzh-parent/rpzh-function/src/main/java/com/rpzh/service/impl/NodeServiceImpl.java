@@ -270,4 +270,18 @@ public class NodeServiceImpl implements NodeService {
         List<NodeVo> nodeVoList = nodeDao.findVagueNode(nodeDto);
         return nodeVoList;
     }
+
+    /**
+     * 测试方法
+     *
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    @Override
+    public List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime) {
+        List<NodeVo> list = nodeDao.testFindNode(nodeId,nodeType,createTime);
+        return list;
+    }
 }

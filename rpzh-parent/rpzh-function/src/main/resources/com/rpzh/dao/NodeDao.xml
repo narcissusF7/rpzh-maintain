@@ -74,8 +74,7 @@
   `site_y` as siteY ,
   `site_z` as siteZ,
   `into_stack_time` as intoStackTime ,
-  `site_route` as siteRoute ,
-  `maintain_stage_id` as maintainStageId
+  `site_route` as siteRoute
   FROM tb_node
   <where>
    <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
@@ -193,5 +192,34 @@
   SELECT node_id as nodeId,id
   FROM tb_node
   WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}, '%')
+</select>
+<select id="testFindNode" resultType="com.rpzh.vo.NodeVo">
+ SELECT
+  `id` as id,
+  `node_id` as nodeId,
+  `node_type` as nodeType,
+  `created_time` as createTime ,
+  `status` as status ,
+  `gather_site` as gatherSite,
+  `stack` as stack ,
+  `site_type` as siteType ,
+  `site_id` as siteId ,
+  `site_x` as siteX,
+  `site_y` as siteY ,
+  `site_z` as siteZ,
+  `into_stack_time` as intoStackTime ,
+  `site_route` as siteRoute
+  FROM tb_node
+  <where>
+   <if test="nodeId != null and nodeId != ''">
+      and node_id like concat('%', #{nodeId}, '%')
+   </if>
+  <if test="nodeType != null and nodeType != ''">
+      and node_type = #{nodeType}
+  </if>
+  <if test="createTime != null and createTime != ''">
+      and into_stack_time &gt;= #{createTime}
+  </if>
+  </where>
 </select>
 </mapper>

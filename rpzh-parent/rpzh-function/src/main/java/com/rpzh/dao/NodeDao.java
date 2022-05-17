@@ -131,4 +131,13 @@ public interface NodeDao {
      * @return
      */
     List<NodeVo> findVagueNode(@Param("nodeDto")NodeDto nodeDto);
+
+    /**
+     * 测试方法
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    List<NodeVo> testFindNode(@Param("nodeId")String nodeId, @Param("nodeType")String nodeType, @Param("createTime")String createTime);
 }

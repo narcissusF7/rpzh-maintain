@@ -114,4 +114,13 @@ public interface NodeService {
      * @return
      */
     List<NodeVo> findVagueNode(NodeDto nodeDto);
+
+    /**
+     * 测试方法
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime);
 }
