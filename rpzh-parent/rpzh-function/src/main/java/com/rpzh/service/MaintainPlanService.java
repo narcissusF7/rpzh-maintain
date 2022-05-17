@@ -1,10 +1,12 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
-import dto.MaintainPlanDto;
-import vo.MaintainPlanVo;
+import com.rpzh.entity.Result;
+import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.vo.MaintainPlanVo;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * @author wbl
@@ -16,7 +18,7 @@ public interface MaintainPlanService {
      * @param maintainPlanDto 养护计划信息
      * @return success or failure
      */
-    int insert(MaintainPlanDto maintainPlanDto) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException;
+    int insertMaintainPlan(MaintainPlanDto maintainPlanDto);
 
     /**
      * 查询养护计划
@@ -27,9 +29,35 @@ public interface MaintainPlanService {
 
     /**
      * 删除养护计划
-     * @param id 养护计划id
+     * @param stageIds 养护计划id
      * @return success or failure
      */
-    Integer deleteMaintainPlanInfo(Integer id);
+    Result deleteMaintainPlanInfo(List<Integer> stageIds);
 
+    MaintainPlanVo findMaintainPlan(Integer id);
+
+    /**
+     * 更改养护计划
+     * @param maintainPlanDto
+     * @return
+     */
+    Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto);
+
+    PageInfo<MaintainPlanVo> findMaintainCountReport(MaintainPlanDto maintainPlanDto);
+
+    PageInfo<MaintainPlanVo> findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto);
+
+    PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto);
+
+    Integer endMaintainPlan(MaintainPlanDto maintainPlanDto);
+
+    Integer deleteMaintainStage(List<Integer> ids);
+
+    MaintainPlanVo findMaintainPlanDetails(Integer id);
+
+    Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
+
+    PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto);
+
+    Integer isExistStackId(Integer stackId);
 }

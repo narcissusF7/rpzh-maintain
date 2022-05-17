@@ -2,7 +2,9 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 楼栋数据返回
@@ -11,13 +13,19 @@ import java.math.BigDecimal;
  * @Description: good good study,day day up
  */
 @Data
-public class BuildingVo {
+public class BuildingVo implements Serializable {
 
     //主键ID
     private Integer id;
 
     //楼号
     private String buildingNo;
+
+    //负责人
+    private String principalName;
+
+    //负责人id
+    private Integer principalId;
 
     //楼号名称
     private String buildingName;
@@ -63,4 +71,6 @@ public class BuildingVo {
 
     //楼栋类型
     private String buildingType;
+
+    private List<FloorVo> floorVos;
 }

@@ -1,19 +1,33 @@
 package com.rpzh.dao;
 
+import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.vo.AlarmValueSettingVo;
 import org.apache.ibatis.annotations.Mapper;
-import pojo.AlarmValueSetting;
+import com.rpzh.pojo.AlarmValueSetting;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface AlarmValueSettingDao {
-     int deleteByPrimaryKey(Integer id);
 
-     int insert(AlarmValueSetting record);
+    AlarmValueSettingVo findAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-     int insertSelective(AlarmValueSetting record);
+    AlarmValueSettingVo findAlarmValueSettingById(@Param("alarmValueSettingId") Integer alarmValueSettingId);
 
-     AlarmValueSetting selectByPrimaryKey(Integer id);
+    Integer updateAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto, @Param("alarmValueSettingId") Integer alarmValueSettingId);
 
-     int updateByPrimaryKeySelective(AlarmValueSetting record);
+    Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-     int updateByPrimaryKey(AlarmValueSetting record);
+    Integer findMaxId();
+
+    AlarmValueSettingVo findColorAndAlertUpgradeDay();
+
+    int insertColorAndAlertUpgradeDay(@Param("settingKey") String settingKey, @Param("settingValue") String settingValue, @Param("settingName") String settingName);
+
+    Integer updateStatus(@Param("alarmValueSettingId") Integer alarmValueSettingId);
+
+    Integer delete(@Param("alarmValueSettingId") Integer alarmValueSettingId);
+
+    int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 }

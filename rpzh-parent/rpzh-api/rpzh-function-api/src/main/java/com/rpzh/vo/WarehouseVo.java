@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 仓库交互类
@@ -14,7 +16,7 @@ import java.util.Date;
  * @Description: good good study,day day up
  */
 @Data
-public class WarehouseVo {
+public class WarehouseVo implements Serializable {
 
     //主键ID
     private Integer id;
@@ -28,6 +30,9 @@ public class WarehouseVo {
 
     //库龄
     private Integer age;
+
+    //负责人
+    private String principalName;
 
     //仓库编码
     private String code;
@@ -82,4 +87,6 @@ public class WarehouseVo {
 
     //位置名称
     private String siteName;
+
+    private List<BuildingVo> buildingVos;
 }

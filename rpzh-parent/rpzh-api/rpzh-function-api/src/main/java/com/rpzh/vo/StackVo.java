@@ -2,6 +2,7 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * @Description: good good study,day day up
  */
 @Data
-public class StackVo {
+public class StackVo implements Serializable {
 
     //主键ID
     private Integer id;

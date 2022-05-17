@@ -2,7 +2,9 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 楼层数据返回
@@ -11,12 +13,18 @@ import java.util.Date;
  * @Description: good good study,day day up
  */
 @Data
-public class FloorVo {
+public class FloorVo implements Serializable {
     //主键ID
     private Integer id;
 
     //楼层编号
     private String floorNo;
+
+    //负责人
+    private String principalName;
+
+    //负责人id
+    private Integer principalId;
 
     //楼层名称
     private String floorName;
@@ -56,4 +64,6 @@ public class FloorVo {
 
     //最后更新人ID
     private Integer lastUpdatedUserId;
+
+    private List<WareAreaVo> wareAreaVos;
 }

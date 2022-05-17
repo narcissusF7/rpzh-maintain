@@ -2,7 +2,9 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,13 +14,19 @@ import java.util.Map;
  * @Description: good good study,day day up
  */
 @Data
-public class WareAreaVo {
+public class WareAreaVo implements Serializable {
 
     //主键ID
     private Integer id;
 
     //区域编号
     private String areaNo;
+
+    //负责人
+    private String principalName;
+
+    //负责人id
+    private Integer principalId;
 
     //分区名称
     private String areaName;
@@ -57,4 +65,6 @@ public class WareAreaVo {
     private String  wareAreaType;
 
     private Map<String,String> data;
+
+    private List<StackVo> stackVos;
 }

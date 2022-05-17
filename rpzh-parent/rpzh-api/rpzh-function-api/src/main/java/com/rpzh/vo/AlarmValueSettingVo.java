@@ -1,0 +1,112 @@
+package com.rpzh.vo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.util.Date;
+
+/**
+ * @author zyq
+ * 预警信息设置
+ */
+@Data
+@ApiModel(description = "预警数值返回数据")
+public class AlarmValueSettingVo {
+
+    @ApiModelProperty(notes = "垛内氧气上限一级")
+    private Double stackOxygenUpperOne;
+    @ApiModelProperty(notes = "垛内氧气上限二级")
+    private Double stackOxygenUpperTwo;
+    @ApiModelProperty(notes = "垛内氧气上限三级")
+    private Double stackOxygenUpperThree;
+    @ApiModelProperty(notes = "垛内氧气下限")
+    private Double stackOxygenLower;
+
+    @ApiModelProperty(notes = "仓间氧气上限一级")
+    private Double warehouseOxygenUpperOne;
+    @ApiModelProperty(notes = "仓间氧气上限二级")
+    private Double warehouseOxygenUpperTwo;
+    @ApiModelProperty(notes = "仓间氧气上限三级")
+    private Double warehouseOxygenUpperThree;
+    @ApiModelProperty(notes = "仓间氧气下限")
+    private Double warehouseOxygenLower;
+
+    @ApiModelProperty(notes = "包芯温度上限一级")
+    private Double tempCoreChipUpperOne;
+    @ApiModelProperty(notes = "包芯温度上限二级")
+    private Double tempCoreChipUpperTwo;
+    @ApiModelProperty(notes = "包芯温度上限三级")
+    private Double tempCoreChipUpperThree;
+    @ApiModelProperty(notes = "包芯温度下限")
+    private Double tempCoreChipLower;
+
+    @ApiModelProperty(notes = "垛内温度上限一级")
+    private Double stackTempUpperOne;
+    @ApiModelProperty(notes = "垛内温度上限二级")
+    private Double stackTempUpperTwo;
+    @ApiModelProperty(notes = "垛内温度上限三级")
+    private Double stackTempUpperThree;
+    @ApiModelProperty(notes = "垛内温度下限")
+    private Double stackTempLower;
+
+    @ApiModelProperty(notes = "垛内水分上限一级")
+    private Double stackMoistureUpperOne;
+    @ApiModelProperty(notes = "垛内水分上限二级")
+    private Double stackMoistureUpperTwo;
+    @ApiModelProperty(notes = "垛内水分上限三级")
+    private Double stackMoistureUpperThree;
+    @ApiModelProperty(notes = "垛内水分下限")
+    private Double stackMoistureLower;
+
+    @ApiModelProperty(notes = "仓间温度上限一级")
+    private Double warehouseTempUpper0ne;
+    @ApiModelProperty(notes = "仓间温度上限二级")
+    private Double warehouseTempUpperTwo;
+    @ApiModelProperty(notes = "仓间温度上限三级")
+    private Double warehouseTempUpperThree;
+    @ApiModelProperty(notes = "仓间温度下限")
+    private Double warehouseTempLower;
+
+    @ApiModelProperty(notes = "仓间水分上限一级")
+    private Double warehouseMoistureUpperOne;
+    @ApiModelProperty(notes = "仓间水分上限二级")
+    private Double warehouseMoistureUpperTwo;
+    @ApiModelProperty(notes = "仓间水分上限三级")
+    private Double warehouseMoistureUpperThree;
+    @ApiModelProperty(notes = "仓间水分下限")
+    private Double warehouseMoistureLower;
+
+    @ApiModelProperty(notes = "平均包芯高于环境一级")
+    private Double coreTempHighEnvTempOne;
+    @ApiModelProperty(notes = "平均包芯高于环境二级")
+    private Double coreTempHighEnvTempTwo;
+    @ApiModelProperty(notes = "平均包芯高于环境三级")
+    private Double coreTempHighEnvTempThree;
+
+    @ApiModelProperty(notes = "预警设置表id")
+    private Integer alarmValueSettingId;
+
+    @ApiModelProperty(notes = "预警规则名称")
+    private String earlyWarningRuleName;
+    @ApiModelProperty(notes = "烟叶年份")
+    private String tobaccoYear;
+    @ApiModelProperty(notes = "物料代码")
+    private String materialCode;
+    @ApiModelProperty(notes = "物料代码和物料代码合并")
+    private String materialCodeYear;
+    @ApiModelProperty(notes = "批次号")
+    private String materialBatchNum;
+
+    @ApiModelProperty(notes = "预警颜色一级")
+    private String colorOne;
+    @ApiModelProperty(notes = "预警颜色二级")
+    private String colorTwo;
+    @ApiModelProperty(notes = "预警颜色三级")
+    private String colorThree;
+
+    @ApiModelProperty(notes = "预警一级升二级的天数")
+    private String oneToTwoDay;
+    @ApiModelProperty(notes = "预警二级升三级的天数")
+    private String twoToThreeDay;
+}

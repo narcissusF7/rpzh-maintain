@@ -7,11 +7,9 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.WarehouseService;
 import com.rpzh.vo.*;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +22,7 @@ import java.util.List;
  * @Description: good good study,day day up
  */
 @RestController
-@RequestMapping("/warehouse")
+@RequestMapping("/maintain/warehouse")
 @CrossOrigin
 public class WarehouseController {
 
@@ -451,4 +449,12 @@ public class WarehouseController {
         return null;
     }
 
+    /**
+     * 多级目录  树状结构
+     * @return success or failure
+     */
+    @GetMapping("/locating")
+    public Result<T> locating(){
+        return new Result<>(true, StatusCode.OK, "查询目录成功", warehouseService.locating());
+    }
 }

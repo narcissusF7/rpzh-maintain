@@ -1,27 +1,72 @@
 package com.rpzh.dao;
 
-import dto.MaintainPlanDto;
+import com.rpzh.dto.MaintainPlanDto;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import pojo.MaintainPlan;
-import vo.MaintainPlanVo;
+import com.rpzh.pojo.MaintainPlan;
+import com.rpzh.vo.MaintainPlanVo;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
 public interface MaintainPlanDao {
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteMaintainPlanById(@Param("ids") List<Integer> ids);
 
-    int insert(MaintainPlan record);
-
-    int insertSelective(MaintainPlan record);
-
-    MaintainPlan selectByPrimaryKey(Integer id);
-
-    int updateByPrimaryKeySelective(MaintainPlan record);
-
-    int updateByPrimaryKey(MaintainPlan record);
+    int deleteMaintainPlanStageById(@Param("ids") List<Integer> ids);
 
     List<MaintainPlanVo> findMaintainPlanInfo(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    MaintainPlanVo findMaintainPlan(@Param("id") Integer id);
+
+
+    Integer updateMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer updateMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer insertMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer insertMaintainStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer findMaxStageId();
+
+    Integer findMaxPlanId();
+
+    int updateMaintainPlanStageId(@Param("stageId") Integer stageId, @Param("id") Integer id);
+
+    List<MaintainPlanVo> findMaintainCountReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    List<MaintainPlanVo> findMaintainMonthEndReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer endMaintainPlan(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId);
+
+    List<Integer> findAlarmValueSettingId(@Param("ids") List<Integer> ids);
+
+    MaintainPlanVo findVersion(@Param("stageId") Integer stageId);
+
+    int deleteMaintainPlan(@Param("stageId") Integer stageId);
+
+    int deleteMaintainPlanStage(@Param("stageId") Integer stageId);
+
+    Integer findStageId(@Param("id") Integer id, @Param("version") Integer version);
+
+    Integer updateChange(@Param("id") Integer id, @Param("change") String change);
+
+    Integer updateStageId(@Param("id") Integer id, @Param("stageId") Integer stageId);
+
+    List<MaintainPlanVo> findDetails(@Param("id") Integer id);
+
+    MaintainPlanVo findDetailsNew(@Param("id") Integer id);
+
+    int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    List<MaintainPlanDto> findVersionAndAftercareDateEnd();
+
+    MaintainPlanVo findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    Integer isExistStackId(@Param("stackId") Integer stackId);
 }

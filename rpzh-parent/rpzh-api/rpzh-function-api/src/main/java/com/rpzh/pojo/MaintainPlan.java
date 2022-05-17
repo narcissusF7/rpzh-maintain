@@ -1,7 +1,7 @@
-package pojo;
+package com.rpzh.pojo;
 
 import cn.hutool.core.date.DateUtil;
-import dto.MaintainPlanDto;
+import com.rpzh.dto.MaintainPlanDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,24 +15,6 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 public class MaintainPlan {
-
-    public MaintainPlan(MaintainPlanDto maintainPlanDto) {
-        this.materialCode = maintainPlanDto.getTobaccoCode();
-        this.materialName = maintainPlanDto.getTobaccoName();
-        this.siteId = maintainPlanDto.getStorageWarehouseId();
-        this.siteName = maintainPlanDto.getStorageWarehouse();
-        this.aftercareDateStart = maintainPlanDto.getMaintainDates();
-        this.year = maintainPlanDto.getYearOfTobacco();
-        this.maintainStage = maintainPlanDto.getMaintainStage();
-        this.maintainDays = maintainPlanDto.getMaintainNumberOfDays();
-        this.maintainCount = maintainPlanDto.getMaintainsAmount();
-        this.oxygenReductionDays = maintainPlanDto.getOxygenFallCompleteTime();
-        this.applyTime = maintainPlanDto.getDateOfApplyFor();
-        this.principalName = maintainPlanDto.getPrincipal();
-        this.principalId = maintainPlanDto.getPrincipalId();
-        this.expireTime = maintainPlanDto.getExpirationReminder();
-        this.createTime = DateUtil.date();
-    }
 
     /**
      * 养护计划id
