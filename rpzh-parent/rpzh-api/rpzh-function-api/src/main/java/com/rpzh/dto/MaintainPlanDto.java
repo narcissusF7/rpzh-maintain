@@ -3,6 +3,7 @@ package com.rpzh.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.rpzh.vo.AlarmValueSettingVo;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -83,14 +84,16 @@ public class MaintainPlanDto {
     /**
      * 调养日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date aftercareDateStart;
     @JsonFormat(pattern = "yyyy-MM-dd 00:00:00", timezone = "GMT+8")
     private Date aftercareDateEnd;
     /**
      * 降氧完成时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date oxygenReductionTime;
     /**
      * 负责人
@@ -99,7 +102,8 @@ public class MaintainPlanDto {
     /**
      * 到期提醒时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date expireTime;
     /**
      * 养护数量
@@ -118,10 +122,6 @@ public class MaintainPlanDto {
      * 库龄
      */
     private Integer storageAge;
-    /**
-     * 预警数值
-     */
-    private AlarmValueSettingDto alarmValueSettingDto;
 
     /**
      * 第几页
@@ -135,4 +135,73 @@ public class MaintainPlanDto {
     private String siteName;
 
     private String changeStatus;
+
+    /**
+     * 垛内氧气
+     */
+    private Double stackOxygenUpperOne;
+    private Double stackOxygenUpperTwo;
+    private Double stackOxygenUpperThree;
+    private Double stackOxygenLower;
+
+    /**
+     * 仓间氧气
+     */
+    private Double warehouseOxygenUpperOne;
+    private Double warehouseOxygenUpperTwo;
+    private Double warehouseOxygenUpperThree;
+    private Double warehouseOxygenLower;
+
+    /**
+     * 包芯温度
+     */
+    private Double tempCoreChipUpperOne;
+    private Double tempCoreChipUpperTwo;
+    private Double tempCoreChipUpperThree;
+    private Double tempCoreChipLower;
+
+    /**
+     * 垛内温度
+     */
+    private Double stackTempUpperOne;
+    private Double stackTempUpperTwo;
+    private Double stackTempUpperThree;
+    private Double stackTempLower;
+
+    /**
+     * 垛内水分
+     */
+    private Double stackMoistureUpperOne;
+    private Double stackMoistureUpperTwo;
+    private Double stackMoistureUpperThree;
+    private Double stackMoistureLower;
+
+    /**
+     * 仓间温度
+     */
+    private Double warehouseTempUpper0ne;
+    private Double warehouseTempUpperTwo;
+    private Double warehouseTempUpperThree;
+    private Double warehouseTempLower;
+
+    /**
+     * 垛内水分
+     */
+    private Double warehouseMoistureUpperOne;
+    private Double warehouseMoistureUpperTwo;
+    private Double warehouseMoistureUpperThree;
+    private Double warehouseMoistureLower;
+
+    /**
+     * 平均包芯高于环境
+     */
+    private Double coreTempHighEnvTempOne;
+    private Double coreTempHighEnvTempTwo;
+    private Double coreTempHighEnvTempThree;
+    private Double coreTempLowEnvTemp;
+
+    /**
+     * 预警规则名称
+     */
+    private String earlyWarningRuleName;
 }

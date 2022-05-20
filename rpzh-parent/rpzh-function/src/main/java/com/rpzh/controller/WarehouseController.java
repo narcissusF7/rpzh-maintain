@@ -9,6 +9,7 @@ import com.rpzh.service.WarehouseService;
 import com.rpzh.vo.*;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -457,4 +458,5 @@ public class WarehouseController {
     public Result<T> locating(){
         return new Result<>(true, StatusCode.OK, "查询目录成功", warehouseService.locating());
     }
+
 }

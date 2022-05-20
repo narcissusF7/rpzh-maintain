@@ -21,7 +21,6 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findMaintainPlan(@Param("id") Integer id);
 
-
     Integer updateMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
     Integer updateMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
@@ -64,9 +63,11 @@ public interface MaintainPlanDao {
 
     int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    List<MaintainPlanDto> findVersionAndAftercareDateEnd();
-
     MaintainPlanVo findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
+    List<MaintainPlanDto> findVersionAndAftercareDateEnd();
+
     Integer isExistStackId(@Param("stackId") Integer stackId);
+
+    Integer isExistAlarmValueSetting(@Param("id")Integer id);
 }

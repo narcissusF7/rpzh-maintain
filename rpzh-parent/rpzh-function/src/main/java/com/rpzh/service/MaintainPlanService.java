@@ -5,7 +5,6 @@ import com.rpzh.entity.Result;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.vo.MaintainPlanVo;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -57,7 +56,7 @@ public interface MaintainPlanService {
 
     Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
 
-    PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto);
+    Result findExpireCollectTable(MaintainPlanDto maintainPlanDto);
 
     Integer isExistStackId(Integer stackId);
 }

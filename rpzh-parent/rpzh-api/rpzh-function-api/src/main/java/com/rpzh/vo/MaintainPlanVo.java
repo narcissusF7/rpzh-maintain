@@ -1,6 +1,7 @@
 package com.rpzh.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rpzh.dto.MaterialCodeYearDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -81,4 +82,6 @@ public class MaintainPlanVo {
     private List<MaintainPlanVo> maintainPlanVos;
 
     private String materialCodeYear;
+
+    private List<MaterialCodeYearVo> materialCodeYearVos;
 }
