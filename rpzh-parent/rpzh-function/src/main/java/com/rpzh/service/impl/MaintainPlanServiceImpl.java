@@ -1,12 +1,12 @@
 package com.rpzh.service.impl;
 
-import cn.hutool.core.date.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.*;
 import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.*;
 import com.rpzh.dto.*;
 import com.rpzh.entity.*;
+import com.rpzh.feign.UserFeign;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.TokenDecode;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MaintainPlanServiceImpl implements MaintainPlanService {
@@ -25,6 +26,12 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Resource
     private AlarmValueSettingDao alarmValueSettingDao;
 
+    @Resource
+    private UserFeign userFeign;
+
+    @Resource
+    private WarehouseDao warehouseDao;
+
     /**
      * 新增养护计划
      *
@@ -33,11 +40,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String materialCodeYear = maintainPlanDto.getMaterialCodeYear();
         List<String> materialCodeYearJson = JSON.parseArray(materialCodeYear, String.class);
         materialCodeYear = JSON.toJSONString(JSON.parse(materialCodeYearJson.toString()));
         List<MaterialCodeYearDto> materialCodeYearDtos = JSON.parseArray(materialCodeYear, MaterialCodeYearDto.class);
-        System.out.println(materialCodeYearDtos);
         String materialCode ="";
         String tobaccoYear = "";
         for (int i = 0; i < materialCodeYearDtos.size(); i++) {
@@ -132,6 +141,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             String[] tobaccoYear = materialCodeYearDtos.get(i).getTobaccoYear().replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","").split(",");
             materialCodeYearVos.get(i).setTobaccoYear(Arrays.asList(tobaccoYear));
         }
+        maintainPlanVo.setUsername(maintainPlanVo.getUsername());
+        maintainPlanVo.setPrincipalName(Arrays.asList(maintainPlanVo.getPrincipalId().split(",")).stream().map(Integer::parseInt).collect(Collectors.toList()));
         maintainPlanVo.setMaterialCodeYearVos(materialCodeYearVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
@@ -141,13 +152,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String updateUser = TokenDecode.getUserInfo().get("username");
         maintainPlanDto.setUpdateUser(updateUser);
         maintainPlanDto.setUpdatedTime(new Date());
         long l =new Date().getTime() % (1000 * 60 * 60 * 24) + 8 * 60 * 60 *1000;
         Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
-        MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId());
         maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));
         maintainPlanDto.setAftercareDateStart(new Date(maintainPlanDto.getAftercareDateStart().getTime() + l));
         maintainPlanDto.setExpireTime(new Date(maintainPlanDto.getExpireTime().getTime() + l));
@@ -225,6 +238,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
+
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String createUser = TokenDecode.getUserInfo().get("username");
         Date date = new Date();
         MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId());

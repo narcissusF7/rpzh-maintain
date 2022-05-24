@@ -6,12 +6,14 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author wbl
  * @description [养护计划前端传入类]
  */
 @Data
+
 public class MaintainPlanDto {
     /**
      * 物料代码
@@ -98,7 +100,10 @@ public class MaintainPlanDto {
     /**
      * 负责人
      */
-    private String principalName;
+    private List<Integer> principalName;
+    private String principalId;
+    private String name;
+
     /**
      * 到期提醒时间
      */
