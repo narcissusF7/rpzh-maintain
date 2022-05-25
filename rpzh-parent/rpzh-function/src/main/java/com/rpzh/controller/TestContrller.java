@@ -11,13 +11,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Author liubc
@@ -88,4 +89,19 @@ public class TestContrller {
         List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
         return new Result<NodeVo>(true, StatusCode.OK, "测试方法3",list);
     }
+
+
+    /**
+     * 测试菜单
+     * @return
+     */
+    @PreAuthorize("hasAnyAuthority('system:maintain:test')")
+    @PostMapping("/testpro")
+    public Result testpro(){
+        return new Result(true, StatusCode.OK, "发送成功");
+    }
+
+
+
+
 }
