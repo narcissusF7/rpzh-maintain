@@ -21,7 +21,8 @@
     <select id="findYear" resultType="java.lang.String">
     select
     distinct tobacco_year as tobaccoYear
-    from tb_material where stack_id = #{stackId} and material_code = #{materialCode}
+    from tb_material where material_code = #{materialCode}
+    <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
     </select>
 
 </mapper>

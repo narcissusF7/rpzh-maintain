@@ -43,4 +43,5 @@ public class AlertSettingSetDefault {
     public static final String colorOne = "#FFFF00";//平均包芯高于环境三级
     public static final String colorTwo = "#FFA500";//平均包芯高于环境三级
     public static final String colorThree = "#FF0000";//平均包芯高于环境三级
+    public static final Double coreTempLowEnvTemp = 2.00;//平均包芯低于环境
 }

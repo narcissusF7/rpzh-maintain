@@ -1,31 +1,21 @@
 package com.rpzh.service.impl;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.*;
+import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.*;
-import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.entity.AlertSettingSetDefault;
-import com.rpzh.entity.Result;
-import com.rpzh.entity.StatusCode;
-import com.rpzh.entity.ToolUtil;
+import com.rpzh.dto.*;
+import com.rpzh.entity.*;
+import com.rpzh.feign.UserFeign;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.AlarmValueSettingVo;
-import com.rpzh.vo.WarehouseVo;
-import org.apache.xmlbeans.impl.piccolo.util.DuplicateKeyException;
+import com.rpzh.vo.*;
 import org.springframework.stereotype.Service;
-import com.rpzh.pojo.AlarmValueSetting;
-import com.rpzh.pojo.MaintainPlan;
-import com.rpzh.vo.MaintainPlanVo;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
-
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MaintainPlanServiceImpl implements MaintainPlanService {
@@ -37,7 +27,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     private AlarmValueSettingDao alarmValueSettingDao;
 
     @Resource
-    private MaterialDao materialDao;
+    private UserFeign userFeign;
 
     @Resource
     private WarehouseDao warehouseDao;
@@ -50,31 +40,49 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
+        String materialCodeYear = maintainPlanDto.getMaterialCodeYear();
+        List<String> materialCodeYearJson = JSON.parseArray(materialCodeYear, String.class);
+        materialCodeYear = JSON.toJSONString(JSON.parse(materialCodeYearJson.toString()));
+        List<MaterialCodeYearDto> materialCodeYearDtos = JSON.parseArray(materialCodeYear, MaterialCodeYearDto.class);
+        String materialCode ="";
+        String tobaccoYear = "";
+        for (int i = 0; i < materialCodeYearDtos.size(); i++) {
+            if(i==0){
+                materialCode =  materialCodeYearDtos.get(i).getId();
+                tobaccoYear =  materialCodeYearDtos.get(i).getTobaccoYear().replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","");
+            }
+            if(i!=0) {
+                materialCode = materialCode + "," + materialCodeYearDtos.get(i).getId();
+                tobaccoYear = tobaccoYear + ";" + materialCodeYearDtos.get(i).getTobaccoYear().replace("\"","").replaceAll("\\[","").replaceAll("\\]","");
+            }
+        }
+        maintainPlanDto.setTobaccoYear(tobaccoYear);
+        maintainPlanDto.setMaterialCode(materialCode);
+        Date nowDate = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
-        AlarmValueSettingDto alarmValueSettingDto = maintainPlanDto.getAlarmValueSettingDto();
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         maintainPlanDto.setCreateUser(createUser);
-        maintainPlanDto.setCreatedTime(new Date());
-        Integer alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
-        alarmValueSettingDto.setMaterialCodeYear(maintainPlanDto.getMaterialCodeYear());
+        maintainPlanDto.setCreatedTime(nowDate);
+        Integer alarmValueSettingId = alarmValueSettingDto.getAlarmValueSettingId();
         if(alarmValueSettingId!=null){
             alarmValueSettingDto.setUpdateUser(createUser);
-            alarmValueSettingDto.setUpdatedTime(new Date());
+            alarmValueSettingDto.setUpdatedTime(nowDate);
             alarmValueSettingDao.updateAlarmValueSetting(alarmValueSettingDto,alarmValueSettingId);
         }else{
             alarmValueSettingDto.setCreateUser(createUser);
-            alarmValueSettingDto.setCreatedTime(new Date());
-            alarmValueSettingDto.setMaintenceStyle(maintainPlanDto.getMaintenceStyle());
-            alarmValueSettingDto.setPhases(maintainPlanDto.getPhases());
-            alarmValueSettingDto.setTobaccoYear(maintainPlanDto.getTobaccoYear());
-            alarmValueSettingDto.setMaterialCode(maintainPlanDto.getMaterialCode());
+            alarmValueSettingDto.setCreatedTime(nowDate);
             alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
             maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findMaxId());
         }
+        long l = nowDate.getTime() % (1000 * 60 * 60 * 24) + 8 * 60 * 60 *1000;
+        maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));
         Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
         maintainPlanDto.setAftercareDateEnd(date);
+        maintainPlanDto.setAftercareDateStart(new Date(maintainPlanDto.getAftercareDateStart().getTime() + l));
+        maintainPlanDto.setExpireTime(new Date(maintainPlanDto.getExpireTime().getTime() + l));
         maintainPlanDao.insertMaintainPlan(maintainPlanDto);
         Integer id =maintainPlanDao.findMaxPlanId();
         maintainPlanDto.setMaintainPlanId(id);
@@ -107,7 +115,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         for (Integer stageId : stageIds) {
             MaintainPlanVo maintainPlan = maintainPlanDao.findVersion(stageId);
             Integer version = maintainPlan.getVersion();
-            Integer alarmValueSettingId = maintainPlan.getAlarmValueSettingId();
             Integer id = maintainPlan.getId();
             if(version == 1){
                 maintainPlanDao.deleteMaintainPlan(stageId);
@@ -119,7 +126,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 maintainPlanDao.updateStageId(id,stageId1);
             }
             maintainPlanDao.deleteMaintainPlanStage(stageId);
-            alarmValueSettingDao.delete(alarmValueSettingId);
         }
         return new Result(true, StatusCode.OK, "删除成功!");
     }
@@ -128,6 +134,16 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public MaintainPlanVo findMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
+        String materialCodeYear = maintainPlanVo.getMaterialCodeYear();
+        List<MaterialCodeYearVo> materialCodeYearVos = JSON.parseArray(materialCodeYear, MaterialCodeYearVo.class);
+        List<MaterialCodeYearDto> materialCodeYearDtos = JSON.parseArray(materialCodeYear, MaterialCodeYearDto.class);
+        for (int i = 0; i < materialCodeYearVos.size(); i++) {
+            String[] tobaccoYear = materialCodeYearDtos.get(i).getTobaccoYear().replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","").split(",");
+            materialCodeYearVos.get(i).setTobaccoYear(Arrays.asList(tobaccoYear));
+        }
+        maintainPlanVo.setUsername(maintainPlanVo.getUsername());
+        maintainPlanVo.setPrincipalName(Arrays.asList(maintainPlanVo.getPrincipalId().split(",")).stream().map(Integer::parseInt).collect(Collectors.toList()));
+        maintainPlanVo.setMaterialCodeYearVos(materialCodeYearVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
@@ -136,17 +152,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String updateUser = TokenDecode.getUserInfo().get("username");
         maintainPlanDto.setUpdateUser(updateUser);
         maintainPlanDto.setUpdatedTime(new Date());
+        long l =new Date().getTime() % (1000 * 60 * 60 * 24) + 8 * 60 * 60 *1000;
         Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
         maintainPlanDto.setAftercareDateEnd(date);
+        maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));
+        maintainPlanDto.setAftercareDateStart(new Date(maintainPlanDto.getAftercareDateStart().getTime() + l));
+        maintainPlanDto.setExpireTime(new Date(maintainPlanDto.getExpireTime().getTime() + l));
         maintainPlanDao.updateMaintainPlan(maintainPlanDto);
+        maintainPlanDto.setStageId(maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getStageId());
         maintainPlanDao.updateMaintainPlanStage(maintainPlanDto);
-        AlarmValueSettingDto alarmValueSettingDto = maintainPlanDto.getAlarmValueSettingDto();
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         alarmValueSettingDto.setUpdateUser(updateUser);
         alarmValueSettingDto.setUpdatedTime(new Date());
         Integer alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
@@ -182,10 +203,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainHistoryCollect(maintainPlanDto);
         for (MaintainPlanVo maintainPlanVo : maintainPlanVos) {
             if (maintainPlanVo.getChangeStatus().equals("0")) {
-                maintainPlanVo.setChangeStatus("未变更");
+                maintainPlanVo.setChangeStatus("未转段");
             }
             if (maintainPlanVo.getChangeStatus().equals("1")) {
-                maintainPlanVo.setChangeStatus("已变更");
+                maintainPlanVo.setChangeStatus("已转段");
             }
         }
         return new PageInfo(maintainPlanVos);
@@ -196,17 +217,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Date updateTime = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         Integer maintainPlanId = maintainPlanDto.getId();
-        maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId);
-        Integer alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
-        Integer result = alarmValueSettingDao.updateStatus(alarmValueSettingId);
+        Integer result =  maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId);
         return result;
     }
 
     @Override
     public Integer deleteMaintainStage(List<Integer> ids) {
         maintainPlanDao.deleteMaintainPlanById(ids);
-        List<Integer> alarmValueSettingIds = maintainPlanDao.findAlarmValueSettingId(ids);
-        alarmValueSettingDao.deleteIds(alarmValueSettingIds);
         maintainPlanDao.deleteMaintainPlanStageById(ids);
         return 1;
     }
@@ -221,6 +238,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
+
+        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
+        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
+        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String createUser = TokenDecode.getUserInfo().get("username");
         Date date = new Date();
         MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId());
@@ -236,11 +257,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             days = (int) ((date.getTime() - maintainPlan.getAftercareDateStart().getTime()) / (1000*3600*24));
         }
         Date date1 = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        date1.setHours(0);
-        date1.setMinutes(0);
-        date1.setSeconds(0);
         maintainPlanDto.setAftercareDateEnd(date1);
-        AlarmValueSettingDto alarmValueSettingDto = maintainPlanDto.getAlarmValueSettingDto();
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         alarmValueSettingDto.setCreateUser(createUser);
         alarmValueSettingDto.setCreatedTime(date);
         Integer alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
@@ -256,29 +274,34 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
-    public PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
-        Date date = new Date();
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
+    public Result findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
+        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
+        if(StringUtil.isNotEmpty(maintainPlanDto.getEndTime())){
+            maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00","23:59:59"));
+        }
+        Date date = new Date(new Date().getTime() / (1000 * 60 * 60 * 24) * (1000 * 60 * 60 * 24));
         maintainPlanDto.setCreatedTime(date);
         List<MaintainPlanDto> test = maintainPlanDao.findVersionAndAftercareDateEnd();
         List<MaintainPlanVo> maintainPlanVos = new ArrayList<>();
         for (MaintainPlanDto maintainPlanDto1 : test) {
-            maintainPlanDto.setVersion(maintainPlanDto1.getVersion());
             maintainPlanDto.setId(maintainPlanDto1.getId());
-            maintainPlanDto.setFlag(date.getTime() < maintainPlanDto1.getAftercareDateEnd().getTime()?1:0);
-            MaintainPlanVo maintainPlanVo1 = maintainPlanDao.findExpireCollectTable(maintainPlanDto);
-            if(date.getTime() < maintainPlanDto1.getAftercareDateEnd().getTime()){
+            MaintainPlanVo maintainPlanVo1;
+            if(date.getTime() < maintainPlanDto1.getAftercareDateEnd().getTime() && maintainPlanDto1.getVersion()>1){
+                maintainPlanDto.setVersion(maintainPlanDto1.getVersion()-1);
+                maintainPlanVo1 = maintainPlanDao.findExpireCollectTable(maintainPlanDto);
                 maintainPlanVo1.setChangeStatus("已转段");
+                maintainPlanVos.add(maintainPlanVo1);
             }
-            if(date.getTime() >= maintainPlanDto1.getAftercareDateEnd().getTime()){
+            if(date.getTime() > maintainPlanDto1.getAftercareDateEnd().getTime()){
+                maintainPlanDto.setVersion(maintainPlanDto1.getVersion());
+                maintainPlanVo1 = maintainPlanDao.findExpireCollectTable(maintainPlanDto);
                 maintainPlanVo1.setChangeStatus("未转段");
+                maintainPlanVo1.setCreatedTime(null);
+                maintainPlanVos.add(maintainPlanVo1);
             }
-            maintainPlanVos.add(maintainPlanVo1);
         }
         PageInfo maintainPlan = new PageInfo(maintainPlanVos);
-        return maintainPlan;
+        return new Result<>(true, StatusCode.OK, "养护到期汇总列表查询成功",maintainPlan);
     }
 
     @Override

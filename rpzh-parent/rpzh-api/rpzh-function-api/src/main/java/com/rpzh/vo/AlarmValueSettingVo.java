@@ -1,5 +1,6 @@
 package com.rpzh.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -83,6 +84,8 @@ public class AlarmValueSettingVo {
     private Double coreTempHighEnvTempTwo;
     @ApiModelProperty(notes = "平均包芯高于环境三级")
     private Double coreTempHighEnvTempThree;
+    @ApiModelProperty(notes = "平均包芯低于环境")
+    private Double coreTempLowEnvTemp;
 
     @ApiModelProperty(notes = "预警设置表id")
     private Integer alarmValueSettingId;
@@ -98,15 +101,17 @@ public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "批次号")
     private String materialBatchNum;
 
-    @ApiModelProperty(notes = "预警颜色一级")
-    private String colorOne;
-    @ApiModelProperty(notes = "预警颜色二级")
-    private String colorTwo;
-    @ApiModelProperty(notes = "预警颜色三级")
-    private String colorThree;
-
-    @ApiModelProperty(notes = "预警一级升二级的天数")
-    private String oneToTwoDay;
-    @ApiModelProperty(notes = "预警二级升三级的天数")
-    private String twoToThreeDay;
+    @ApiModelProperty(notes = "预警设置id")
+    private Integer id;
+    @ApiModelProperty(notes = "养护方式")
+    private String maintenceStyle;
+    @ApiModelProperty(notes = "制定人")
+    private String createUser;
+    @ApiModelProperty(notes = "状态(0:停用,1:启用)")
+    private String status;
+    @ApiModelProperty(notes = "最后更新时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updatedTime;
+    @ApiModelProperty(notes = "养护阶段")
+    private String phases;
 }

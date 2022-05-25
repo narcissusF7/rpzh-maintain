@@ -14,5 +14,6 @@ public class MaterialVo {
     private String tobaccoYear;
     private Double maintainCount;
     private String principalName;
+    private Integer principalId;
     private Integer stackId;
 }

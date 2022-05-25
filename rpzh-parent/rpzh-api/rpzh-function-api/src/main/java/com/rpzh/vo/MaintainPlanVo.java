@@ -56,7 +56,9 @@ public class MaintainPlanVo {
     private Date oxygenReductionTime;
 
     @ApiModelProperty(notes = "负责人")
-    private String principalName;
+    private List<Integer> principalName;
+    private String username;
+    private String principalId;
 
     @ApiModelProperty(notes = "到期提醒时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -79,4 +81,8 @@ public class MaintainPlanVo {
 
     @ApiModelProperty(notes = "养护阶段集合")
     private List<MaintainPlanVo> maintainPlanVos;
+
+    private String materialCodeYear;
+
+    private List<MaterialCodeYearVo> materialCodeYearVos;
 }

@@ -76,6 +76,7 @@ public class AlarmValueSettingDto {
     private Double coreTempHighEnvTempOne;
     private Double coreTempHighEnvTempTwo;
     private Double coreTempHighEnvTempThree;
+    private Double coreTempLowEnvTemp;
 
     /**
      * 预警颜色
@@ -119,4 +120,56 @@ public class AlarmValueSettingDto {
      */
     private String materialCodeYear;
 
+    private Integer alarmValueSettingId;
+
+    private Integer size=10;
+    private Integer page=0;
+    private Integer status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
+
+    public AlarmValueSettingDto(MaintainPlanDto maintainPlanDto){
+      this.stackOxygenUpperOne =maintainPlanDto.getStackOxygenUpperOne();
+      this.stackOxygenUpperTwo =maintainPlanDto.getStackOxygenUpperTwo();
+      this.stackOxygenUpperThree =maintainPlanDto.getStackOxygenUpperThree();
+      this.stackOxygenLower =maintainPlanDto.getStackOxygenLower();
+      this.warehouseOxygenUpperOne =maintainPlanDto.getWarehouseOxygenUpperOne();
+      this.warehouseOxygenUpperTwo =maintainPlanDto.getWarehouseOxygenUpperTwo();
+      this.warehouseOxygenUpperThree =maintainPlanDto.getWarehouseOxygenUpperThree();
+      this.warehouseOxygenLower =maintainPlanDto.getWarehouseOxygenLower();
+      this.tempCoreChipUpperOne =maintainPlanDto.getTempCoreChipUpperOne();
+      this.tempCoreChipUpperTwo =maintainPlanDto.getTempCoreChipUpperTwo();
+      this.tempCoreChipUpperThree=maintainPlanDto.getTempCoreChipUpperThree();
+      this.tempCoreChipLower=maintainPlanDto.getTempCoreChipLower();
+      this.stackTempUpperOne=maintainPlanDto.getStackTempUpperOne();
+      this.stackTempUpperTwo=maintainPlanDto.getStackTempUpperTwo();
+      this.stackTempUpperThree=maintainPlanDto.getStackTempUpperThree();
+      this.stackTempLower=maintainPlanDto.getStackTempLower();
+      this.stackMoistureUpperOne=maintainPlanDto.getStackMoistureUpperOne();
+      this.stackMoistureUpperTwo=maintainPlanDto.getStackMoistureUpperTwo();
+      this.stackMoistureUpperThree=maintainPlanDto.getStackMoistureUpperThree();
+      this.stackMoistureLower=maintainPlanDto.getStackMoistureLower();
+      this.warehouseTempUpper0ne=maintainPlanDto.getWarehouseTempUpper0ne();
+      this.warehouseTempUpperTwo=maintainPlanDto.getWarehouseTempUpperTwo();
+      this.warehouseTempUpperThree=maintainPlanDto.getWarehouseTempUpperThree();
+      this.warehouseTempLower=maintainPlanDto.getWarehouseTempLower();
+      this.warehouseMoistureUpperOne=maintainPlanDto.getWarehouseMoistureUpperOne();
+      this.warehouseMoistureUpperTwo=maintainPlanDto.getWarehouseMoistureUpperTwo();
+      this.warehouseMoistureUpperThree=maintainPlanDto.getWarehouseMoistureUpperThree();
+      this.warehouseMoistureLower=maintainPlanDto.getWarehouseMoistureLower();
+      this.coreTempHighEnvTempOne=maintainPlanDto.getCoreTempHighEnvTempOne();
+      this.coreTempHighEnvTempTwo=maintainPlanDto.getCoreTempHighEnvTempTwo();
+      this.coreTempHighEnvTempThree=maintainPlanDto.getCoreTempHighEnvTempThree();
+      this.earlyWarningRuleName=maintainPlanDto.getEarlyWarningRuleName();
+      this.maintenceStyle=maintainPlanDto.getMaintenceStyle();
+      this.phases=maintainPlanDto.getPhases();
+      this.tobaccoYear=maintainPlanDto.getTobaccoYear();
+      this.materialCode=maintainPlanDto.getMaterialCode();
+      this.materialBatchNum=maintainPlanDto.getMaterialBatchNum();
+      this.materialCodeYear=maintainPlanDto.getMaterialCodeYear();
+      this.alarmValueSettingId=maintainPlanDto.getAlarmValueSettingId();
+      this.coreTempLowEnvTemp = maintainPlanDto.getCoreTempLowEnvTemp();
+    }
 }
