@@ -115,6 +115,7 @@
         update tb_maintain_plan
         <set>
             <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">principal_name = #{maintainPlanDto.name},</if>
+            <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style= #{maintainPlanDto.maintenceStyle},</if>
             <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids = #{maintainPlanDto.principalId}</if>
         </set>
         where id = #{maintainPlanDto.id}
@@ -128,6 +129,7 @@
             <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count = #{maintainPlanDto.maintainCount},</if>
             <if test="maintainPlanDto.oxygenReductionTime != null">oxygen_reduction_time = #{maintainPlanDto.oxygenReductionTime},</if>
             <if test="maintainPlanDto.expireTime != null">expire_time = #{maintainPlanDto.expireTime},</if>
+            <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">phases=#{maintainPlanDto.phases},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">update_user = #{maintainPlanDto.updateUser},</if>
             updated_time = #{maintainPlanDto.updatedTime}
         </set>
@@ -288,7 +290,7 @@
     <select id="findDetails" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t2.id as id,
-        t1.principal_name AS principalName,
+        t1.principal_name AS username,
         t2.created_time as createdTime,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,

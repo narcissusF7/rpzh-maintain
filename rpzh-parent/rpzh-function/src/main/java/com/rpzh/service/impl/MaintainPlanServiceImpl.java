@@ -29,9 +29,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Resource
     private UserFeign userFeign;
 
-    @Resource
-    private WarehouseDao warehouseDao;
-
     /**
      * 新增养护计划
      *
@@ -77,7 +74,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
             maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findMaxId());
         }
-        long l = nowDate.getTime() % (1000 * 60 * 60 * 24) + 8 * 60 * 60 *1000;
+        long l = nowDate.getTime() % (1000 * 60 * 60 * 24);
         maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));
         Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
@@ -158,7 +155,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String updateUser = TokenDecode.getUserInfo().get("username");
         maintainPlanDto.setUpdateUser(updateUser);
         maintainPlanDto.setUpdatedTime(new Date());
-        long l =new Date().getTime() % (1000 * 60 * 60 * 24) + 8 * 60 * 60 *1000;
+        long l =new Date().getTime() % (1000 * 60 * 60 * 24);
         Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
         maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));

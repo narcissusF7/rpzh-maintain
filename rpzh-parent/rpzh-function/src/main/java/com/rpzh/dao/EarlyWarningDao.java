@@ -6,6 +6,7 @@ import com.rpzh.vo.WarningCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,5 +17,7 @@ import java.util.List;
 @Mapper
 public interface EarlyWarningDao {
     List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-    EarlyWarningVo findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
 }

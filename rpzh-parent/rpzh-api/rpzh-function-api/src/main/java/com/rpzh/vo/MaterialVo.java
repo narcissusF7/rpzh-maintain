@@ -2,6 +2,8 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author: zyq
  * @Date: 2022/05/06/11:36

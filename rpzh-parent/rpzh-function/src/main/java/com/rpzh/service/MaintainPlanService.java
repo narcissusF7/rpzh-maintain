@@ -59,4 +59,5 @@ public interface MaintainPlanService {
     Result findExpireCollectTable(MaintainPlanDto maintainPlanDto);
 
     Integer isExistStackId(Integer stackId);
+
 }
