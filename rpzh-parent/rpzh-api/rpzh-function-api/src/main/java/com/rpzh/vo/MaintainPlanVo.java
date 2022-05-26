@@ -1,6 +1,7 @@
 package com.rpzh.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rpzh.dto.MaterialCodeYearDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -56,9 +57,7 @@ public class MaintainPlanVo {
     private Date oxygenReductionTime;
 
     @ApiModelProperty(notes = "负责人")
-    private List<Integer> principalName;
-    private String username;
-    private String principalId;
+    private String principalName;
 
     @ApiModelProperty(notes = "到期提醒时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

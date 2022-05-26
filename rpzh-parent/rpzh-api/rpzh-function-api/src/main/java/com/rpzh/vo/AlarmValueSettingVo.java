@@ -114,4 +114,31 @@ public class AlarmValueSettingVo {
     private Date updatedTime;
     @ApiModelProperty(notes = "养护阶段")
     private String phases;
+
+    public static String[] getColumn(String type,String siteType) {
+        if ("04".equals(siteType)){
+            switch (type){
+                case "01":
+                    return new String[]{"warehouseOxygenUpperThree","warehouseOxygenUpperTwo","warehouseOxygenUpperOne","warehouseOxygenLower"};
+                case "03":
+                    return new String[]{"warehouseTempUpperThree","warehouseTempUpperTwo","warehouseTempUpper0ne","warehouseTempLower"
+                            ,"warehouseMoistureUpperThree","warehouseMoistureUpperTwo","warehouseMoistureUpperOne","warehouseMoistureLower"};
+            }
+        }else {
+            switch (type){
+                case "01":
+                    return new String[]{"stackOxygenUpperThree","stackOxygenUpperTwo","stackOxygenUpperOne","stackOxygenLower",};
+                case "03":
+                    return new String[]{"stackTempUpperThree","stackTempUpperTwo","stackTempUpper0ne","stackTempLower"
+                            ,"stackMoistureUpperThree","stackMoistureUpperTwo","stackMoistureUpperOne", "stackMoistureLower"};
+                case "04":
+                    return new String[]{"stackTempUpperThree","stackTempUpperTwo","tempCoreChipUpperOne","tempCoreChipLower"};
+            }
+        }
+
+        return new String[0];
+    }
+    public static String[] getStackColumn() {
+        return new String[]{"coreTempHighEnvTempThree","coreTempHighEnvTempTwo","coreTempHighEnvTempOne","coreTempLowerEnvTemp"};
+    }
 }

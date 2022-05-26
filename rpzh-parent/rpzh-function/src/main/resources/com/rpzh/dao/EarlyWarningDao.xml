@@ -1,51 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.EarlyWarningDao">
-    <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
-    select
-    warning_type as warningType,
-    warning_grade as warningGrade,
-    COUNT(warning_grade='1' OR NULL) AS oneWarningCount,
-    COUNT(warning_grade='2' OR NULL) AS twoWarningCount,
-    COUNT(warning_grade='3' OR NULL) AS threeWarningCount
-    from tb_early_warning
-    where is_affirm = '2'
-    <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
-    <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
-    <if test="earlyWarningDto.startTime != null"> and #{earlyWarningDto.startTime} &lt;= (CASE warning_grade
-        WHEN '1' THEN warning_time_one
-        WHEN '2' THEN warning_time_two
-        WHEN '3' THEN warning_time_three END)</if>
-    <if test="earlyWarningDto.endTime != null"> and #{earlyWarningDto.endTime} >= (CASE warning_grade
-        WHEN '1' THEN warning_time_one
-        WHEN '2' THEN warning_time_two
-        WHEN '3' THEN warning_time_three END)</if>
-    group by warning_type,warning_grade
-</select>
-    <select id="findEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT
-          stack_id AS stackId,
-          is_affirm AS affirm,
-          warning_grade AS warningGrade,
-          substring_index(group_concat(node_type),',',1) AS nodeType,
-          (CASE warning_grade
-              WHEN '1' THEN substring_index(group_concat(warning_val_one),',',1)
-              WHEN '2' THEN substring_index(group_concat(warning_val_two),',',1)
-              WHEN '3' THEN substring_index(group_concat(warning_val_three),',',1) END) AS warningVal,
-          (CASE warning_grade
-              WHEN '1' THEN substring_index(group_concat(warning_time_one),',',1)
-              WHEN '2' THEN substring_index(group_concat(warning_time_two),',',1)
-              WHEN '3' THEN substring_index(group_concat(warning_time_three),',',1) END) AS warningTime
-        FROM tb_early_warning WHERE warning_type = #{earlyWarningDto.warningType}
-        <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
-        <if test="earlyWarningDto.startTime != null"> and #{earlyWarningDto.startTime} &lt;= (CASE warning_grade
-            WHEN '1' THEN warning_time_one
-            WHEN '2' THEN warning_time_two
-            WHEN '3' THEN warning_time_three END)</if>
-        <if test="earlyWarningDto.endTime != null"> and #{earlyWarningDto.endTime} >= (CASE warning_grade
-            WHEN '1' THEN warning_time_one
-            WHEN '2' THEN warning_time_two
-            WHEN '3' THEN warning_time_three END)</if>
-        GROUP BY is_affirm,warning_grade,stack_id ORDER BY is_affirm DESC,warning_grade DESC;
+
+    <update id="updateWarningThreshold">
+        update tb_general_setting set setting_value = #{settingValue} where setting_name =#{settingName}
+    </update>
+
+    <select id="findUndoEarlyWarningByNodeId" resultType="com.rpzh.vo.EarlyWarningVo">
+        select id , warning_grade as warningGrade from tb_early_warning where node_id =#{nodeId} and is_affirm = 2;
     </select>
+
+    <select id="findUndoStackEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
+        select id , warning_grade as warningGrade from tb_early_warning where node_id =#{stackId} and is_affirm = 2 and node_id is null;
+    </select>
+    <select id="findWarningThreshold" resultType="java.lang.String">
+        select setting_value from tb_general_setting where setting_key = #{settingKey}
+    </select>
+    <select id="findUndoEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
+        select node_id,warning_grade from tb_general_setting where is_affirm = 0 order by warning_grade desc;
+    </select>
+
+    <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
+        select
+        warning_type as warningType,
+        warning_grade as warningGrade,
+        count(warning_grade) as warningCount
+        from tb_early_warning
+        where 1=1
+        <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
+        <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
+        <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime} </if>
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime} </if>
+        group by warning_type,warning_grade
+    </select>
+    <select id="findEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT t.* FROM ( SELECT
+        node_id AS nodeId,
+        is_affirm AS isAffirm,
+        node_type AS nodeType,
+        warning_val_one AS warningValOne,
+        warning_val_two AS warningValTwo,
+        warning_val_three AS warningValThree,
+        warning_type AS warningType,
+        warning_grade AS warningGrade,
+        warning_time_one AS warningTimeOne,
+        warning_time_two AS warningTimeTwo,
+        warning_time_three AS warningTimeThree
+        FROM tb_early_warning WHERE warning_type = #{earlyWarning.warningType} and
+        warning_grade = #{earlyWarning.warningGrade} AND is_affirm = #{earlyWarning.affirm} LIMIT 1) t
+    </select>
+    <select id="findEarlyWarningByStack" resultType="com.rpzh.vo.EarlyWarningVo">
+        select id, warning_type warningType , node_id nodeId , node_type nodeType , warning_val_one warningValOne ,
+               warning_time_one warningTimeOne , warning_val_two warningValTwo , warning_time_two warningTimeTwo ,
+               warning_val_three warningValThree , warning_time_three warningTimeThree , warning_grade warningGrade ,
+                stack_id stackId from tb_early_warning
+        where stack_id = #{stackId} and is_affirm = 0 ;
+    </select>
+    <select id="findUndoCount" resultType="java.lang.Integer">
+        select count (*) from tb_early_warning where node_id = #{nodeId} and status = 2 and warning_type = #{warningType}
+    </select>
+    <insert id="insertWarning">
+        insert into tb_early_warning (
+        <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">warning_type,</if>
+        <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null"> node_id,</if>
+        <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">node_type,</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one,</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_time_one,</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two,</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two,</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three,</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three,</if>
+        <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade,</if>
+        <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">stack_id,</if>
+        <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">area_id,</if>
+        is_affirm
+        ) values {
+        <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">#{earlyWarning.warningType}</if>
+        <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null">#{earlyWarning.nodeId},</if>
+        <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">#{earlyWarning.nodeType},</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">#{earlyWarning.warningValOne},</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">#{earlyWarning.warningTimeOne},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">#{earlyWarning.warningValTwo},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">#{earlyWarning.warningTimeTwo},</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">#{earlyWarning.warningValThree},</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">#{earlyWarning.warningTimeThree},</if>
+        <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
+        <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
+        <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
+        2
+        }
+    </insert>
+
+    <update id="updateWarning">
+        update tb_early_warning set
+        <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade = #{earlyWarning.warningGrade},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate()</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate()</if>
+        where id = #{earlyWarning.id}
+    </update>
 </mapper>

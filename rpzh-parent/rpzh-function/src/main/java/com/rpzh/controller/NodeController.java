@@ -1,21 +1,37 @@
 package com.rpzh.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.constant.NodeConstant;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.NodeTypeEnum;
+import com.rpzh.service.NodeOperationService;
 import com.rpzh.service.NodeService;
+import com.rpzh.util.EasyPoiUtil;
+import com.rpzh.vo.NodeDataVo;
+import com.rpzh.vo.NodeOperationVo;
 import com.rpzh.vo.NodeVo;
+import io.swagger.annotations.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 节点管理
@@ -25,247 +41,605 @@ import java.util.Map;
  * @Description: good good study,day day up   /node/deleteNode
  */
 @RestController
-@RequestMapping("/node")
+@RequestMapping("/maintain/node")
 @CrossOrigin
+@Api(value = "设备控制中心", tags = "设备控制中心")
 public class NodeController {
 
-
+    @Autowired
+    NodeOperationService operationService;
     @Autowired
     private NodeService nodeService;
 
-    /**
-     * 添加节点测试
-     *
-     * @param nodeDto
-     * @return
-     */
     @PostMapping("/addNode")
-    public Result addNode(NodeDto nodeDto) {
+    @ApiOperation(value = "添加设备")
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "status",
+            value = "状态,0:解垛,1:入垛,2:未使用 默认2",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "gatherSite",
+            value = "采集位置",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "stackId",
+            value = "垛位id",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "stack",
+            value = "垛位",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "siteType",
+            value = "采集位置类型,04:仓间,05非仓间",
+            required = true,
+            dataType = "String"
+    )})
+    public Result addNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
-            return new Result(false, StatusCode.ERROR, "节点Id不能为空");
+            return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
         }
         //判断设备id是否存在
         int nodeCount = nodeService.findNodeCountById(nodeId);
         if (nodeCount > 0) {
-            return new Result(false, StatusCode.ERROR, "该设备已经存在,禁止添加");
+            return new Result<>(false, StatusCode.ERROR, "该设备已经存在,禁止添加");
         }
         int addFlag = nodeService.addNode(nodeDto);
-        return new Result(true, StatusCode.OK, "添加节点成功");
+        return new Result<>(true, StatusCode.OK, "添加节点成功");
     }
 
-    /**
-     * 更新设备
-     *
-     * @param nodeDto
-     * @return
-     */
+    @ApiOperation(
+            value = "更新设备"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "id",
+            value = "id",
+            required = true,
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "status",
+            value = "状态,0:解垛,1:入垛,2:未使用 默认2,3:故障",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "gatherSite",
+            value = "采集位置",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "stackId",
+            value = "垛位id",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "stack",
+            value = "垛位",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "siteType",
+            value = "采集位置类型,04:仓间,05非仓间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "siteId",
+            value = "采集位置ID",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "siteX",
+            value = "采集位置-X坐标",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "siteY",
+            value = "采集位置-Y坐标",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "siteZ",
+            value = "采集位置-Z坐标",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "siteRoute",
+            value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",
+            dataType = "String"
+    )})
     @PostMapping("/updateNode")
-    public Result updateNode(NodeDto nodeDto) {
+    public Result updateNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
-            return new Result(false, StatusCode.ERROR, "节点Id不能为空");
+            return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
         }
         Integer id = nodeDto.getId();
         if (ToolUtil.isEmpty(id)) {
-            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         String nodeIdFind = nodeService.findNodeID(nodeId, id);
         if (nodeId.equals(nodeIdFind)) {
-            return new Result(false, StatusCode.ERROR, "节点id已经存在,不允许修改");
+            return new Result<>(false, StatusCode.ERROR, "节点id已经存在,不允许修改");
         }
         int updateFlag = nodeService.updateNode(nodeDto);
-        return new Result(true, StatusCode.OK, "修改设备成功");
+        return new Result<>(true, StatusCode.OK, "修改设备成功");
     }
 
 
-    /**
-     * 查询节点列表
-     *
-     * @param nodeDto
-     * @return
-     */
+    @ApiOperation(
+            value = "查询设备列表"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "status",
+            value = "状态,0:解垛,1:入垛,2:未使用 默认2",
+            dataType = "String"
+    ),@ApiImplicitParam(
+            name = "gatherSite",
+            value = "采集位置",
+            dataType = "String"
+    ),@ApiImplicitParam(
+            name = "siteId",
+            value = "采集位置ID",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "startTime",
+            value = "开始时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "endTime",
+            value = "结束时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
     @PostMapping("/findNode")
-    public Result<PageInfo> findNode(NodeDto nodeDto) {
+    public Result<PageInfo<NodeVo>> findNode(@ApiIgnore NodeDto nodeDto) {
         PageInfo<NodeVo> pageInfo = nodeService.findAllNodeList(nodeDto);
-        return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
+        return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-    /**
-     * 删除节点
-     *
-     * @param
-     * @return
-     */
-    @PostMapping("/deleteNode")
-    public Result deleteNode(NodeDto nodeDto) {
-        List<Integer> ids = nodeDto.getIds();
-        if (ToolUtil.isEmpty(ids)) {
-            return new Result(false, StatusCode.ERROR, "请选择一个节点");
+    @ApiOperation(value = "删除设备")
+    @ApiImplicitParam(value = "nodeIds", name = "要被删除的设备id列表", paramType = "body", allowMultiple = true, dataType = "String")
+    @DeleteMapping({"/deleteNode"})
+    public Result deleteNode(String[] nodeIds) {
+
+        if (ToolUtil.isEmpty(nodeIds)) {
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
-        int delFlag = nodeService.deleteNode(ids);
-        return new Result(true, StatusCode.OK, "删除节点成功");
+        int delFlag = nodeService.deleteNode(Arrays.asList(nodeIds));
+        return new Result<>(true, StatusCode.OK, "删除节点成功");
     }
 
 
-    /**
-     * 设备id替换,历史数据模块完成以后,需要完善历史模块的设备id替换
-     *
-     * @param nodeDto
-     * @return
-     */
-    @PostMapping("/replaceNodeId")
-    public Result replaceNodeId(NodeDto nodeDto) {
+    @ApiOperation(
+            value = "设备替换"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "id",
+            value = "id",
+            required = true,
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            required = true,
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "afterNodeId",
+            value = "替换后的设备id",
+            required = true,
+            dataType = "Integer"
+    )})
+    @PostMapping({"/replaceNode"})
+    public Result replaceNodeId(@ApiIgnore NodeDto nodeDto) {
         Integer id = nodeDto.getId();
-        if (ToolUtil.isEmpty(id)){
-            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+        if (ToolUtil.isEmpty(id)) {
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
-        String beforeNodeId = nodeDto.getBeforeNodeId();
+        String beforeNodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(beforeNodeId)) {
-            return new Result(false, StatusCode.ERROR, "请选择需要替换的设备id");
+            return new Result<>(false, StatusCode.ERROR, "请选择需要替换的设备id");
         }
         String afterNodeId = nodeDto.getAfterNodeId();
         if (ToolUtil.isEmpty(afterNodeId)) {
-            return new Result(false, StatusCode.ERROR, "请输入替换之后的设备id");
+            return new Result<>(false, StatusCode.ERROR, "请输入替换之后的设备id");
         }
-        //String gatherSite = nodeDto.getGatherSite();
-        /*if (ToolUtil.isEmpty(gatherSite)) {
-            return new Result(false, StatusCode.ERROR, "采集位置不能为空");
-        }*/
+
         int updateFlag = nodeService.replaceNodeId(nodeDto);
-        return new Result(true, StatusCode.OK, "设备替换成功");
+        if (updateFlag != 1) {
+            return new Result<>(true, StatusCode.ERROR, "设备替换失败");
+        }
+        return new Result<>(true, StatusCode.OK, "设备替换成功");
+
     }
 
 
-    /**
-     * 设备替换日志
-     *
-     * @param nodeDto
-     * @return
-     */
-    @PostMapping("/findNodeReplaceLog")
-    public Result<PageInfo> findNodeReplaceLog(NodeDto nodeDto) {
+    @ApiOperation(
+            value = "设备替换记录"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "id",
+            value = "id",
+            required = true,
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
+    @GetMapping({"/findNodeReplaceLog"})
+    public Result<PageInfo<NodeVo>> findNodeReplaceLog(@ApiIgnore NodeDto nodeDto) {
         Integer id = nodeDto.getId();
-        if (ToolUtil.isEmpty(id)){
+        if (ToolUtil.isEmpty(id)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         PageInfo<NodeVo> pageInfo = nodeService.findNodeReplaceLog(nodeDto);
-        return new Result(true, StatusCode.OK, "查询成功", pageInfo);
+        return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-    /**
-     * 查询设备未入垛列表
-     *
-     * @param nodeDto
-     * @return
-     */
-    @PostMapping("/findNoEnterStack")
-    public Result<PageInfo> findNoEnterStack(NodeDto nodeDto) {
+    @ApiOperation(
+            value = "查询设备未入垛列表"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "siteId",
+            value = "采集位置ID",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
+    @GetMapping({"/findNoEnterStack"})
+    public Result<PageInfo<NodeVo>> findNoEnterStack(@ApiIgnore NodeDto nodeDto) {
         PageInfo<NodeVo> pageInfo = nodeService.findNoEnterStack(nodeDto);
-        return new Result<PageInfo>(true, StatusCode.OK, "查询成功", pageInfo);
+        return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-    /**
-     * 设备入垛
-     *
-     * @param
-     * @return
-     */
+    @ApiOperation("设备入垛")
+    @ApiImplicitParam(
+            name = "data",
+            value = "JSON字符串,可以包含多个对象 每个对象包含id,x,y,z,stackId,stack,siteId属性",
+            dataType = "String"
+    )
     @PostMapping("/enterStack")
     public Result enterStack(String data) {
         if (ToolUtil.isEmpty(data)) {
-            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
+        System.out.println(data);
         int updateFlag = nodeService.enterStack(data);
-        return new Result(true, StatusCode.OK, "设备入垛成功");
+        return new Result<>(true, StatusCode.OK, "设备入垛成功");
     }
 
 
-    /**
-     * 设备解垛
-     *
-     * @param nodeDto
-     * @return
-     */
-    @PostMapping("/unbindStack")
-    public Result unbindStack(NodeDto nodeDto) {
-        Integer id = nodeDto.getId();
-        if (ToolUtil.isEmpty(id)) {
-            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+    @ApiOperation(
+            value = "设备解垛"
+    )
+    @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true)
+    @PostMapping({"/unbindStack"})
+    public Result unbindStack(@ApiIgnore NodeDto nodeDto) {
+        Integer[] ids = nodeDto.getIds();
+        if (ids.length<=0) {
+            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         int updateFlag = nodeService.unbindStack(nodeDto);
-        return new Result(true, StatusCode.OK, "解垛成功");
+        return new Result<>(true, StatusCode.OK, "解垛成功");
     }
 
 
-    /**
-     * 批量导入设备
-     *
-     * @param file
-     * @param nodeType
-     * @return
-     */
+    @ApiOperation(
+            value = "批量导入设备"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "file",
+            value = "文件",
+            dataType = "MultipartFile",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型",
+            dataType = "String",
+            required = true
+    )})
     @PostMapping("/exportNode")
     public Result exportNode(MultipartFile file, String nodeType) {
-        if (ToolUtil.isEmpty(nodeType)){
-            return new Result(false, StatusCode.ERROR, "节点类型不能为空");
+        if (ToolUtil.isEmpty(nodeType)) {
+            return new Result<>(false, StatusCode.ERROR, "节点类型不能为空");
         }
-        if (ToolUtil.isEmpty(file)){
-            return new Result(false, StatusCode.ERROR, "请选择一个文件");
+        if (ToolUtil.isEmpty(file)) {
+            return new Result<>(false, StatusCode.ERROR, "请选择一个文件");
         }
         //读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
-        List<Map<Integer, String>> nodeDate = null;
+        List<Map<Integer, String>> nodeDate;
         try {
             nodeDate = ExcelUtils.importExcel(file, 2, 0, 0);
         } catch (IOException e) {
             e.printStackTrace();
-            return new Result(false, StatusCode.ERROR, "导入失败");
+            return new Result<>(false, StatusCode.ERROR, "导入失败");
         }
-        Result result = nodeService.exportNode(nodeDate,nodeType);
-        return result;
+        return nodeService.exportNode(nodeDate, nodeType);
     }
 
 
     /**
      * 设备导入模板下载
-     *
-     * @param response
-     * @return
      */
-    @RequestMapping("/downloadTemplate")
-    public Result downloadTemplate(HttpServletResponse response) {
+    @ApiOperation("设备导入模板下载")
+    @GetMapping("/downloadTemplate")
+    public void downloadTemplate(HttpServletResponse response) {
         String downloadFilePath = "/template/node/node.xlsx";//被下载的文件在服务器中的路径,
         String fileName = "设备导入模板";//被下载文件的名称
-        InputStream inputStream = this.getClass().getResourceAsStream(downloadFilePath);
+        InputStream inputStream = getClass().getResourceAsStream(downloadFilePath);
         ExcelUtils.outFile(inputStream, response, fileName, "xlsx");
-        return null;
     }
 
-    /**
-     * 模糊查询设备id
-     * @param nodeDto
-     * @return
-     */
+    @ApiOperation(
+            value = "模糊查询设备"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
     @PostMapping("/findVagueNode")
-    public Result findVagueNode(NodeDto nodeDto){
-        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
-            return new Result(false, StatusCode.ERROR, "请输入节点id");
+    public Result<List<NodeVo>> findVagueNode(@ApiIgnore NodeDto nodeDto) {
+
+        int page = nodeDto.getPage();
+        int size = nodeDto.getSize();
+        PageHelper.startPage(page, size);
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())) {
+            return new Result<>(false, StatusCode.ERROR, "请输入节点id");
         }
         List<NodeVo> nodeList = nodeService.findVagueNode(nodeDto);
-        return new Result(true, StatusCode.OK, "查询成功", nodeList);
+
+        return new Result<>(true, StatusCode.OK, "查询成功", nodeList);
     }
 
-    /**
-     * 根据id查询设备类型
-     * @param nodeDto
-     * @return
-     */
+    @ApiOperation(
+            value = "根据id查询设备类型"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "id",
+            value = "id",
+            required = true,
+            dataType = "Integer"
+    )})
     @PostMapping("/findNodeType")
-    public Result findNodeType(NodeDto nodeDto){
-        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
-            return new Result(false, StatusCode.ERROR, "请输入一个设备");
+    public Result<String> findNodeType(@ApiIgnore NodeDto nodeDto) {
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())) {
+            return new Result<>(false, StatusCode.ERROR, "请输入一个设备");
         }
         String nodeType = nodeService.findNodeType(nodeDto);
-        return new Result(true, StatusCode.OK, "查询成功", nodeType);
+        return new Result<>(true, StatusCode.OK, "查询成功", nodeType);
+    }
+
+    @ApiOperation(
+            value = "根据垛位id查询设备"
+    )
+    @ApiImplicitParam(
+            name = "stackId",
+            value = "垛位id",
+            dataType = "Integer"
+    )
+    @GetMapping({"/findNodeByStackId"})
+    public Result<List<NodeVo>> findNodeByStackId(Integer stackId) {
+        List<NodeVo> nodeVoList = nodeService.findNodeByStackId(stackId);
+        return new Result(true, StatusCode.OK, "查询成功", nodeVoList);
+    }
+
+
+//    @ApiOperation(
+//            value = "翻垛"
+//    )
+//    @PostMapping({"/flipStack"})
+//    public Result flipStack(@RequestBody @ApiIgnore List<NodeDto> nodeDtoList) {
+//        Integer updateFlag = nodeService.updateNodes(nodeDtoList);
+//        return new Result(true, StatusCode.OK, "翻垛成功");
+//    }
+
+    public Result flipStack(String data) {
+
+        Integer updateFlag = nodeService.updateNodes(data);
+        return new Result(true, StatusCode.OK, "翻垛成功");
+    }
+
+    @ApiOperation(
+            value = "操作记录"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "operationType",
+            value = "操作类型",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
+    @GetMapping({"/findOperationHistory"})
+    public Result<List<NodeOperationVo>> findOperationHistory(@ApiIgnore NodeOperationDto nodeOperationDto) {
+        List<NodeOperationVo> nodeOperationVos = operationService.selectNodeOperation(nodeOperationDto);
+        return new Result(true, StatusCode.OK, "查询成功", nodeOperationVos);
+    }
+
+
+    @ApiOperation(
+            value = "查询设备历史数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
+    @GetMapping({"findNodeHistory"})
+    public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
+        int page = nodeDto.getPage();
+        int size = nodeDto.getSize();
+        PageHelper.startPage(page, size);
+        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataVos));
+    }
+
+    @ApiOperation(
+            value = "查询设备历史数据(日数据)"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "dataType",
+            value = "数据类型",
+            dataType = "Integer",
+            required = true
+    )})
+    @GetMapping({"/findNodeHistoryGraph"})
+    public Result<Map<String, HashMap<String, Double>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
+        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
+                item.getTransferTime().split(" ")[0])));
+        Map<String, HashMap<String, Double>> historyGraphData = new HashMap();
+        if (nodeDto.getDataType() == NodeConstant.HUMITURE_NUMBER) {
+            collect.forEach((k, value) -> {
+                HashMap<String, Double> map = new HashMap();
+                map.put("max", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get());
+                map.put("min", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get());
+                map.put("avg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble());
+                historyGraphData.put(k, map);
+            });
+        } else {
+            collect.forEach((k, value) -> {
+                HashMap<String, Double> map = new HashMap();
+                map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get());
+                map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get());
+                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble());
+                historyGraphData.put(k, map);
+            });
+        }
+
+        return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
+    }
+
+    @ApiOperation(
+            value = "导出历史数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型",
+            dataType = "String",
+            required = true
+    )})
+    @GetMapping({"/exportNodeHistory"})
+    public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
+        List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
+        EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
+        List<String> columns = new ArrayList<>();
+        //把要导出的字段添加到集合中
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())) {
+            columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
+            if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
+                columns.add("humiture");
+            }
+        }
+
+        //显示要导出的字段
+        nodeHistory.forEach((item) -> {
+            easyPoiUtil.t = item;
+            columns.forEach((column) -> {
+                try {
+                    easyPoiUtil.hihdColumn(column, false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            });
+        });
+        String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
+        EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
     }
 }

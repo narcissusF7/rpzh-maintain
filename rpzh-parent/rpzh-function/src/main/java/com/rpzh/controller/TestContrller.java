@@ -11,14 +11,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Author liubc
@@ -83,25 +83,50 @@ public class TestContrller {
     public Result<NodeVo> three(NodeDto nodeDto){
         String nodeId = nodeDto.getNodeId();
         String nodeType = nodeDto.getNodeType();
-        String createTime = nodeDto.getCreateTime();
+        String createTime = nodeDto.getCreatedTime();
         String startTime = nodeDto.getStartTime();
         String endTime = nodeDto.getEndTime();
         List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
         return new Result<NodeVo>(true, StatusCode.OK, "测试方法3",list);
     }
 
-
     /**
-     * 测试菜单
+     *测试用例方法4
+     * @param nodeDto
      * @return
      */
-    @PreAuthorize("hasAnyAuthority('system:maintain:test')")
-    @PostMapping("/testpro")
-    public Result testpro(){
-        return new Result(true, StatusCode.OK, "发送成功");
+    @PostMapping("/four")
+    @ApiOperation(value = "测试用例方法4")
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型,默认:01",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "createdTime()",
+            value = "创建时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "startTime",
+            value = "开始时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "endTime",
+            value = "结束时间",
+            dataType = "Integer"
+    )})
+    public Result<NodeVo> four(@ApiIgnore NodeDto nodeDto){
+        String nodeId = nodeDto.getNodeId();
+        String nodeType = nodeDto.getNodeType();
+        String createTime = nodeDto.getCreatedTime();
+        String startTime = nodeDto.getStartTime();
+        String endTime = nodeDto.getEndTime();
+        List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
+        return new Result<>(true, StatusCode.OK, "测试方法4",list);
     }
-
-
-
-
 }

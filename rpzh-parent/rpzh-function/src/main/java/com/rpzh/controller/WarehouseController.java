@@ -285,7 +285,7 @@ public class WarehouseController {
      */
     @PostMapping("/updateStack")
     public Result updateStack(StackDto stackDto) {
-        Integer id = stackDto.getId();
+        Integer id = stackDto.getStackId();
         if (ToolUtil.isEmpty(id)) {
             return new Result(false, StatusCode.ERROR, "请选择一个垛位");
         }
@@ -373,7 +373,7 @@ public class WarehouseController {
      */
     @PostMapping("/getStackPage")
     public Result<PageInfo> getStackPage(StackDto stackDto) {
-        if (ToolUtil.isEmpty(stackDto.getWareareaId())) {
+        if (ToolUtil.isEmpty(stackDto.getWareAreaId())) {
             return new Result<>(false, StatusCode.ERROR, "区域id不能为空");
         }
         PageInfo<StackVo> pageInfo = warehouseService.getStackPage(stackDto);

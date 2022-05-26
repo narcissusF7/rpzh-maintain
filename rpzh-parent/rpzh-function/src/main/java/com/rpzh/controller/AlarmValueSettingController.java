@@ -10,6 +10,10 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.AlarmValueSettingService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.vo.AlarmValueSettingVo;
+import io.swagger.annotations.ApiImplicitParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.rpzh.vo.SettingColorAndDayVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -27,16 +31,14 @@ import java.util.List;
  * @Description: 功能
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/maintain/alarmValueSetting")
 @Api(value = "预警设置类", tags = "预警设置类", description = "预警设置类")
 public class AlarmValueSettingController {
     @Resource
     private AlarmValueSettingService alarmValueSettingService;
 
-    @PostMapping(value = "/findAlarmValueSettingInfo")
-    public Result findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
-        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
+    @GetMapping(value = "/findAlarmValueSettingInfo")
+    public Result findMaintainPlanInfo(AlarmValueSettingDto alarmValueSettingDto) {
         String materialCodeYear = alarmValueSettingDto.getMaterialCodeYear();
         String phases = alarmValueSettingDto.getPhases();
         String maintenceStyle = alarmValueSettingDto.getMaintenceStyle();

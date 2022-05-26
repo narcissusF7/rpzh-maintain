@@ -41,22 +41,22 @@ public class NodeVo {
 
     //X坐标
     @ApiModelProperty(notes = "X坐标")
-    private Integer siteX;
+    private String siteX;
 
     //Y坐标
     @ApiModelProperty(notes = "Y坐标")
-    private Integer siteY;
+    private String siteY;
 
     //Z坐标
     @ApiModelProperty(notes = "Z坐标")
-    private Integer siteZ;
+    private String siteZ;
 
     //位置路径
     @ApiModelProperty(notes = "位置路径")
     private String siteRoute;
 
     //状态,0:解垛,1:入垛
-    @ApiModelProperty(notes = "状态,0:解垛,1:入垛")
+    @ApiModelProperty(notes = "状态,0:解垛,1:入垛,2:未入垛,3:损坏")
     private String status;
 
     //创建时间
@@ -79,9 +79,9 @@ public class NodeVo {
     @ApiModelProperty(notes = "最后更新时间")
     private String lastUpdatedTime;
 
-    //传输数据
-    @ApiModelProperty(notes = "传输数据")
-    private String transferData;
+    //垛位Id
+    @ApiModelProperty(notes = "垛位id")
+    private Integer stackId;
 
     //垛位
     @ApiModelProperty(notes = "垛位")
@@ -96,7 +96,7 @@ public class NodeVo {
     private Integer siteId;
 
     //养护计划
-    @ApiModelProperty(notes = "养护计划")
+    @ApiModelProperty(notes = "养护计划阶段Id")
     private Integer maintainStageId;
 
     //替换之前设备id
@@ -110,4 +110,11 @@ public class NodeVo {
     //替换的位置
     @ApiModelProperty(notes = "替换的位置")
     private String replaceLocation;
+
+    @ApiModelProperty(notes = "养护计划id")
+    private Integer maintainPlanId;
+    @ApiModelProperty(notes = "预警等级")
+    private Integer alertLevel;
+
+
 }

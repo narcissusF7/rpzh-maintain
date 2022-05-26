@@ -1,12 +1,21 @@
 package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +24,6 @@ import com.rpzh.vo.MaintainPlanVo;
 import javax.annotation.Resource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -215,15 +223,19 @@ public class MaintainPlanController {
         return maintainPlan;
     }
 
-    @PostMapping("/getPhases")
-    public Result getPhases(String maintenceStyle) {
-        List<String> phases = new ArrayList<>();
-        phases.add("养护阶段");
-        phases.add("充氮杀虫阶段");
-        phases.add("磷化铝杀虫阶段");
-        if("机械调控方式".equals(maintenceStyle)){
-            phases.add("充氮保质阶段");
+    /**
+     * 移垛
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping({"/moveStack"})
+    public Result<T> moveStack(@RequestBody com.rpzh.dto.MaintainPlanDto maintainPlanDto) {
+        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        if (maintainPlanDto.getStackId().equals(((NodeDto)nodeDtoList.get(0)).getStackId())) {
+            return new Result<>(false, 20001, "垛位没有移动!");
+        } else {
+            Integer result = maintainPlanService.moveStack(maintainPlanDto);
+            return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);
         }
-        return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 }

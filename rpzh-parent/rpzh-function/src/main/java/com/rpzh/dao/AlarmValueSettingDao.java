@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface AlarmValueSettingDao {
@@ -41,4 +42,7 @@ public interface AlarmValueSettingDao {
     String findEarlyWarningRuleName(@Param("id")Integer id);
 
     Integer updateColorAndAlertUpgradeDay(@Param("settingValue")Object settingValue,@Param("settingKey")String settingKey,@Param("settingName")String settingName);
+
+//    List<AlarmValueSetting> findByMaintainStageId(Set<Integer> set);
+    AlarmValueSettingVo findByMaintainStageId(@Param("phases") Integer maintainStageId);
 }

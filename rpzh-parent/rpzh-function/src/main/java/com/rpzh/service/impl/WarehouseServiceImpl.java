@@ -13,16 +13,14 @@ import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import com.sun.org.apache.regexp.internal.RE;
+import org.apache.poi.ss.formula.functions.T;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -291,7 +289,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
         String username = userInfo.get("username");
-        stackDto.setUpdateUser(username);
+        Integer userId = Integer.valueOf(userInfo.get("userId"));
+        stackDto.setLastUpdatedUser(username);
+        stackDto.setLastUpdatedUserId(userId);
         int updateFlag = warehouseDao.updateStack(stackDto);
         return updateFlag;
     }
@@ -624,7 +624,6 @@ public class WarehouseServiceImpl implements WarehouseService {
             redisTemplate.opsForHash().put("floorVos","floorVos",floorVos);
             redisTemplate.opsForHash().put("wareAreaVos","wareAreaVos",wareAreaVos);
             redisTemplate.opsForHash().put("stackVos","stackVos",stackVos);
-
             //将所有的垛位放到对应的区间去
             wareAreaVos.stream().forEach(wareAreaVo ->{
                 stackVos.stream().collect(Collectors.groupingBy(stackVo -> stackVo.getAreaId())).forEach((key, value)->{
@@ -656,10 +655,9 @@ public class WarehouseServiceImpl implements WarehouseService {
                         warehouseVo.setBuildingVos(value);
                     }
                 });});
-
             redisTemplate.opsForHash().put("maintain-locating","locating",warehouseVos);
-
         }
+
         return warehouseVos;
     }
 

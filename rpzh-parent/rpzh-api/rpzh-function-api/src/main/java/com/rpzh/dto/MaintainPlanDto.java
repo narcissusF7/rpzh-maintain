@@ -13,7 +13,6 @@ import java.util.List;
  * @description [养护计划前端传入类]
  */
 @Data
-
 public class MaintainPlanDto {
     /**
      * 物料代码
@@ -100,10 +99,7 @@ public class MaintainPlanDto {
     /**
      * 负责人
      */
-    private List<Integer> principalName;
-    private String principalId;
-    private String name;
-
+    private String principalName;
     /**
      * 到期提醒时间
      */
@@ -209,4 +205,9 @@ public class MaintainPlanDto {
      * 预警规则名称
      */
     private String earlyWarningRuleName;
+
+    /**
+     * 该养护计划下的所有设备
+     */
+    List<NodeDto> nodeDtoList;
 }

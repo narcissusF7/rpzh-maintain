@@ -325,7 +325,8 @@
   <set>
  <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no = #{stackDto.stackNo}, </if>
  <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn =  #{stackDto.nameCn}, </if>
- <if test="stackDto.updateUser != null and stackDto.updateUser != ''"> last_updated_user =  #{stackDto.updateUser}, </if>
+ <if test="stackDto.lastUpdatedUser != null and stackDto.lastUpdatedUser != ''"> last_updated_user =  #{stackDto.lastUpdatedUser}, </if>
+ <if test="stackDto.lastUpdatedUserId != null and stackDto.lastUpdatedUserId != ''"> last_updated_user_id =  #{stackDto.lastUpdatedUserId}, </if>
  <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id =  #{stackDto.areaId}, </if>
  <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route =  #{stackDto.pidRoute}, </if>
  <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name =  #{stackDto.siteName}, </if>
