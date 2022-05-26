@@ -167,4 +167,5 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return new Result<>(true, StatusCode.OK, "查询成功",warningVo);
     }
 
+
 }
