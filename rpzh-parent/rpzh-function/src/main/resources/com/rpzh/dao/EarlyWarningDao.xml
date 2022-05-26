@@ -24,30 +24,48 @@
         select
         warning_type as warningType,
         warning_grade as warningGrade,
-        count(warning_grade) as warningCount
+        COUNT(warning_grade='1' OR NULL) AS oneWarningCount,
+        COUNT(warning_grade='2' OR NULL) AS twoWarningCount,
+        COUNT(warning_grade='3' OR NULL) AS threeWarningCount
         from tb_early_warning
-        where 1=1
+        where is_affirm = '2'
         <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
-        <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime} </if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime} </if>
+        <if test="earlyWarningDto.startTime != null"> and #{earlyWarningDto.startTime} &lt;= (CASE warning_grade
+            WHEN '1' THEN warning_time_one
+            WHEN '2' THEN warning_time_two
+            WHEN '3' THEN warning_time_three END)</if>
+        <if test="earlyWarningDto.endTime != null"> and #{earlyWarningDto.endTime} >= (CASE warning_grade
+            WHEN '1' THEN warning_time_one
+            WHEN '2' THEN warning_time_two
+            WHEN '3' THEN warning_time_three END)</if>
         group by warning_type,warning_grade
     </select>
     <select id="findEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT t.* FROM ( SELECT
-        node_id AS nodeId,
-        is_affirm AS isAffirm,
-        node_type AS nodeType,
-        warning_val_one AS warningValOne,
-        warning_val_two AS warningValTwo,
-        warning_val_three AS warningValThree,
-        warning_type AS warningType,
+        SELECT
+        stack_id AS stackId,
+        is_affirm AS affirm,
         warning_grade AS warningGrade,
-        warning_time_one AS warningTimeOne,
-        warning_time_two AS warningTimeTwo,
-        warning_time_three AS warningTimeThree
-        FROM tb_early_warning WHERE warning_type = #{earlyWarning.warningType} and
-        warning_grade = #{earlyWarning.warningGrade} AND is_affirm = #{earlyWarning.affirm} LIMIT 1) t
+        substring_index(group_concat(node_type),',',1) AS nodeType,
+        (CASE warning_grade
+        WHEN '1' THEN substring_index(group_concat(warning_val_one),',',1)
+        WHEN '2' THEN substring_index(group_concat(warning_val_two),',',1)
+        WHEN '3' THEN substring_index(group_concat(warning_val_three),',',1) END) AS warningVal,
+        (CASE warning_grade
+        WHEN '1' THEN substring_index(group_concat(warning_time_one),',',1)
+        WHEN '2' THEN substring_index(group_concat(warning_time_two),',',1)
+        WHEN '3' THEN substring_index(group_concat(warning_time_three),',',1) END) AS warningTime
+        FROM tb_early_warning WHERE warning_type = #{earlyWarningDto.warningType}
+        <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
+        <if test="earlyWarningDto.startTime != null"> and #{earlyWarningDto.startTime} &lt;= (CASE warning_grade
+            WHEN '1' THEN warning_time_one
+            WHEN '2' THEN warning_time_two
+            WHEN '3' THEN warning_time_three END)</if>
+        <if test="earlyWarningDto.endTime != null"> and #{earlyWarningDto.endTime} >= (CASE warning_grade
+            WHEN '1' THEN warning_time_one
+            WHEN '2' THEN warning_time_two
+            WHEN '3' THEN warning_time_three END)</if>
+        GROUP BY is_affirm,warning_grade,stack_id ORDER BY is_affirm DESC,warning_grade DESC;
     </select>
     <select id="findEarlyWarningByStack" resultType="com.rpzh.vo.EarlyWarningVo">
         select id, warning_type warningType , node_id nodeId , node_type nodeType , warning_val_one warningValOne ,

@@ -11,6 +11,10 @@ import java.util.List;
 
 @Mapper
 public interface EarlyWarningDao {
+    List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId);
     EarlyWarningVo findUndoStackEarlyWarning(@Param("stackId") Integer stackId);
 
@@ -19,8 +23,6 @@ public interface EarlyWarningDao {
     Integer updateWarningThreshold(@Param("settingValue") Integer settingValue, @Param("settingName") String settingName);
 
     List<EarlyWarningVo> findUndoEarlyWarning();
-    List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-    EarlyWarningVo findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findEarlyWarningByStack(@Param("stackId") String stackId);
 

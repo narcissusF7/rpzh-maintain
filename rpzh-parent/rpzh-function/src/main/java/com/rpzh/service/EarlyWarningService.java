@@ -1,5 +1,7 @@
 package com.rpzh.service;
 
+import com.rpzh.dto.EarlyWarningDto;
+import com.rpzh.entity.Result;
 import com.rpzh.vo.WarningVo;
 
 import java.util.List;
@@ -10,5 +12,5 @@ import java.util.List;
  * @Description: 功能
  */
 public interface EarlyWarningService {
-    //List<WarningVo> findEarlyWarning()
+    Result findEarlyWarning(EarlyWarningDto earlyWarningDto);
 }
