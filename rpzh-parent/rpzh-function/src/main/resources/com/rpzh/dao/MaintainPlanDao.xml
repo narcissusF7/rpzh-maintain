@@ -54,8 +54,10 @@
             t2.oxygen_reduction_time AS oxygenReductionTime,
             t2.created_time AS createdTime,
             t1.principal_name AS principalName,
+            t1.principal_name AS username,
             t2.expire_time AS expireTime,
             t2.maintain_count as maintainCount,
+            t1.principal_ids as principalId,
             t2.id as stageId,
             t2.version as version,
             t2.alarm_value_setting_id AS alarmValueSettingId
@@ -112,7 +114,9 @@
     <update id="updateMaintainPlan">
         update tb_maintain_plan
         <set>
-            <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">principal_name = #{maintainPlanDto.principalName}</if>
+            <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">principal_name = #{maintainPlanDto.name},</if>
+            <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style= #{maintainPlanDto.maintenceStyle},</if>
+            <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids = #{maintainPlanDto.principalId}</if>
         </set>
         where id = #{maintainPlanDto.id}
     </update>
@@ -125,6 +129,7 @@
             <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count = #{maintainPlanDto.maintainCount},</if>
             <if test="maintainPlanDto.oxygenReductionTime != null">oxygen_reduction_time = #{maintainPlanDto.oxygenReductionTime},</if>
             <if test="maintainPlanDto.expireTime != null">expire_time = #{maintainPlanDto.expireTime},</if>
+            <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">phases=#{maintainPlanDto.phases},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">update_user = #{maintainPlanDto.updateUser},</if>
             updated_time = #{maintainPlanDto.updatedTime}
         </set>
@@ -133,6 +138,8 @@
     <update id="changeMaintainPlanStage">
         update tb_maintain_plan t1,tb_maintain_plan_stage t2
         <set>
+            <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">t1.principal_name = #{maintainPlanDto.name},</if>
+            <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">t1.principal_ids = #{maintainPlanDto.principalId},</if>
             <if test="maintainPlanDto.stageId != null and maintainPlanDto.stageId !=''">t1.stage_id = #{maintainPlanDto.stageId},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">t2.update_user = #{maintainPlanDto.updateUser},</if>
             <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">t2.maintain_days = #{maintainPlanDto.maintainDays},</if>
@@ -144,27 +151,29 @@
     <insert id="insertMaintainPlan">
         insert into tb_maintain_plan
         (
-            <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code,</if>
-            <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">tobacco_year,</if>
-            <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num,</if>
-            <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">stack_id,</if>
-            <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">principal_name,</if>
-            <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">storage_age,</if>
-            <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style,</if>
-            <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">material_code_year,</if>
-            stack_name
+        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code,</if>
+        <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">tobacco_year,</if>
+        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num,</if>
+        <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">stack_id,</if>
+        <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">principal_name,</if>
+        <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids,</if>
+        <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">storage_age,</if>
+        <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style,</if>
+        <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">material_code_year,</if>
+        stack_name
         )
         values
         (
-            <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">#{maintainPlanDto.materialCode},</if>
-            <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">#{maintainPlanDto.tobaccoYear},</if>
-            <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">#{maintainPlanDto.materialBatchNum},</if>
-            <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">#{maintainPlanDto.stackId},</if>
-            <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">#{maintainPlanDto.principalName},</if>
-            <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">#{maintainPlanDto.storageAge},</if>
-            <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
-            <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">#{maintainPlanDto.materialCodeYear},</if>
-            #{maintainPlanDto.stackName}
+        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">#{maintainPlanDto.materialCode},</if>
+        <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">#{maintainPlanDto.tobaccoYear},</if>
+        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">#{maintainPlanDto.materialBatchNum},</if>
+        <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">#{maintainPlanDto.stackId},</if>
+        <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">#{maintainPlanDto.name},</if>
+        <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">#{maintainPlanDto.principalId},</if>
+        <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">#{maintainPlanDto.storageAge},</if>
+        <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
+        <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">#{maintainPlanDto.materialCodeYear},</if>
+        #{maintainPlanDto.stackName}
         )
     </insert>
     <insert id="insertMaintainStage">
@@ -281,7 +290,7 @@
     <select id="findDetails" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t2.id as id,
-        t1.principal_name AS principalName,
+        t1.principal_name AS username,
         t2.created_time as createdTime,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
@@ -332,13 +341,5 @@
     <select id="isExistAlarmValueSetting" resultType="java.lang.Integer">
         select count(*) from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t2.id = t1.stage_id where
         t2.alarm_value_setting_id = #{id} and t1.is_end = '0'
-    </select>
-
-    <update id="updateStackByStackId" parameterType="java.lang.Integer">
-        update tb_maintain_plan set stack_id = #{stackId} where id = #{id};
-    </update>
-
-    <select id="findStackCountByStackId" resultType="java.lang.Integer">
-        select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
     </select>
 </mapper>
