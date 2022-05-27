@@ -342,4 +342,11 @@
         select count(*) from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t2.id = t1.stage_id where
         t2.alarm_value_setting_id = #{id} and t1.is_end = '0'
     </select>
+    <update id="updateStackByStackId" parameterType="java.lang.Integer">
+        update tb_maintain_plan set stack_id = #{stackId} where id = #{id};
+    </update>
+
+    <select id="findStackCountByStackId" resultType="java.lang.Integer">
+        select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
+    </select>
 </mapper>

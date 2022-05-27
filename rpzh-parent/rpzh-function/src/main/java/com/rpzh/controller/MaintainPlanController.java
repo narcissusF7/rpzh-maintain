@@ -2,11 +2,13 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -213,6 +215,21 @@ public class MaintainPlanController {
     public Result findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
         Result maintainPlan = maintainPlanService.findExpireCollectTable(maintainPlanDto);
         return maintainPlan;
+    }
+    /**
+     * 移垛
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping({"/moveStack"})
+    public Result<T> moveStack(@RequestBody com.rpzh.dto.MaintainPlanDto maintainPlanDto) {
+        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        if (maintainPlanDto.getStackId().equals(((NodeDto) nodeDtoList.get(0)).getStackId())) {
+            return new Result<>(false, 20001, "垛位没有移动!");
+        } else {
+            Integer result = maintainPlanService.moveStack(maintainPlanDto);
+            return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);
+        }
     }
 
     @PostMapping("/getPhases")

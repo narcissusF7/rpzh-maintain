@@ -12,6 +12,8 @@ import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -28,6 +30,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Resource
     private UserFeign userFeign;
+
+    @Resource
+    private NodeDao nodeDao;
 
     /**
      * 新增养护计划
@@ -304,5 +309,25 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public Integer isExistStackId(Integer stackId) {
         return maintainPlanDao.isExistStackId(stackId);
+    }
+
+    @Override
+    @Transactional
+    public Integer moveStack(MaintainPlanDto maintainPlanDto) {
+        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        Integer stackId = maintainPlanDto.getStackId();
+        Integer count = maintainPlanDao.findStackCountByStackId(stackId);
+        if (count > 0) {
+            return -1;
+        } else {
+            Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
+            if (flag > 0) {
+                nodeDtoList.forEach((nodeDto) -> {
+                    nodeDto.setStackId(stackId);
+                    nodeDao.updateNode(nodeDto);
+                });
+            }
+            return flag;
+        }
     }
 }

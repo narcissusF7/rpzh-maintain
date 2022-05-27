@@ -209,4 +209,8 @@ public class MaintainPlanDto {
      * 预警规则名称
      */
     private String earlyWarningRuleName;
+    /**
+     * 该养护计划下的所有设备
+     */
+    List<NodeDto> nodeDtoList;
 }

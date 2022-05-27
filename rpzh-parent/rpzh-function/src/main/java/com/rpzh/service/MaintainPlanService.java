@@ -60,4 +60,5 @@ public interface MaintainPlanService {
 
     Integer isExistStackId(Integer stackId);
 
+    Integer moveStack(MaintainPlanDto maintainPlanDto);
 }
