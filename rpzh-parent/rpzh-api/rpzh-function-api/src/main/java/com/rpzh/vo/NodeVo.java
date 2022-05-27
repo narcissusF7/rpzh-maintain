@@ -1,7 +1,5 @@
 package com.rpzh.vo;
 
-import com.rpzh.verify.Insert;
-import com.rpzh.verify.Update;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
