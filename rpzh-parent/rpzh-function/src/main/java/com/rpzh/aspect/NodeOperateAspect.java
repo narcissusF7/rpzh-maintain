@@ -7,7 +7,6 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.Result;
 import com.rpzh.enums.NodeOperationEnum;
-import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
@@ -16,7 +15,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 
-import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -24,24 +22,23 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * 节点操作切面
+ *
+ * @Author liujj
+ * @create 2022/4/30
+ */
 @Component
 @Aspect
 public class NodeOperateAspect {
 
     @Autowired
     NodeOperationService operationService;
-    @Before(value = "execution(* com.rpzh.controller.NodeController.*(..))||execution(* com.rpzh.controller.MaintainPlanController..*(..)))")
-    public  void NodeOperateLog(JoinPoint pjp){
-        System.out.println("进来了");
-    }
 
     @AfterReturning(value = "execution(* com.rpzh.controller.NodeController.*(..))||execution(* com.rpzh.controller.MaintainPlanController..*(..)))", returning = "result")
     public void NodeOperateLog(JoinPoint pjp, Result<T> result){
