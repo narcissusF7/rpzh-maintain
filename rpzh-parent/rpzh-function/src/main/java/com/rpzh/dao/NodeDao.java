@@ -2,6 +2,7 @@ package com.rpzh.dao;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.pojo.NodeData;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
@@ -164,4 +165,6 @@ public interface NodeDao {
 
     NodeVo findNodeAndMaintainStageByNodeId(@Param("nodeId") String nodeId);
 
+    @DS("clickhouse")
+    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData,@Param("tableName") String tableName);
 }

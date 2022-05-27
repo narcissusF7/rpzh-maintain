@@ -1,9 +1,12 @@
 package com.rpzh.vo;
 
+import com.rpzh.verify.Insert;
+import com.rpzh.verify.Update;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -17,7 +20,7 @@ import java.util.List;
 public class NodeVo {
 
     //主键id
-    @ApiModelProperty(notes = "部门id主键")
+    @ApiModelProperty(notes = "id主键")
     private Integer id;
 
     @ApiModelProperty(notes = "设备id集合")
@@ -25,6 +28,7 @@ public class NodeVo {
 
     //设备id
     @ApiModelProperty(notes = "设备id")
+//    @NotNull(message = "设备不能为空",groups = {Insert.class, Update.class})
     private String nodeId;
 
     //设备类型

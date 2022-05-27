@@ -321,7 +321,6 @@ public class NodeServiceImpl implements NodeService {
         AtomicInteger updateFlag = new AtomicInteger();
         list.forEach(map->{
             Map newMap = new HashMap();
-            @SuppressWarnings("unchecked")
             Map<String,String> intermediate = Collections.checkedMap(newMap, String.class, String.class);
             intermediate.putAll(map);
             nodeDao.updateNode(intermediate);

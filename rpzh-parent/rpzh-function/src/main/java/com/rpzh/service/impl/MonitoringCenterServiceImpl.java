@@ -15,6 +15,7 @@ import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -47,23 +48,23 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     @Override
     public PageInfo<NodeDataVo> findMonitoringData(MonitorCondition monitorCondition) {
         //位置路由
-        if (monitorCondition.getStackId() > 0) {
-            monitorCondition.setSiteRoute("");
-        } else if (monitorCondition.getWareAreaId() > 0) {
-            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId()
-                    + "],[04:" + monitorCondition.getWareAreaId() + "]");
-        } else if (monitorCondition.getFloodId() > 0) {
-            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId() + "]%");
-        } else if (monitorCondition.getBulidingId() > 0) {
-            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-                    + "],[02:" + monitorCondition.getBulidingId() + "]%");
-        } else if (monitorCondition.getWarehouseId() > 0) {
-            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId() + "]%");
-        } else {
-            monitorCondition.setSiteRoute("[00:0]%");
-        }
+//        if (monitorCondition.getStackId() > 0) {
+//            monitorCondition.setSiteRoute("");
+//        } else if (monitorCondition.getWareAreaId() > 0) {
+//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
+//                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId()
+//                    + "],[04:" + monitorCondition.getWareAreaId() + "]");
+//        } else if (monitorCondition.getFloodId() > 0) {
+//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
+//                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId() + "]%");
+//        } else if (monitorCondition.getBulidingId() > 0) {
+//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
+//                    + "],[02:" + monitorCondition.getBulidingId() + "]%");
+//        } else if (monitorCondition.getWarehouseId() > 0) {
+//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId() + "]%");
+//        } else {
+//            monitorCondition.setSiteRoute("[00:0]%");
+//        }
 
         //设备数据集
         List<NodeDataVo> nodeDataVos = new ArrayList<>();
@@ -77,13 +78,8 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
         for (NodeVo nodeVo : nodeVos) {
             //获取缓存中该设备的数据
-            Map<String,String> data = redisTemplate.opsForHash().entries(CACHE_KEY_REDIS_MAINTAIN + nodeVo.getNodeId());
-            try {
-                //把该数据添加到集合中
-                nodeDataVos.add(JSONObject.parseObject((InputStream) data, NodeDataVo.class, new Feature[0]));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Object data = this.redisTemplate.opsForHash().get("MAINTAIN_" + nodeVo.getStackId(), nodeVo.getNodeId());
+            nodeDataVos.add(new ObjectMapper().convertValue(data, NodeDataVo.class));
         }
 
         //监控状态筛选 1.正常 2.预警

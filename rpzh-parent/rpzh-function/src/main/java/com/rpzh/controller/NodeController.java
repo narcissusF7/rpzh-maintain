@@ -64,26 +64,11 @@ public class NodeController {
             required = true,
             dataType = "String"
     ), @ApiImplicitParam(
-            name = "status",
-            value = "状态,0:解垛,1:入垛,2:未使用 默认2",
-            dataType = "String"
-    ), @ApiImplicitParam(
-            name = "gatherSite",
-            value = "采集位置",
-            dataType = "String"
-    ), @ApiImplicitParam(
-            name = "stackId",
-            value = "垛位id",
-            dataType = "Integer"
-    ), @ApiImplicitParam(
-            name = "stack",
-            value = "垛位",
-            dataType = "String"
-    ), @ApiImplicitParam(
             name = "siteType",
-            value = "采集位置类型,04:仓间,05非仓间",
+            value = "采集位置类型,04:仓间,05非仓间  默认05",
             required = true,
-            dataType = "String"
+            dataType = "String",
+            defaultValue = "05"
     )})
     public Result addNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
@@ -119,7 +104,7 @@ public class NodeController {
             dataType = "String"
     ), @ApiImplicitParam(
             name = "status",
-            value = "状态,0:解垛,1:入垛,2:未使用 默认2,3:故障",
+            value = "状态,0:解垛,1:入垛,2:未使用 ,3:故障",
             dataType = "String"
     ), @ApiImplicitParam(
             name = "gatherSite",
@@ -138,10 +123,6 @@ public class NodeController {
             value = "采集位置类型,04:仓间,05非仓间",
             dataType = "String"
     ), @ApiImplicitParam(
-            name = "siteId",
-            value = "采集位置ID",
-            dataType = "Integer"
-    ), @ApiImplicitParam(
             name = "siteX",
             value = "采集位置-X坐标",
             dataType = "Integer"
@@ -153,10 +134,6 @@ public class NodeController {
             name = "siteZ",
             value = "采集位置-Z坐标",
             dataType = "Integer"
-    ), @ApiImplicitParam(
-            name = "siteRoute",
-            value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",
-            dataType = "String"
     )})
     @PostMapping("/updateNode")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {
@@ -186,20 +163,16 @@ public class NodeController {
             dataType = "String"
     ), @ApiImplicitParam(
             name = "nodeType",
-            value = "设备类型,默认:01",
+            value = "设备类型",
             dataType = "String"
     ), @ApiImplicitParam(
             name = "status",
-            value = "状态,0:解垛,1:入垛,2:未使用 默认2",
+            value = "状态,0:解垛,1:入垛,2:未使用 3:故障",
             dataType = "String"
     ),@ApiImplicitParam(
             name = "gatherSite",
             value = "采集位置",
             dataType = "String"
-    ),@ApiImplicitParam(
-            name = "siteId",
-            value = "采集位置ID",
-            dataType = "Integer"
     ), @ApiImplicitParam(
             name = "startTime",
             value = "开始时间",
@@ -232,6 +205,7 @@ public class NodeController {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         int delFlag = nodeService.deleteNode(Arrays.asList(nodeIds));
+
         return new Result<>(true, StatusCode.OK, "删除节点成功");
     }
 
@@ -485,7 +459,9 @@ public class NodeController {
 //        Integer updateFlag = nodeService.updateNodes(nodeDtoList);
 //        return new Result(true, StatusCode.OK, "翻垛成功");
 //    }
-
+    @ApiOperation(value = "翻垛")
+    @PostMapping({"/flipStack"})
+    @ApiImplicitParam(name = "data",value = "翻垛的数据集",dataType = "String",required = true)
     public Result flipStack(String data) {
 
         Integer updateFlag = nodeService.updateNodes(data);

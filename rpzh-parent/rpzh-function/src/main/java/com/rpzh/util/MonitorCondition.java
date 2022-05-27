@@ -4,11 +4,7 @@ import lombok.Data;
 
 @Data
 public class MonitorCondition {
-    private Integer warehouseId;
-    private Integer BulidingId;
-    private Integer floodId;
-    private Integer wareAreaId;
-    private Integer StackId;
+    private String pidRoute;
     private String siteRoute;
     private String siteType;
     private String maintainStage;
