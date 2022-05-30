@@ -310,10 +310,11 @@ public class NodeController {
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
+    //todo 重新开发
     @ApiOperation("设备入垛")
     @ApiImplicitParam(
             name = "data",
-            value = "JSON字符串,可以包含多个对象 每个对象包含id,x,y,z,stackId,stack,siteId属性",
+            value = "JSON字符串,可以包含多个对象 每个对象包含id,x,y,z,stackId,stack,caseNo（箱号）",
             dataType = "String"
     )
     @PostMapping("/enterStack")

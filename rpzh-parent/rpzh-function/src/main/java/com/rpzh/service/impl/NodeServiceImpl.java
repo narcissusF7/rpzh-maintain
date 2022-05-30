@@ -191,10 +191,15 @@ public class NodeServiceImpl implements NodeService {
             Map map = list.get(i);
             int id = 0,siteId = 0,stackId = 0;
 
-            String x = "-",y = "-",z = "-",gatherSite = "--",stack = "-";
+            String x = "-",y = "-",z = "-",gatherSite = "--",stack = "-",caseNo = "";
             if (!ToolUtil.isEmpty(map.get("id"))){
                 id = Integer.parseInt(map.get("id").toString());
             }
+            //如果设备类型为空
+            if (ToolUtil.isEmpty(map.get("nodeType"))){
+                return -1;
+            }
+
             if (!ToolUtil.isEmpty(map.get("siteId"))){
                 siteId = Integer.parseInt(map.get("siteId").toString());
             }
@@ -214,8 +219,12 @@ public class NodeServiceImpl implements NodeService {
                 stack = map.get("stack").toString();
                 gatherSite =stack;
             }
+            if (!ToolUtil.isEmpty(map.get("caseNo"))){
+                stack = map.get("caseNo").toString();
+                caseNo =stack;
+            }
 
-            updateFlag = nodeDao.enterStack(id,x,y,z,stackId,stack,siteId,gatherSite);
+            updateFlag = nodeDao.enterStack(id,x,y,z,stackId,stack,siteId,gatherSite,caseNo);
         }
         return updateFlag;
     }

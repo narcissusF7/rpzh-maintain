@@ -19,6 +19,8 @@ public class NodeData {
     private Double humiture;
     private Double oxygen;
     private String dateTime;
+    private String gatherSite;
+    private String siteType;
 
 
 
@@ -34,6 +36,8 @@ public class NodeData {
         this.stackId = nodeVo.getStackId();
         this.maintainStageId = nodeVo.getMaintainStageId();
         this.maintainPlanId = nodeVo.getMaintainPlanId();
+        this.gatherSite = nodeVo.getGatherSite();
+        this.siteType = nodeVo.getSiteType();
         switch (nodeVo.getNodeType()){
             case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
                 this.oxygen=parseData.getData().get(count);

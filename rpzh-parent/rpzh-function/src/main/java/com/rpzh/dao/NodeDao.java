@@ -110,7 +110,7 @@ public interface NodeDao {
      * @return
      */
     int enterStack(@Param("id")Integer id,@Param("x")String x, @Param("y")String y,
-                   @Param("z")String z,@Param("stackId") Integer stackId,@Param("stack")String stack,@Param("siteId")Integer siteId,@Param("gatherSite")String gatherSite );
+                   @Param("z")String z,@Param("stackId") Integer stackId,@Param("stack")String stack,@Param("siteId")Integer siteId,@Param("gatherSite")String gatherSite,@Param("caseNo") String caseNo);
 
     /**
      * 判断设备是否存在

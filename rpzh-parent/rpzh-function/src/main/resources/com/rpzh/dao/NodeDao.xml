@@ -142,10 +142,12 @@
         UPDATE tb_node
         SET `status` = '0',
         `stack`  = '--',
+        stack_id =null ,
         `site_x` = '-',
         `site_y` = '-',
         `site_z` = '-',
-        gather_site = '--'
+        gather_site = '--',
+        caseNo = ""
         WHERE id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -175,6 +177,7 @@
             site_z   = #{z},
             status   = '1',
             gather_site = #{gatherSite},
+            case_no = #{caseNo},
             into_stack_time = sysdate()
         WHERE id = #{id}
     </update>
