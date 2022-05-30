@@ -331,24 +331,28 @@
         <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
         <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
         <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
+        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
+        <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
         <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
         <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
         <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
-        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">date_time,</if>
+        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
         createdTime
         ) values {
-        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
-        <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
-        <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
-        <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
-        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signalStrength,</if>
-        <if test="nodeData.stackId!=null and nodeData.stackId!=''">stackId,</if>
-        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintainPlanId,</if>
-        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintainStageId,</if>
-        <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
-        <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
-        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
-        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">dateTime,</if>
+        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
+        <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
+        <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
+        <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
+        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
+        <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
+        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
+        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
+        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
+        <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
+        <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
+        <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
+        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
+        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
             sysdate()
         }
     </insert>
