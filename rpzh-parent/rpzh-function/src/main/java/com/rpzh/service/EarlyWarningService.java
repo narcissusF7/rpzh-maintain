@@ -12,5 +12,7 @@ import java.util.List;
  * @Description: 功能
  */
 public interface EarlyWarningService {
+    Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto);
     Result findEarlyWarning(EarlyWarningDto earlyWarningDto);
+    Result findDetailsEarlyWarning(EarlyWarningDto earlyWarningDto);
 }

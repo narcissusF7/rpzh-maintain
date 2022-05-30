@@ -18,12 +18,11 @@ public class MaintainPlanDto {
     /**
      * 物料代码
      */
+    private List<String> materialCodes;
+    private String materialBatchNum;
     private String materialCode;
-    /**
-     * 物料代码与烟叶年份
-     */
-    private String materialCodeYear;
     private Integer stageId;
+    private String materialName;
     /**
      * 垛位id
      */
@@ -54,17 +53,6 @@ public class MaintainPlanDto {
      * 养护计划id
      */
     private Integer id;
-    private Integer flag;
-
-    /**
-     * 物料批次号
-     */
-    private String materialBatchNum;
-
-    /**
-     * 烟叶年份
-     */
-    private String tobaccoYear;
 
     /**
      * 制定时间
@@ -83,12 +71,13 @@ public class MaintainPlanDto {
      */
     private Integer maintainDays;
     private Integer version = 1;
+    private Integer storageAge;
     /**
      * 调养日期
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date aftercareDateStart;
+    private String aftercareDateStart;
     @JsonFormat(pattern = "yyyy-MM-dd 00:00:00", timezone = "GMT+8")
     private Date aftercareDateEnd;
     /**
@@ -96,20 +85,20 @@ public class MaintainPlanDto {
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date oxygenReductionTime;
+    private String oxygenReductionTime;
     /**
      * 负责人
      */
-    private List<Integer> principalName;
+    private List<Integer> principalIds;
     private String principalId;
-    private String name;
+    private String principalName;
 
     /**
      * 到期提醒时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date expireTime;
+    private String expireTime;
     /**
      * 养护数量
      */
@@ -123,15 +112,12 @@ public class MaintainPlanDto {
      * 放在养护阶段表中的养护计划id
      */
     private Integer maintainPlanId;
-    /**
-     * 库龄
-     */
-    private Integer storageAge;
+    private Date nowDate;
 
     /**
      * 第几页
      */
-    private Integer page = 0;
+    private Integer page = 1;
     /**
      * 有几条数据
      */

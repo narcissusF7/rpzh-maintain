@@ -15,12 +15,9 @@ import java.util.List;
  * @Description: 功能
  */
 public interface AlarmValueSettingService {
-    AlarmValueSettingVo findMaintainPlanInfo(AlarmValueSettingDto alarmValueSettingDto);
     PageInfo<AlarmValueSettingVo> findAlarmValueSettingTable(AlarmValueSettingDto alarmValueSettingDto);
     Result changeAlarmValueSettingStatus(Integer id);
     Result deleteAlarmValueSetting(List<Integer> ids);
-
-    List<String> findYear(String materialCode);
 
     void insertAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto);
 

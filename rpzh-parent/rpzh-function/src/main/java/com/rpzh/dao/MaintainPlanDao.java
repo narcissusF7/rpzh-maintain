@@ -29,9 +29,9 @@ public interface MaintainPlanDao {
 
     Integer insertMaintainStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    Integer findMaxStageId();
+    Integer findMaxStageId(@Param("id") Integer id);
 
-    Integer findMaxPlanId();
+    Integer findMaxPlanId(@Param("stackId") Integer stackId);
 
     int updateMaintainPlanStageId(@Param("stageId") Integer stageId, @Param("id") Integer id);
 
@@ -69,9 +69,11 @@ public interface MaintainPlanDao {
 
     Integer isExistStackId(@Param("stackId") Integer stackId);
 
-    Integer isExistAlarmValueSetting(@Param("id")Integer id);
+    Integer isExistAlarmValueSetting(@Param("id") Integer id);
 
     Integer updateStackByStackId(@Param("id") Integer id, @Param("stackId") Integer stackId);
 
     Integer findStackCountByStackId(Integer stackId);
+
+    MaintainPlanVo findMaintainStackId(@Param("stackId") Integer stackId);
 }

@@ -10,9 +10,5 @@ import java.util.List;
  * @Description: 功能
  */
 public interface MaterialService {
-    MaterialVo getMaterialInfoBySiteId(Integer siteId);
-
-    List<String> findMaterialCode(Integer stackId);
-
-    List<String> findYear(Integer stackId,String materialCode);
+    MaterialVo findMaterialInfo(Integer stackId);
 }

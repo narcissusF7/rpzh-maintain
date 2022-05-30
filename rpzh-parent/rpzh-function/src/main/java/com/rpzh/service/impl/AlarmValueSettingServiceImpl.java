@@ -35,57 +35,6 @@ public class AlarmValueSettingServiceImpl implements AlarmValueSettingService {
     private MaintainPlanDao maintainPlanDao;
     @Resource
     private MaterialDao materialDao;
-    @Override
-    public AlarmValueSettingVo findMaintainPlanInfo(AlarmValueSettingDto alarmValueSettingDto) {
-        String materialCodeYear = alarmValueSettingDto.getMaterialCodeYear();
-        if(!materialCodeYear.contains("[")){
-            materialCodeYear = "[" + materialCodeYear;
-        }
-        if(!materialCodeYear.contains("]")){
-            materialCodeYear = materialCodeYear + "]";
-        }
-        List<String> materialCodeYearJson = JSON.parseArray(materialCodeYear, String.class);
-        Collections.sort(materialCodeYearJson);
-        alarmValueSettingDto.setMaterialCodeYear(materialCodeYearJson.toString());
-        AlarmValueSettingVo alarmValueSetting = alarmValueSettingDao.findAlarmValueSetting(alarmValueSettingDto);
-        if(alarmValueSetting!=null){
-            return alarmValueSetting;
-        }
-        alarmValueSetting = new AlarmValueSettingVo();
-        alarmValueSetting.setStackOxygenUpperOne(AlertSettingSetDefault.stackOxygenUpperOne);
-        alarmValueSetting.setStackOxygenUpperTwo(AlertSettingSetDefault.stackOxygenUpperTwo);
-        alarmValueSetting.setStackOxygenUpperThree(AlertSettingSetDefault.stackOxygenUpperThree);
-        alarmValueSetting.setStackOxygenLower(AlertSettingSetDefault.stackOxygenLower);
-        alarmValueSetting.setWarehouseOxygenUpperOne(AlertSettingSetDefault.warehouseOxygenUpperOne);
-        alarmValueSetting.setWarehouseOxygenUpperTwo(AlertSettingSetDefault.warehouseOxygenUpperTwo);
-        alarmValueSetting.setWarehouseOxygenUpperThree(AlertSettingSetDefault.warehouseOxygenUpperThree);
-        alarmValueSetting.setWarehouseOxygenLower(AlertSettingSetDefault.warehouseOxygenLower);
-        alarmValueSetting.setTempCoreChipUpperOne(AlertSettingSetDefault.tempCoreChipUpperOne);
-        alarmValueSetting.setTempCoreChipUpperTwo(AlertSettingSetDefault.tempCoreChipUpperTwo);
-        alarmValueSetting.setTempCoreChipUpperThree(AlertSettingSetDefault.tempCoreChipUpperThree);
-        alarmValueSetting.setTempCoreChipLower(AlertSettingSetDefault.tempCoreChipLower);
-        alarmValueSetting.setStackTempUpperOne(AlertSettingSetDefault.stackTempUpperOne);
-        alarmValueSetting.setStackTempUpperTwo(AlertSettingSetDefault.stackTempUpperTwo);
-        alarmValueSetting.setStackTempUpperThree(AlertSettingSetDefault.stackTempUpperThree);
-        alarmValueSetting.setStackTempLower(AlertSettingSetDefault.stackTempLower);
-        alarmValueSetting.setStackMoistureUpperOne(AlertSettingSetDefault.stackMoistureUpperOne);
-        alarmValueSetting.setStackMoistureUpperTwo(AlertSettingSetDefault.stackMoistureUpperTwo);
-        alarmValueSetting.setStackMoistureUpperThree(AlertSettingSetDefault.stackMoistureUpperThree);
-        alarmValueSetting.setStackMoistureLower(AlertSettingSetDefault.stackMoistureLower);
-        alarmValueSetting.setWarehouseTempUpper0ne(AlertSettingSetDefault.warehouseTempUpperOne);
-        alarmValueSetting.setWarehouseTempUpperTwo(AlertSettingSetDefault.warehouseTempUpperTwo);
-        alarmValueSetting.setWarehouseTempUpperThree(AlertSettingSetDefault.warehouseTempUpperThree);
-        alarmValueSetting.setWarehouseTempLower(AlertSettingSetDefault.warehouseTempLower);
-        alarmValueSetting.setWarehouseMoistureUpperOne(AlertSettingSetDefault.warehouseMoistureUpperOne);
-        alarmValueSetting.setWarehouseMoistureUpperTwo(AlertSettingSetDefault.warehouseMoistureUpperTwo);
-        alarmValueSetting.setWarehouseMoistureUpperThree(AlertSettingSetDefault.warehouseMoistureUpperThree);
-        alarmValueSetting.setWarehouseMoistureLower(AlertSettingSetDefault.warehouseMoistureLower);
-        alarmValueSetting.setCoreTempHighEnvTempOne(AlertSettingSetDefault.coreTempHighEnvTempOne);
-        alarmValueSetting.setCoreTempHighEnvTempTwo(AlertSettingSetDefault.coreTempHighEnvTempTwo);
-        alarmValueSetting.setCoreTempHighEnvTempThree(AlertSettingSetDefault.coreTempHighEnvTempThree);
-        alarmValueSetting.setCoreTempLowEnvTemp(AlertSettingSetDefault.coreTempLowEnvTemp);
-        return alarmValueSetting;
-    }
 
     @Override
     public PageInfo<AlarmValueSettingVo> findAlarmValueSettingTable(AlarmValueSettingDto alarmValueSettingDto) {
@@ -133,11 +82,6 @@ public class AlarmValueSettingServiceImpl implements AlarmValueSettingService {
         return new Result(true, StatusCode.OK, "删除预警设置成功!");
     }
 
-    @Override
-    public List<String> findYear(String materialCode) {
-        List<String> year = materialDao.findYear(null, materialCode);
-        return year;
-    }
 
     @Override
     public void insertAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {

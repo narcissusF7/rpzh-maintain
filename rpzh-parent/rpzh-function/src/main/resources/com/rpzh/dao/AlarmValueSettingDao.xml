@@ -163,12 +163,6 @@
         <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">core_temp_high_env_temp_two,</if>
         <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">core_temp_high_env_temp_three,</if>
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name,</if>
-        <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">material_code,</if>
-        <if test="alarmValueSettingDto.tobaccoYear != null and alarmValueSettingDto.tobaccoYear != ''">tobacco_year,</if>
-        <if test="alarmValueSettingDto.materialBatchNum != null and alarmValueSettingDto.materialBatchNum != ''">material_batch_number,</if>
-        <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">maintence_style,</if>
-        <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases,</if>
-        <if test="alarmValueSettingDto.materialCodeYear != null and alarmValueSettingDto.materialCodeYear != ''">material_code_year,</if>
         <if test="alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">create_user,</if>
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp,</if>
         created_time
@@ -207,12 +201,6 @@
         <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
         <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">#{alarmValueSettingDto.earlyWarningRuleName},</if>
-        <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">#{alarmValueSettingDto.materialCode},</if>
-        <if test="alarmValueSettingDto.tobaccoYear != null and alarmValueSettingDto.tobaccoYear != ''">#{alarmValueSettingDto.tobaccoYear},</if>
-        <if test="alarmValueSettingDto.materialBatchNum != null and alarmValueSettingDto.materialBatchNum != ''">#{alarmValueSettingDto.materialBatchNumber},</if>
-        <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">#{alarmValueSettingDto.maintenceStyle},</if>
-        <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
-        <if test="alarmValueSettingDto.materialCodeYear != null and alarmValueSettingDto.materialCodeYear != ''">#{alarmValueSettingDto.materialCodeYear},</if>
         <if test="alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">#{alarmValueSettingDto.createUser},</if>
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         #{alarmValueSettingDto.createdTime}
