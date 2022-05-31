@@ -21,6 +21,6 @@ public class NodeConstant {
     public static final int UNBIND_STACK_NODE_OPERATE_NUMBER = 6;
     public static final int FLIP_STACK_NODE_OPERATE_NUMBER = 7;
     public static final int MOVE_STACK_NODE_OPERATE_NUMBER = 8;
-    public static final String NODE_STACK = "04";
-    public static final String NODE_WARE_AREA = "05";
+    public static final String NODE_WARE_AREA = "04";
+    public static final String NODE_STACK = "05";
 }

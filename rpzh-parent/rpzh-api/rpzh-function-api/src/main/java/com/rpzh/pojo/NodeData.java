@@ -21,6 +21,7 @@ public class NodeData {
     private String dateTime;
     private String gatherSite;
     private String siteType;
+    private Integer alertLevel;
 
 
 
@@ -38,6 +39,7 @@ public class NodeData {
         this.maintainPlanId = nodeVo.getMaintainPlanId();
         this.gatherSite = nodeVo.getGatherSite();
         this.siteType = nodeVo.getSiteType();
+        this.alertLevel = nodeVo.getAlertLevel();
         switch (nodeVo.getNodeType()){
             case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
                 this.oxygen=parseData.getData().get(count);

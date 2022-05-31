@@ -3,6 +3,7 @@ package com.rpzh.dao;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.EarlyWarningVo;
+import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.WarningCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -31,4 +32,6 @@ public interface EarlyWarningDao {
     Integer updateWarning(@Param("earlyWarning") EarlyWarning earlyWarning);
 
     Integer findUndoCount(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
+
+    List<EarlyWarningVo> findTroubleNode();
 }

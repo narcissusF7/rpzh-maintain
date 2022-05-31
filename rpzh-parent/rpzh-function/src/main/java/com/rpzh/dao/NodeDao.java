@@ -6,8 +6,10 @@ import com.rpzh.pojo.NodeData;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
+import com.rpzh.vo.WeatherDataVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,14 +105,10 @@ public interface NodeDao {
 
     /**
      *
-     * @param id
-     * @param x
-     * @param y
-     * @param z
+     * @param nodeDto
      * @return
      */
-    int enterStack(@Param("id")Integer id,@Param("x")String x, @Param("y")String y,
-                   @Param("z")String z,@Param("stackId") Integer stackId,@Param("stack")String stack,@Param("siteId")Integer siteId,@Param("gatherSite")String gatherSite,@Param("caseNo") String caseNo);
+    int enterStack(@Param("nodeDto") NodeDto nodeDto);
 
     /**
      * 判断设备是否存在
@@ -155,10 +153,10 @@ public interface NodeDao {
 
     int findNodeCountByNodeId(@Param("nodeId") String nodeId);
 
-    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,String[] nodeTypes);
+    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     @DS("clickhouse")
-    List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto var1, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+    List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 
 //    @DS("clickhouse")
 //    List<NodeDataVo> insertNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
@@ -167,4 +165,9 @@ public interface NodeDao {
 
     @DS("clickhouse")
     Integer insertNodeHistory(@Param("nodeData") NodeData nodeData,@Param("tableName") String tableName);
+
+    @DS("clickhouse")
+    Integer insertWeatherData(@Param("weatherName") String weatherName , @Param("temp") Double temp , @Param("humidity") Double humidity , @Param("precip") Double precip);
+
+    List<WeatherDataVo> findWeatherData(@Param("monitorCondition") MonitorCondition monitorCondition);
 }

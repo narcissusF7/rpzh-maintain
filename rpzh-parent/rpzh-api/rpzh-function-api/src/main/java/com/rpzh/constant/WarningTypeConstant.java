@@ -6,10 +6,14 @@ public class WarningTypeConstant {
     public static String NODE_LOW_BATTERY_BREAKDOWN ="01";
     public static String NODE_SIGNAL_STRENGTH_BREAKDOWN ="02";
     public static String NODE_PACKET_LOSS_BREAKDOWN ="03";
-    public static String BORER_POPULATION_OVERRUN_WARNING ="04";
-    public static String CORE_TEMP_OVERRUN_WARNING ="05";
-    public static String ATMOSPHERE_TEMP_OVERRUN_WARNING ="06";
-    public static String ATMOSPHERE_HUMIDITY_OVERRUN_WARNING ="07";
-    public static String OXYGEN_OVERRUN_WARNING ="08";
-    public static String STACK_TEMP_OVERRUN_WARNING ="09";
+    public static String STACK_BORER_POPULATION_OVERRUN_WARNING ="04";
+    public static String WARE_BORER_POPULATION_OVERRUN_WARNING ="05";
+    public static String STACK_OXYGEN_OVERRUN_WARNING ="06";
+    public static String WARE_OXYGEN_OVERRUN_WARNING ="07";
+    public static String STACK_TEMP_OVERRUN_WARNING ="08";
+    public static String WARE_TEMP_OVERRUN_WARNING ="09";
+    public static String STACK_HUMIDITY_OVERRUN_WARNING ="10";
+    public static String WARE_HUMIDITY_OVERRUN_WARNING ="11";
+    public static String CORE_TEMP_OVERRUN_WARNING ="12";
+    public static String CORE_TEMP_OVERRUN_STACK_WARNING ="13";
 }

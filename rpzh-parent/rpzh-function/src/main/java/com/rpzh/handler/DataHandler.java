@@ -1,6 +1,5 @@
 package com.rpzh.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.AlarmValueSettingDao;
@@ -138,7 +137,7 @@ public class DataHandler {
                 //判断当前数据所属等级
                 int level = decideValue(data, list);
                 //处理该设备数据
-                earlyWarningHandle(nodeVo, level, parseData, data, nodeVo.getSiteType());
+                earlyWarningHandle(nodeVo, level, parseData, data);
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);
@@ -146,7 +145,7 @@ public class DataHandler {
             Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
 
             //最后一条数据需要存放到redis中
-            if (i==1){
+            if (i==0){
                 redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(), nodeData);
             }
         }
@@ -308,18 +307,21 @@ public class DataHandler {
         } else {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             if (level > 0) {
-                //预警类型,01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:虫数超限预警,05:包芯温度超限预警,06:环境温度超限预警,07:环境湿度超限预警,08:氧气超限预警,09:垛位温度预警
+                //判断是否是仓间设备
+                boolean isNodeStack =  NodeConstant.NODE_STACK.equals(nodeVo.getSiteType());
+                //如果不为空即该设备为温湿度设备
                 if (!ToolUtil.isEmpty(evnType)) {
-
+                    //温湿度 温度预警
                     if ("temp".equals(evnType)) {
-                        earlyWarning.setWarningType(WarningTypeConstant.ATMOSPHERE_TEMP_OVERRUN_WARNING);
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING);
+                        //温湿度 湿度预警
                     } else if ("humidity".equals(evnType)) {
-                        earlyWarning.setWarningType(WarningTypeConstant.ATMOSPHERE_HUMIDITY_OVERRUN_WARNING);
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING);
                     }
                 } else {
                     switch (nodeVo.getNodeType()) {
                         case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(WarningTypeConstant.OXYGEN_OVERRUN_WARNING);
+                            earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING);
                             break;
                         case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
                             earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING);
@@ -363,7 +365,7 @@ public class DataHandler {
             }
         } else if (level > 0) {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
-            earlyWarning.setWarningType(WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING);
+            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
             setLevel(earlyWarning, level, data);
             earlyWarningDao.insertWarning(earlyWarning);
         }

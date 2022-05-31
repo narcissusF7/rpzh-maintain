@@ -11,10 +11,11 @@ import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.NodeDao;
 
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.pojo.AlarmValueSetting;
+import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.util.MonitorCondition;
-import com.rpzh.vo.NodeDataVo;
-import com.rpzh.vo.NodeVo;
+import com.rpzh.vo.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -47,25 +49,6 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      */
     @Override
     public PageInfo<NodeDataVo> findMonitoringData(MonitorCondition monitorCondition) {
-        //位置路由
-//        if (monitorCondition.getStackId() > 0) {
-//            monitorCondition.setSiteRoute("");
-//        } else if (monitorCondition.getWareAreaId() > 0) {
-//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-//                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId()
-//                    + "],[04:" + monitorCondition.getWareAreaId() + "]");
-//        } else if (monitorCondition.getFloodId() > 0) {
-//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-//                    + "],[02:" + monitorCondition.getBulidingId() + "],[03:" + monitorCondition.getFloodId() + "]%");
-//        } else if (monitorCondition.getBulidingId() > 0) {
-//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId()
-//                    + "],[02:" + monitorCondition.getBulidingId() + "]%");
-//        } else if (monitorCondition.getWarehouseId() > 0) {
-//            monitorCondition.setSiteRoute("[00:0],[01:" + monitorCondition.getWarehouseId() + "]%");
-//        } else {
-//            monitorCondition.setSiteRoute("[00:0]%");
-//        }
-
         //设备数据集
         List<NodeDataVo> nodeDataVos = new ArrayList<>();
         int pageNum = monitorCondition.getPage();
@@ -73,12 +56,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         if (monitorCondition.getSortCondition() == 0) {
             PageHelper.startPage(pageNum, pageSize);
         }
-        //通过条件查询对应的所有设备
-        List<NodeVo> nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition, monitorCondition.getNodeTypes());
+
+        //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
+        List<NodeVo> nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
 
         for (NodeVo nodeVo : nodeVos) {
             //获取缓存中该设备的数据
-            Object data = this.redisTemplate.opsForHash().get("MAINTAIN_" + nodeVo.getStackId(), nodeVo.getNodeId());
+            Object data = this.redisTemplate.opsForValue().get("MAINTAIN_"+nodeVo.getNodeId());
             nodeDataVos.add(new ObjectMapper().convertValue(data, NodeDataVo.class));
         }
 
@@ -87,18 +71,18 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
                     nodeDataVo.getAlertLevel() ==0
             ).collect(Collectors.toList());
-        }else if (monitorCondition.getMonitorStatus()==1){
+        }else if (monitorCondition.getMonitorStatus()==2){
             nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
                     nodeDataVo.getAlertLevel() >0
             ).collect(Collectors.toList());
         }
 
         //如果物料代码不为空  过滤
-        if (ToolUtil.isEmpty(monitorCondition.getMaterialCode())){
-            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-                    nodeDataVo.getMaterialCode().startsWith(monitorCondition.getMaterialCode())
-            ).collect(Collectors.toList());
-        }
+//        if (ToolUtil.isEmpty(monitorCondition.getMaterialCode())){
+//            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
+//                    nodeDataVo.getMaterialCode().startsWith(monitorCondition.getMaterialCode())
+//            ).collect(Collectors.toList());
+//        }
         //如果设备时按预警排序  需要手动分页
         if (monitorCondition.getSortCondition() == 1) {
             //排序  按预警等级才需
@@ -121,11 +105,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     }
 
     /**
-     * TODO 查询故障或者丢包设备
+     * 查询故障设备
+     * @return 预警设备列表
      */
     @Override
-    public PageInfo<NodeVo> findTroubleNode() {
-        return null;
+    public List<EarlyWarningVo> findTroubleNode() {
+        List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findTroubleNode();
+        return earlyWarningVos;
     }
 
     /**
@@ -161,6 +147,59 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         thresholdMap.put("oneToTwo", oneToTwo);
         thresholdMap.put("twoToThree", twoToThree);
         return thresholdMap;
+    }
+
+    @Override
+    public List<Double> findAlarmValue(NodeData nodeData) {
+        //该设备需要预警的字段
+        String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), nodeData.getSiteType());
+        //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
+        Boolean hasKey = redisTemplate.opsForHash().hasKey("MAINTAIN_" + nodeData.getMaintainStageId(), column[0]);
+        //如果不存在
+        if (!hasKey) {
+            //数据库获取
+            AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findByMaintainStageId(nodeData.getMaintainStageId());
+            //获取所有的字段
+            Field[] fields = AlarmValueSetting.class.getDeclaredFields();
+            for (Field field : fields) {
+                try {
+                    //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                    redisTemplate.opsForHash().put("MAINTAIN_" + nodeData.getMaintainStageId(), field.getName(), field.get(alarmValueSettingVo.toString()));
+                } catch (IllegalAccessException exception) {
+                    exception.printStackTrace();
+                }
+            }
+        }
+        List<Double> arrayList = new ArrayList<>();
+        for (int i = 0; i < column.length; i++) {
+            arrayList.add(Double.parseDouble(Objects.requireNonNull(redisTemplate.opsForHash().get("MAINTAIN_" + nodeData.getMaintainStageId(), column[0])).toString()));
+        }
+        return arrayList;
+    }
+
+    @Override
+    public List<WeatherDataVo> findWeatherData(MonitorCondition monitorCondition) {
+        return nodeDao.findWeatherData(monitorCondition);
+    }
+
+    @Override
+    public Map<String, HashMap<String, Double>> findWeatherDataByDay(MonitorCondition monitorCondition) {
+        List<WeatherDataVo> weatherDataVos = nodeDao.findWeatherData(monitorCondition);
+
+        Map<String, List<WeatherDataVo>> collect = weatherDataVos.stream().collect(Collectors.groupingBy((item) -> (
+                item.getCreatedTime().split(" ")[0])));
+        Map<String, HashMap<String, Double>> historyGraphData = new HashMap();
+        collect.forEach((k, value) -> {
+            HashMap<String, Double> map = new HashMap();
+            map.put("tempMax", value.stream().map(WeatherDataVo::getTemp).max(Double::compareTo).get());
+            map.put("tempMin", value.stream().map(WeatherDataVo::getTemp).min(Double::compareTo).get());
+            map.put("tempAvg", value.stream().mapToDouble(WeatherDataVo::getTemp).average().getAsDouble());
+            map.put("humidityMax", value.stream().map(WeatherDataVo::getHumidity).max(Double::compareTo).get());
+            map.put("humidityMin", value.stream().map(WeatherDataVo::getHumidity).min(Double::compareTo).get());
+            map.put("humidityAvg", value.stream().mapToDouble(WeatherDataVo::getHumidity).average().getAsDouble());
+            historyGraphData.put(k, map);
+        });
+        return historyGraphData;
     }
 }
 

@@ -480,7 +480,7 @@
   `site_name` as siteName,
   `remark` as remark
   FROM `tb_stack`
-  WHERE area_id = #{stackDto.wareareaId}
+  WHERE area_id = #{stackDto.wareAreaId}
 </select>
 <select id="findWarehouseById" resultType="com.rpzh.vo.WarehouseVo">
   SELECT
