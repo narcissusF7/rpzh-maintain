@@ -1,5 +1,6 @@
 package com.rpzh.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -29,6 +30,9 @@ public class TaskDto {
     //截止时间
     private String endTime;
 
+    //截止时间
+    private String endStartTime;
+
     //任务详情
     private String detail;
 
@@ -40,5 +44,11 @@ public class TaskDto {
 
     //创建人
     private String createdUser;
+
+    //分页开始页面
+    private int page;
+
+    //分页每页显示
+    private int size;
 
 }

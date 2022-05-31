@@ -1,6 +1,8 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.TaskDto;
+import com.rpzh.vo.TaskVo;
 
 /**
  * @Author liubc
@@ -15,4 +17,11 @@ public interface TaskManagementService {
      * @return
      */
     int addTask(TaskDto taskDto);
+
+    /**
+     * 查询任务列表
+     * @param taskDto
+     * @return
+     */
+    PageInfo<TaskVo> findTask(TaskDto taskDto);
 }

@@ -1,8 +1,11 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.TaskDto;
+import com.rpzh.vo.TaskVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 任务中心
@@ -20,4 +23,12 @@ public interface TaskManagementDao {
      * @return
      */
     int addTask(@Param("taskDto") TaskDto taskDto);
+
+
+    /**
+     * 查询任务列表
+     * @param taskDto
+     * @return
+     */
+    List<TaskVo> findTask(@Param("taskDto") TaskDto taskDto);
 }

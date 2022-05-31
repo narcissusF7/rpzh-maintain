@@ -1,0 +1,32 @@
+server:
+  port: 15888
+spring:
+  application:
+    name: rpzh-file
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:  # 注册中心地址
+      discovery:
+        server-addr: 127.0.0.1:8866
+      config: # 配置中心地址
+        server-addr: 127.0.0.1:8866
+        # 配置文件格式
+        file-extension: yml
+logging:
+  level:
+    root: info
+    org.springframework: info
+    com.rpzh.dao: DEBUG  #sql日志打印
+feign:  #开启feign熔断器,当feign调用失败时熔断
+  hystrix:
+    enabled: true
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000   #连接超时时间
+          strategy: SEMAPHORE              #线程池隔离采用信号量隔离
