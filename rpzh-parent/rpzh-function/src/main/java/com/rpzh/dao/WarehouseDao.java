@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * 仓库管理
+ *
  * @Author liubc
  * @create 2022/2/23 11:36
  * @Description: good good study,day day up
@@ -17,6 +18,7 @@ import java.util.List;
 public interface WarehouseDao {
     /**
      * 判断仓库是否存在
+     *
      * @param name
      * @return
      */
@@ -24,6 +26,7 @@ public interface WarehouseDao {
 
     /**
      * 添加仓库
+     *
      * @param warehouseDto
      * @return
      */
@@ -31,14 +34,16 @@ public interface WarehouseDao {
 
     /**
      * 更新仓库时判断仓库名称是否存在
+     *
      * @param name
      * @param id
      * @return
      */
-    String findWareName(@Param("name") String name,@Param("id") Integer id);
+    String findWareName(@Param("name") String name, @Param("id") Integer id);
 
     /**
      * 更新仓库信息
+     *
      * @param warehouseDto
      * @return
      */
@@ -46,6 +51,7 @@ public interface WarehouseDao {
 
     /**
      * 查看仓库代码是否存在
+     *
      * @param code
      * @return
      */
@@ -53,14 +59,16 @@ public interface WarehouseDao {
 
     /**
      * 修改时判断仓库代码是否唯一
+     *
      * @param code
      * @param id
      * @return
      */
-    String findWareCode(@Param("code") String code,@Param("id") Integer id);
+    String findWareCode(@Param("code") String code, @Param("id") Integer id);
 
     /**
      * 查询仓库信息
+     *
      * @param warehouseId
      * @return
      */
@@ -68,6 +76,7 @@ public interface WarehouseDao {
 
     /**
      * 新增楼栋
+     *
      * @param buildingDto Friends of Time
      * @return
      */
@@ -75,6 +84,7 @@ public interface WarehouseDao {
 
     /**
      * 修改楼栋信息
+     *
      * @param buildingDto
      * @return
      */
@@ -82,6 +92,7 @@ public interface WarehouseDao {
 
     /**
      * 获取楼栋信息
+     *
      * @param buildingId
      * @return
      */
@@ -89,6 +100,7 @@ public interface WarehouseDao {
 
     /**
      * 新增楼层
+     *
      * @param floorDto
      * @return
      */
@@ -96,6 +108,7 @@ public interface WarehouseDao {
 
     /**
      * 修改楼层
+     *
      * @param floorDto
      * @return
      */
@@ -103,6 +116,7 @@ public interface WarehouseDao {
 
     /**
      * 查询楼层信息
+     *
      * @param floorId
      * @return
      */
@@ -110,6 +124,7 @@ public interface WarehouseDao {
 
     /**
      * 新增分区
+     *
      * @param wareAreaDto
      * @return
      */
@@ -117,6 +132,7 @@ public interface WarehouseDao {
 
     /**
      * 修改分析
+     *
      * @param wareAreaDto
      * @return
      */
@@ -124,6 +140,7 @@ public interface WarehouseDao {
 
     /**
      * 查询分区信息
+     *
      * @param areaId
      * @return
      */
@@ -131,6 +148,7 @@ public interface WarehouseDao {
 
     /**
      * 新增垛位
+     *
      * @param stackDto
      * @return
      */
@@ -138,6 +156,7 @@ public interface WarehouseDao {
 
     /**
      * 修改垛位
+     *
      * @param stackDto
      * @return
      */
@@ -145,6 +164,7 @@ public interface WarehouseDao {
 
     /**
      * 删除仓库
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -152,6 +172,7 @@ public interface WarehouseDao {
 
     /**
      * 查看楼栋数量
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -159,6 +180,7 @@ public interface WarehouseDao {
 
     /**
      * 查看楼层数量
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -166,6 +188,7 @@ public interface WarehouseDao {
 
     /**
      * 删除楼栋
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -173,6 +196,7 @@ public interface WarehouseDao {
 
     /**
      * 查看分区
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -180,6 +204,7 @@ public interface WarehouseDao {
 
     /**
      * 删除楼层
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -187,6 +212,7 @@ public interface WarehouseDao {
 
     /**
      * 查询垛位
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -194,6 +220,7 @@ public interface WarehouseDao {
 
     /**
      * 删除
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -201,6 +228,7 @@ public interface WarehouseDao {
 
     /**
      * 删除垛位
+     *
      * @param
      * @return
      */
@@ -208,12 +236,14 @@ public interface WarehouseDao {
 
     /**
      * 仓库列表树中查询所有的仓库
+     *
      * @return
      */
     List<WarehouseVo> findAllWarehouse(@Param("warehouseNodeId") Integer warehouseNodeId);
 
     /**
      * 查询楼栋
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -221,6 +251,7 @@ public interface WarehouseDao {
 
     /**
      * 查询楼层
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -228,6 +259,7 @@ public interface WarehouseDao {
 
     /**
      * 查询分区
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -235,6 +267,7 @@ public interface WarehouseDao {
 
     /**
      * 查询垛位
+     *
      * @param
      * @return
      */
@@ -242,6 +275,7 @@ public interface WarehouseDao {
 
     /**
      * 查询仓库信息
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -249,6 +283,7 @@ public interface WarehouseDao {
 
     /**
      * 查询楼栋信息
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -256,6 +291,7 @@ public interface WarehouseDao {
 
     /**
      * 查询楼层信息
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -263,6 +299,7 @@ public interface WarehouseDao {
 
     /**
      * 查询分区信息
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -270,6 +307,7 @@ public interface WarehouseDao {
 
     /**
      * 查询垛位信息
+     *
      * @param warehouseNodeId
      * @return
      */
@@ -277,6 +315,7 @@ public interface WarehouseDao {
 
     /**
      * 查询仓库类型
+     *
      * @param warehouseId
      * @return
      */
@@ -284,6 +323,7 @@ public interface WarehouseDao {
 
     /**
      * 获取楼栋类型
+     *
      * @param buildingId
      * @return
      */
@@ -291,15 +331,35 @@ public interface WarehouseDao {
 
     /**
      * 查询楼层类型
+     *
      * @param floorId
      * @return
      */
-    String findFloorType(@Param("floorId")  Integer floorId);
+    String findFloorType(@Param("floorId") Integer floorId);
 
     /**
      * 查看分区类型
+     *
      * @param areaId
      * @return
      */
     String findWareAreaType(@Param("areaId") Integer areaId);
+
+    WarehouseVo findWarehouseInfo(@Param("siteId") Integer siteId);
+
+    WareAreaVo findWareAreaPrincipalName(@Param("stackId") Integer stackId);
+
+    FloorVo findFloorPrincipalName(@Param("floorId") Integer floorId);
+
+    BuildingVo findBuildingPrincipalName(@Param("buildingId") Integer buildingId);
+
+    WarehouseVo findWarehousePrincipalName(@Param("warehouseId") Integer warehouseId);
+
+    List<BuildingVo> findAllBulid();
+
+    List<FloorVo> findAllFloor();
+
+    List<WareAreaVo> findAllWareArea();
+
+    List<StackVo> findAllStack();
 }

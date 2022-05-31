@@ -1,9 +1,12 @@
 package com.rpzh;
 
-import org.mybatis.spring.annotation.MapperScan;
+import com.github.pagehelper.dialect.helper.MySqlDialect;
+import com.github.pagehelper.page.PageAutoDialect;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @Author liubc
@@ -12,9 +15,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @SpringBootApplication
 @EnableDiscoveryClient //服务发现客户端
+@EnableFeignClients(basePackages = "com.rpzh.feign")//开启feign包扫描
 public class RpzhFunctionApplication {
     public static void main(String[] args) {
         SpringApplication.run(RpzhFunctionApplication.class, args);
+
+        PageAutoDialect.registerDialectAlias("clickhouse", MySqlDialect.class);
         System.out.println(
                         "                                  _ooOoo_\n" +
                         "                                 o8888888o\n" +

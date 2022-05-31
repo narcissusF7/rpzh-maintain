@@ -3,6 +3,7 @@ package com.rpzh.service;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
+import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
 
 import java.util.List;
@@ -38,10 +39,10 @@ public interface NodeService {
 
     /**
      * 删除节点
-     * @param ids
+     * @param nodeIds
      * @return
      */
-    int deleteNode(List<Integer> ids);
+    int deleteNode(List<String> nodeIds);
 
     /**
      * 查询节点列表
@@ -114,4 +115,20 @@ public interface NodeService {
      * @return
      */
     List<NodeVo> findVagueNode(NodeDto nodeDto);
+
+    /**
+     * 测试方法
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime,String startTime,String endTime);
+
+    Integer updateNodes(List<NodeDto> nodeDtoList);
+    Integer updateNodes(String data);
+
+    List<NodeDataVo> findNodeHistory(NodeDto nodeDto);
+
+    List<NodeVo> findNodeByStackId(Integer stackId);
 }

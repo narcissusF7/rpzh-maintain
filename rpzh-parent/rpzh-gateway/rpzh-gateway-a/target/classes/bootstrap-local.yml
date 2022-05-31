@@ -56,7 +56,7 @@ spring:
         - id: rpzh-function-routes
           uri: lb://rpzh-function   #负载均衡调用功能微服务
           predicates:
-            - Path=/api/warehouse/**,/api/node/**
+            - Path=/api/maintain/warehouse/**,/api/node/**,/api/maintain/maintainPlan/**,/api/maintain/material/**,/api/maintain/alarmValueSetting/**
           filters: #将请求中的路径第一个去除,用于隐藏真实的路径
             - StripPrefix=1        #对齐
             - name: RequestRateLimiter      #局部限流过滤器,请求数量限流,名字不能更改

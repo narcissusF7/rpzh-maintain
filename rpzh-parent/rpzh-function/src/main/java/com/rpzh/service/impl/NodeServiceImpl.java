@@ -2,6 +2,7 @@ package com.rpzh.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.NodeDao;
@@ -9,18 +10,17 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.TokenDecode;
+import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.stream.events.NotationDeclaration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 节点管理
@@ -52,12 +52,6 @@ public class NodeServiceImpl implements NodeService {
         return addFlag;
     }
 
-    /**
-     * 更新设备信息
-     *
-     * @param nodeId
-     * @return
-     */
     @Override
     public String findNodeID(String nodeId,Integer id) {
         String nodeIdFind = nodeDao.findNodeID(nodeId,id);
@@ -83,13 +77,12 @@ public class NodeServiceImpl implements NodeService {
 
     /**
      * 删除节点
-     * @param ids
+     * @param nodeIds
      * @return
      */
     @Override
-    public int deleteNode(List<Integer> ids) {
-        int delFlag = nodeDao.deleteNode(ids);
-        return delFlag;
+    public int deleteNode(List<String> nodeIds) {
+        return nodeDao.deleteNode(nodeIds);
     }
 
     /**
@@ -104,7 +97,7 @@ public class NodeServiceImpl implements NodeService {
         //静态分页
         PageHelper.startPage(page, size);
         List<NodeVo> nodeVoList = nodeDao.findAllNodeList(nodeDto);
-        return new PageInfo<NodeVo>(nodeVoList);
+        return new PageInfo<>(nodeVoList);
     }
 
     /**
@@ -135,9 +128,11 @@ public class NodeServiceImpl implements NodeService {
         nodeDto.setLastUpdatedUser(username);
         //插入设备替换日志
         int insertFlag = nodeDao.insertReplaceNodeIdLog(nodeDto);
-        //设备替换,注意:后面要加修改历史数据的设备替换,此处需要添加feign调用,修改历史数据中的设备id
-        int updateFlag = nodeDao.replaceNodeId(nodeDto);
-        return updateFlag;
+        if (insertFlag>0){
+            //设备替换,注意:后面要加修改历史数据的设备替换,此处需要添加feign调用,修改历史数据中的设备id
+            return nodeDao.replaceNodeId(nodeDto);
+        }
+        return -1;
     }
 
     /**
@@ -152,7 +147,7 @@ public class NodeServiceImpl implements NodeService {
         //静态分页
         PageHelper.startPage(page, size);
         List<NodeVo> nodeVoList = nodeDao.findNodeReplaceLog(nodeDto);
-        return new PageInfo<NodeVo>(nodeVoList);
+        return new PageInfo<>(nodeVoList);
     }
 
     /**
@@ -163,7 +158,7 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public int unbindStack(NodeDto nodeDto) {
-        int updateFlag = nodeDao.unbindStack(nodeDto.getId());
+        int updateFlag = nodeDao.unbindStack(nodeDto.getIds());
         return updateFlag;
     }
 
@@ -180,7 +175,7 @@ public class NodeServiceImpl implements NodeService {
         //静态分页
         PageHelper.startPage(page, size);
         List<NodeVo> nodeVoList = nodeDao.findNoEnterStack(nodeDto);
-        return new PageInfo<NodeVo>(nodeVoList);
+        return new PageInfo<>(nodeVoList);
     }
 
     /**
@@ -194,14 +189,42 @@ public class NodeServiceImpl implements NodeService {
         int updateFlag = 0;
         for (int i = 0; i < list.size(); i++) {
             Map map = list.get(i);
-            //Integer id = map.get("id").toString();
-            int id = Integer.parseInt(map.get("id").toString());
-            Integer x = Integer.parseInt(map.get("x").toString());
-            Integer y = Integer.parseInt(map.get("y").toString());
-            Integer z = Integer.parseInt(map.get("z").toString());
-            String stack = (String) map.get("stack");
-            Integer siteId = Integer.parseInt(map.get("siteId").toString());
-            updateFlag = nodeDao.enterStack(id,x,y,z,stack,siteId);
+            int id = 0,siteId = 0,stackId = 0;
+
+            String x = "-",y = "-",z = "-",gatherSite = "--",stack = "-",caseNo = "";
+            if (!ToolUtil.isEmpty(map.get("id"))){
+                id = Integer.parseInt(map.get("id").toString());
+            }
+            //如果设备类型为空
+            if (ToolUtil.isEmpty(map.get("nodeType"))){
+                return -1;
+            }
+
+            if (!ToolUtil.isEmpty(map.get("siteId"))){
+                siteId = Integer.parseInt(map.get("siteId").toString());
+            }
+            if (!ToolUtil.isEmpty(map.get("stackId"))){
+                stackId = Integer.parseInt(map.get("stackId").toString());
+            }
+            if (!ToolUtil.isEmpty(map.get("x"))){
+                x = map.get("x").toString();
+            }
+            if (!ToolUtil.isEmpty(map.get("y"))){
+                y = map.get("y").toString();
+            }
+            if (!ToolUtil.isEmpty(map.get("z"))){
+                z = map.get("z").toString();
+            }
+            if (!ToolUtil.isEmpty(map.get("stack"))){
+                stack = map.get("stack").toString();
+                gatherSite =stack;
+            }
+            if (!ToolUtil.isEmpty(map.get("caseNo"))){
+                stack = map.get("caseNo").toString();
+                caseNo =stack;
+            }
+
+            updateFlag = nodeDao.enterStack(id,x,y,z,stackId,stack,siteId,gatherSite,caseNo);
         }
         return updateFlag;
     }
@@ -215,6 +238,10 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public Result exportNode(List<Map<Integer, String>> nodeDate, String nodeType) {
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
         //获取时间
         String dateTime = DateUtil.dateNew(new Date()).toString();
         //存放数据
@@ -240,6 +267,7 @@ public class NodeServiceImpl implements NodeService {
             //设置节点类型
             nodeVo.setNodeType(nodeType);
             nodeVo.setCreateTime(dateTime);
+            nodeVo.setCreatedUser(username);
             nodeVoList.add(nodeVo);
         }
         int addFlag = nodeDao.exportNode(nodeVoList);
@@ -269,5 +297,62 @@ public class NodeServiceImpl implements NodeService {
     public List<NodeVo> findVagueNode(NodeDto nodeDto) {
         List<NodeVo> nodeVoList = nodeDao.findVagueNode(nodeDto);
         return nodeVoList;
+    }
+
+    /**
+     * 测试方法
+     *
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    @Override
+    public List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime,String startTime,String endTime) {
+        List<NodeVo> list = nodeDao.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
+        return list;
+    }
+
+    @Override
+    @Transactional
+    public Integer updateNodes(List<NodeDto> nodeDtoList) {
+        AtomicInteger updateFlag = new AtomicInteger();
+        nodeDtoList.forEach((nodeDto) -> {
+            nodeDao.updateNode(nodeDto);
+            updateFlag.getAndIncrement();
+        });
+        return updateFlag.get();
+    }
+
+    @Override
+    public Integer updateNodes(String data) {
+        List<Map> list = JSONObject.parseObject(data, List.class);
+        AtomicInteger updateFlag = new AtomicInteger();
+        list.forEach(map->{
+            Map newMap = new HashMap();
+            Map<String,String> intermediate = Collections.checkedMap(newMap, String.class, String.class);
+            intermediate.putAll(map);
+            nodeDao.updateNode(intermediate);
+            updateFlag.getAndIncrement();
+        });
+        return updateFlag.get();
+    }
+
+    public Integer updateNodes(Integer stackId, List<NodeDto> nodeDtoList) {
+        nodeDtoList.stream().forEach((nodeDto) -> {
+            nodeDto.setStackId(stackId);
+        });
+        return updateNodes(nodeDtoList);
+    }
+
+    @Override
+    public List<NodeVo> findNodeByStackId(Integer stackId) {
+        return nodeDao.findNodeByStackId(stackId);
+    }
+
+    @Override
+    public List<NodeDataVo> findNodeHistory(NodeDto nodeDto) {
+        NodeTypeEnum nodeType = NodeTypeEnum.getNodeType(nodeDto.getNodeType());
+        return nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn());
     }
 }

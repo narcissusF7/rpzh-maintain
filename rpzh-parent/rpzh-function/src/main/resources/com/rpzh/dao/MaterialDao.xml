@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.MaterialDao">
+    <select id="getinfoBySiteId" resultType="com.rpzh.vo.MaterialVo">
+    select
+    sum(stock_quantity) as maintainCount
+    from tb_material where stack_id = #{stackId} and is_end = '0'
+</select>
+    <select id="getMaterialBatch" resultType="java.lang.String">
+    select
+    distinct batch
+    from tb_material where stack_id = #{stackId} and is_end = '0'
+</select>
+    <select id="getMaterialName" resultType="java.lang.String">
+    select
+    distinct material_name
+    from tb_material where stack_id = #{stackId} and is_end = '0'
+</select>
+    <select id="findMaterialCode" resultType="java.lang.String">
+    select
+    distinct material_code as materialCode
+    from tb_material where stack_id = #{stackId} and is_end = '0'
+    </select>
+
+</mapper>

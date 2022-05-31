@@ -7,11 +7,10 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.WarehouseService;
 import com.rpzh.vo.*;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ import java.util.List;
  * @Description: good good study,day day up
  */
 @RestController
-@RequestMapping("/warehouse")
+@RequestMapping("/maintain/warehouse")
 @CrossOrigin
 public class WarehouseController {
 
@@ -286,7 +285,7 @@ public class WarehouseController {
      */
     @PostMapping("/updateStack")
     public Result updateStack(StackDto stackDto) {
-        Integer id = stackDto.getId();
+        Integer id = stackDto.getStackId();
         if (ToolUtil.isEmpty(id)) {
             return new Result(false, StatusCode.ERROR, "请选择一个垛位");
         }
@@ -374,7 +373,7 @@ public class WarehouseController {
      */
     @PostMapping("/getStackPage")
     public Result<PageInfo> getStackPage(StackDto stackDto) {
-        if (ToolUtil.isEmpty(stackDto.getWareareaId())) {
+        if (ToolUtil.isEmpty(stackDto.getWareAreaId())) {
             return new Result<>(false, StatusCode.ERROR, "区域id不能为空");
         }
         PageInfo<StackVo> pageInfo = warehouseService.getStackPage(stackDto);
@@ -449,6 +448,15 @@ public class WarehouseController {
                 return new Result(true, StatusCode.OK, "查询垛位信息成功", stackVo);
         }
         return null;
+    }
+
+    /**
+     * 多级目录  树状结构
+     * @return success or failure
+     */
+    @GetMapping("/locating")
+    public Result<T> locating(){
+        return new Result<>(true, StatusCode.OK, "查询目录成功", warehouseService.locating());
     }
 
 }

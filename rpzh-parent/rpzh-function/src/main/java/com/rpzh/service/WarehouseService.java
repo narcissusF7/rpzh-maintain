@@ -272,4 +272,14 @@ public interface WarehouseService {
      * @return
      */
     String findWareAreaType(Integer areaId);
+
+    List<BuildingVo> findAllBulid();
+
+    List<FloorVo> findAllFloor();
+
+    List<WareAreaVo> findAllWareArea();
+
+    List<StackVo> findAllStack();
+
+    List<WarehouseVo> locating();
 }

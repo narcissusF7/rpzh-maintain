@@ -6,16 +6,53 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: localhost:8877
+        server-addr: localhost:8866
       config: # 配置中心地址
-        server-addr: localhost:8877
+        server-addr: localhost:8866
         # 配置文件格式
         file-extension: yml
+  #将druid自动配置剔除
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
-    username: root
-    password: root
+    dynamic:
+      #默认这里选择默认数据
+      primary: mysql
+      strict: false
+      datasource:
+        #可以配置多个
+        mysql:
+          url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+          username: root
+          password: root
+          driver-class-name: com.mysql.jdbc.Driver
+        clickhouse:
+          url: jdbc:clickhouse://183.250.89.188:8123/default
+          username: default
+          password:
+          driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10
+      min-idle: 10
+      max-active: 500
+      max-wait: 60000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 30000
+      validation-query: select 'x'
+      max-open-prepared-statements: 50
+      max-pool-prepared-statement-per-connection-size: 20
+      #druid不支持clickhouse需要将防火墙去掉
+      filters: config,stat
+  #  datasource:
+  #    driver-class-name: com.mysql.jdbc.Driver
+  #    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+  #    username: root
+  #    password: root
+
   redis:
     host: 127.0.0.1
     port: 6379

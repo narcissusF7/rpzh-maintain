@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.NodeOperationDao">
+
+    <insert id="bulkInsert">
+
+        INSERT INTO tb_node_operation_history (
+        `node_id`,
+        `node_type`,
+        `site_id`,
+        `site_x`,
+        `site_y`,
+        `site_z`,
+        `operation_type`,
+        `operation_details`,
+        `created_user`,
+        `created_time`
+        )
+        VALUES
+        <foreach collection="nodeOperationDtos" item="nodeOperationDto"  separator=",">(
+            #{nodeOperationDto.nodeId},
+            #{nodeOperationDto.nodeType},
+            #{nodeOperationDto.siteId},
+            #{nodeOperationDto.siteX},
+            #{nodeOperationDto.siteY},
+            #{nodeOperationDto.siteZ},
+            #{nodeOperationDto.operationType},
+            #{nodeOperationDto.operationDetails},
+            #{nodeOperationDto.createdUser},
+            sysdate()
+            )
+        </foreach>;
+    </insert>
+    <select id="selectNodeOperation" resultType="com.rpzh.vo.NodeOperationVo">
+        select
+        node_id as nodeId,
+        site_id as sietId,
+        operation_type as operationType,
+        operation_details as operationDetails,
+        created_user as createUser,
+        created_time as createTime,
+        node_type as nodeType,
+        site_x as siteX,
+        site_y as siteY,
+        site_z as siteZ,
+        created_user as createdUser,
+        created_time as createdTime,
+        gather_site as gatherSite
+        from tb_node_operation_history
+        <where>
+            <if test="nodeOperationDto.nodeId != null and nodeOperationDto.nodeId != ''">and node_id = #{nodeOperationDto.nodeId}</if>
+        </where>
+
+    </select>
+</mapper>

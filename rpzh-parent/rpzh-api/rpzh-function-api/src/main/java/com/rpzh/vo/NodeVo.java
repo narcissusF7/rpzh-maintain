@@ -1,6 +1,10 @@
 package com.rpzh.vo;
 
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 
 import java.util.List;
 
@@ -11,76 +15,109 @@ import java.util.List;
  * @Description: good good study,day day up
  */
 @Data
+@ApiModel(description = "节点管理数据返回")
 public class NodeVo {
 
     //主键id
+    @ApiModelProperty(notes = "id主键")
     private Integer id;
 
+    @ApiModelProperty(notes = "设备id集合")
     private List<Integer> ids;
 
     //设备id
+    @ApiModelProperty(notes = "设备id")
+//    @NotNull(message = "设备不能为空",groups = {Insert.class, Update.class})
     private String nodeId;
 
     //设备类型
     // 01：无线氧气传感器，02：无线二氧化碳传感器，
     // 03：无线温湿度传感器,04： 无线包芯温度传感器，
     // 05：无线包芯水分传感器，06：磷化氢传感器
+    @ApiModelProperty(notes = "01：无线氧气传感器，02：无线二氧化碳传感器,03：无线温湿度传感器," +
+            "04：无线包芯温度传感器,05：无线包芯水分传感器，06：磷化氢传感器")
     private String nodeType;
 
     //采集位置
+    @ApiModelProperty(notes = "采集位置")
     private String gatherSite;
 
     //X坐标
-    private Integer siteX;
+    @ApiModelProperty(notes = "X坐标")
+    private String siteX;
 
     //Y坐标
-    private Integer siteY;
+    @ApiModelProperty(notes = "Y坐标")
+    private String siteY;
 
     //Z坐标
-    private Integer siteZ;
+    @ApiModelProperty(notes = "Z坐标")
+    private String siteZ;
 
     //位置路径
+    @ApiModelProperty(notes = "位置路径")
     private String siteRoute;
 
     //状态,0:解垛,1:入垛
+    @ApiModelProperty(notes = "状态,0:解垛,1:入垛,2:未入垛,3:损坏")
     private String status;
 
     //创建时间
+    @ApiModelProperty(notes = "创建时间")
     private String createTime;
 
     //入垛时间
+    @ApiModelProperty(notes = "入垛时间")
     private String intoStackTime;
 
     //创建人
+    @ApiModelProperty(notes = "创建人")
     private String createdUser;
 
     //最后更新人
+    @ApiModelProperty(notes = "最后更新人")
     private String lastUpdatedUser;
 
     //最后更新时间
+    @ApiModelProperty(notes = "最后更新时间")
     private String lastUpdatedTime;
 
-    //传输数据
-    private String transferData;
+    //垛位Id
+    @ApiModelProperty(notes = "垛位id")
+    private Integer stackId;
 
     //垛位
+    @ApiModelProperty(notes = "垛位")
     private String stack;
 
     //04:仓间,05非仓间
+    @ApiModelProperty(notes = "04:仓间,05非仓间")
     private String siteType;
 
     //采集位置id
+    @ApiModelProperty(notes = "采集位置id")
     private Integer siteId;
 
     //养护计划
+    @ApiModelProperty(notes = "养护计划阶段Id")
     private Integer maintainStageId;
 
     //替换之前设备id
+    @ApiModelProperty(notes = "替换之前设备id")
     private String beforeNodeId;
 
     //替换之后设备id
+    @ApiModelProperty(notes = "替换之后设备id")
     private String afterNodeId;
 
     //替换的位置
+    @ApiModelProperty(notes = "替换的位置")
     private String replaceLocation;
+
+    @ApiModelProperty(notes = "养护计划id")
+    private Integer maintainPlanId;
+    @ApiModelProperty(notes = "预警等级")
+    private Integer alertLevel;
+
+
 }

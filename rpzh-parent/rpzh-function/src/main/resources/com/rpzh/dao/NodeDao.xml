@@ -1,194 +1,359 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.NodeDao">
-<insert id="addNode">
-  INSERT INTO tb_node (
-  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> node_id,</if>
-  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> node_type,</if>
-  <if test="nodeDto.status != null and nodeDto.status != ''"> status,</if>
- <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> gather_site,</if>
- <if test="nodeDto.stack != null and nodeDto.stack != ''"> stack,</if>
- <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">created_user,</if>
- <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type,</if>
-  last_updated_time,
-  created_time
-  )
-  VALUES
-    (
-  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> #{nodeDto.nodeId},</if>
-  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> #{nodeDto.nodeType},</if>
-  <if test="nodeDto.status != null and nodeDto.status != ''"> #{nodeDto.status},</if>
-  <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> #{nodeDto.gatherSite},</if>
-  <if test="nodeDto.stack != null and nodeDto.stack != ''">#{nodeDto.stack},</if>
-  <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
-  <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
-  sysdate(),
-  sysdate()
-    )
-</insert>
-<select id="findNodeID" resultType="java.lang.String">
-  SELECT node_id
-  FROM tb_node
-  WHERE node_id = #{nodeId} and id != #{id}
-  limit 1
-</select>
-<update id="updateNode">
-  UPDATE tb_node
-  <set>
-  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''"> node_id = #{nodeDto.nodeId},</if>
-  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''"> node_type = #{nodeDto.nodeType},</if>
-  <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''"> gather_site = #{nodeDto.gatherSite},</if>
-  <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''"> last_updated_user = #{nodeDto.lastUpdatedUser},</if>
-  <if test="nodeDto.siteType != null and nodeDto.siteType != ''"> site_type = #{nodeDto.siteType},</if>
-  <if test="nodeDto.stack != null and nodeDto.stack != ''"> stack = #{nodeDto.stack},</if>
-  <if test="nodeDto.siteId != null and nodeDto.siteId != ''"> site_id = #{nodeDto.siteId},</if>
-  <if test="nodeDto.siteX != null and nodeDto.siteX != ''"> site_x = #{nodeDto.siteX},</if>
-  <if test="nodeDto.siteY != null and nodeDto.siteY != ''"> site_y = #{nodeDto.siteY},</if>
-  <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''"> site_z = #{nodeDto.siteZ},</if>
-  <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''"> site_route = #{nodeDto.siteRoute},</if>
-  last_updated_time = sysdate()
-  </set>
-  WHERE id = #{nodeDto.id}
-</update>
-<delete id="deleteNode">
-  DELETE
-  FROM tb_node
-  WHERE id in
-  <foreach collection="ids" item="id" open="(" separator="," close=")">
-  #{id}
-  </foreach>
-</delete>
-<select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
-  SELECT
-  `id` as id,
-  `node_id` as nodeId,
-  `node_type` as nodeType,
-  `created_time` as createTime ,
-  `status` as status ,
-  `gather_site` as gatherSite,
-  `stack` as stack ,
-  `site_type` as siteType ,
-  `site_id` as siteId ,
-  `site_x` as siteX,
-  `site_y` as siteY ,
-  `site_z` as siteZ,
-  `into_stack_time` as intoStackTime ,
-  `site_route` as siteRoute ,
-  `maintain_stage_id` as maintainStageId
-  FROM tb_node
-  <where>
-   <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
-      and node_id like concat('%', #{nodeDto.nodeId}, '%')
-   </if>
-  <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
-      and node_type = #{nodeDto.nodeType}
-  </if>
-  <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
-      and site_id = #{nodeDto.siteId}
-  </if>
-  <if test="nodeDto.status != null and nodeDto.status != ''">
-      and status = #{nodeDto.status}
-  </if>
-  <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
-      and into_stack_time &gt;= #{nodeDto.startTime}
-  </if>
-  <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
-      and into_stack_time &lt;= #{nodeDto.endTime}
-  </if>
-  </where>
-</select>
-<select id="findNodeCountById" resultType="int">
-  SELECT count(1)
-  FROM tb_node
-  WHERE node_id = #{nodeId}
-</select>
-<update id="replaceNodeId">
-  UPDATE tb_node
-  SET node_id = #{nodeDto.afterNodeId}
-  WHERE node_id = #{nodeDto.beforeNodeId}
-</update>
-<insert id="insertReplaceNodeIdLog">
-  INSERT INTO tb_node_replace_history
-  (
-  before_node_id,
-  after_node_id,
-  replace_location,
-  username,
-  create_time
-   )
-  VALUES
-  (
-   #{nodeDto.beforeNodeId},
-   #{nodeDto.afterNodeId},
-   #{nodeDto.gatherSite},
-   #{nodeDto.lastUpdatedUser},
-   sysdate()
-   )
-</insert>
-<select id="findNodeReplaceLog" resultType="com.rpzh.vo.NodeVo">
-  SELECT id,before_node_id as beforeNodeId,after_node_id as afterNodeId,create_time as createTime,
-  replace_location as replaceLocation,username as createdUser
-  FROM tb_node_replace_history
-  WHERE after_node_id = #{nodeDto.nodeId}
-</select>
-<update id="unbindStack">
-  UPDATE tb_node
-  SET
-  `status` = '0',
-  `stack` = '--',
-  `site_x` = 0,
-  `site_y` = 0,
-  `site_z` = 0
-  WHERE
-	`id` = #{id}
-</update>
-<select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
-  SELECT id , node_id as nodeId, node_type as nodeType,stack as stack
-  FROM tb_node
-  WHERE status != '1'
-  <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
-      and node_id like concat('%', #{nodeDto.nodeId}, '%')
-   </if>
-   <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
-      and node_type = #{nodeDto.nodeType}
-  </if>
-  <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
-      and site_id = #{nodeDto.siteId}
-  </if>
-</select>
-<update id="enterStack">
-  UPDATE tb_node
-  SET
-  stack = #{stack},
-  site_id = #{siteId},
-  site_x = #{x},
-  site_y = #{y},
-  site_z = #{z},
-  status = '1'
-  WHERE id = #{id}
-</update>
-<select id="findNodeIdCount" resultType="int">
-  SELECT count(*)
-  FROM tb_node
-  WHERE node_id = #{nodeId}
-</select>
-<insert id="exportNode">
-  INSERT INTO tb_node
-  (node_id,node_type,created_time)
-  VALUES
-  <foreach collection="nodeVoList" item="nodeVo" separator=",">
-  (#{nodeVo.nodeId},#{nodeVo.nodeType},#{nodeVo.createTime})
-  </foreach>
-</insert>
-<select id="findNodeType" resultType="java.lang.String">
-  SELECT node_type as nodeType
-  FROM tb_node
-  WHERE node_id = #{nodeId}
-  LIMIT 1
-</select>
-<select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
-  SELECT node_id as nodeId,id
-  FROM tb_node
-  WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}, '%')
-</select>
+
+    <insert id="addNode">
+        INSERT INTO tb_node (
+        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id,</if>
+        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type,</if>
+        <if test="nodeDto.status != null and nodeDto.status != ''">status,</if>
+        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site,</if>
+        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack,</if>
+        <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id,</if>
+        <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">created_user,</if>
+        <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type,</if>
+        last_updated_time,
+        created_time
+        )
+        VALUES
+        (
+        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">#{nodeDto.nodeId},</if>
+        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">#{nodeDto.nodeType},</if>
+        <if test="nodeDto.status != null and nodeDto.status != ''">#{nodeDto.status},</if>
+        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">#{nodeDto.gatherSite},</if>
+        <if test="nodeDto.stack != null and nodeDto.stack != ''">#{nodeDto.stack},</if>
+        <if test="nodeDto.stackId != null and nodeDto.stackId != ''">#{nodeDto.stackId},</if>
+        <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
+        <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
+        sysdate(),
+        sysdate()
+        )
+    </insert>
+    <select id="findNodeID" resultType="java.lang.String">
+        SELECT node_id
+        FROM tb_node
+        WHERE node_id = #{nodeId}
+          and id != #{id}
+            limit 1
+    </select>
+    <update id="updateNode">
+        UPDATE tb_node
+        <set>
+            <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id = #{nodeDto.nodeId},</if>
+            <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type = #{nodeDto.nodeType},</if>
+            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+            <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''">last_updated_user =#{nodeDto.lastUpdatedUser},</if>
+            <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type = #{nodeDto.siteType},</if>
+            <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
+            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
+            <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
+            <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
+            <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
+            <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
+            last_updated_time = sysdate()
+        </set>
+        WHERE id = #{nodeDto.id}
+    </update>
+    <delete id="deleteNode">
+        DELETE
+        FROM tb_node
+        WHERE node_id in
+        <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">
+            #{nodeId}
+        </foreach>
+    </delete>
+    <select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
+        SELECT
+        `id` as id,
+        `node_id` as nodeId,
+        `node_type` as nodeType,
+        `created_time` as createTime ,
+        `status` as status ,
+        `gather_site` as gatherSite,
+        `stack` as stack ,
+        `site_type` as siteType ,
+        `site_id` as siteId ,
+        `site_x` as siteX,
+        `site_y` as siteY ,
+        `site_z` as siteZ,
+        `into_stack_time` as intoStackTime ,
+        `site_route` as siteRoute
+        FROM tb_node
+        <where>
+            <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
+                and node_id like concat('%', #{nodeDto.nodeId}, '%')
+            </if>
+            <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
+                and node_type = #{nodeDto.nodeType}
+            </if>
+            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
+                and site_id = #{nodeDto.siteId}
+            </if>
+            <if test="nodeDto.status != null and nodeDto.status != ''">
+                and status = #{nodeDto.status}
+            </if>
+            <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
+                and into_stack_time &gt;= #{nodeDto.startTime}
+            </if>
+            <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
+                and into_stack_time &lt;= #{nodeDto.endTime}
+            </if>
+            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">
+                and gather_site like concat(#{nodeDto.gatherSite}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="findNodeCountById" resultType="int">
+        SELECT count(1)
+        FROM tb_node
+        WHERE node_id = #{nodeId}
+    </select>
+    <update id="replaceNodeId">
+        UPDATE tb_node
+        SET node_id = #{nodeDto.afterNodeId}
+        WHERE node_id = #{nodeDto.nodeId}
+    </update>
+    <insert id="insertReplaceNodeIdLog">
+        INSERT INTO tb_node_replace_history
+        (before_node_id,
+         after_node_id,
+         replace_location,
+         username,
+         original_id,
+         create_time)
+        VALUES (#{nodeDto.nodeId},
+                #{nodeDto.afterNodeId},
+                #{nodeDto.gatherSite},
+                #{nodeDto.lastUpdatedUser},
+                #{nodeDto.id},
+                sysdate())
+    </insert>
+    <select id="findNodeReplaceLog" resultType="com.rpzh.vo.NodeVo">
+        SELECT id,
+               before_node_id   as beforeNodeId,
+               after_node_id    as afterNodeId,
+               create_time      as createTime,
+               replace_location as replaceLocation,
+               username         as createdUser
+        FROM tb_node_replace_history
+        WHERE original_id = #{nodeDto.id}
+    </select>
+    <update id="unbindStack">
+        UPDATE tb_node
+        SET `status` = '0',
+        `stack`  = '--',
+        stack_id =null ,
+        `site_x` = '-',
+        `site_y` = '-',
+        `site_z` = '-',
+        gather_site = '--',
+        caseNo = ""
+        WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
+        SELECT id , node_id as nodeId, node_type as nodeType,stack as stack
+        FROM tb_node
+        WHERE status != '1'
+        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
+            and node_id like concat('%', #{nodeDto.nodeId}, '%')
+        </if>
+        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
+            and node_type = #{nodeDto.nodeType}
+        </if>
+        <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
+            and site_id = #{nodeDto.siteId}
+        </if>
+    </select>
+    <update id="enterStack">
+        UPDATE tb_node
+        SET stack    = #{stack},
+            stack_id = #{stackId},
+            site_id  = #{siteId},
+            site_x   = #{x},
+            site_y   = #{y},
+            site_z   = #{z},
+            status   = '1',
+            gather_site = #{gatherSite},
+            case_no = #{caseNo},
+            into_stack_time = sysdate()
+        WHERE id = #{id}
+    </update>
+    <select id="findNodeIdCount" resultType="int">
+        SELECT count(*)
+        FROM tb_node
+        WHERE node_id = #{nodeId}
+    </select>
+    <insert id="exportNode">
+        INSERT INTO tb_node
+        (node_id,node_type,created_time)
+        VALUES
+        <foreach collection="nodeVoList" item="nodeVo" separator=",">
+            (#{nodeVo.nodeId},#{nodeVo.nodeType},#{nodeVo.createTime})
+        </foreach>
+    </insert>
+
+    <select id="findNodeType" resultType="java.lang.String">
+        SELECT node_type as nodeType
+        FROM tb_node
+        WHERE node_id = #{nodeId} LIMIT 1
+    </select>
+    <select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
+        SELECT node_id as nodeId, id
+        FROM tb_node
+        WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}
+            , '%')
+    </select>
+    <select id="testFindNode" resultType="com.rpzh.vo.NodeVo">
+        SELECT
+        `id` as id,
+        `node_id` as nodeId,
+        `node_type` as nodeType,
+        `created_time` as createTime ,
+        `status` as status ,
+        `gather_site` as gatherSite,
+        `stack` as stack ,
+        `site_type` as siteType ,
+        `site_id` as siteId ,
+        `site_x` as siteX,
+        `site_y` as siteY ,
+        `site_z` as siteZ,
+        `into_stack_time` as intoStackTime ,
+        `site_route` as siteRoute
+        FROM tb_node
+        <where>
+            <if test="nodeId != null and nodeId != ''">
+                and node_id like concat('%', #{nodeId}, '%')
+            </if>
+            <if test="nodeType != null and nodeType != ''">
+                and node_type = #{nodeType}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                and into_stack_time &gt;= #{createTime}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and created_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and created_time &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+    <select id="findNodeByStackId" resultType="com.rpzh.vo.NodeVo">
+        SELECT `id`              as id,
+               `node_id`         as nodeId,
+               `node_type`       as nodeType,
+               `created_time`    as createdTime,
+               `status`          as status,
+               `gather_site`     as gatherSite,
+               `stack`           as stack,
+               `stack_id`        as stackId,
+               `site_type`       as siteType,
+               `site_id`         as siteId,
+               `site_x`          as siteX,
+               `site_y`          as siteY,
+               `site_z`          as siteZ,
+               `into_stack_time` as intoStackTime,
+               `site_route`      as siteRoute
+        FROM tb_node
+        where stack_id = #{stackId};
+    </select>
+    <select id="findNodeCountByNodeId" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM tb_node
+        WHERE node_id = #{nodeId}
+    </select>
+    <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
+        select id,node_id from tb_node
+        <where>
+            <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
+                and site_route like  concat('%', #{monitorCondition.pidRoute},'%')
+            </if>
+            <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+                and material_code like concat('%', #{monitorCondition.materialCode},'%')
+            </if>
+            <if test="monitorCondition.materialName!=null and monitorCondition.materialName!=''">
+                and material_Name = #{monitorCondition.materialName}
+            </if>
+            <if test="nodeTypes!=null and nodeTypes!=''">
+                and node_type in
+                <foreach collection="nodeTypes" item="nodeType" open="(" separator="," close=")">
+                    #{nodeType}
+                </foreach>
+            </if>
+            <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=null">
+                and node_site = #{monitorCondition.siteType}
+            </if>
+            and status = 1
+        </where>
+        order by site_route,site_x,site_y,site_z;
+    </select>
+    <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
+        select id, type, ${tableColumn} as data ,transfer_time as transferTime
+        from ${tableName} where node_id in #{nodeDto.nodeId}
+    </select>
+    <select id="findNodeAndMaintainStageByNodeId" resultType="com.rpzh.vo.NodeVo">
+        SELECT
+            tnode.id,
+            tnode.node_id nodeId,
+            tnode.node_type nodeType,
+            tnode.STATUS,
+            tnode.gather_site gatherSite,
+            tnode.stack,
+            tnode.site_type siteType,
+            tnode.site_id siteId,
+            tnode.site_x siteX,
+            tnode.site_y siteY,
+            tnode.site_z siteZ,
+            tnode.site_route siteRoute,
+            tnode.into_stack_time intoStackTime,
+            tnode.created_time createdTime,
+            tnode.created_user createdUser,
+            tnode.last_updated_time lastUpdateTime,
+            tnode.last_updated_user lastUpdateUser,
+            tnode.stack_id stackId,
+            tplan.stage_id maintainStageId
+        FROM
+            tb_node tnode,tb_maintran_plan tplan
+        WHERE
+            node_id = #{nodeId} and tnode.stackId = tplan.stackId
+    </select>
+
+    <insert id="insertNodeHistory">
+        insert into ${tableName} (
+        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
+        <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
+        <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
+        <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
+        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signal_strength,</if>
+        <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
+        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
+        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
+        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
+        <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
+        <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
+        <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
+        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
+        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
+        createdTime
+        ) values {
+        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
+        <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
+        <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
+        <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
+        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
+        <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
+        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
+        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
+        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
+        <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
+        <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
+        <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
+        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
+        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
+            sysdate()
+        }
+    </insert>
 </mapper>

@@ -6,19 +6,22 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
+import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import com.sun.org.apache.regexp.internal.RE;
+import org.apache.poi.ss.formula.functions.T;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author liubc
@@ -30,6 +33,9 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Autowired
     private WarehouseDao warehouseDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 查看仓库是否存在
@@ -283,7 +289,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
         String username = userInfo.get("username");
-        stackDto.setUpdateUser(username);
+        Integer userId = Integer.valueOf(userInfo.get("userId"));
+        stackDto.setLastUpdatedUser(username);
+        stackDto.setLastUpdatedUserId(userId);
         int updateFlag = warehouseDao.updateStack(stackDto);
         return updateFlag;
     }
@@ -559,6 +567,98 @@ public class WarehouseServiceImpl implements WarehouseService {
     public String findWareAreaType(Integer areaId) {
         String wareAreaType = warehouseDao.findWareAreaType(areaId);
         return wareAreaType;
+    }
+
+    /**
+     * 查询所有的楼栋
+     * @return
+     */
+    @Override
+    public List<BuildingVo> findAllBulid() {
+        return warehouseDao.findAllBulid();
+    }
+
+    /**
+     * 查询所有楼层
+     * @return
+     */
+    @Override
+    public List<FloorVo> findAllFloor() {
+
+        return warehouseDao.findAllFloor();
+    }
+
+    @Override
+    public List<WareAreaVo> findAllWareArea() {
+        return warehouseDao.findAllWareArea();
+    }
+
+    @Override
+    public List<StackVo> findAllStack() {
+        return warehouseDao.findAllStack();
+    }
+
+    @Override
+    public List<WarehouseVo> locating() {
+        Object locating = redisTemplate.opsForHash().get("maintain-locating", "locating");
+        List<WarehouseVo> warehouseVos = new ArrayList<>();
+        if(!ToolUtil.isEmpty(locating)){
+            //先从缓存中获取多级目录
+            warehouseVos = (List<WarehouseVo>) locating;
+        }
+        //如果缓存中没有就从数据库中查询 重新放到缓存中
+        if(ToolUtil.isEmpty(locating)){
+            //查询所有仓库
+            warehouseVos = findAllWarehouse(null);
+            //查询所有楼栋
+            List<BuildingVo> buildingVos = findAllBulid();
+            //查询所有楼层
+            List<FloorVo> floorVos = findAllFloor();
+            //查询所有区间
+            List<WareAreaVo> wareAreaVos = findAllWareArea();
+            //查询所有垛位
+            List<StackVo> stackVos = findAllStack();
+
+            //原始的数据 未经过stream处理
+            redisTemplate.opsForHash().put("buildingVos","buildingVos",buildingVos);
+            redisTemplate.opsForHash().put("floorVos","floorVos",floorVos);
+            redisTemplate.opsForHash().put("wareAreaVos","wareAreaVos",wareAreaVos);
+            redisTemplate.opsForHash().put("stackVos","stackVos",stackVos);
+            //将所有的垛位放到对应的区间去
+            wareAreaVos.stream().forEach(wareAreaVo ->{
+                stackVos.stream().collect(Collectors.groupingBy(stackVo -> stackVo.getAreaId())).forEach((key, value)->{
+                    if (wareAreaVo.getId().equals(key)){
+                        wareAreaVo.setStackVos(value);
+                    }
+                });
+            });
+            //将所有区间放到对应的楼层去
+            floorVos.stream().forEach(floorVo ->{
+                wareAreaVos.stream().collect(Collectors.groupingBy(wareAreaVo -> wareAreaVo.getFloorId())).forEach((key,value)->{
+                    if (floorVo.getId().equals(key)){
+                        floorVo.setWareAreaVos(value);
+                    }
+                });
+            });
+            //将所有楼层放到对应的楼栋去
+            buildingVos.stream().forEach(buildingVo ->{
+                floorVos.stream().collect(Collectors.groupingBy(floorVo -> floorVo.getBuildingId())).forEach((key,value)->{
+                    if (buildingVo.getId().equals(key)){
+                        buildingVo.setFloorVos(value);
+                    }
+                });
+            });
+            //将所有的楼栋放到对应的仓库去
+            warehouseVos.stream().forEach(warehouseVo -> {
+                buildingVos.stream().collect(Collectors.groupingBy(buildingVo -> buildingVo.getWarehouseId())).forEach((key,value)->{
+                    if (warehouseVo.getId().equals(key)){
+                        warehouseVo.setBuildingVos(value);
+                    }
+                });});
+            redisTemplate.opsForHash().put("maintain-locating","locating",warehouseVos);
+        }
+
+        return warehouseVos;
     }
 
 

@@ -1,11 +1,17 @@
 package com.rpzh.dao;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.pojo.NodeData;
+import com.rpzh.util.MonitorCondition;
+import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 节点管理
@@ -37,12 +43,14 @@ public interface NodeDao {
      */
     int updateNode(@Param("nodeDto") NodeDto nodeDto);
 
+    int updateNode(@Param("nodeDto") Map<String,String> nodeDto);
+
     /**
      * 删除节点
      * @param ids
      * @return
      */
-    int deleteNode(@Param("ids") List<Integer> ids);
+    int deleteNode(@Param("nodeIds") List<String> ids);
 
     /**
      * 查询节点列表
@@ -81,10 +89,10 @@ public interface NodeDao {
 
     /**
      * 设备解垛
-     * @param id
+     * @param ids
      * @return
      */
-    int unbindStack(@Param("id") Integer id);
+    int unbindStack(@Param("ids") Integer[] ids);
 
     /**
      *查询未入垛
@@ -101,8 +109,8 @@ public interface NodeDao {
      * @param z
      * @return
      */
-    int enterStack(@Param("id")Integer id,@Param("x")Integer x, @Param("y")Integer y,
-                   @Param("z")Integer z,@Param("stack")String stack,@Param("siteId")Integer siteId);
+    int enterStack(@Param("id")Integer id,@Param("x")String x, @Param("y")String y,
+                   @Param("z")String z,@Param("stackId") Integer stackId,@Param("stack")String stack,@Param("siteId")Integer siteId,@Param("gatherSite")String gatherSite,@Param("caseNo") String caseNo);
 
     /**
      * 判断设备是否存在
@@ -131,4 +139,32 @@ public interface NodeDao {
      * @return
      */
     List<NodeVo> findVagueNode(@Param("nodeDto")NodeDto nodeDto);
+
+    /**
+     * 测试方法
+     * @param nodeId
+     * @param nodeType
+     * @param createTime
+     * @return
+     */
+    List<NodeVo> testFindNode(@Param("nodeId")String nodeId, @Param("nodeType")String nodeType,
+                              @Param("createTime")String createTime,@Param("startTime") String startTime,
+                              @Param("endTime") String endTime);
+
+    List<NodeVo> findNodeByStackId(Integer stackID);
+
+    int findNodeCountByNodeId(@Param("nodeId") String nodeId);
+
+    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,String[] nodeTypes);
+
+    @DS("clickhouse")
+    List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto var1, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
+//    @DS("clickhouse")
+//    List<NodeDataVo> insertNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
+    NodeVo findNodeAndMaintainStageByNodeId(@Param("nodeId") String nodeId);
+
+    @DS("clickhouse")
+    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData,@Param("tableName") String tableName);
 }
