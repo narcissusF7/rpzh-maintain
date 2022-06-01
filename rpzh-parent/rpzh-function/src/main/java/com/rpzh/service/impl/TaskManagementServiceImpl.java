@@ -69,6 +69,13 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int size = taskDto.getSize();
         //静态分页
         PageHelper.startPage(page, size);
+        //获取当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //获取传入的状态,如果状态是3,查询过期的任务
+        String status = taskDto.getStatus();
+        if ("3".equals(status)){
+            taskDto.setExpiresTime(nowTime);
+        }
         List<TaskVo> taskVoList = taskManagementDao.findTask(taskDto);
 
         return new PageInfo<TaskVo>(taskVoList);

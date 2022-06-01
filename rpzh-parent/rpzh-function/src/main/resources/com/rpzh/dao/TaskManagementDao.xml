@@ -89,10 +89,10 @@
      AND principal = #{taskDto.principal}
   </if>
   <if test="taskDto.endTime != null and taskDto.endTime != ''">
-     AND endTime &lt;= #{taskDto.endTime}
+     AND end_time &lt;= #{taskDto.endTime}
   </if>
   <if test="taskDto.endStartTime != null and taskDto.endStartTime != ''">
-     AND endTime &gt;= #{taskDto.endStartTime}
+     AND end_time &gt;= #{taskDto.endStartTime}
   </if>
   </where>
 </select>

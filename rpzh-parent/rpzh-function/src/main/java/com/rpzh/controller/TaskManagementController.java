@@ -39,7 +39,7 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "新建任务", tags = "新建任务")
+    @ApiOperation(value = "新建任务", tags = "任务管理中心")
     @PostMapping("/addTask")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
@@ -83,7 +83,7 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "发布任务菜单查询任务列表", tags = "发布任务菜单查询任务列表")
+    @ApiOperation(value = "发布任务菜单查询任务列表", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
                     "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = false,dataType = "String"),
