@@ -700,4 +700,7 @@
     from tb_warehouse
     where id = #{warehouseId}
   </select>
+  <select id="findPidRoute" resultType="com.rpzh.vo.StackVo">
+    select pid_route as pidRoute,area_id as areaId from  tb_stack where id = #{stackId}
+  </select>
 </mapper>

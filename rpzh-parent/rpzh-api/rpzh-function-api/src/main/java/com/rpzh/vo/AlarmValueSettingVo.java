@@ -16,7 +16,7 @@ import java.util.Date;
 public class AlarmValueSettingVo {
 
     @ApiModelProperty(notes = "垛内氧气上限一级")
-    private Double stackOxygenUpperOne;
+    public Double stackOxygenUpperOne;
     @ApiModelProperty(notes = "垛内氧气上限二级")
     private Double stackOxygenUpperTwo;
     @ApiModelProperty(notes = "垛内氧气上限三级")
@@ -92,19 +92,9 @@ public class AlarmValueSettingVo {
 
     @ApiModelProperty(notes = "预警规则名称")
     private String earlyWarningRuleName;
-    @ApiModelProperty(notes = "烟叶年份")
-    private String tobaccoYear;
-    @ApiModelProperty(notes = "物料代码")
-    private String materialCode;
-    @ApiModelProperty(notes = "物料代码和物料代码合并")
-    private String materialCodeYear;
-    @ApiModelProperty(notes = "批次号")
-    private String materialBatchNum;
 
     @ApiModelProperty(notes = "预警设置id")
     private Integer id;
-    @ApiModelProperty(notes = "养护方式")
-    private String maintenceStyle;
     @ApiModelProperty(notes = "制定人")
     private String createUser;
     @ApiModelProperty(notes = "状态(0:停用,1:启用)")

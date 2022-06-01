@@ -101,7 +101,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Override
     public Result findDetailsEarlyWarning(EarlyWarningDto earlyWarningDto) {
         MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainStackId(earlyWarningDto.getStackId());
-        String newDate = earlyWarningDao.findNewDate(earlyWarningDto);
+        //String newDate = earlyWarningDao.findNewDate(earlyWarningDto);
         AlarmValueSettingVo alarmValueSetting = alarmValueSettingDao.findAlarmValueSettingById(maintainPlan.getAlarmValueSettingId());
         /*switch (earlyWarningDto.getWarningType()){
             case ;

@@ -14,11 +14,13 @@ import java.util.List;
 @Mapper
 public interface MaterialDao {
 
-    MaterialVo getinfoBySiteId(@Param("stackId") Integer stackId);
+    Double getMaintainCount(@Param("stackId") Integer stackId);
 
     List<String> getMaterialBatch(@Param("stackId") Integer stackId);
 
     List<String> findMaterialCode(@Param("stackId") Integer stackId);
 
     List<String> getMaterialName(@Param("stackId") Integer stackId);
+
+    int updateMaterialStatus(@Param("stackId") Integer stackId);
 }

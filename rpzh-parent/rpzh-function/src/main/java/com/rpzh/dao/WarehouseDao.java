@@ -362,4 +362,6 @@ public interface WarehouseDao {
     List<WareAreaVo> findAllWareArea();
 
     List<StackVo> findAllStack();
+
+    StackVo findPidRoute(@Param("stackId") Integer id);
 }

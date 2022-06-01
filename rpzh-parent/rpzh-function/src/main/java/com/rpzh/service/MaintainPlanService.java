@@ -37,31 +37,34 @@ public interface MaintainPlanService {
      * @return success or failure
      */
     Result deleteMaintainPlanInfo(List<Integer> stageIds);
-    /*
+
     MaintainPlanVo findMaintainPlan(Integer id);
 
-    *//**
+    Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
+
+    /**
      * 更改养护计划
      * @param maintainPlanDto
      * @return
-     *//*
+     */
     Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto);
 
-    PageInfo<MaintainPlanVo> findMaintainCountReport(MaintainPlanDto maintainPlanDto);
+    MaintainPlanVo beforeUpdateMaintainPlan(Integer id);
+
+    Integer endMaintainPlan(MaintainPlanDto maintainPlanDto);
+
+    MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId);
+
+    PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto);
 
     PageInfo<MaintainPlanVo> findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto);
 
     PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto);
 
-    Integer endMaintainPlan(MaintainPlanDto maintainPlanDto);
+    Integer moveStack(MaintainPlanDto maintainPlanDto);
 
-    Integer deleteMaintainStage(List<Integer> ids);
-
-    MaintainPlanVo findMaintainPlanDetails(Integer id);
-
-    Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
-
-    Result findExpireCollectTable(MaintainPlanDto maintainPlanDto);
+    /*
+    PageInfo<MaintainPlanVo> findMaintainCountReport(MaintainPlanDto maintainPlanDto);
 
     Integer moveStack(MaintainPlanDto maintainPlanDto);*/
 }

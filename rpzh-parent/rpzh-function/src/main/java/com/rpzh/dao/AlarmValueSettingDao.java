@@ -19,7 +19,7 @@ public interface AlarmValueSettingDao {
 
     AlarmValueSettingVo findAlarmValueSettingById(@Param("alarmValueSettingId") Integer alarmValueSettingId);
 
-    Integer updateAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto, @Param("alarmValueSettingId") Integer alarmValueSettingId);
+    Integer updateAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
     Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
@@ -29,7 +29,7 @@ public interface AlarmValueSettingDao {
 
     int insertColorAndAlertUpgradeDay(@Param("settingKey") String settingKey, @Param("settingValue") String settingValue, @Param("settingName") String settingName);
 
-    Integer updateStatus(@Param("alarmValueSettingId") Integer alarmValueSettingId);
+    Integer updateStatus(@Param("alarmValueSetting") AlarmValueSetting alarmValueSetting);
 
     Integer delete(@Param("alarmValueSettingId") Integer alarmValueSettingId);
 

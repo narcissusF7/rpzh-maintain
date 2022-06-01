@@ -27,10 +27,18 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public MaterialVo findMaterialInfo(Integer stackId) {
-        MaterialVo materialVo = materialDao.getinfoBySiteId(stackId);
+        MaterialVo materialVo = new MaterialVo();
+        Double maintainCount = materialDao.getMaintainCount(stackId);
+        materialVo.setMaintainCount(maintainCount);
         if(materialVo==null){
             return null;
         }
+        List<String> materialNames = materialDao.getMaterialName(stackId);
+        String materialName ="";
+        if (materialNames.size() > 0) {
+            materialName=String.join(",", materialName);
+        }
+        materialVo.setMaterialName(materialName);
         List<String> materialCodes = materialDao.findMaterialCode(stackId);
         if(materialCodes.size()>0) {
             materialVo.setMaterialCodes(materialCodes);

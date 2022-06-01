@@ -5,8 +5,10 @@ import com.rpzh.parse.ParseData;
 import com.rpzh.vo.NodeVo;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class NodeData {
+public class NodeData implements Serializable {
     private String nodeId;
     private String type;
     private Integer frequency;
@@ -15,9 +17,9 @@ public class NodeData {
     private Integer stackId;
     private Integer maintainPlanId;
     private Integer maintainStageId;
-    private Double temp;
-    private Double humiture;
-    private Double oxygen;
+    private Double temp=0d;
+    private Double humiture=0d;
+    private Double oxygen=0d;
     private String dateTime;
     private String gatherSite;
     private String siteType;

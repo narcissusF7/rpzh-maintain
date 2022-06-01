@@ -45,15 +45,11 @@ public class MaintainPlanDto {
     private String phases;
 
     /**
-     * 垛位名称
-     */
-    private String stackName;
-
-    /**
      * 养护计划id
      */
     private Integer id;
 
+    private String stackName;
     /**
      * 制定时间
      */

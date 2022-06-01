@@ -5,20 +5,21 @@
         select
         t1.id as id,
         t1.material_code as materialCode,
-        t1.stack_name as stackName,
+        t3.site_name as stackName,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
         t2.id as stageId,
         t2.created_time as createdTime
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
+        inner join
+        (select id,site_name from tb_stack <where>
+        <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">site_name like concat('%',#{maintainPlanDto.stackName},'%')</if></where>
+        ) t3 on t3.id = t1.stack_id
         <where>
-            t1.is_end = '0' and t2.aftercare_date_end >= #{maintainPlanDto.nowDate}
+            t1.is_end = '0' and t2.aftercare_date_end >= #{maintainPlanDto.nowDate} and t2.is_change = '0'
             <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">
                 and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')
-            </if>
-            <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">
-                and t1.stack_name like concat('%',#{maintainPlanDto.stackName},'%')
             </if>
             <if test="maintainPlanDto.startTime !=null">
                 and t2.created_time >= #{maintainPlanDto.startTime}
@@ -39,9 +40,7 @@
         SELECT
             t1.id as id,
             t1.material_code AS materialCode,
-            t1.material_code_year AS materialCodeYear,
-            t1.tobacco_year AS tobaccoYear,
-            t1.stack_name as stackName,
+            t3.site_name as stackName,
             t1.stack_id as stackId,
             t1.maintence_style as maintenceStyle,
             t2.phases as phases,
@@ -50,7 +49,6 @@
             t2.oxygen_reduction_time AS oxygenReductionTime,
             t2.created_time AS createdTime,
             t1.principal_name AS principalName,
-            t1.principal_name AS username,
             t2.expire_time AS expireTime,
             t2.maintain_count as maintainCount,
             t1.principal_ids as principalId,
@@ -59,6 +57,7 @@
             t2.alarm_value_setting_id AS alarmValueSettingId
         FROM tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
+        left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
         WHERE t1.id= #{id}
     </select>
     <select id="findVersion" resultType="com.rpzh.vo.MaintainPlanVo">
@@ -79,16 +78,6 @@
     <update id="updateStageId">
         update tb_maintain_plan set stage_id = #{stageId} where id=#{id}
     </update>
-    <delete id="deleteMaintainPlan" parameterType="java.lang.Integer">
-        delete
-        from tb_maintain_plan
-        WHERE stage_id = #{stageId}
-    </delete>
-    <delete id="deleteMaintainPlanStage" parameterType="java.lang.Integer">
-        delete
-        from tb_maintain_plan_stage
-        WHERE id = #{stageId}
-    </delete>
 
     <delete id="deleteMaintainPlanById" parameterType="java.lang.Integer">
         delete
@@ -110,8 +99,11 @@
     <update id="updateMaintainPlan">
         update tb_maintain_plan
         <set>
-            <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">principal_name = #{maintainPlanDto.name},</if>
+            <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">principal_name = #{maintainPlanDto.principalName},</if>
             <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style= #{maintainPlanDto.maintenceStyle},</if>
+            <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code= #{maintainPlanDto.materialCode},</if>
+            <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num= #{maintainPlanDto.materialBatchNum},</if>
+            <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">material_name= #{maintainPlanDto.materialName},</if>
             <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids = #{maintainPlanDto.principalId}</if>
         </set>
         where id = #{maintainPlanDto.id}
@@ -134,11 +126,12 @@
     <update id="changeMaintainPlanStage">
         update tb_maintain_plan t1,tb_maintain_plan_stage t2
         <set>
-            <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">t1.principal_name = #{maintainPlanDto.name},</if>
+            <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">t1.principal_name = #{maintainPlanDto.principalName},</if>
             <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">t1.principal_ids = #{maintainPlanDto.principalId},</if>
             <if test="maintainPlanDto.stageId != null and maintainPlanDto.stageId !=''">t1.stage_id = #{maintainPlanDto.stageId},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">t2.update_user = #{maintainPlanDto.updateUser},</if>
             <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">t2.maintain_days = #{maintainPlanDto.maintainDays},</if>
+            <if test="maintainPlanDto.aftercareDateEnd != null">t2.aftercare_date_end = #{maintainPlanDto.aftercareDateEnd},</if>
             t2.updated_time = #{maintainPlanDto.updatedTime},t2.is_change = '1'
         </set>
         where t1.id = #{maintainPlanDto.id} AND t1.stage_id = t2.id
@@ -148,26 +141,24 @@
         insert into tb_maintain_plan
         (
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code,</if>
-        <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">stack_id,</if>
         <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num,</if>
         <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">principal_name,</if>
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids,</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">storage_age,</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style,</if>
         <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">material_name,</if>
-        stack_name
+        stack_id
         )
         values
         (
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">#{maintainPlanDto.materialCode},</if>
-        <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">#{maintainPlanDto.stackId},</if>
         <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">#{maintainPlanDto.materialBatchNum},</if>
         <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">#{maintainPlanDto.principalName},</if>
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">#{maintainPlanDto.principalId},</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">#{maintainPlanDto.storageAge},</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
         <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">#{maintainPlanDto.materialName},</if>
-        #{maintainPlanDto.stackName}
+        #{maintainPlanDto.stackId}
         )
     </insert>
     <insert id="insertMaintainStage">
@@ -180,7 +171,7 @@
         <if test="maintainPlanDto.expireTime != null">expire_time,</if>
         <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count,</if>
         <if test="maintainPlanDto.alarmValueSettingId != null and maintainPlanDto.alarmValueSettingId !=''">alarm_value_setting_id,</if>
-        <if test="maintainPlanDto.maintainPlanId != null and maintainPlanDto.maintainPlanId !=''">maintain_plan_id,</if>
+        <if test="maintainPlanDto.id != null and maintainPlanDto.id !=''">maintain_plan_id,</if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">phases,</if>
         update_user,updated_time,create_user,created_time, version
         )
@@ -193,17 +184,17 @@
         <if test="maintainPlanDto.expireTime != null">#{maintainPlanDto.expireTime},</if>
         <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">#{maintainPlanDto.maintainCount},</if>
         <if test="maintainPlanDto.alarmValueSettingId != null and maintainPlanDto.alarmValueSettingId !=''">#{maintainPlanDto.alarmValueSettingId},</if>
-        <if test="maintainPlanDto.maintainPlanId != null and maintainPlanDto.maintainPlanId !=''">#{maintainPlanDto.maintainPlanId},</if>
+        <if test="maintainPlanDto.id != null and maintainPlanDto.id !=''">#{maintainPlanDto.id},</if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">#{maintainPlanDto.phases},</if>
         #{maintainPlanDto.updateUser},#{maintainPlanDto.updatedTime},#{maintainPlanDto.createUser},#{maintainPlanDto.createdTime},#{maintainPlanDto.version}
         )
     </insert>
 
     <select id="findMaxStageId" resultType="java.lang.Integer">
-        select id from tb_maintain_plan_stage where maintain_plan_id = #{id} and is_change ='0'
+        select max(id) from tb_maintain_plan_stage where maintain_plan_id = #{id} and is_change ='0'
     </select>
     <select id="findMaxPlanId" resultType="java.lang.Integer">
-        select id from tb_maintain_plan where stack_id = #{stackId} and is_end='0'
+        select max(id) from tb_maintain_plan where stack_id = #{stackId} and is_end='0'
     </select>
 
     <update id="updateMaintainPlanStageId">
@@ -216,12 +207,15 @@
         t2.maintain_count as maintainCount,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
-        t1.stack_name as stackName,
+        t3.site_name as stackName,
         t2.maintain_days as maintainDays
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id
+        inner join
+        (select id,site_name from tb_stack <where>
+        <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">site_name like concat('%',#{maintainPlanDto.stackName},'%')</if></where>
+        ) t3 on t3.id = t1.stack_id
         where 1=1
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
-        <if test="maintainPlanDto.stackName != null and maintainPlanDto.stackName != ''"> and t1.stack_name like concat('%',#{maintainPlanDto.stackName},'%')</if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         ORDER BY stack_id
@@ -233,12 +227,15 @@
         t2.maintain_count as maintainCount,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
-        t1.stack_name as stackName,
+        t3.site_name as stackName,
         DATE_FORMAT(t2.created_time,'%Y-%m-%d') as sealStackTime
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id
+        inner join
+        (select id,site_name from tb_stack <where>
+        <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">site_name like concat('%',#{maintainPlanDto.stackName},'%')</if></where>
+        ) t3 on t3.id = t1.stack_id
         where t2.version = '1'
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
-        <if test="maintainPlanDto.stackName != null and maintainPlanDto.stackName != ''"> and t1.stack_name like concat('%',#{maintainPlanDto.stackName},'%') </if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         <if test="maintainPlanDto.startTime != null"> and t2.created_time >= #{maintainPlanDto.startTime}</if>
@@ -250,16 +247,19 @@
         t1.material_code as materialCode,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
-        t1.stack_name as stackName,
+        t3.site_name as stackName,
         t2.maintain_days as maintainDays,
         t2.is_change as changeStatus
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id
+        inner join
+        (select id,site_name from tb_stack <where>
+        <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">site_name like concat('%',#{maintainPlanDto.stackName},'%')</if></where>
+        ) t3 on t3.id = t1.stack_id
         where t1.is_end = '1'
-        <if test="maintainPlanDto.stackName != null and maintainPlanDto.stackName != ''"> and t1.stack_name like concat('%',#{maintainPlanDto.stackName},'%') </if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         <if test="maintainPlanDto.changeStatus != null and maintainPlanDto.changeStatus != ''"> and t2.is_change=#{maintainPlanDto.changeStatus}</if>
-        ORDER BY stack_id
+        ORDER BY t2.maintain_plan_id
     </select>
 
     <update id="endMaintainPlan">
@@ -272,61 +272,72 @@
             #{id}
         </foreach>
     </select>
+    <select id="findId" resultType="java.lang.Integer">
+        select id from tb_maintain_plan_stage
+        WHERE maintain_plan_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
     <select id="findDetailsNew" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t1.material_code as materialCode,
-        t1.stack_name as stackName,
+        t3.site_name as stackName,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
+        left join (select id,site_name from tb_stack where id = #{stackId}) t3 on t3.id = t1.stack_id
         where t1.id = #{id}
     </select>
     <select id="findDetails" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t2.id as id,
-        t1.principal_name AS username,
+        t1.principal_name AS principalName,
         t2.created_time as createdTime,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
         t2.maintain_days as maintainDays
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id
-        where t1.id = #{id}
+        where t1.id = #{id} order by t2.id
     </select>
-    <select id="findVersionAndAftercareDateEnd" resultType="com.rpzh.dto.MaintainPlanDto">
-        SELECT
-        t1.id AS id,
-        t2.version AS version,
-        t2.aftercare_date_end as aftercareDateEnd
-        FROM tb_maintain_plan t1
-        LEFT JOIN tb_maintain_plan_stage t2 ON t1.id = t2.maintain_plan_id
-        WHERE t2.is_change = '0' AND t1.is_end = '0'
-    </select>
+
     <select id="findExpireCollectTable" resultType="com.rpzh.vo.MaintainPlanVo">
-        SELECT
-        t1.id AS id,
-        t1.material_code AS materialCode,
-        t2.maintain_count AS maintainCount,
-        t1.maintence_style AS maintenceStyle,
-        t2.phases AS phases,
-        t1.stack_name AS stackName,
-        t2.maintain_days AS maintainDays,
-        t2.alarm_value_setting_id as alarmValueSettingId,
-        t2.is_change AS changeStatus,
-        created_time AS createdTime
-        FROM tb_maintain_plan t1
-        LEFT JOIN tb_maintain_plan_stage t2 ON t1.id = t2.maintain_plan_id
-        WHERE
-        t1.id  = #{maintainPlanDto.id}
-        and t2.version = #{maintainPlanDto.version}
-        <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId != ''"> and t1.stack_id = #{maintainPlanDto.stackId}</if>
-        <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
-        <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
-        <if test="maintainPlanDto.changeStatus != null and maintainPlanDto.changeStatus != ''"> and t2.is_change=#{maintainPlanDto.changeStatus}</if>
-        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
-        <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''"> and t2.maintain_count = #{maintainPlanDto.maintainCount}</if>
-        <if test="maintainPlanDto.startTime !=null">and t2.updated_time >= #{maintainPlanDto.startTime}</if>
-        <if test="maintainPlanDto.endTime !=null">and t2.updated_time &lt;= #{maintainPlanDto.endTime}</if>
-        order by is_change
+        select
+        t1.id as id,
+        t1.material_code as materialCode,
+        t3.site_name as stackName,
+        t1.maintence_style as maintenceStyle,
+        t2.phases as phases,
+        t2.id as stageId,
+        t2.aftercare_date_end as aftercareDateEnd
+        from tb_maintain_plan t1
+        left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
+        inner join
+        (select id,site_name from tb_stack <where>
+        <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">site_name like concat('%',#{maintainPlanDto.stackName},'%')</if></where>
+        ) t3 on t3.id = t1.stack_id
+        <where>
+            t1.is_end = '0' and t2.aftercare_date_end &lt;= #{maintainPlanDto.nowDate} and t2.is_change = '0'
+            <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">
+                and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')
+            </if>
+            <if test="maintainPlanDto.startTime !=null">
+                and t2.created_time >= #{maintainPlanDto.startTime}
+            </if>
+            <if test="maintainPlanDto.endTime !=null">
+                and t2.created_time &lt;= #{maintainPlanDto.endTime}
+            </if>
+            <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount != ''">
+                and t2.maintain_count = #{maintainPlanDto.maintainCount}
+            </if>
+            <if test="maintainPlanDto.phases !=null and maintainPlanDto.phases !=''">
+                and t2.phases = #{maintainPlanDto.phases}
+            </if>
+            <if test="maintainPlanDto.maintenceStyle !=null and maintainPlanDto.maintenceStyle != ''">
+                and t1.maintence_style = #{maintainPlanDto.maintenceStyle}
+            </if>
+        </where>
+        order by created_time desc
     </select>
     <select id = "isExistStackId" resultType="java.lang.Integer">
         select count(*) from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'

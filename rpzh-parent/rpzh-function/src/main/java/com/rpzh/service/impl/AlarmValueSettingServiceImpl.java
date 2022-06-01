@@ -65,8 +65,8 @@ public class AlarmValueSettingServiceImpl implements AlarmValueSettingService {
         if(count>0){
             return new Result(false, StatusCode.ERROR, "该预警设置已存在养护计划,不可修改状态!");
         }
-        Integer result = alarmValueSettingDao.updateStatus(id);
-        return new Result(true, StatusCode.OK, "修改预警状态成功!",result);
+        //Integer result = alarmValueSettingDao.updateStatus(id);
+        return new Result(true, StatusCode.OK, "修改预警状态成功!");//result);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class AlarmValueSettingServiceImpl implements AlarmValueSettingService {
         String updateUser = TokenDecode.getUserInfo().get("username");
         alarmValueSettingDto.setUpdateUser(updateUser);
         alarmValueSettingDto.setUpdatedTime(new Date());
-        Integer result = alarmValueSettingDao.updateAlarmValueSetting(alarmValueSettingDto, alarmValueSettingDto.getAlarmValueSettingId());
+        Integer result = alarmValueSettingDao.updateAlarmValueSetting(alarmValueSettingDto);
         return result;
     }
 

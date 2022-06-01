@@ -47,10 +47,6 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findVersion(@Param("stageId") Integer stageId);
 
-    int deleteMaintainPlan(@Param("stageId") Integer stageId);
-
-    int deleteMaintainPlanStage(@Param("stageId") Integer stageId);
-
     Integer findStageId(@Param("id") Integer id, @Param("version") Integer version);
 
     Integer updateChange(@Param("id") Integer id, @Param("change") String change);
@@ -59,13 +55,11 @@ public interface MaintainPlanDao {
 
     List<MaintainPlanVo> findDetails(@Param("id") Integer id);
 
-    MaintainPlanVo findDetailsNew(@Param("id") Integer id);
+    MaintainPlanVo findDetailsNew(@Param("id") Integer id,@Param("stackId")Integer stackId);
 
     int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    MaintainPlanVo findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
-
-    List<MaintainPlanDto> findVersionAndAftercareDateEnd();
+    List<MaintainPlanVo> findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
     Integer isExistStackId(@Param("stackId") Integer stackId);
 
@@ -76,4 +70,6 @@ public interface MaintainPlanDao {
     Integer findStackCountByStackId(Integer stackId);
 
     MaintainPlanVo findMaintainStackId(@Param("stackId") Integer stackId);
+
+    List<Integer> findId(@Param("ids") List<Integer> ids);
 }

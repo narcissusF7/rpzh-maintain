@@ -172,4 +172,6 @@ public interface NodeDao {
     List<WeatherDataVo> findWeatherData(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     Integer findNodeStatus(@Param("id") Integer id);
+
+    List<NodeVo> findNodeIdBySiteType(@Param("siteType") String siteType,@Param("stackId")Integer stackId,@Param("pidRoute")String pidRoute);
 }

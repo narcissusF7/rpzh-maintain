@@ -6,6 +6,7 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.StringUtils;
@@ -17,9 +18,11 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import com.rpzh.vo.MaintainPlanVo;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.text.DateFormat;
@@ -44,6 +47,50 @@ public class MaintainPlanController {
     @Resource
     private MaintainPlanService maintainPlanService;
 
+    public static String MAINTAIN = "MAINTAIN_";
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @PostMapping("/testZyq")
+    public Result testZyq(){
+        NodeData nodeData = new NodeData();
+        nodeData.setOxygen(23.01);
+        redisTemplate.opsForValue().set(MAINTAIN + "13113131", nodeData);
+        nodeData.setOxygen(27.04);
+        redisTemplate.opsForValue().set(MAINTAIN + "83DD43E1", nodeData);
+        nodeData.setOxygen(23.07);
+        redisTemplate.opsForValue().set(MAINTAIN + "83DD43E0", nodeData);
+        nodeData.setOxygen(23.02);
+        redisTemplate.opsForValue().set(MAINTAIN + "83EE8902", nodeData);
+        nodeData.setOxygen(28.01);
+        redisTemplate.opsForValue().set(MAINTAIN + "83DD43DE", nodeData);
+        nodeData = new NodeData();
+        nodeData.setTemp(33.13);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDA", nodeData);
+        nodeData.setTemp(35.25);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFD9", nodeData);
+        nodeData.setTemp(36.38);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFD8", nodeData);
+        nodeData = new NodeData();
+        nodeData.setTemp(39.49);
+        nodeData.setHumiture(17.35);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDB", nodeData);
+        nodeData.setTemp(30.22);
+        nodeData.setHumiture(16.11);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDE", nodeData);
+        nodeData.setTemp(32.33);
+        nodeData.setHumiture(17.22);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDC", nodeData);
+        nodeData = new NodeData();
+        nodeData.setTemp(43.56);
+        nodeData.setHumiture(18.11);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDD", nodeData);
+        nodeData.setTemp(52.33);
+        nodeData.setHumiture(19.22);
+        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDF", nodeData);
+        return new Result<>(true, StatusCode.OK, "查询成功");
+    }
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -52,9 +99,13 @@ public class MaintainPlanController {
     }
 
     @PostMapping("/findAlarmSettingTemplate")
-    public Result findAlarmSettingTemplate(@Param("earlyWarningRuleName")String earlyWarningRuleName){
+    @ApiOperation(value = "查询预警规则名称")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String")
+    })
+    public Result<AlarmValueSettingVo> findAlarmSettingTemplate(String earlyWarningRuleName){
         AlarmValueSettingVo alarmSettingTemplate = maintainPlanService.findAlarmSettingTemplate(earlyWarningRuleName);
-        return new Result<>(true, StatusCode.OK, "查询成功",alarmSettingTemplate);
+        return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplate);
     }
     /**
      * 插入一条养护计划
@@ -66,58 +117,46 @@ public class MaintainPlanController {
     @PostMapping(value = "/insert")
     @ApiOperation(value = "新建养护计划")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
             @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
             @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "Double"),
+            @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
             @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseOxygenUpperOne", value = "仓间氧气上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseOxygenUpperTwo", value = "仓间氧气上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseOxygenUpperThree", value = "仓间氧气上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseOxygenLower", value = "仓间氧气下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseTempUpper0ne", value = "仓间温度上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseTempUpperTwo", value = "仓间温度上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseTempUpperThree", value = "仓间温度上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseTempLower", value = "仓间温度下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseMoistureUpperOne", value = "仓间湿度上限一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseMoistureUpperTwo", value = "仓间湿度上限二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseMoistureUpperThree", value = "仓间湿度上限三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "warehouseMoistureLower", value = "仓间湿度下限",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="Double"),
-            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="Double")
+            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
-    public Result insertMaintainPlan(MaintainPlanDto maintainPlanDto){
+    public Result insertMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto){
         // 烟叶代码是否为null
         if (ToolUtil.isEmpty(maintainPlanDto.getMaterialCodes())) {
             return new Result(false, StatusCode.ERROR, "烟叶代码不能为空!");
         }
-        if (ToolUtil.isEmpty(maintainPlanDto.getStackName())) {
+        if (ToolUtil.isEmpty(maintainPlanDto.getStackId())) {
             return new Result(false, StatusCode.ERROR, "仓库位置不能为空!");
         }
         if (ToolUtil.isEmpty(maintainPlanDto.getPhases()) || ToolUtil.isEmpty(maintainPlanDto.getMaintenceStyle())) {
@@ -157,13 +196,20 @@ public class MaintainPlanController {
      * @updateUser zyq
      */
     @PostMapping(value = "/findMaintainPlanInfo")
-    public Result findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
+    @ApiOperation(value = "分页查询养护计划")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
+    })
+    public Result<MaintainPlanVo> findMaintainPlanInfo(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         if(StringUtils.isNotEmpty(maintainPlanDto.getEndTime())){
-            if(maintainPlanDto.getEndTime().equals("00:00:00")) {
-                maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00", "23:59:59"));
-            }else {
-                maintainPlanDto.setEndTime(maintainPlanDto.getEndTime() + " 23:59:59");
-            }
+            maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00", "23:59:59"));
         }
         PageInfo<MaintainPlanVo> maintainPlanInfo = maintainPlanService.findMaintainPlanInfo(maintainPlanDto);
         return new Result(true, StatusCode.OK, "查询成功!", maintainPlanInfo);
@@ -171,42 +217,273 @@ public class MaintainPlanController {
 
     /**
      * 删除养护计划
-     * @param stageIds  养护计划id
+     * @param ids  养护计划id
      * @return Result
      * @createUser wbl
      * @updateUser zyq
      */
     @PostMapping("/deleteMaintainPlanInfo")
-    public Result<Integer> deleteMaintainPlanInfo(@RequestParam("stageIds") List<Integer> stageIds) {
-        Result result = maintainPlanService.deleteMaintainPlanInfo(stageIds);
+    @ApiOperation(value = "删除养护计划")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "养护计划ids", required = true, dataType = "String")
+    })
+    public Result<Integer> deleteMaintainPlanInfo(@RequestParam("ids") List<Integer> ids) {
+        Result result = maintainPlanService.deleteMaintainPlanInfo(ids);
         return result;
     }
 
     /**
-     * 根据养护id查询养护详情/更改养护计划时回显
+     * 根据养护id查询养护详情
      *
      * @param id 养护计划id
      * @return success or failure
      * @createUser wbl
-     *//*
+     */
     @PostMapping("/findMaintainPlanById")
-    public Result findMaintainPlanById(Integer id) {
+    @ApiOperation(value = "根据养护id查询养护详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
+    })
+    public Result<MaintainPlanVo> findMaintainPlanById(Integer id) {
         MaintainPlanVo maintainPlan = maintainPlanService.findMaintainPlan(id);
-        return new Result<>(true, StatusCode.OK, "查询养护详情成功",maintainPlan);
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询养护详情成功",maintainPlan);
     }
 
-    *//**
+    @PostMapping("/beforeUpdateMaintainPlan")
+    @ApiOperation(value = "更改养护计划前回显")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
+    })
+    public Result<MaintainPlanVo> beforeUpdateMaintainPlan(Integer id){
+        MaintainPlanVo maintainPlan = maintainPlanService.beforeUpdateMaintainPlan(id);
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "回显成功",maintainPlan);
+    }
+    /**
      * 更改养护计划
      * @param maintainPlanDto
      * @return
-     *//*
+     */
     @PostMapping("/updateMaintainPlan")
-    public Result updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
+    @ApiOperation(value = "更改养护计划")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
+            @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "alarmValueSettingId", value = "预警设置id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
+    })
+    public Result updateMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         Integer i = maintainPlanService.updateMaintainPlan(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "更改养护计划成功",i);
     }
 
-    *//**
+    /**
+     * 开垛使用
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping(value = "/endMaintainPlan")
+    @ApiOperation(value = "开垛使用")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int")
+    })
+    public Result endMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        Integer i = maintainPlanService.endMaintainPlan(maintainPlanDto);
+        return new Result<>(true, StatusCode.OK, "开垛成功",i);
+    }
+
+    @PostMapping("/getPhases")
+    @ApiOperation(value = "根据养护方式查询养护阶段")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String")
+    })
+    public Result getPhases(String maintenceStyle) {
+        List<String> phases = new ArrayList<>();
+        phases.add("养护阶段");
+        phases.add("充氮杀虫阶段");
+        phases.add("磷化铝杀虫阶段");
+        if("机械调控方式".equals(maintenceStyle)){
+            phases.add("充氮保质阶段");
+        }
+        return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
+    }
+
+    /**
+     * 转段
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping("/changeMaintainPlanStage")
+    @ApiOperation(value = "转段")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
+            @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "alarmValueSettingId", value = "预警设置id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
+    })
+    public Result changeMaintainPlanStage(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
+        return new Result<>(true, StatusCode.OK, "转段成功",result);
+    }
+
+    /**
+     * 养护到期汇总中的详情
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping("/findMaintainPlanDetails")
+    @ApiOperation(value = "养护到期汇总中的详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int")
+    })
+    public Result<MaintainPlanVo> findMaintainPlanDetails(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        MaintainPlanVo maintainPlanVo = maintainPlanService.findMaintainPlanDetails(maintainPlanDto.getId(),maintainPlanDto.getStackId());
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
+    }
+
+    @PostMapping("/findExpireCollectTable")
+    @ApiOperation(value = "养护到期汇总列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "养护数量", required = false,dataType = "double"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
+    })
+    public Result<MaintainPlanVo> findExpireCollectTable(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        PageInfo<MaintainPlanVo> maintainPlanInfo = maintainPlanService.findExpireCollectTable(maintainPlanDto);
+        return new Result<>(true, StatusCode.OK, "养护到期汇总列表查询成功",maintainPlanInfo);
+    }
+
+    /**
+     * 养护当月新建报表/月底养护报表
+     * @param maintainPlanDto
+     * @return
+     */
+    @GetMapping(value = "/findMaintainMonthEndReport")
+    @ApiOperation(value = "月底养护报表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
+    })
+    public Result<MaintainPlanVo> findMaintainMonthEndReport(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainMonthEndReport(maintainPlanDto);
+        return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
+    }
+
+    /**
+     * 历史汇总单
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping(value = "/findMaintainHistoryCollect")
+    @ApiOperation(value = "历史汇总单")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
+    })
+    public Result findMaintainHistoryCollect(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainHistoryCollect(maintainPlanDto);
+        return new Result(true, StatusCode.OK, "查询历史汇总单成功",maintainPlanVos);
+    }
+
+    /**
+     * 移垛
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping({"/moveStack"})
+    public Result<T> moveStack(@RequestBody MaintainPlanDto maintainPlanDto) {
+        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        if (maintainPlanDto.getStackId().equals(((NodeDto) nodeDtoList.get(0)).getStackId())) {
+            return new Result<>(false, 20001, "垛位没有移动!");
+        } else {
+            Integer result = maintainPlanService.moveStack(maintainPlanDto);
+            return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);
+        }
+    }
+
+
+    /**
      * 养护统计报表
      * @param maintainPlanDto
      * @return
@@ -217,102 +494,5 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
     }
 
-    *//**
-     * 养护当月新建报表/月底养护报表
-     * @param maintainPlanDto
-     * @return
-     *//*
-    @GetMapping(value = "/findMaintainMonthEndReport")
-    public Result findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto) {
-        PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainMonthEndReport(maintainPlanDto);
-        return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
-    }
-
-    *//**
-     * 历史汇总单
-     * @param maintainPlanDto
-     * @return
-     *//*
-    @PostMapping(value = "/findMaintainHistoryCollect")
-    public Result findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
-        PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainHistoryCollect(maintainPlanDto);
-        return new Result(true, StatusCode.OK, "查询历史汇总单成功",maintainPlanVos);
-    }
-
-    *//**
-     * 开垛使用
-     * @param maintainPlanDto
-     * @return
-     *//*
-    @PostMapping(value = "/endMaintainPlan")
-    public Result endMaintainPlan(MaintainPlanDto maintainPlanDto) {
-        Integer i = maintainPlanService.endMaintainPlan(maintainPlanDto);
-        return new Result<>(true, StatusCode.OK, "开垛成功",i);
-    }
-
-    *//**
-     * 养护到期汇总中的删除
-     * @param ids
-     * @return
-     *//*
-    @PostMapping("/deleteMaintainPlanStage")
-    public Result deleteMaintainStage(@RequestParam("ids")List<Integer> ids) {
-        Integer i = maintainPlanService.deleteMaintainStage(ids);
-        return new Result<>(true, StatusCode.OK, "删除成功",i);
-    }
-
-    *//**
-     * 养护到期汇总中的详情
-     * @param id
-     * @return
-     *//*
-    @PostMapping("/findMaintainPlanDetails")
-    public Result findMaintainPlanDetails(Integer id) {
-        MaintainPlanVo maintainPlanVo = maintainPlanService.findMaintainPlanDetails(id);
-        return new Result<>(true, StatusCode.OK, "查询成功",maintainPlanVo);
-    }
-
-    *//**
-     * 转段
-     * @param maintainPlanDto
-     * @return
-     *//*
-    @PostMapping("/changeMaintainPlanStage")
-    public Result changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
-        Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
-        return new Result<>(true, StatusCode.OK, "转段成功",result);
-    }
-
-    @PostMapping("/findExpireCollectTable")
-    public Result findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
-        Result maintainPlan = maintainPlanService.findExpireCollectTable(maintainPlanDto);
-        return maintainPlan;
-    }
-    *//**
-     * 移垛
-     * @param maintainPlanDto
-     * @return
-     *//*
-    @PostMapping({"/moveStack"})
-    public Result<T> moveStack(@RequestBody com.rpzh.dto.MaintainPlanDto maintainPlanDto) {
-        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
-        if (maintainPlanDto.getStackId().equals(((NodeDto) nodeDtoList.get(0)).getStackId())) {
-            return new Result<>(false, 20001, "垛位没有移动!");
-        } else {
-            Integer result = maintainPlanService.moveStack(maintainPlanDto);
-            return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);
-        }
-    }
-
-    @PostMapping("/getPhases")
-    public Result getPhases(String maintenceStyle) {
-        List<String> phases = new ArrayList<>();
-        phases.add("养护阶段");
-        phases.add("充氮杀虫阶段");
-        phases.add("磷化铝杀虫阶段");
-        if("机械调控方式".equals(maintenceStyle)){
-            phases.add("充氮保质阶段");
-        }
-        return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
-    }*/
+    */
 }

@@ -18,4 +18,5 @@ public class MaterialVo {
     private String principalName;
     private Integer principalId;
     private Integer stackId;
+    private String materialName;
 }

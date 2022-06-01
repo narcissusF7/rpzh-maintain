@@ -395,4 +395,9 @@
     <select id="findNodeStatus" resultType="java.lang.Integer">
         select status from tb_node where id = #{id}
     </select>
+    <select id="findNodeIdBySiteType" resultType="com.rpzh.vo.NodeVo">
+        select node_type as nodeType,node_id as nodeId from tb_node where site_type = #{siteType}
+        <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
+        <if test="pidRoute != null and pidRoute != ''">and site_route = #{pidRoute}</if>
+    </select>
 </mapper>

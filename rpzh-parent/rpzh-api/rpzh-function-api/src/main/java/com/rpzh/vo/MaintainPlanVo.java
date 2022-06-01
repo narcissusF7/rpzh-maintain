@@ -25,8 +25,8 @@ public class MaintainPlanVo {
     @ApiModelProperty(notes = "物料代码")
     private String materialCode;
 
-    @ApiModelProperty(notes = "烟叶年份")
-    private String tobaccoYear;
+    @ApiModelProperty(notes = "物料代码集合")
+    private List<String> materialCodes;
 
     @ApiModelProperty(notes = "养护阶段")
     private String phases;
@@ -51,14 +51,20 @@ public class MaintainPlanVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date aftercareDateStart;
 
+    @ApiModelProperty(notes = "调养结束日期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date aftercareDateEnd;
+
     @ApiModelProperty(notes = "降氧完成时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date oxygenReductionTime;
 
     @ApiModelProperty(notes = "负责人")
-    private List<Integer> principalName;
-    private String username;
+    private String principalName;
+    @ApiModelProperty(notes = "负责人id")
     private String principalId;
+    @ApiModelProperty(notes = "负责人ids集合")
+    private List<String> principalIds;
 
     @ApiModelProperty(notes = "到期提醒时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -67,22 +73,45 @@ public class MaintainPlanVo {
     @ApiModelProperty(notes = "养护数量")
     private Double maintainCount;
 
+    @ApiModelProperty(notes = "封垛日期")
     private String sealStackTime;
 
     @ApiModelProperty(notes = "预警设置表id")
     private Integer alarmValueSettingId;
 
-    @ApiModelProperty(notes = "变更状态")
+    @ApiModelProperty(notes = "变更状态  1:变更,0:未变更")
     private String changeStatus;
+    @ApiModelProperty(notes = "是否是新建养护计划  1:是,0:否")
     private Integer version;
-
+    @ApiModelProperty(notes = "烟叶名称")
+    private String materialName;
     @ApiModelProperty(notes = "预警设置信息")
     private AlarmValueSettingVo alarmValueSettingVo;
 
+    @ApiModelProperty(notes = "垛内氧气当前数值")
+    private Double stackOxygenNow;
+
+    @ApiModelProperty(notes = "仓间氧气当前数值")
+    private Double warehouseOxygenNow;
+
+    @ApiModelProperty(notes = "包芯温度当前数值")
+    private Double tempCoreChipNow;
+
+    @ApiModelProperty(notes = "垛内温度当前数值")
+    private Double stackTempNow;
+
+    @ApiModelProperty(notes = "垛内水分当前数值")
+    private Double stackMoistureNow;
+
+    @ApiModelProperty(notes = "仓间水分当前数值")
+    private Double warehouseMoistureNow;
+
+    @ApiModelProperty(notes = "仓间温度当前数值")
+    private Double warehouseTempNow;
+
+    @ApiModelProperty(notes = "平均包芯高于环境的当前数值")
+    private Double coreTempHighEnvTempNow;
+
     @ApiModelProperty(notes = "养护阶段集合")
     private List<MaintainPlanVo> maintainPlanVos;
-
-    private String materialCodeYear;
-
-    private List<MaterialCodeYearVo> materialCodeYearVos;
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.AirConditioningDao">
+  <select id="findAirConditioningData" resultType="com.rpzh.pojo.NodeData">
+    select temp as temp,humiture as humiture from tb_air_conditioning where ware_area_id = #{wareAreaId} and
+    transfer_time in (select max(transfer_time) from tb_air_conditioning where ware_area_id = #{wareAreaId} group by air_conditioning_no)
+  </select>
+</mapper>

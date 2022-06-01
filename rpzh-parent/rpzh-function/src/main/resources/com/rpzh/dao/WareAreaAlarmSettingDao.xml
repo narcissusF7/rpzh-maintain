@@ -4,22 +4,22 @@
 
     <select id="findBySite" resultType="com.rpzh.vo.AlarmValueSettingVo">
         SELECT
-            warehouse_oxygen_upper_one,
-            warehouse_oxygen_upper_two,
-            warehouse_oxygen_upper_three,
-            warehouse_oxygen_lower,
-            warehouse_temp_upper_one,
-            warehouse_temp_upper_two,
-            warehouse_temp_upper_three,
-            warehouse_temp_lower,
-            warehouse_moisture_upper_on,
-            warehouse_moisture_upper_two,
-            warehouse_moisture_upper_three,
-            warehouse_moisture_lower,
+            warehouse_oxygen_upper_one as warehouseOxygenUpperOne,
+            warehouse_oxygen_upper_two as warehouseOxygenUpperTwo,
+            warehouse_oxygen_upper_three as warehouseOxygenUpperThree,
+            warehouse_oxygen_lower as warehouseOxygenLower,
+            warehouse_temp_upper_one as warehouseTempUpper0ne,
+            warehouse_temp_upper_two as warehouseTempUpperTwo,
+            warehouse_temp_upper_three as warehouseTempUpperThree,
+            warehouse_temp_lower as warehouseTempLower,
+            warehouse_moisture_upper_one as warehouseMoistureUpperOne,
+            warehouse_moisture_upper_two as warehouseMoistureUpperTwo,
+            warehouse_moisture_upper_three as warehouseMoistureUpperThree,
+            warehouse_moisture_lower as warehouseMoistureLower,
             site_id,
             site_type
         FROM
             tb_ware_area_alarm_setting
-        where CONCAT_WS ('',site_id ,site_type ) = #{site}
+        where CONCAT_WS ('',site_type ,site_id ) = #{site}
     </select>
 </mapper>
