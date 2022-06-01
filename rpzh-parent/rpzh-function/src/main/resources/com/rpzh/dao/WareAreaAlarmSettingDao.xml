@@ -20,6 +20,6 @@
             site_type
         FROM
             tb_ware_area_alarm_setting
-        where cast(site_id as varchar(11))+ case(site_type as varchar (2)) = #{site}
+        where CONCAT_WS ('',site_id ,site_type ) = #{site}
     </select>
 </mapper>
