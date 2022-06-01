@@ -36,6 +36,7 @@
           and id != #{id}
             limit 1
     </select>
+
     <update id="updateNode">
         UPDATE tb_node
         <set>
@@ -86,8 +87,8 @@
             <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
                 and node_type = #{nodeDto.nodeType}
             </if>
-            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
-                and site_id = #{nodeDto.siteId}
+            <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">
+                and site_route = #{nodeDto.siteRoute}
             </if>
             <if test="nodeDto.status != null and nodeDto.status != ''">
                 and status = #{nodeDto.status}
@@ -168,18 +169,20 @@
         </if>
     </select>
     <update id="enterStack">
-        UPDATE tb_node
-        SET stack    = #{stack},
-            stack_id = #{stackId},
-            site_id  = #{siteId},
-            site_x   = #{x},
-            site_y   = #{y},
-            site_z   = #{z},
-            status   = '1',
-            gather_site = #{gatherSite},
-            case_no = #{caseNo},
+        UPDATE tb_node SET
+            <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
+            <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id = #{nodeDto.stackId},</if>
+            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
+            <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
+            <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
+            <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
+            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+            <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
+            <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
+            STATUS = '1',
             into_stack_time = sysdate()
-        WHERE id = #{id}
+        WHERE
+            id = #{nodeDto.id}
     </update>
     <select id="findNodeIdCount" resultType="int">
         SELECT count(*)
@@ -266,29 +269,26 @@
         WHERE node_id = #{nodeId}
     </select>
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
-        select id,node_id from tb_node
+        select id,node_id from tb_node tnode,tb_material tmate
         <where>
-            <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
-                and site_route like  concat('%', #{monitorCondition.pidRoute},'%')
+            <if test="monitorCondition.gatherSite!=null and monitorCondition.gatherSite!=''">
+                and tnode.gather_site like  concat('%', #{monitorCondition.gatherSite},'%')
             </if>
             <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-                and material_code like concat('%', #{monitorCondition.materialCode},'%')
-            </if>
-            <if test="monitorCondition.materialName!=null and monitorCondition.materialName!=''">
-                and material_Name = #{monitorCondition.materialName}
+                and tmate.material_code like concat('%', #{monitorCondition.materialCode},'%')
             </if>
             <if test="nodeTypes!=null and nodeTypes!=''">
-                and node_type in
-                <foreach collection="nodeTypes" item="nodeType" open="(" separator="," close=")">
+                and tnode.node_type in
+                <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
                     #{nodeType}
                 </foreach>
             </if>
             <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=null">
-                and node_site = #{monitorCondition.siteType}
+                and tnode.site_type = #{monitorCondition.siteType}
             </if>
-            and status = 1
+            and tnode.status = 1 and tnode.stack_id = tmate.stack_id
         </where>
-        order by site_route,site_x,site_y,site_z;
+        order by tnode.gather_site,tnode.site_x,tnode.site_y,tnode.site_z;
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
         select id, type, ${tableColumn} as data ,transfer_time as transferTime
@@ -317,43 +317,76 @@
             tplan.stage_id maintainStageId
         FROM
             tb_node tnode,tb_maintran_plan tplan
-        WHERE
-            node_id = #{nodeId} and tnode.stackId = tplan.stackId
+        <where>
+            and node_id = #{nodeId}
+            and tnode.stackId = tplan.stackId
+            <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
+                and into_stack_time &gt;= #{nodeDto.startTime}
+            </if>
+            <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
+                and into_stack_time &lt;= #{nodeDto.endTime}
+            </if>
+        </where>
     </select>
+
 
     <insert id="insertNodeHistory">
         insert into ${tableName} (
-        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
-        <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
-        <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
-        <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
-        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signal_strength,</if>
-        <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
-        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
-        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
-        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
-        <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
-        <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
-        <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
-        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
-        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
-        createdTime
+            <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
+            <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
+            <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
+            <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
+            <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signal_strength,</if>
+            <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
+            <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
+            <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
+            <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
+            <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
+            <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
+            <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
+            <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
+            <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
+            <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
+            createdTime
         ) values {
-        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
-        <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
-        <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
-        <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
-        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
-        <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
-        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
-        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
-        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
-        <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
-        <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
-        <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
-        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
-        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
+            <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
+            <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
+            <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
+            <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
+            <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
+            <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
+            <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
+            <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
+            <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
+            <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
+            <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
+            <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
+            <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
+            <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
+            <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
             sysdate()
         }
     </insert>
+    <insert id="insertWeatherData">
+        insert into tb_weather_history (weather_name,temp,humidity,precip,created_time)values (#{weatherName},#{temp},#{humidity},#{precip},now())
+    </insert>
+
+    <select id="findWeatherData" resultType="com.rpzh.vo.WeatherDataVo">
+        select
+               weather_name as weatherName ,
+               temp as temp,
+               humidity as humidity ,
+               precip as precip ,
+               created_time as createdTime
+        from tb_weather_history
+        <where>
+            <if test="monitorCondition.startTime!=null and monitorCondition.startTime!=''">
+                and created_time &gt;= #{monitorCondition.startTime}
+            </if>
+
+            <if test="monitorCondition.endTime!=null and monitorCondition.endTime!=''">
+                and created_time &lt;= #{monitorCondition.endTime}
+            </if>
+        </where>
+    </select>
 </mapper>

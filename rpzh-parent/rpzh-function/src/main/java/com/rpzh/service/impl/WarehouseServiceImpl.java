@@ -620,10 +620,10 @@ public class WarehouseServiceImpl implements WarehouseService {
             List<StackVo> stackVos = findAllStack();
 
             //原始的数据 未经过stream处理
-            redisTemplate.opsForHash().put("buildingVos","buildingVos",buildingVos);
-            redisTemplate.opsForHash().put("floorVos","floorVos",floorVos);
-            redisTemplate.opsForHash().put("wareAreaVos","wareAreaVos",wareAreaVos);
-            redisTemplate.opsForHash().put("stackVos","stackVos",stackVos);
+//            redisTemplate.opsForHash().put("buildingVos","buildingVos",buildingVos);
+//            redisTemplate.opsForHash().put("floorVos","floorVos",floorVos);
+//            redisTemplate.opsForHash().put("wareAreaVos","wareAreaVos",wareAreaVos);
+//            redisTemplate.opsForHash().put("stackVos","stackVos",stackVos);
             //将所有的垛位放到对应的区间去
             wareAreaVos.stream().forEach(wareAreaVo ->{
                 stackVos.stream().collect(Collectors.groupingBy(stackVo -> stackVo.getAreaId())).forEach((key, value)->{

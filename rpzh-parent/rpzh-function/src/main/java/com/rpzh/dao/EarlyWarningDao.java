@@ -3,6 +3,7 @@ package com.rpzh.dao;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.EarlyWarningVo;
+import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.WarningCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,7 +17,6 @@ public interface EarlyWarningDao {
     List<EarlyWarningVo> findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId);
-
     EarlyWarningVo findUndoStackEarlyWarning(@Param("stackId") Integer stackId);
 
     List<String> findWarningThreshold(@Param("settingKey") String settingKey);
@@ -33,5 +33,5 @@ public interface EarlyWarningDao {
 
     Integer findUndoCount(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
-    String findNewDate(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<EarlyWarningVo> findTroubleNode();
 }
