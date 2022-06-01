@@ -1,5 +1,6 @@
 package com.rpzh.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
@@ -10,6 +11,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
+import com.rpzh.service.MaterialService;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.EasyPoiUtil;
@@ -50,6 +52,8 @@ public class NodeController {
     NodeOperationService operationService;
     @Autowired
     private NodeService nodeService;
+    @Autowired
+    private MaterialService materialService;
 
     @PostMapping("/addNode")
     @ApiOperation(value = "添加设备")
@@ -105,10 +109,20 @@ public class NodeController {
     ), @ApiImplicitParam(
             name = "status",
             value = "状态,0:解垛,1:入垛,2:未使用 ,3:故障",
-            dataType = "String"
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "siteRoute",
+            value = "位置路由",
+            dataType = "String",
+            required = true
     ), @ApiImplicitParam(
             name = "gatherSite",
             value = "采集位置",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "pid_route",
+            value = "位置路由",
             dataType = "String"
     ), @ApiImplicitParam(
             name = "stackId",
@@ -137,6 +151,7 @@ public class NodeController {
     )})
     @PostMapping("/updateNode")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {
+        //TODO 需要传个siteId 然后拼接到nodeDto.siteRoute中
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
             return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
@@ -148,6 +163,10 @@ public class NodeController {
         String nodeIdFind = nodeService.findNodeID(nodeId, id);
         if (nodeId.equals(nodeIdFind)) {
             return new Result<>(false, StatusCode.ERROR, "节点id已经存在,不允许修改");
+        }
+        Integer status = nodeService.findNodeStatus(id);
+        if (status ==0){
+            return new Result<>(false, StatusCode.ERROR, "解垛设备不允许修改");
         }
         int updateFlag = nodeService.updateNode(nodeDto);
         return new Result<>(true, StatusCode.OK, "修改设备成功");
@@ -310,11 +329,10 @@ public class NodeController {
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
-    //todo 重新开发
     @ApiOperation("设备入垛")
     @ApiImplicitParam(
             name = "data",
-            value = "JSON字符串,可以包含多个对象 每个对象包含id,x,y,z,stackId,stack,caseNo（箱号）",
+            value = "JSON字符串,可以包含多个对象 每个对象包含id（设备主键id 必传）,xyz（根据情况填写）,stackId（垛位id 垛内设备必传）,caseNo（箱号）,siteType（采集位置类型 04 仓间设备 05非仓间设备 必传），level （位置等级 必传），pid_route",
             dataType = "String"
     )
     @PostMapping("/enterStack")
@@ -322,8 +340,48 @@ public class NodeController {
         if (ToolUtil.isEmpty(data)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
-        System.out.println(data);
-        int updateFlag = nodeService.enterStack(data);
+        List<Map> list = JSONObject.parseObject(data, List.class);
+        for (int i = 0; i < list.size(); i++) {
+            Map map = list.get(i);
+            NodeDto nodeDto = new NodeDto();
+            //设置主键id
+            nodeDto.setId(Integer.parseInt(map.get("id").toString()));
+            //如果是垛内设备
+            if ("5".equals(map.get("level"))) {
+                //设置设备所在垛位的id
+                nodeDto.setStackId(Integer.parseInt(map.get("stackId").toString()));
+                //设置采集位置类型
+                nodeDto.setSiteType(NodeConstant.NODE_STACK);
+                //设置X坐标
+                nodeDto.setSiteX(map.get("x").toString());
+                //设置Y坐标
+                nodeDto.setSiteY(map.get("y").toString());
+                //设置Z坐标
+                nodeDto.setSiteZ(map.get("z").toString());
+                //设置采集位置
+                nodeDto.setGatherSite(map.get("stack").toString());
+                //设置垛位名称
+                nodeDto.setStack(map.get("stack").toString());
+
+                nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[05:"+map.get("stackId")+"]");
+
+                //如果是包芯设备
+                if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(map.get("nodeType").toString())) {
+                    nodeDto.setCaseNo(map.get("caseNo").toString());
+                }
+
+                //如果是仓间设备
+            } else if ("4".equals(map.get("level"))) {
+                //设置位置路由
+                nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[04:"+map.get("stackId")+"]");
+                //设置采集位置
+                nodeDto.setGatherSite(map.get("stack").toString());
+                //设置采集位置类型
+                nodeDto.setSiteType(NodeConstant.NODE_WARE_AREA);
+            }
+            nodeService.enterStack(nodeDto);
+        }
+
         return new Result<>(true, StatusCode.OK, "设备入垛成功");
     }
 
@@ -522,7 +580,7 @@ public class NodeController {
             value = "每页数量",
             dataType = "Integer"
     )})
-    @GetMapping({"findNodeHistory"})
+    @GetMapping({"/findNodeHistory"})
     public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
         int page = nodeDto.getPage();
         int size = nodeDto.getSize();

@@ -1,11 +1,12 @@
 package com.rpzh.handler;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.AlarmValueSettingDao;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.WareAreaAlarmSettingDao;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
@@ -44,6 +45,9 @@ public class DataHandler {
     @Autowired
     MonitoringCenterService monitoringCenterService;
 
+    @Autowired
+    WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
+
     @Value("${node.voltage}")
     Double voltage;
     @Value("${node.signalStrength}")
@@ -54,6 +58,7 @@ public class DataHandler {
     public static String ALERT_LEVER_NUM = "ALERT_LEVER_NUM";
 
     public void handlerData(ParseData parseData) {
+
         //判断电量
         if (parseData.getVoltage() < voltage) {
             //判断数据库中该设备是否存在未处理的低电量预警
@@ -73,31 +78,29 @@ public class DataHandler {
         NodeVo nodeVo = nodeDao.findNodeAndMaintainStageByNodeId(parseData.getNodeId());
 
         //该设备需要预警的字段
-        String[] column = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
-        //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
-        Boolean hasKey = redisTemplate.opsForHash().hasKey(MAINTAIN + nodeVo.getMaintainStageId(), column[0]);
-
-        //如果不存在
-        if (!hasKey) {
-            //数据库获取
-            AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findByMaintainStageId(nodeVo.getMaintainStageId());
-            //获取所有的字段
-            Field[] fields = AlarmValueSetting.class.getDeclaredFields();
-            for (Field field : fields) {
-                try {
-                    //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                    redisTemplate.opsForHash().put(MAINTAIN + nodeVo.getMaintainStageId(), field.getName(), field.get(alarmValueSettingVo.toString()));
-                } catch (IllegalAccessException exception) {
-                    exception.printStackTrace();
-                }
-            }
-        }
-
-        //获取该设备需要预警的字段  通过这个字段找到redis中的值 然后和当前值做比较
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
 
-        //redis中的对象名
-        String redisHashKey = MAINTAIN + nodeVo.getMaintainStageId();
+        //将位置路由转换成map
+        Map map = JSONObject.parseObject(nodeVo.getSiteRoute());
+
+        String redisHashKey;
+        if(NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())){//如果是仓间设备
+            //
+            List<String> hashKeys = new ArrayList<>();
+            map.forEach((k,v) ->{
+                hashKeys.add(k.toString()+v.toString());
+            });
+            //redis中的对象名
+            redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
+        }else {//垛内设备
+
+            List<String> hashKeys = Arrays.asList(MAINTAIN + nodeVo.getMaintainStageId());
+
+            putAlarmValueToCache(hashKeys,alarmColumns[0]);
+
+            //redis中的对象名
+            redisHashKey = MAINTAIN + nodeVo.getMaintainStageId();
+        }
 
         //存放预警阈值
         List<Double> list = new ArrayList<>();
@@ -138,7 +141,7 @@ public class DataHandler {
                 //判断当前数据所属等级
                 int level = decideValue(data, list);
                 //处理该设备数据
-                earlyWarningHandle(nodeVo, level, parseData, data, nodeVo.getSiteType());
+                earlyWarningHandle(nodeVo, level, parseData, data);
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);
@@ -146,7 +149,7 @@ public class DataHandler {
             Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
 
             //最后一条数据需要存放到redis中
-            if (i==1){
+            if (i==0){
                 redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(), nodeData);
             }
         }
@@ -187,6 +190,45 @@ public class DataHandler {
             avgCoreHandle(nodeVo, level, parseData, v);
         }
 
+    }
+
+    /**
+     * 向缓存中存放预警值
+     * @param hashKeys 位置id和位置类型（位置类型,1:仓库, 2: 楼号, 3: 层, 4: 区）拼接的集合
+     * @param alarmColumn 字段名称（用来判断缓存是否存在）
+     * @return
+     */
+    public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn){
+
+        for (int i = hashKeys.size()-1; i >=0 ; i--) {
+            //判断缓存是否存在
+            Boolean hasKey = redisTemplate.opsForHash().hasKey(MAINTAIN + hashKeys.get(i), alarmColumn);
+            if (hasKey) {
+                return MAINTAIN + hashKeys.get(i);
+            }else {
+                //不存在就从数据库中查找
+                AlarmValueSettingVo alarmValueSettingVo = wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
+                //数据库中有就存在缓存中并跳出循环  没有就向上查找
+                if (!ToolUtil.isEmpty(alarmValueSettingVo)){
+
+                    //获取 AlarmValueSettingVo中所有的字段
+                    Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
+                    for (Field field : fields) {
+                        try {
+                            field.setAccessible(true);
+                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                            if (field.get(alarmValueSettingVo)!=""||field.get(alarmValueSettingVo)!=null){
+                                redisTemplate.opsForHash().put(MAINTAIN + hashKeys.get(i), field.getName(), field.get(alarmValueSettingVo));
+                            }
+                        } catch (IllegalAccessException exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                    return MAINTAIN + hashKeys.get(i);
+                }
+            }
+        }
+        return MAINTAIN + hashKeys.get(0);
     }
 
     /**
@@ -308,18 +350,21 @@ public class DataHandler {
         } else {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             if (level > 0) {
-                //预警类型,01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:虫数超限预警,05:包芯温度超限预警,06:环境温度超限预警,07:环境湿度超限预警,08:氧气超限预警,09:垛位温度预警
+                //判断是否是仓间设备
+                boolean isNodeStack =  NodeConstant.NODE_STACK.equals(nodeVo.getSiteType());
+                //如果不为空即该设备为温湿度设备
                 if (!ToolUtil.isEmpty(evnType)) {
-
+                    //温湿度 温度预警
                     if ("temp".equals(evnType)) {
-                        earlyWarning.setWarningType(WarningTypeConstant.ATMOSPHERE_TEMP_OVERRUN_WARNING);
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING);
+                        //温湿度 湿度预警
                     } else if ("humidity".equals(evnType)) {
-                        earlyWarning.setWarningType(WarningTypeConstant.ATMOSPHERE_HUMIDITY_OVERRUN_WARNING);
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING);
                     }
                 } else {
                     switch (nodeVo.getNodeType()) {
                         case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(WarningTypeConstant.OXYGEN_OVERRUN_WARNING);
+                            earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING);
                             break;
                         case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
                             earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING);
@@ -363,7 +408,7 @@ public class DataHandler {
             }
         } else if (level > 0) {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
-            earlyWarning.setWarningType(WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING);
+            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
             setLevel(earlyWarning, level, data);
             earlyWarningDao.insertWarning(earlyWarning);
         }

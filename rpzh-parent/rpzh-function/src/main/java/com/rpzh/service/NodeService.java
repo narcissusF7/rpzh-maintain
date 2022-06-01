@@ -91,7 +91,7 @@ public interface NodeService {
      * @param data
      * @return
      */
-    int enterStack(String data);
+    int enterStack(NodeDto data);
 
     /**
      * 批量导入设备
@@ -131,4 +131,6 @@ public interface NodeService {
     List<NodeDataVo> findNodeHistory(NodeDto nodeDto);
 
     List<NodeVo> findNodeByStackId(Integer stackId);
+
+    Integer findNodeStatus(Integer id);
 }

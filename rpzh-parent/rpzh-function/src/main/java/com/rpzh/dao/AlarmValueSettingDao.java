@@ -44,4 +44,5 @@ public interface AlarmValueSettingDao {
     Integer updateColorAndAlertUpgradeDay(@Param("settingValue")Object settingValue,@Param("settingKey")String settingKey,@Param("settingName")String settingName);
 
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
+
 }

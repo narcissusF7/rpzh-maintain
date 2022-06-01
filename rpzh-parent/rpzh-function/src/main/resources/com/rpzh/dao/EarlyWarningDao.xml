@@ -21,22 +21,22 @@
     </select>
 
     <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
-        SELECT
-        warning_type AS warningType,
-        COUNT(warning_grade ='1' OR NULL) AS oneWarningCount,
-        COUNT(warning_grade ='2' OR NULL) AS twoWarningCount,
-        COUNT(warning_grade ='3' OR NULL) AS threeWarningCount
-        FROM tb_early_warning
-        WHERE is_affirm = '2'
+        select
+        warning_type as warningType,
+        warning_grade as warningGrade,
+        COUNT(warning_grade='1' OR NULL) AS oneWarningCount,
+        COUNT(warning_grade='2' OR NULL) AS twoWarningCount,
+        COUNT(warning_grade='3' OR NULL) AS threeWarningCount
+        from tb_early_warning
+        where is_affirm = '2'
         <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        group by warning_type
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
+        group by warning_type,warning_grade
     </select>
     <select id="findEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
-        t.warning_type as warningType,
         t.stack_id AS stackId,
         substring_index(group_concat(t.is_affirm),',',1) AS affirm,
         substring_index(group_concat(t.warning_grade),',',1) AS warningGrade,
@@ -47,21 +47,15 @@
         WHEN '3' THEN substring_index(group_concat(t.warning_val_three),',',1) END) AS warningVal,
         substring_index(group_concat(t.warning_time),',',1) AS warningTime
         FROM(
-        SELECT * FROM tb_early_warning WHERE 1=1
-        <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
-        <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
-        <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t
+        SELECT * FROM tb_early_warning WHERE warning_type = #{earlyWarningDto.warningType}) t
         INNER JOIN
         (SELECT stack_id,MAX(warning_grade) AS warning_grade FROM tb_early_warning WHERE 1=1
         <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        GROUP BY stack_id,is_affirm ORDER BY is_affirm DESC) t2
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
+        GROUP BY stack_id) t2
         ON t.warning_grade = t2.warning_grade AND t2.stack_id = t.stack_id GROUP BY t.stack_id
-        ORDER BY substring_index(group_concat(t.is_affirm),',',1) DESC,substring_index(group_concat(t.warning_grade),',',1) DESC
     </select>
     <select id="findEarlyWarningByStack" resultType="com.rpzh.vo.EarlyWarningVo">
         select id, warning_type warningType , node_id nodeId , node_type nodeType , warning_val_one warningValOne ,
@@ -114,10 +108,4 @@
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate()</if>
         where id = #{earlyWarning.id}
     </update>
-    <select id="findNewDate" resultType="java.lang.String">
-        SELECT MAX(warning_time) FROM tb_early_warning WHERE stack_id = #{earlyWarningDto.stackId} and is_affirm = #{earlyWarningDto.affirm} and warning_type = #{earlyWarningDto.warningType}
-        <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
-        <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-    </select>
 </mapper>

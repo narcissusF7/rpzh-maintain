@@ -42,6 +42,7 @@ public class NodeDto {
     private String startTime;
     private String endTime;
     private String afterNodeId;
+    private String caseNo;
     private int page = 1;
     private int size = 10;
     private Integer dataType;

@@ -85,6 +85,9 @@ public class NodeDataVo {
     //物料代码
     private String materialCode;
 
+    private Integer maintainPlanId;
+    private Integer maintainStageId;
+
 
 
     public Double getData() {

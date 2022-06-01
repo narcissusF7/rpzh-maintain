@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
@@ -71,6 +72,10 @@ public class NodeServiceImpl implements NodeService {
         String username = userInfo.get("username");
         //最后更新人
         nodeDto.setLastUpdatedUser(username);
+        String siteType = nodeDto.getSiteRoute().split(",").length ==4? "04":"05";
+        nodeDto.setSiteType(siteType);
+        nodeDto.setSiteRoute(nodeDto.getSiteRoute()+",["+siteType+":"+nodeDto.getSiteId()+"]");
+
         int updateFlag = nodeDao.updateNode(nodeDto);
         return updateFlag;
     }
@@ -180,53 +185,13 @@ public class NodeServiceImpl implements NodeService {
 
     /**
      * 设备入垛
-     * @param data
+     * @param nodeDto
      * @return
      */
     @Override
-    public int enterStack(String data) {
-        List<Map> list = JSONObject.parseObject(data, List.class);
-        int updateFlag = 0;
-        for (int i = 0; i < list.size(); i++) {
-            Map map = list.get(i);
-            int id = 0,siteId = 0,stackId = 0;
-
-            String x = "-",y = "-",z = "-",gatherSite = "--",stack = "-",caseNo = "";
-            if (!ToolUtil.isEmpty(map.get("id"))){
-                id = Integer.parseInt(map.get("id").toString());
-            }
-            //如果设备类型为空
-            if (ToolUtil.isEmpty(map.get("nodeType"))){
-                return -1;
-            }
-
-            if (!ToolUtil.isEmpty(map.get("siteId"))){
-                siteId = Integer.parseInt(map.get("siteId").toString());
-            }
-            if (!ToolUtil.isEmpty(map.get("stackId"))){
-                stackId = Integer.parseInt(map.get("stackId").toString());
-            }
-            if (!ToolUtil.isEmpty(map.get("x"))){
-                x = map.get("x").toString();
-            }
-            if (!ToolUtil.isEmpty(map.get("y"))){
-                y = map.get("y").toString();
-            }
-            if (!ToolUtil.isEmpty(map.get("z"))){
-                z = map.get("z").toString();
-            }
-            if (!ToolUtil.isEmpty(map.get("stack"))){
-                stack = map.get("stack").toString();
-                gatherSite =stack;
-            }
-            if (!ToolUtil.isEmpty(map.get("caseNo"))){
-                stack = map.get("caseNo").toString();
-                caseNo =stack;
-            }
-
-            updateFlag = nodeDao.enterStack(id,x,y,z,stackId,stack,siteId,gatherSite,caseNo);
-        }
-        return updateFlag;
+    @Transactional
+    public int enterStack(NodeDto nodeDto) {
+        return nodeDao.enterStack(nodeDto);
     }
 
     /**
@@ -348,6 +313,12 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<NodeVo> findNodeByStackId(Integer stackId) {
         return nodeDao.findNodeByStackId(stackId);
+    }
+
+    @Override
+    public Integer findNodeStatus(Integer id) {
+
+        return nodeDao.findNodeStatus(id);
     }
 
     @Override

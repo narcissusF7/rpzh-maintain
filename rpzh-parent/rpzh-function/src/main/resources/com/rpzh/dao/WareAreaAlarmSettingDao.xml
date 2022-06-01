@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.WareAreaAlarmSettingDao">
+
+    <select id="findBySite" resultType="com.rpzh.vo.AlarmValueSettingVo">
+        SELECT
+            warehouse_oxygen_upper_one,
+            warehouse_oxygen_upper_two,
+            warehouse_oxygen_upper_three,
+            warehouse_oxygen_lower,
+            warehouse_temp_upper_one,
+            warehouse_temp_upper_two,
+            warehouse_temp_upper_three,
+            warehouse_temp_lower,
+            warehouse_moisture_upper_on,
+            warehouse_moisture_upper_two,
+            warehouse_moisture_upper_three,
+            warehouse_moisture_lower,
+            site_id,
+            site_type
+        FROM
+            tb_ware_area_alarm_setting
+        where CONCAT_WS ('',site_id ,site_type ) = #{site}
+    </select>
+</mapper>
