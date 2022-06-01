@@ -45,4 +45,5 @@ public interface AlarmValueSettingDao {
 
 //    List<AlarmValueSetting> findByMaintainStageId(Set<Integer> set);
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
+
 }

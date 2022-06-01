@@ -148,7 +148,8 @@
         `site_y` = '-',
         `site_z` = '-',
         gather_site = '--',
-        caseNo = ""
+        site_route = '',
+        case_no = ""
         WHERE id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -314,12 +315,14 @@
             tnode.last_updated_time lastUpdateTime,
             tnode.last_updated_user lastUpdateUser,
             tnode.stack_id stackId,
-            tplan.stage_id maintainStageId
+            tplan.stage_id maintainStageId,
+            tstack.area_id wareAreaId
         FROM
-            tb_node tnode,tb_maintran_plan tplan
+            tb_node tnode,tb_maintran_plan tplan,tb_stack tstack
         <where>
             and node_id = #{nodeId}
-            and tnode.stackId = tplan.stackId
+            and tnode.stackId = tplan.stackId,
+            and tstack.stackId = tplan.stackId,
             <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
                 and into_stack_time &gt;= #{nodeDto.startTime}
             </if>
@@ -388,5 +391,8 @@
                 and created_time &lt;= #{monitorCondition.endTime}
             </if>
         </where>
+    </select>
+    <select id="findNodeStatus" resultType="java.lang.Integer">
+        select status from tb_node where id = #{id}
     </select>
 </mapper>

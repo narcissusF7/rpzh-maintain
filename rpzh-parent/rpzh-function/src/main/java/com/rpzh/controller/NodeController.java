@@ -112,6 +112,11 @@ public class NodeController {
             dataType = "String",
             required = true
     ), @ApiImplicitParam(
+            name = "siteRoute",
+            value = "位置路由",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
             name = "gatherSite",
             value = "采集位置",
             dataType = "String"
@@ -146,6 +151,7 @@ public class NodeController {
     )})
     @PostMapping("/updateNode")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {
+        //TODO 需要传个siteId 然后拼接到nodeDto.siteRoute中
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
             return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
@@ -158,7 +164,8 @@ public class NodeController {
         if (nodeId.equals(nodeIdFind)) {
             return new Result<>(false, StatusCode.ERROR, "节点id已经存在,不允许修改");
         }
-        if ("0".equals(nodeDto.getStatus())){
+        Integer status = nodeService.findNodeStatus(id);
+        if (status ==0){
             return new Result<>(false, StatusCode.ERROR, "解垛设备不允许修改");
         }
         int updateFlag = nodeService.updateNode(nodeDto);
@@ -325,7 +332,7 @@ public class NodeController {
     @ApiOperation("设备入垛")
     @ApiImplicitParam(
             name = "data",
-            value = "JSON字符串,可以包含多个对象 每个对象包含id（设备主键id 必传）,xyz（根据情况填写）,stackId（垛位id 垛内设备必传）,caseNo（箱号）,siteType（采集位置类型 04 仓间设备 05非仓间设备 必传），level （位置等级 必传）",
+            value = "JSON字符串,可以包含多个对象 每个对象包含id（设备主键id 必传）,xyz（根据情况填写）,stackId（垛位id 垛内设备必传）,caseNo（箱号）,siteType（采集位置类型 04 仓间设备 05非仓间设备 必传），level （位置等级 必传），pid_route",
             dataType = "String"
     )
     @PostMapping("/enterStack")
@@ -356,13 +363,17 @@ public class NodeController {
                 //设置垛位名称
                 nodeDto.setStack(map.get("stack").toString());
 
+                nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[05:"+map.get("stackId")+"]");
+
                 //如果是包芯设备
-                if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(map.get("siteType").toString())) {
+                if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(map.get("nodeType").toString())) {
                     nodeDto.setCaseNo(map.get("caseNo").toString());
                 }
 
                 //如果是仓间设备
             } else if ("4".equals(map.get("level"))) {
+                //设置位置路由
+                nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[04:"+map.get("stackId")+"]");
                 //设置采集位置
                 nodeDto.setGatherSite(map.get("stack").toString());
                 //设置采集位置类型

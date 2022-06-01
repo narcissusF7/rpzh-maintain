@@ -170,4 +170,6 @@ public interface NodeDao {
     Integer insertWeatherData(@Param("weatherName") String weatherName , @Param("temp") Double temp , @Param("humidity") Double humidity , @Param("precip") Double precip);
 
     List<WeatherDataVo> findWeatherData(@Param("monitorCondition") MonitorCondition monitorCondition);
+
+    Integer findNodeStatus(@Param("id") Integer id);
 }
