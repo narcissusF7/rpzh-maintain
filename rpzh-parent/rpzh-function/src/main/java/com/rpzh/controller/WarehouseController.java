@@ -144,8 +144,8 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
-        String wareType = warehouseService.findWareType(warehouseId);
-        buildingDto.setBuildingType(wareType);
+        //String wareType = warehouseService.findWareType(warehouseId);
+        //buildingDto.setBuildingType(wareType);
         int updateFlag = warehouseService.updateBuilding(buildingDto);
         return new Result(true, StatusCode.OK, "修改楼栋信息成功");
     }
@@ -196,8 +196,8 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
         }
         //获取楼栋类型
-        String buildType = warehouseService.findBuildType(buildingId);
-        floorDto.setFloorType(buildType);
+        //String buildType = warehouseService.findBuildType(buildingId);
+        //floorDto.setFloorType(buildType);
         int updateFlag = warehouseService.updateFloor(floorDto);
         return new Result(true, StatusCode.OK, "修改楼层成功");
     }
@@ -242,8 +242,8 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "楼层id不能为空");
         }
         //查询楼层类型
-        String floorType = warehouseService.findFloorType(floorId);
-        wareAreaDto.setWareAreaType(floorType);
+        //String floorType = warehouseService.findFloorType(floorId);
+        //wareAreaDto.setWareAreaType(floorType);
         int updateFlag = warehouseService.updateWarearea(wareAreaDto);
         return new Result(true, StatusCode.OK, "修改分区成功");
     }
@@ -294,8 +294,8 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
         //查看分区类型
-        String wareAreaType = warehouseService.findWareAreaType(areaId);
-        stackDto.setStackType(wareAreaType);
+        //String wareAreaType = warehouseService.findWareAreaType(areaId);
+        //stackDto.setStackType(wareAreaType);
         int updateFlag = warehouseService.updateStack(stackDto);
         return new Result(true, StatusCode.OK, "修改垛位成功");
     }

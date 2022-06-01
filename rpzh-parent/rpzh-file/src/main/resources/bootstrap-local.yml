@@ -1,0 +1,47 @@
+server:
+  port: 15888
+spring:
+  application:
+    name: rpzh-file
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:  # 注册中心地址
+      discovery:
+        server-addr: 127.0.0.1:8866
+      config: # 配置中心地址
+        server-addr: 127.0.0.1:8866
+        # 配置文件格式
+        file-extension: yml
+  servlet:
+    multipart:
+      max-file-size: 10MB    #单个文件大小
+      max-request-size: 10MB   #文件传输大小
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    #hikari:
+    #max-lifetime: 1800000       #在连接池中的存活时间  Yl123456
+    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+    username: root
+    password: root
+logging:
+  level:
+    root: info
+    org.springframework: info
+    com.rpzh.dao: DEBUG  #sql日志打印
+feign:  #开启feign熔断器,当feign调用失败时熔断
+  hystrix:
+    enabled: true
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000   #连接超时时间
+          strategy: SEMAPHORE              #线程池隔离采用信号量隔离
+fastdfs:
+  ip: 120.24.91.199:8080
+
+
