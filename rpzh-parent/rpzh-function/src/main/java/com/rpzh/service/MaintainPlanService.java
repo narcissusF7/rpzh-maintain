@@ -3,7 +3,9 @@ package com.rpzh.service;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.entity.Result;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainPlanVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,6 +21,9 @@ public interface MaintainPlanService {
      */
     int insertMaintainPlan(MaintainPlanDto maintainPlanDto);
 
+    AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName);
+
+    Integer isExistStackId(Integer stackId);
     /**
      * 查询养护计划
      * @param maintainPlanDto 养护计划信息
@@ -32,14 +37,14 @@ public interface MaintainPlanService {
      * @return success or failure
      */
     Result deleteMaintainPlanInfo(List<Integer> stageIds);
-
+    /*
     MaintainPlanVo findMaintainPlan(Integer id);
 
-    /**
+    *//**
      * 更改养护计划
      * @param maintainPlanDto
      * @return
-     */
+     *//*
     Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto);
 
     PageInfo<MaintainPlanVo> findMaintainCountReport(MaintainPlanDto maintainPlanDto);
@@ -58,7 +63,5 @@ public interface MaintainPlanService {
 
     Result findExpireCollectTable(MaintainPlanDto maintainPlanDto);
 
-    Integer isExistStackId(Integer stackId);
-
-    Integer moveStack(MaintainPlanDto maintainPlanDto);
+    Integer moveStack(MaintainPlanDto maintainPlanDto);*/
 }

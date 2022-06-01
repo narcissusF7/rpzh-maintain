@@ -34,18 +34,6 @@ public class AlarmValueSettingController {
     @Resource
     private AlarmValueSettingService alarmValueSettingService;
 
-    @PostMapping(value = "/findAlarmValueSettingInfo")
-    public Result findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
-        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
-        String materialCodeYear = alarmValueSettingDto.getMaterialCodeYear();
-        String phases = alarmValueSettingDto.getPhases();
-        String maintenceStyle = alarmValueSettingDto.getMaintenceStyle();
-        if(StringUtils.isEmpty(materialCodeYear) || StringUtils.isEmpty(phases) || StringUtils.isEmpty(maintenceStyle)){
-            return new Result(false, StatusCode.ERROR, "物料等级,烟叶年份,养护阶段或养护方法不能为空!");
-        }
-        AlarmValueSettingVo alarmValueSetting = alarmValueSettingService.findMaintainPlanInfo(alarmValueSettingDto);
-        return new Result(true, StatusCode.OK, "查询成功!",alarmValueSetting);
-    }
 
     @PostMapping(value = "/findAlarmValueSettingTable")
     @ApiImplicitParams({
@@ -83,16 +71,6 @@ public class AlarmValueSettingController {
     public Result deleteAlarmValueSetting(@RequestParam List<Integer> ids) {
         Result result = alarmValueSettingService.deleteAlarmValueSetting(ids);
         return result;
-    }
-
-    @PostMapping(value = "/findYear")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String")
-    })
-    @ApiOperation(value = "根据物料代码查找烟叶年份")
-    public Result findYear(String materialCode) {
-        List<String> years = alarmValueSettingService.findYear(materialCode);
-        return new Result<>(true, StatusCode.OK, "查询烟叶年份成功!",years);
     }
 
     @PostMapping(value = "/insertAlarmValueSetting")

@@ -3,6 +3,7 @@ package com.rpzh.controller;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.EarlyWarningService;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,8 +28,13 @@ public class EarlyWarningController {
     @Resource
     private EarlyWarningService earlyWarningService;
 
-    @PostMapping("test")
-    public Result test(EarlyWarningDto earlyWarningDto){
+    @PostMapping("/findEarlyWarningInfo")
+    public Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto){
+        return earlyWarningService.findEarlyWarningInfo(earlyWarningDto);
+    }
+    @PostMapping("/findEarlyWarning")
+    public Result findEarlyWarning(EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findEarlyWarning(earlyWarningDto);
     }
+
 }

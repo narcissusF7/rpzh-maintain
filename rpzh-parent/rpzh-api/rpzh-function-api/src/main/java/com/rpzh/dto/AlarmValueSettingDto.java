@@ -165,10 +165,7 @@ public class AlarmValueSettingDto {
       this.earlyWarningRuleName=maintainPlanDto.getEarlyWarningRuleName();
       this.maintenceStyle=maintainPlanDto.getMaintenceStyle();
       this.phases=maintainPlanDto.getPhases();
-      this.tobaccoYear=maintainPlanDto.getTobaccoYear();
       this.materialCode=maintainPlanDto.getMaterialCode();
-      this.materialBatchNum=maintainPlanDto.getMaterialBatchNum();
-      this.materialCodeYear=maintainPlanDto.getMaterialCodeYear();
       this.alarmValueSettingId=maintainPlanDto.getAlarmValueSettingId();
       this.coreTempLowEnvTemp = maintainPlanDto.getCoreTempLowEnvTemp();
     }

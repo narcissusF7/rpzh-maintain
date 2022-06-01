@@ -17,6 +17,7 @@ public interface EarlyWarningDao {
     List<EarlyWarningVo> findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId);
+
     EarlyWarningVo findUndoStackEarlyWarning(@Param("stackId") Integer stackId);
 
     List<String> findWarningThreshold(@Param("settingKey") String settingKey);

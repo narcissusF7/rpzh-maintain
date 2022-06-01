@@ -11,10 +11,13 @@ import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
+import org.hibernate.validator.constraints.pl.REGON;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,13 +29,24 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     private MaintainPlanDao maintainPlanDao;
 
     @Resource
+    private AlarmSettingTemplateDao alarmSettingTemplateDao;
+
+    @Resource
     private AlarmValueSettingDao alarmValueSettingDao;
+
+    @Resource
+    private MaterialDao materialDao;
 
     @Resource
     private UserFeign userFeign;
 
     @Resource
     private NodeDao nodeDao;
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    public static String MAINTAIN ="MAINTAIN_";
 
     /**
      * 新增养护计划
@@ -42,55 +56,100 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
-        List<Integer> principalIds = maintainPlanDto.getPrincipalName();
-        maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
-        maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
-        String materialCodeYear = maintainPlanDto.getMaterialCodeYear();
-        List<String> materialCodeYearJson = JSON.parseArray(materialCodeYear, String.class);
-        materialCodeYear = JSON.toJSONString(JSON.parse(materialCodeYearJson.toString()));
-        List<MaterialCodeYearDto> materialCodeYearDtos = JSON.parseArray(materialCodeYear, MaterialCodeYearDto.class);
-        String materialCode ="";
-        String tobaccoYear = "";
-        for (int i = 0; i < materialCodeYearDtos.size(); i++) {
-            if(i==0){
-                materialCode =  materialCodeYearDtos.get(i).getId();
-                tobaccoYear =  materialCodeYearDtos.get(i).getTobaccoYear().replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","");
-            }
-            if(i!=0) {
-                materialCode = materialCode + "," + materialCodeYearDtos.get(i).getId();
-                tobaccoYear = tobaccoYear + ";" + materialCodeYearDtos.get(i).getTobaccoYear().replace("\"","").replaceAll("\\[","").replaceAll("\\]","");
-            }
+        List<String> materialName = materialDao.getMaterialName(maintainPlanDto.getStackId());
+        if (materialName.size() > 0) {
+            maintainPlanDto.setMaterialName(String.join(",", materialName));
         }
-        maintainPlanDto.setTobaccoYear(tobaccoYear);
-        maintainPlanDto.setMaterialCode(materialCode);
+        List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        maintainPlanDto.setPrincipalId(principalIds.toString().replaceAll("\\[","").replaceAll("\\]","").replaceAll(" ",""));
+        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
+        List<String> materialCodes = maintainPlanDto.getMaterialCodes();
+        maintainPlanDto.setMaterialCode(String.join(",",materialCodes));
         Date nowDate = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
-        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(nowDate);
-        Integer alarmValueSettingId = alarmValueSettingDto.getAlarmValueSettingId();
-        if(alarmValueSettingId!=null){
-            alarmValueSettingDto.setUpdateUser(createUser);
-            alarmValueSettingDto.setUpdatedTime(nowDate);
-            alarmValueSettingDao.updateAlarmValueSetting(alarmValueSettingDto,alarmValueSettingId);
-        }else{
-            alarmValueSettingDto.setCreateUser(createUser);
-            alarmValueSettingDto.setCreatedTime(nowDate);
-            alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-            maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findMaxId());
-        }
+        String hours = new SimpleDateFormat("HH:mm:ss").format(new Date());
         long l = nowDate.getTime() % (1000 * 60 * 60 * 24);
-        maintainPlanDto.setOxygenReductionTime(new Date(maintainPlanDto.getOxygenReductionTime().getTime() + l));
-        Date date = new Date(maintainPlanDto.getAftercareDateStart().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        maintainPlanDto.setAftercareDateEnd(date);
-        maintainPlanDto.setAftercareDateStart(new Date(maintainPlanDto.getAftercareDateStart().getTime() + l));
-        maintainPlanDto.setExpireTime(new Date(maintainPlanDto.getExpireTime().getTime() + l));
+        if(maintainPlanDto.getOxygenReductionTime().equals("00:00:00")) {
+            maintainPlanDto.setOxygenReductionTime(maintainPlanDto.getOxygenReductionTime().replace("00:00:00", hours));
+        }else{
+            maintainPlanDto.setOxygenReductionTime(maintainPlanDto.getOxygenReductionTime()+" "+hours);
+        }
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            if(maintainPlanDto.getAftercareDateStart().equals("00:00:00")) {
+                date = new Date(dayFormat.parse(maintainPlanDto.getAftercareDateStart()).getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+                maintainPlanDto.setAftercareDateStart(maintainPlanDto.getAftercareDateStart().replace("00:00:00", hours));
+            }else{
+                date = new Date(dayFormat.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+                maintainPlanDto.setAftercareDateStart(maintainPlanDto.getAftercareDateStart()+" "+hours);
+            }
+            maintainPlanDto.setAftercareDateEnd(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if(maintainPlanDto.getExpireTime().equals("00:00:00")) {
+            maintainPlanDto.setExpireTime(maintainPlanDto.getExpireTime().replace("00:00:00", hours));
+        }else{
+            maintainPlanDto.setExpireTime(maintainPlanDto.getExpireTime()+" "+hours);
+        }
         maintainPlanDao.insertMaintainPlan(maintainPlanDto);
-        Integer id =maintainPlanDao.findMaxPlanId();
+        Integer alarmValueSettingId = alarmValueSettingDao.findMaxId();
+        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingId);
+        Integer id =maintainPlanDao.findMaxPlanId(maintainPlanDto.getStackId());
         maintainPlanDto.setMaintainPlanId(id);
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
-        Integer stageId = maintainPlanDao.findMaxStageId();
+        Integer stageId = maintainPlanDao.findMaxStageId(id);
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
+        alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
         return maintainPlanDao.updateMaintainPlanStageId(stageId,id);
+    }
+
+    @Override
+    public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName) {
+        AlarmValueSettingVo alarmSettingTemplate = alarmSettingTemplateDao.findAlarmSettingTemplate(earlyWarningRuleName);
+        if(ToolUtil.isEmpty(alarmSettingTemplate)){
+            alarmSettingTemplate.setStackOxygenUpperOne(AlertSettingSetDefault.stackOxygenUpperOne);
+            alarmSettingTemplate.setStackOxygenUpperTwo(AlertSettingSetDefault.stackOxygenUpperTwo);
+            alarmSettingTemplate.setStackOxygenUpperThree(AlertSettingSetDefault.stackOxygenUpperThree);
+            alarmSettingTemplate.setStackOxygenLower(AlertSettingSetDefault.stackOxygenLower);
+            alarmSettingTemplate.setWarehouseOxygenUpperOne(AlertSettingSetDefault.warehouseOxygenUpperOne);
+            alarmSettingTemplate.setWarehouseOxygenUpperTwo(AlertSettingSetDefault.warehouseOxygenUpperTwo);
+            alarmSettingTemplate.setWarehouseOxygenUpperThree(AlertSettingSetDefault.warehouseOxygenUpperThree);
+            alarmSettingTemplate.setWarehouseOxygenLower(AlertSettingSetDefault.warehouseOxygenLower);
+            alarmSettingTemplate.setTempCoreChipUpperOne(AlertSettingSetDefault.tempCoreChipUpperOne);
+            alarmSettingTemplate.setTempCoreChipUpperTwo(AlertSettingSetDefault.tempCoreChipUpperTwo);
+            alarmSettingTemplate.setTempCoreChipUpperThree(AlertSettingSetDefault.tempCoreChipUpperThree);
+            alarmSettingTemplate.setTempCoreChipLower(AlertSettingSetDefault.tempCoreChipLower);
+            alarmSettingTemplate.setStackTempUpperOne(AlertSettingSetDefault.stackTempUpperOne);
+            alarmSettingTemplate.setStackTempUpperTwo(AlertSettingSetDefault.stackTempUpperTwo);
+            alarmSettingTemplate.setStackTempUpperThree(AlertSettingSetDefault.stackTempUpperThree);
+            alarmSettingTemplate.setStackTempLower(AlertSettingSetDefault.stackTempLower);
+            alarmSettingTemplate.setStackMoistureUpperOne(AlertSettingSetDefault.stackMoistureUpperOne);
+            alarmSettingTemplate.setStackMoistureUpperTwo(AlertSettingSetDefault.stackMoistureUpperTwo);
+            alarmSettingTemplate.setStackMoistureUpperThree(AlertSettingSetDefault.stackMoistureUpperThree);
+            alarmSettingTemplate.setStackMoistureLower(AlertSettingSetDefault.stackMoistureLower);
+            alarmSettingTemplate.setWarehouseTempUpper0ne(AlertSettingSetDefault.warehouseTempUpperOne);
+            alarmSettingTemplate.setWarehouseTempUpperTwo(AlertSettingSetDefault.warehouseTempUpperTwo);
+            alarmSettingTemplate.setWarehouseTempUpperThree(AlertSettingSetDefault.warehouseTempUpperThree);
+            alarmSettingTemplate.setWarehouseTempLower(AlertSettingSetDefault.warehouseTempLower);
+            alarmSettingTemplate.setWarehouseMoistureUpperOne(AlertSettingSetDefault.warehouseMoistureUpperOne);
+            alarmSettingTemplate.setWarehouseMoistureUpperTwo(AlertSettingSetDefault.warehouseMoistureUpperTwo);
+            alarmSettingTemplate.setWarehouseMoistureUpperThree(AlertSettingSetDefault.warehouseMoistureUpperThree);
+            alarmSettingTemplate.setWarehouseMoistureLower(AlertSettingSetDefault.warehouseMoistureLower);
+            alarmSettingTemplate.setCoreTempHighEnvTempOne(AlertSettingSetDefault.coreTempHighEnvTempOne);
+            alarmSettingTemplate.setCoreTempHighEnvTempTwo(AlertSettingSetDefault.coreTempHighEnvTempTwo);
+            alarmSettingTemplate.setCoreTempHighEnvTempThree(AlertSettingSetDefault.coreTempHighEnvTempThree);
+            alarmSettingTemplate.setCoreTempLowEnvTemp(AlertSettingSetDefault.coreTempLowEnvTemp);
+        }
+        return alarmSettingTemplate;
+    }
+
+    @Override
+    public Integer isExistStackId(Integer stackId) {
+        return maintainPlanDao.isExistStackId(stackId);
     }
 
     /**
@@ -102,6 +161,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
+        maintainPlanDto.setNowDate(new Date());
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto);
         return new PageInfo<>(maintainPlanVos);
     }
@@ -132,7 +192,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return new Result(true, StatusCode.OK, "删除成功!");
     }
 
-
+    /*
     @Override
     public MaintainPlanVo findMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
@@ -154,6 +214,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
+        redisTemplate.opsForHash().delete(MAINTAIN + maintainPlanDto.getStageId());
         List<Integer> principalIds = maintainPlanDto.getPrincipalName();
         maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
         maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
@@ -219,6 +280,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Date updateTime = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         Integer maintainPlanId = maintainPlanDto.getId();
+        MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainPlan(maintainPlanId);
+        redisTemplate.opsForHash().delete(MAINTAIN + maintainPlan.getStageId());
         Integer result =  maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId);
         return result;
     }
@@ -240,13 +303,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
-
         List<Integer> principalIds = maintainPlanDto.getPrincipalName();
         maintainPlanDto.setPrincipalId(String.join(",",principalIds.stream().map(String::valueOf).collect(Collectors.toList())));
         maintainPlanDto.setName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String createUser = TokenDecode.getUserInfo().get("username");
         Date date = new Date();
         MaintainPlanVo maintainPlan = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId());
+        redisTemplate.opsForHash().delete(MAINTAIN + maintainPlan.getStageId());
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(date);
         maintainPlanDto.setVersion(maintainPlan.getVersion()+1);
@@ -307,11 +370,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
-    public Integer isExistStackId(Integer stackId) {
-        return maintainPlanDao.isExistStackId(stackId);
-    }
-
-    @Override
     @Transactional
     public Integer moveStack(MaintainPlanDto maintainPlanDto) {
         List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
@@ -329,5 +387,5 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             }
             return flag;
         }
-    }
+    }*/
 }

@@ -20,5 +20,5 @@ public interface MaterialDao {
 
     List<String> findMaterialCode(@Param("stackId") Integer stackId);
 
-    List<String> findYear(@Param("stackId") Integer stackId,@Param("materialCode")String materialCode);
+    List<String> getMaterialName(@Param("stackId") Integer stackId);
 }

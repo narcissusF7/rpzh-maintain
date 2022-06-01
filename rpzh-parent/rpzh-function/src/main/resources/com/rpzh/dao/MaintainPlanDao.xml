@@ -5,7 +5,6 @@
         select
         t1.id as id,
         t1.material_code as materialCode,
-        t1.tobacco_year as tobaccoYear,
         t1.stack_name as stackName,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
@@ -14,12 +13,9 @@
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
         <where>
-            t1.is_end = '0'
+            t1.is_end = '0' and t2.aftercare_date_end >= #{maintainPlanDto.nowDate}
             <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">
                 and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')
-            </if>
-            <if test="maintainPlanDto.tobaccoYear!=null and maintainPlanDto.tobaccoYear!=''">
-                and t1.tobacco_year like concat('%',#{maintainPlanDto.tobaccoYear},'%')
             </if>
             <if test="maintainPlanDto.stackName!=null and maintainPlanDto.stackName!=''">
                 and t1.stack_name like concat('%',#{maintainPlanDto.stackName},'%')
@@ -152,27 +148,25 @@
         insert into tb_maintain_plan
         (
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code,</if>
-        <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">tobacco_year,</if>
-        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num,</if>
         <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">stack_id,</if>
-        <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">principal_name,</if>
+        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num,</if>
+        <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">principal_name,</if>
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids,</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">storage_age,</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style,</if>
-        <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">material_code_year,</if>
+        <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">material_name,</if>
         stack_name
         )
         values
         (
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">#{maintainPlanDto.materialCode},</if>
-        <if test="maintainPlanDto.tobaccoYear != null and maintainPlanDto.tobaccoYear !=''">#{maintainPlanDto.tobaccoYear},</if>
-        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">#{maintainPlanDto.materialBatchNum},</if>
         <if test="maintainPlanDto.stackId != null and maintainPlanDto.stackId !=''">#{maintainPlanDto.stackId},</if>
-        <if test="maintainPlanDto.name != null and maintainPlanDto.name !=''">#{maintainPlanDto.name},</if>
+        <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">#{maintainPlanDto.materialBatchNum},</if>
+        <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">#{maintainPlanDto.principalName},</if>
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">#{maintainPlanDto.principalId},</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">#{maintainPlanDto.storageAge},</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
-        <if test="maintainPlanDto.materialCodeYear != null and maintainPlanDto.materialCodeYear != ''">#{maintainPlanDto.materialCodeYear},</if>
+        <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">#{maintainPlanDto.materialName},</if>
         #{maintainPlanDto.stackName}
         )
     </insert>
@@ -206,10 +200,10 @@
     </insert>
 
     <select id="findMaxStageId" resultType="java.lang.Integer">
-        select max(id) from tb_maintain_plan_stage
+        select id from tb_maintain_plan_stage where maintain_plan_id = #{id} and is_change ='0'
     </select>
     <select id="findMaxPlanId" resultType="java.lang.Integer">
-        select max(id) from tb_maintain_plan
+        select id from tb_maintain_plan where stack_id = #{stackId} and is_end='0'
     </select>
 
     <update id="updateMaintainPlanStageId">
@@ -348,5 +342,9 @@
 
     <select id="findStackCountByStackId" resultType="java.lang.Integer">
         select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
+    </select>
+    <select id="findMaintainStackId" resultType="com.rpzh.vo.MaintainPlanVo">
+        SELECT t.stack_name,t.material_code,t.material_name,t2.alarm_value_setting_id FROM tb_maintain_plan t LEFT
+      JOIN tb_maintain_plan_stage t2 ON t.stage_id=t2.id WHERE stack_id = #{stackId} AND is_end = 0;
     </select>
 </mapper>

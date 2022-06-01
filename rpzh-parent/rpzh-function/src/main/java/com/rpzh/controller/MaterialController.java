@@ -6,6 +6,7 @@ import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.MaterialCodeYearDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.service.MaterialService;
 import com.rpzh.vo.AlarmValueSettingVo;
@@ -36,17 +37,8 @@ public class MaterialController {
      * @param stackId
      * @return
      */
-    @PostMapping(value = "/getMaterialInfoBySiteId")
-    public Result getMaterialInfoBySiteId(Integer stackId){
-        if(stackId == null){
-            return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
-        }
-        MaterialVo materialVo = materialService.getMaterialInfoBySiteId(stackId);
-        return new Result(true, StatusCode.OK, "查询成功!", materialVo);
-    }
-
-    @PostMapping(value = "/findMaterialCode")
-    public Result findMaterialCode(Integer stackId){
+    @PostMapping(value = "/findMaterialInfo")
+    public Result findMaterialInfo(Integer stackId){
         if(stackId == null){
             return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
         }
@@ -54,16 +46,10 @@ public class MaterialController {
         if(stackIdCount>0){
             return new Result(false, StatusCode.EXISTERROR, "该垛位已存在养护计划!");
         }
-        List<String> materialCode = materialService.findMaterialCode(stackId);
-        if(materialCode.size()>0) {
-            return new Result(true, StatusCode.OK, "查询物料代码成功!", materialCode);
+        MaterialVo materialVo = materialService.findMaterialInfo(stackId);
+        if(!ToolUtil.isEmpty(materialVo)) {
+            return new Result(true, StatusCode.OK, "查询物料代码成功!", materialVo);
         }
-        return new Result(false, StatusCode.ERROR, "该垛位暂无物料代码,请重新选择垛位!");
-    }
-
-    @PostMapping(value = "/findYear")
-    public Result findYear(Integer stackId,String materialCode){
-        List<String> tobaccoYear = materialService.findYear(stackId,materialCode);
-        return new Result(true, StatusCode.OK, "查询烟叶年份成功!", tobaccoYear);
+        return new Result(false, StatusCode.ERROR, "该垛位暂无物料信息,请重新选择垛位!");
     }
 }

@@ -24,25 +24,32 @@ public class MaterialServiceImpl implements MaterialService {
     @Resource
     private WarehouseDao warehouseDao;
 
+
     @Override
-    public MaterialVo getMaterialInfoBySiteId(Integer stackId) {
+    public MaterialVo findMaterialInfo(Integer stackId) {
         MaterialVo materialVo = materialDao.getinfoBySiteId(stackId);
         if(materialVo==null){
             return null;
         }
+        List<String> materialCodes = materialDao.findMaterialCode(stackId);
+        if(materialCodes.size()>0) {
+            materialVo.setMaterialCodes(materialCodes);
+        }
         List<String> materialBatches = materialDao.getMaterialBatch(stackId);
         String materialBatch = "";
-        List<Integer> ids = new ArrayList<>();
-        for (int i = 0; i < materialBatches.size(); i++) {
-            if(i==0){
-                materialBatch = materialBatches.get(i);
+        if(materialBatches.size()>0) {
+            for (int i = 0; i < materialBatches.size(); i++) {
+                if (i == 0) {
+                    materialBatch = materialBatches.get(i);
+                }
+                if (i != 0) {
+                    materialBatch = materialBatch + "," + materialBatches.get(i);
+                }
             }
-            if(i!=0){
-                materialBatch =materialBatch+","+ materialBatches.get(i);
-            }
+            materialVo.setMaterialBatchNum(materialBatch);
         }
         materialVo.setPrincipalName("");
-        ids.add(0);
+        materialVo.setPrincipalId(0);
         WareAreaVo wareAreaVo = warehouseDao.findWareAreaPrincipalName(stackId);
         if(!StringUtils.isEmpty(wareAreaVo.getPrincipalName())){
             materialVo.setPrincipalName(wareAreaVo.getPrincipalName());
@@ -67,15 +74,4 @@ public class MaterialServiceImpl implements MaterialService {
         return materialVo;
     }
 
-    @Override
-    public List<String> findMaterialCode(Integer stackId) {
-        List<String> materialCodes = materialDao.findMaterialCode(stackId);
-        return materialCodes;
-    }
-
-    @Override
-    public List<String> findYear(Integer stackId, String materialCode) {
-        List<String> year = materialDao.findYear(stackId, materialCode);
-        return year;
-    }
 }
