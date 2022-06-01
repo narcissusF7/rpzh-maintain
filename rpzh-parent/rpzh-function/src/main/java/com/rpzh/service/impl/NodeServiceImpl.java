@@ -72,6 +72,10 @@ public class NodeServiceImpl implements NodeService {
         String username = userInfo.get("username");
         //最后更新人
         nodeDto.setLastUpdatedUser(username);
+        String siteType = nodeDto.getSiteRoute().split(",").length ==4? "04":"05";
+        nodeDto.setSiteType(siteType);
+        nodeDto.setSiteRoute(nodeDto.getSiteRoute()+",["+siteType+":"+nodeDto.getSiteId()+"]");
+
         int updateFlag = nodeDao.updateNode(nodeDto);
         return updateFlag;
     }
@@ -309,6 +313,12 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<NodeVo> findNodeByStackId(Integer stackId) {
         return nodeDao.findNodeByStackId(stackId);
+    }
+
+    @Override
+    public Integer findNodeStatus(Integer id) {
+
+        return nodeDao.findNodeStatus(id);
     }
 
     @Override

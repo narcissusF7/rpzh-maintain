@@ -301,4 +301,5 @@ FROM tb_general_setting limit 1
         from tb_alarm_value_setting
         where id = #{id}
     </select>
+
 </mapper>

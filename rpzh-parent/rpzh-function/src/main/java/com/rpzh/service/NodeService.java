@@ -132,4 +132,5 @@ public interface NodeService {
 
     List<NodeVo> findNodeByStackId(Integer stackId);
 
+    Integer findNodeStatus(Integer id);
 }
