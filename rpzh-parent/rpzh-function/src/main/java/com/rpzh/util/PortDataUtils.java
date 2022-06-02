@@ -10,15 +10,14 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
-public class WeatherUtils {
-
-    private static String weatherUrl = "https://devapi.qweather.com/v7/weather/now?location=101230201&key=8fdc54a3ac93474cbe6ae1efa42493fd";
+public class PortDataUtils {
 
     /**
-     * 通过城市名称获取该城市的天气信息
+     * 通过接口获取数据
+     * @param str 地址
+     * @return 数据
      */
-
-    public static String GetWeatherData() {
+    public static String GetPortData(String str) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -26,7 +25,7 @@ public class WeatherUtils {
 
         try {
 
-            URL url = new URL(weatherUrl);
+            URL url = new URL(str);
 
             URLConnection conn = url.openConnection();
 

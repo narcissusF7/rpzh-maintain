@@ -13,7 +13,15 @@ public class MonitorCondition {
     //多个设备类型
     private String[] nodeTypes;
     //采集位置类型 04 仓间 05 非仓间
-    private String site_type;
+    private String siteType;
+
+    //位置等级
+    private Integer level;
+    //位置id
+    private Integer siteId;
+
+    //位置路由
+    private String pidRoute;
 
     private String startTime;
     private String endTime;

@@ -174,4 +174,6 @@ public interface NodeDao {
     Integer findNodeStatus(@Param("id") Integer id);
 
     List<NodeVo> findNodeIdBySiteType(@Param("siteType") String siteType,@Param("stackId")Integer stackId,@Param("pidRoute")String pidRoute);
+
+    List<NodeVo> findHumitureDevice(@Param("monitorCondition") MonitorCondition monitorCondition);
 }

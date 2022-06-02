@@ -2,7 +2,7 @@ package com.rpzh.Task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.NodeDao;
-import com.rpzh.util.WeatherUtils;
+import com.rpzh.util.PortDataUtils;
 import com.rpzh.vo.WeatherDataVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,9 +18,15 @@ public class WeatherTask {
     @Autowired
     RedisTemplate redisTemplate;
 
+    //TODO 需要修改location=101230201
+    private static String weatherUrl = "https://devapi.qweather.com/v7/weather/now?location=101230201&key=8fdc54a3ac93474cbe6ae1efa42493fd";
+
+    /**
+     * 天气数据redis 存放规则  redisTemplate.opsForValue().set("MAINTAIN_WEATHER",weatherDataVo);
+     */
     @Scheduled(cron="${time.cron}")
     void insertWeatherData() {
-        String s = WeatherUtils.GetWeatherData();
+        String s = PortDataUtils.GetPortData(weatherUrl);
         JSONObject dataOfJson = JSONObject.parseObject(s); // json天气数据
         JSONObject nowWeather = JSONObject.parseObject(dataOfJson.getString("now"));
 

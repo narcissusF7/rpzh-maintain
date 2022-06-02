@@ -1,6 +1,5 @@
 package com.rpzh.handler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.AlarmValueSettingDao;
@@ -10,7 +9,6 @@ import com.rpzh.dao.WareAreaAlarmSettingDao;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
-import com.rpzh.pojo.AlarmValueSetting;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
@@ -27,6 +25,12 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * 数据处理类
+ *
+ * @Author liujj
+ * @create 2022/4/30
+ */
 @Component
 public class DataHandler {
 
@@ -55,7 +59,72 @@ public class DataHandler {
 
 
     public static String MAINTAIN = "MAINTAIN_";
-    public static String ALERT_LEVER_NUM = "ALERT_LEVER_NUM";
+    public static String ALERT_NUM = "ALERT_NUM_";
+
+    /**
+     * 设备推送数据处理
+     * 设备数据 redis存放规则 redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(), nodeData);
+     * 仓间及仓间以上的预警值 redis存放规则 redisTemplate.opsForHash().put(MAINTAIN + hashKey, columnName, columnValue);  hashkey =MAINTAIN + 层级（01，02，03，04）+ 对应的层级id
+     * 垛内预警值 redis存放规则 redisTemplate.opsForHash().put(MAINTAIN + maintainStageId, columnName, columnValue);
+     * @param parseData
+     */
+
+    public void handlerData(ParseData parseData ,String siteRoute) {
+        //该设备需要预警的字段
+        String[] alarmColumns = AlarmValueSettingVo.getColumn(NodeConstant.NODE_WARE_AREA,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
+
+        //将位置路由转成map 后 key value 拼接
+        List<String> hashKeys = getHashKeys(siteRoute);
+        //redis中的对象名
+        String  redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
+
+        //从缓存中获取预警阈值
+        List<Double> list = new ArrayList<>();
+        for (String alarmColumn : alarmColumns) {
+            list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
+        }
+
+        NodeData nodeData = new NodeData();
+
+
+        //温度数据
+        Double data = parseData.getData().get(0);
+        //判断当前数据所属等级
+        int level = decideValue(data, list);
+        //siteRoute 例[00:0],[01:2],[02:1],[03:1],[04:1]
+        Integer areaId = Integer.parseInt(hashKeys.get(4).substring(2));
+        //温度处理
+        level =earlyWarningHandle(level, parseData,"temp",areaId);
+
+        nodeData.setAlertLevel(level);
+        //湿度数据
+        data = parseData.getData().get(1);
+
+        //湿度数据等级
+        level = decideValue(data, list.subList(4, 8));
+
+        //湿度处理
+        level = earlyWarningHandle(level, parseData, "humidity", areaId);
+        if (nodeData.getAlertLevel()<level){
+            nodeData.setAlertLevel(level);
+        }
+        //给nodeData赋值
+        nodeData.setNodeId(parseData.getNodeId());
+        nodeData.setType(parseData.getNodeType());
+        nodeData.setDateTime(parseData.getDateTime().get(0));
+        nodeData.setTemp(parseData.getData().get(0));
+        nodeData.setHumiture(parseData.getData().get(1));
+        nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
+        nodeData.setPidRoute(siteRoute);
+
+        //向数据库插入当前数据
+        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history");
+
+        //将该数据放入到缓存中
+        redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), nodeData);
+
+
+    }
 
     public void handlerData(ParseData parseData) {
 
@@ -80,16 +149,12 @@ public class DataHandler {
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
 
-        //将位置路由转换成map
-        Map map = JSONObject.parseObject(nodeVo.getSiteRoute());
-
         String redisHashKey;
+
         if(NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())){//如果是仓间设备
-            //
-            List<String> hashKeys = new ArrayList<>();
-            map.forEach((k,v) ->{
-                hashKeys.add(k.toString()+v.toString());
-            });
+
+            //将位置路由转成map 后 key value 拼接
+            List<String> hashKeys = getHashKeys(nodeVo.getSiteRoute());
             //redis中的对象名
             redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
         }else {//垛内设备
@@ -102,7 +167,7 @@ public class DataHandler {
             redisHashKey = MAINTAIN + nodeVo.getMaintainStageId();
         }
 
-        //存放预警阈值
+        //从缓存中获取预警阈值
         List<Double> list = new ArrayList<>();
         for (String alarmColumn : alarmColumns) {
             list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
@@ -157,24 +222,14 @@ public class DataHandler {
         //如果设备时包芯温度设备时 需要判断垛位平均温度是否正常
         if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(nodeVo.getNodeType())) {
 
+            //查询该垛位下的所有设备
             List<NodeVo> nodeVos = nodeDao.findNodeByStackId(nodeVo.getStackId());
 
             //过滤 选择包芯设备 取温度
-            Stream<Double> stream2 = nodeVos.stream().filter(s -> NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(s.getNodeType())).map(vos -> {
-                Object o = redisTemplate.opsForValue().get(MAINTAIN + nodeVo.getNodeId());
-                NodeData nodeData = new ObjectMapper().convertValue(o, NodeData.class);
-                return nodeData.getTemp();
-            });
-            //取平均值
-            double avg = stream2.mapToDouble(Double::doubleValue).sum();
+            double avg = getAvg(nodeVos,NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE);
+
             //过滤 选择环境温湿度设备 取温度
-            Stream<Double> stream3 = nodeVos.stream().filter(s -> NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(s.getNodeType())).map(vos -> {
-                Object o = redisTemplate.opsForValue().get(MAINTAIN + nodeVo.getNodeId());
-                NodeData nodeData = new ObjectMapper().convertValue(o, NodeData.class);
-                return nodeData.getTemp();
-            });
-            //取环境温度值
-            double evnTemp = stream3.mapToDouble(Double::doubleValue).sum();
+            double evnTemp = getAvg(nodeVos,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
             //计算插值
             double v = avg - evnTemp;
 
@@ -194,7 +249,7 @@ public class DataHandler {
 
     /**
      * 向缓存中存放预警值
-     * @param hashKeys 位置id和位置类型（位置类型,1:仓库, 2: 楼号, 3: 层, 4: 区）拼接的集合
+     * @param hashKeys 位置id和位置类型（位置类型,01:仓库, 02: 楼号, 03: 层, 04: 区）拼接的集合
      * @param alarmColumn 字段名称（用来判断缓存是否存在）
      * @return
      */
@@ -285,6 +340,26 @@ public class DataHandler {
     }
 
     /**
+     * 处理空调数据
+     * @param level
+     * @param parseData
+     * @param evnType
+     * @param areaId
+     */
+    public Integer earlyWarningHandle(Integer level, ParseData parseData,String evnType,Integer areaId) {
+        //查询数据库中该空调未处理的预警
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(parseData.getNodeId());
+
+        EarlyWarning earlyWarning = new EarlyWarning();
+        earlyWarning.setId(areaId);
+
+         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
+
+        return level;
+    }
+
+
+    /**
      * 数据预警分析
      *
      * @param nodeVo    当前设备
@@ -299,8 +374,6 @@ public class DataHandler {
         EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(nodeVo.getNodeId());
 
         EarlyWarning earlyWarning = new EarlyWarning();
-        earlyWarning.setNodeId(parseData.getNodeId());
-        earlyWarning.setNodeType(parseData.getNodeType());
 
         //判断是否是仓间设备
         if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())) {
@@ -316,71 +389,8 @@ public class DataHandler {
             earlyWarning.setStackId(nodeVo.getStackId());
         }
 
-        //如果存在未处理的预警
-        if (!ToolUtil.isEmpty(earlyWarningVo)) {
-            //如果当前预警等级更高
-            Object o = redisTemplate.opsForHash().get(ALERT_LEVER_NUM, nodeVo.getNodeId());
-            int i = Integer.parseInt(o.toString());
-            if (earlyWarningVo.getWarningGrade() < level) {
+        decideEarlyWarning(earlyWarningVo,earlyWarning,parseData,level,data,evnType,nodeVo.getSiteType());
 
-                setLevel(earlyWarning, level, data);
-
-                earlyWarningDao.updateWarning(earlyWarning);
-                //redis中设置连续预警
-                redisTemplate.opsForHash().put(ALERT_LEVER_NUM, nodeVo.getNodeId(), 1);
-            } else {
-                if (ToolUtil.isEmpty(o)) {
-                    int frequency = parseData.getFrequency();
-                    boolean flag = false;
-                    //通过频率计算连续预警次数
-                    Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
-                    if (level == 1) {
-                        flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - i <= 1;
-                    } else if (level == 2) {
-                        flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - i <= 1;
-                    }
-                    if (flag) {
-                        level += 1;
-                        setLevel(earlyWarning, level, data);
-                    }
-                }
-
-            }
-            redisTemplate.opsForHash().put(ALERT_LEVER_NUM, nodeVo.getNodeId(), i + 1);
-        } else {
-            //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
-            if (level > 0) {
-                //判断是否是仓间设备
-                boolean isNodeStack =  NodeConstant.NODE_STACK.equals(nodeVo.getSiteType());
-                //如果不为空即该设备为温湿度设备
-                if (!ToolUtil.isEmpty(evnType)) {
-                    //温湿度 温度预警
-                    if ("temp".equals(evnType)) {
-                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING);
-                        //温湿度 湿度预警
-                    } else if ("humidity".equals(evnType)) {
-                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING);
-                    }
-                } else {
-                    switch (nodeVo.getNodeType()) {
-                        case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING);
-                            break;
-                        case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING);
-                            break;
-                    }
-                }
-                setLevel(earlyWarning, level, data);
-                earlyWarningDao.insertWarning(earlyWarning);
-                //往redis中设置连续预警次数为1
-                if (level < 3) {
-                    redisTemplate.opsForHash().put(ALERT_LEVER_NUM, nodeVo.getNodeId(), 1);
-                }
-            } else {
-                redisTemplate.opsForHash().put(ALERT_LEVER_NUM, nodeVo.getNodeId(), 0);
-            }
-        }
         nodeVo.setAlertLevel(level);
 
     }
@@ -413,5 +423,145 @@ public class DataHandler {
             earlyWarningDao.insertWarning(earlyWarning);
         }
 
+    }
+
+    /**
+     *  将位置路由转成map 再将map的键值对拼接后 用于作为redis中的key
+     * @param siteRoute 位置路由
+     * @return
+     */
+    private List<String> getHashKeys(String siteRoute){
+        siteRoute.replace("]","");
+        //将位置路由转成键值对 键:(垛 区 层 楼 仓库) 值 键对应的id
+        Map<String,String> map = new HashMap<>();
+        String[] split = siteRoute.split(",");
+        for (int i = 0; i < split.length; i++) {
+            map.put(split[i].split(":")[0],split[i].split(":")[1]);
+        }
+        List<String> hashKeys = new ArrayList<>();
+        map.forEach((k,v) ->{
+            hashKeys.add(k+v);
+        });
+
+        return hashKeys;
+    }
+
+    /**
+     * 将一个垛位的所有设备通过过滤 分别取包芯设备 环境温湿度设备 取均值后用于判断预警
+     * @param nodeVos 指定垛位下的所有设备
+     * @param nodeType 设备类型
+     * @return 该设备类型的数据均值
+     */
+    private Double getAvg(List<NodeVo> nodeVos , String nodeType){
+
+        Stream<Double> stream = nodeVos.stream().filter(s -> nodeType.equals(s.getNodeType())).map(vos -> {
+            Object o = redisTemplate.opsForValue().get(MAINTAIN + vos.getNodeId());
+            NodeData nodeData = new ObjectMapper().convertValue(o, NodeData.class);
+            return nodeData.getTemp();
+        });
+        //取平均值
+        return stream.mapToDouble(Double::doubleValue).sum();
+    }
+
+    /**
+     *
+     * @param earlyWarningVo
+     * @param earlyWarning
+     * @param parseData
+     * @param level
+     * @param data
+     * @param evnType
+     * @param siteType
+     */
+    private Integer decideEarlyWarning(EarlyWarningVo earlyWarningVo ,EarlyWarning earlyWarning , ParseData parseData ,Integer level ,Double data ,String evnType ,String siteType){
+        //如果存在未处理的预警
+        if (!ToolUtil.isEmpty(earlyWarningVo)) {
+            //获取缓存中的连续预警次数
+            Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId());
+            int i;
+            if (ToolUtil.isEmpty(o)){
+                i = 0;
+            }else {
+                i = Integer.parseInt(o.toString());
+            }
+            //用于判断当前数据判断后预警是否达到更高一级
+            boolean flag = false;
+            //如果当前预警等级更高
+            if (earlyWarningVo.getWarningGrade() < level) {
+                flag=true;
+            } else {
+                int frequency = parseData.getFrequency();
+
+                //通过频率计算升级所需的连续预警次数
+                Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
+                if (level == 1) {
+                    flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - i <= 1;
+                } else if (level == 2) {
+                    flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - i <= 1;
+                }
+                if (flag) {
+                    level += 1;
+                }
+            }
+            if (flag){
+                //设置等级
+                setLevel(earlyWarning, level, data);
+                //设置主键id
+                earlyWarning.setId(earlyWarningVo.getId());
+                //更新数据
+                earlyWarningDao.updateWarning(earlyWarning);
+            }
+            if (level==3){
+                //达到3级 不用连续预警
+                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(),0);
+            }else if (level>0){
+                //连续预警次数+1
+                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(), i + 1);
+            }
+        } else {
+            //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
+            if (level > 0) {
+                //判断是否是仓间设备
+                boolean isNodeStack =  NodeConstant.NODE_STACK.equals(siteType);
+                //如果不为空即该设备为温湿度设备
+                if (!ToolUtil.isEmpty(evnType)) {
+                    //温湿度 温度预警
+                    if ("temp".equals(evnType)) {
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING);
+                        //温湿度 湿度预警
+                    } else if ("humidity".equals(evnType)) {
+                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING);
+                    }
+                } else {
+                    switch (parseData.getNodeType()) {
+                        //氧气设备
+                        case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
+                            earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING);
+                            break;
+                        //包芯温度设备
+                        case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
+                            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING);
+                            break;
+                    }
+                }
+
+                //设置设备id
+                earlyWarning.setNodeId(parseData.getNodeId());
+                //设置设备类型
+                earlyWarning.setNodeType(parseData.getNodeType());
+                setLevel(earlyWarning, level, data);
+                earlyWarningDao.insertWarning(earlyWarning);
+                //往redis中设置连续预警次数为1
+                if (level < 3) {
+                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(), 1);
+                }else {
+                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(), 0);
+                }
+            } else {
+                //连续预警中断
+                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(), 0);
+            }
+        }
+        return level;
     }
 }

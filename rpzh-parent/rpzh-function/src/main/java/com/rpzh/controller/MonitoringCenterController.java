@@ -26,6 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 监控中心控制类
+ *
+ * @Author liujj
+ * @create 2022/5/31
+ */
 @RestController
 @RequestMapping({"/maintain/monitoringCenter"})
 @CrossOrigin

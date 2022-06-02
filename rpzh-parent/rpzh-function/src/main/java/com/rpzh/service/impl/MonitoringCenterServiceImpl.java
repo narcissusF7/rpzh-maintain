@@ -1,11 +1,10 @@
 package com.rpzh.service.impl;
 
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.Feature;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.AlarmValueSettingDao;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.NodeDao;
@@ -22,12 +21,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
 
 @Service
 public class MonitoringCenterServiceImpl implements MonitoringCenterService {
@@ -53,42 +51,33 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         List<NodeDataVo> nodeDataVos = new ArrayList<>();
         int pageNum = monitorCondition.getPage();
         int pageSize = monitorCondition.getSize();
+
+        WeatherDataVo weatherDataVo;
+
         if (monitorCondition.getSortCondition() == 0) {
+            //如果不是仓间温湿度设备并且正常排序 相当于在查找设备时凭借上limit
             PageHelper.startPage(pageNum, pageSize);
         }
-
-        //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
-        List<NodeVo> nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
-
-        for (NodeVo nodeVo : nodeVos) {
-            //获取缓存中该设备的数据
-            Object data = this.redisTemplate.opsForValue().get("MAINTAIN_"+nodeVo.getNodeId());
-            nodeDataVos.add(new ObjectMapper().convertValue(data, NodeDataVo.class));
+        List<NodeVo> nodeVos;
+        //判断是否包含仓间的温湿度设备
+        if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())&& Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)){
+            //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
+            monitorCondition.setPidRoute(monitorCondition.getPidRoute()+",[0"+monitorCondition.getLevel()+":"+monitorCondition.getSiteId()+"]");
+            //查询 温湿度设备包括空调
+            nodeVos = nodeDao.findHumitureDevice(monitorCondition);
+        }else{
+            //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
+            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
         }
 
-        //监控状态筛选 1.正常 2.预警
-        if (monitorCondition.getMonitorStatus()==1){
-            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-                    nodeDataVo.getAlertLevel() ==0
-            ).collect(Collectors.toList());
-        }else if (monitorCondition.getMonitorStatus()==2){
-            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-                    nodeDataVo.getAlertLevel() >0
-            ).collect(Collectors.toList());
-        }
+        nodeDataVos.addAll(setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus()));
 
-        //如果物料代码不为空  过滤
-//        if (ToolUtil.isEmpty(monitorCondition.getMaterialCode())){
-//            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-//                    nodeDataVo.getMaterialCode().startsWith(monitorCondition.getMaterialCode())
-//            ).collect(Collectors.toList());
-//        }
         //如果设备时按预警排序  需要手动分页
         if (monitorCondition.getSortCondition() == 1) {
-            //排序  按预警等级才需
+            //排序  按预警等级排序
             nodeDataVos = nodeDataVos.stream().sorted(Comparator.comparing(NodeDataVo::getAlertLevel).reversed()).collect(Collectors.toList());
             //创建一个page类
-            Page<NodeDataVo> page = new Page(pageNum, pageSize);
+            Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
             //总数量
             int total = nodeDataVos.size();
             page.setTotal(total);
@@ -123,8 +112,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     public Integer updateWarningThreshold(Map<String, Integer> thresholdMap) {
         AtomicInteger flag = new AtomicInteger();
         thresholdMap.keySet().forEach((key) -> flag.addAndGet(earlyWarningDao.updateWarningThreshold(thresholdMap.get(key), key)));
-        redisTemplate.delete("MAINTAIN_oneToTwo");
-        redisTemplate.delete("MAINTAIN_TwoToThree");
+        //删除掉缓存中的预警升级阈值
+        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
+        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"TwoToThree");
         return flag.get();
     }
 
@@ -134,18 +124,19 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     @Override
     public Map<String, String> findWarningThreshold() {
         HashMap<String, String> thresholdMap = new HashMap<>();
-        String oneToTwo = (String)redisTemplate.opsForValue().get("MAINTAIN_oneToTwo");
-        String twoToThree = (String)redisTemplate.opsForValue().get("MAINTAIN_twoToThree");
-        if (Objects.equals(oneToTwo, "") || Objects.equals(twoToThree, "")) {
+        //缓存中获取预警升级阈值
+        Object oneToTwo = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
+        Object twoToThree = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+"twoToThree");
+        if (ToolUtil.isEmpty(oneToTwo)||ToolUtil.isEmpty(twoToThree)) {
             List<String> thresholds = earlyWarningDao.findWarningThreshold("settingKey");
             oneToTwo = thresholds.get(0);
-            redisTemplate.opsForValue().set("MAINTAIN_oneToTwo", oneToTwo);
+            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo", oneToTwo);
             twoToThree = thresholds.get(1);
-            redisTemplate.opsForValue().set("MAINTAIN_twoToThree", twoToThree);
+            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+"twoToThree", twoToThree);
         }
 
-        thresholdMap.put("oneToTwo", oneToTwo);
-        thresholdMap.put("twoToThree", twoToThree);
+        thresholdMap.put("oneToTwo", oneToTwo.toString());
+        thresholdMap.put("twoToThree", twoToThree.toString());
         return thresholdMap;
     }
 
@@ -154,7 +145,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         //该设备需要预警的字段
         String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), nodeData.getSiteType());
         //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
-        Boolean hasKey = redisTemplate.opsForHash().hasKey("MAINTAIN_" + nodeData.getMaintainStageId(), column[0]);
+        Boolean hasKey = redisTemplate.opsForHash().hasKey(CACHE_KEY_REDIS_MAINTAIN + nodeData.getMaintainStageId(), column[0]);
         //如果不存在
         if (!hasKey) {
             //数据库获取
@@ -172,7 +163,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         }
         List<Double> arrayList = new ArrayList<>();
         for (int i = 0; i < column.length; i++) {
-            arrayList.add(Double.parseDouble(Objects.requireNonNull(redisTemplate.opsForHash().get("MAINTAIN_" + nodeData.getMaintainStageId(), column[0])).toString()));
+            arrayList.add(Double.parseDouble(Objects.requireNonNull(redisTemplate.opsForHash().get(CACHE_KEY_REDIS_MAINTAIN+ + nodeData.getMaintainStageId(), column[0])).toString()));
         }
         return arrayList;
     }
@@ -200,6 +191,26 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             historyGraphData.put(k, map);
         });
         return historyGraphData;
+    }
+
+    public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos , List<NodeVo> nodeVos ,Integer status) {
+        for (NodeVo nodeVo : nodeVos) {
+            //获取缓存中该设备的数据
+            Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
+            nodeDataVos.add(new ObjectMapper().convertValue(data, NodeDataVo.class));
+        }
+        //监控状态筛选 1.正常 2.预警
+        if (status==1){
+            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
+                    nodeDataVo.getAlertLevel() ==0
+            ).collect(Collectors.toList());
+        }else if (status==2){
+            nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
+                    nodeDataVo.getAlertLevel() >0
+            ).collect(Collectors.toList());
+        }
+
+        return nodeDataVos;
     }
 }
 
