@@ -8,7 +8,7 @@
             warehouse_oxygen_upper_two as warehouseOxygenUpperTwo,
             warehouse_oxygen_upper_three as warehouseOxygenUpperThree,
             warehouse_oxygen_lower as warehouseOxygenLower,
-            warehouse_temp_upper_one as warehouseTempUpper0ne,
+            warehouse_temp_upper_one as warehouseTempUpperOne,
             warehouse_temp_upper_two as warehouseTempUpperTwo,
             warehouse_temp_upper_three as warehouseTempUpperThree,
             warehouse_temp_lower as warehouseTempLower,

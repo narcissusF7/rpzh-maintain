@@ -61,7 +61,7 @@ public class AlarmValueSettingVo {
     private Double stackMoistureLower;
 
     @ApiModelProperty(notes = "仓间温度上限一级")
-    private Double warehouseTempUpper0ne;
+    private Double warehouseTempUpperOne;
     @ApiModelProperty(notes = "仓间温度上限二级")
     private Double warehouseTempUpperTwo;
     @ApiModelProperty(notes = "仓间温度上限三级")
@@ -116,7 +116,7 @@ public class AlarmValueSettingVo {
                 case "01":
                     return new String[]{"warehouseOxygenUpperThree","warehouseOxygenUpperTwo","warehouseOxygenUpperOne","warehouseOxygenLower"};
                 case "03":
-                    return new String[]{"warehouseTempUpperThree","warehouseTempUpperTwo","warehouseTempUpper0ne","warehouseTempLower"
+                    return new String[]{"warehouseTempUpperThree","warehouseTempUpperTwo","warehouseTempUpperOne","warehouseTempLower"
                             ,"warehouseMoistureUpperThree","warehouseMoistureUpperTwo","warehouseMoistureUpperOne","warehouseMoistureLower"};
             }
         }else {

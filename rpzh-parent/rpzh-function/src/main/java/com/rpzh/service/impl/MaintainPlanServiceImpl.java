@@ -199,22 +199,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 }
             }
         }
-        maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         //01：无线氧气传感器,03：无线温湿度传感器,04： 无线包芯温度传感器,
-        alarmValueSettingVo = null;
         Integer stackId = maintainPlanVo.getStackId();
         StackVo stackVo = warehouseDao.findPidRoute(stackId);
         String pidRoute = stackVo.getPidRoute();
         String[] pidRoutes =pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(",");
+        AlarmValueSettingVo alarmValueSettingVo1 = new AlarmValueSettingVo();
+        int k = 0;
         for (String routes : pidRoutes) {
             String[] route = routes.split(":");
             if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0]+route[1]))){
-                alarmValueSettingVo = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
+                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
+                k =1;
                 break;
             }
         }
-        AlarmValueSettingVo alarmValueSettingVo1 = new AlarmValueSettingVo();
-        if(ToolUtil.isEmpty(alarmValueSettingVo)){
+        if(k == 0){
             for (String routes : pidRoutes) {
                 String[] route = routes.split(":");
                 alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
@@ -232,7 +232,21 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 }
             }
         }
+        alarmValueSettingVo.setWarehouseOxygenUpperOne(alarmValueSettingVo1.getWarehouseOxygenUpperOne());
+        alarmValueSettingVo.setWarehouseOxygenUpperTwo(alarmValueSettingVo1.getWarehouseOxygenUpperTwo());
+        alarmValueSettingVo.setWarehouseOxygenUpperThree(alarmValueSettingVo1.getWarehouseOxygenUpperThree());
+        alarmValueSettingVo.setWarehouseOxygenLower(alarmValueSettingVo1.getWarehouseOxygenLower());
+        alarmValueSettingVo.setWarehouseTempUpperOne(alarmValueSettingVo1.getWarehouseTempUpperOne());
+        alarmValueSettingVo.setWarehouseTempUpperTwo(alarmValueSettingVo1.getWarehouseTempUpperTwo());
+        alarmValueSettingVo.setWarehouseTempUpperThree(alarmValueSettingVo1.getWarehouseTempUpperThree());
+        alarmValueSettingVo.setWarehouseTempLower(alarmValueSettingVo1.getWarehouseTempLower());
+        alarmValueSettingVo.setWarehouseMoistureUpperOne(alarmValueSettingVo1.getWarehouseMoistureUpperOne());
+        alarmValueSettingVo.setWarehouseMoistureUpperTwo(alarmValueSettingVo1.getWarehouseMoistureUpperTwo());
+        alarmValueSettingVo.setWarehouseMoistureUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
+        alarmValueSettingVo.setWarehouseMoistureLower(alarmValueSettingVo1.getWarehouseMoistureLower());
+        maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         log.debug("alarmValueSettingVo1:{}",alarmValueSettingVo1);
+        alarmValueSettingVo1 = null;
         Integer areaId = stackVo.getAreaId();
         List<NodeData> conditioningDatas = airConditioningDao.findAirConditioningData(areaId);
         Map<String, Object> nodeDate = getNodeDate("05", stackId, null);
@@ -290,22 +304,24 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             String nodeType = nodeVo.getNodeType();
             String nodeId = nodeVo.getNodeId();
             NodeData nodeData = new ObjectMapper().convertValue(redisTemplate.opsForValue().get(MAINTAIN + nodeId), NodeData.class);
-            switch (nodeType){
-                case "01":
-                    o2Sum = o2Sum + nodeData.getOxygen();
-                    o2Count = o2Count + 1;
-                    break;
-                case "03":
-                    coreTempSum = coreTempSum + nodeData.getTemp();
-                    coreTempCount = coreTempCount + 1;
-                    break;
-                case "04":
-                    tempSum = tempSum + nodeData.getTemp();
-                    humitureSum = humitureSum + nodeData.getHumiture();
-                    tempCount = tempCount + 1;
-                    break;
-                default:
-                    break;
+            if (ToolUtil.isNotEmpty(nodeData)) {
+                switch (nodeType) {
+                    case "01":
+                        o2Sum = o2Sum + nodeData.getOxygen();
+                        o2Count = o2Count + 1;
+                        break;
+                    case "03":
+                        coreTempSum = coreTempSum + nodeData.getTemp();
+                        coreTempCount = coreTempCount + 1;
+                        break;
+                    case "04":
+                        tempSum = tempSum + nodeData.getTemp();
+                        humitureSum = humitureSum + nodeData.getHumiture();
+                        tempCount = tempCount + 1;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         Map<String,Object> nodeDataMap = new HashMap<>();
