@@ -86,7 +86,7 @@ public class FileController {
      * @param fileName
      * @return
      */
-    @ApiOperation(value = "文件删除", tags = "文件操作")
+    @ApiOperation(value = "图片删除", tags = "文件操作")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupName", value = "组名", required = true,dataType = "String"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true,dataType = "String")

@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -8,6 +9,11 @@ import com.rpzh.dto.TaskDto;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.TaskVo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +29,14 @@ import java.util.UUID;
  * @Description: good good study,day day up
  */
 @Service
+@Slf4j
 public class TaskManagementServiceImpl implements TaskManagementService {
 
     @Autowired
     private TaskManagementDao taskManagementDao;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     /**
@@ -40,7 +49,6 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     public int addTask(TaskDto taskDto) {
         //获取推送方式
         String pushWay = taskDto.getPushWay();
-        //TODO 根据不同的推送方式推送,后期增加
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -54,6 +62,25 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //获取当前时间
         String nowDayTime = DateUtil.dateNew(new Date()).toString();
         taskDto.setCreatedTime(nowDayTime);
+        //获取结束时间,用于计算时间差
+        String endTime = taskDto.getEndTime();
+        Date date1 = DateUtil.parse(endTime);
+        //设置当前时间,用于计算时间差
+        Date date2 = DateUtil.parse(nowDayTime);
+        //当前时间与结束时间相差的毫秒数
+        long betweenMs = DateUtil.between(date1, date2, DateUnit.MS);
+        //当前时间与结束时间相差的毫秒字符串
+        String betweenMsStr = String.valueOf(betweenMs);
+        //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
+        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                //消息过期设置
+                message.getMessageProperties().setExpiration(betweenMsStr);
+                return message;
+            }
+        });
+        log.info("新建任务发送消息成功:"+uuid+":结束时间:"+endTime+":相差时间为:"+betweenMsStr);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
     }
@@ -79,5 +106,19 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         List<TaskVo> taskVoList = taskManagementDao.findTask(taskDto);
 
         return new PageInfo<TaskVo>(taskVoList);
+    }
+
+    /**
+     * 修改任务状态
+     *
+     * @param msg
+     * @return
+     */
+    @Override
+    public int mqUpdateStatus(String msg) {
+        //只有未完成的任务才能逾期
+        String taskStatus = "0";
+        int mqUpdateFlag = taskManagementDao.mqUpdateStatus(msg,taskStatus);
+        return mqUpdateFlag;
     }
 }

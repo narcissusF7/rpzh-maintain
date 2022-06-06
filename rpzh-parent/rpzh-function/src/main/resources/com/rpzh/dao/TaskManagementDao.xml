@@ -96,4 +96,11 @@
   </if>
   </where>
 </select>
+<update id="mqUpdateStatus">
+  UPDATE tb_task
+  SET
+  status = '2'
+  WHERE
+	task_num = #{msg} and status = #{taskStatus}
+</update>
 </mapper>

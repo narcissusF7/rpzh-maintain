@@ -11,6 +11,11 @@ spring:
         server-addr: localhost:8866
         # 配置文件格式
         file-extension: yml
+  rabbitmq: #RabbitMq配置
+    host: 120.24.91.199
+    port: 5672
+    password: guest
+    username: guest
   #将druid自动配置剔除
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure

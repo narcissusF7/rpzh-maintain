@@ -24,4 +24,11 @@ public interface TaskManagementService {
      * @return
      */
     PageInfo<TaskVo> findTask(TaskDto taskDto);
+
+    /**
+     * 修改任务状态
+     * @param msg
+     * @return
+     */
+    int mqUpdateStatus(String msg);
 }

@@ -31,4 +31,12 @@ public interface TaskManagementDao {
      * @return
      */
     List<TaskVo> findTask(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * mq修改任务状态
+     * @param msg
+     * @param taskStatus
+     * @return
+     */
+    int mqUpdateStatus(@Param("msg")String msg, @Param("taskStatus")String taskStatus);
 }
