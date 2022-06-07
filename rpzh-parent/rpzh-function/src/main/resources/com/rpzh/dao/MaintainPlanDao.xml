@@ -103,7 +103,6 @@
             <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style= #{maintainPlanDto.maintenceStyle},</if>
             <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code= #{maintainPlanDto.materialCode},</if>
             <if test="maintainPlanDto.materialBatchNum != null and maintainPlanDto.materialBatchNum !=''">material_batch_num= #{maintainPlanDto.materialBatchNum},</if>
-            <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">material_name= #{maintainPlanDto.materialName},</if>
             <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids = #{maintainPlanDto.principalId}</if>
         </set>
         where id = #{maintainPlanDto.id}
@@ -146,7 +145,6 @@
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">principal_ids,</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">storage_age,</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">maintence_style,</if>
-        <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">material_name,</if>
         stack_id
         )
         values
@@ -157,7 +155,6 @@
         <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId !=''">#{maintainPlanDto.principalId},</if>
         <if test="maintainPlanDto.storageAge != null and maintainPlanDto.storageAge !=''">#{maintainPlanDto.storageAge},</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
-        <if test="maintainPlanDto.materialName != null and maintainPlanDto.materialName !=''">#{maintainPlanDto.materialName},</if>
         #{maintainPlanDto.stackId}
         )
     </insert>
@@ -366,5 +363,118 @@
         WHERE
             stack_id = #{stackId} AND
         	is_end = 0;
+    </select>
+    <insert id="insertMaintainCount">
+        insert into tb_maintain_count(
+        <if test="materialCode != null and materialCode !=''">material_code,</if>
+        <if test="maintainCount != null and maintainCount !=''">maintain_count,</if>
+        <if test="maintainPlanId != null and maintainPlanId !=''">maintain_plan_id,</if>
+        <if test="pidRoute != null and pidRoute !=''">pid_route,</if>
+        <if test="maintenceStyle != null and maintenceStyle !=''">maintence_style,</if>
+        <if test="phases != null and phases !=''">phases,</if>
+        created_time
+        )
+        values (
+        <if test="materialCode != null and materialCode !=''">#{materialCode},</if>
+        <if test="maintainCount != null and maintainCount !=''">#{maintainCount},</if>
+        <if test="maintainPlanId != null and maintainPlanId !=''">#{maintainPlanId},</if>
+        <if test="pidRoute != null and pidRoute !=''">#{pidRoute},</if>
+        <if test="maintenceStyle != null and maintenceStyle !=''">#{maintenceStyle},</if>
+        <if test="phases != null and phases !=''">#{phases},</if>
+        #{createdTime}
+        )
+    </insert>
+    <delete id="deleteMaintainCount">
+    delete from tb_maintain_count where maintain_plan_id = #{id}
+    </delete>
+    <select id="findMaintainCountBySiteName" resultType="com.rpzh.vo.MaintainCountVo">
+        select
+        t1.material_code as materialCode,
+        t1.maintain_count as maintainCount,
+        t1.created_time as createdTime,
+        t1.pid_route as pidRoute,
+        t1.maintence_style as maintenceStyle,
+        t1.phases as phases,
+        t3.site_name as stackName
+        from tb_maintain_count t1
+        left join tb_maintain_plan t2 on t1.maintain_plan_id = t2.id
+        left join tb_stack t3 on t2.stack_id = t3.id
+        where 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and t1.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
+        <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and t1.pid_route like concat('%',#{maintainCountDto.pidRoute},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t1.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t1.phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
+         order by t1.pid_route
+    </select>
+    <select id="findFirstMaterialCode" resultType="com.rpzh.vo.MaintainCountVo">
+        SELECT material_code as materialCode FROM tb_maintain_count
+        WHERE 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and created_time &lt;= #{maintainCountDto.endTime}</if>
+        GROUP BY material_code
+    </select>
+    <select id="findFirst" resultType="com.rpzh.vo.MaintainCountVo">
+    SELECT t.material_code as materialCode,substring_index(t.pid_route,',',3) as pidRoute,SUM(t.maintain_count) as maintainCount,a.site_name as stackName FROM tb_maintain_count t
+        inner join tb_building a on a.id = substring_index(substring_index(t.pid_route,'03:',-1),']',1)
+    WHERE 1=1
+    <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and t.material_code = #{maintainCountDto.materialCode}</if>
+    <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+    <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
+    <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
+    <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+    GROUP BY t.material_code,substring_index(t.pid_route,',',3),a.site_name
+    </select>
+    <select id="findChild" resultType="com.rpzh.vo.MaintainCountVo">
+        SELECT t.material_code as materialCode,t.p as pidRoute,t.maintain_count as maintainCount,t.site_name as stackName FROM (
+        SELECT t3.* FROM (
+        SELECT f1.material_code,substring_index(f1.pid_route,',',4) p,SUM(f1.maintain_count) as maintain_count,a1.site_name FROM tb_maintain_count f1
+        inner join tb_floor a1 on a1.id = substring_index(substring_index(f1.pid_route,'04:',-1),']',1)
+        WHERE 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and f1.material_code = #{maintainCountDto.materialCode}</if>
+        <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and f1.pid_route like concat('%',#{maintainCountDto.pidRoute},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and f1.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and f1.phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and f1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and f1.created_time &lt;= #{maintainCountDto.endTime}</if>
+        GROUP BY f1.material_code,substring_index(f1.pid_route,',',4),a1.site_name) t3
+        UNION
+        SELECT t4.* FROM (
+        SELECT f2.material_code,substring_index(f2.pid_route,',',5) p,SUM(f2.maintain_count) as maintain_count,a2.site_name FROM tb_maintain_count f2
+        inner join tb_ware_area a2 on a2.id = substring_index(substring_index(f2.pid_route,'05:',-1),']',1)
+        WHERE 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and f2.material_code = #{maintainCountDto.materialCode}</if>
+        <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and f2.pid_route like concat('%',#{maintainCountDto.pidRoute},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and f2.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and f2.phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and f2.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and f2.created_time &lt;= #{maintainCountDto.endTime}</if>
+        GROUP BY f2.material_code,substring_index(f2.pid_route,',',5),a2.site_name) t4
+        UNION
+        SELECT t5.* FROM (
+        SELECT f3.material_code,substring_index(f3.pid_route,',',6) p,SUM(f3.maintain_count) as maintain_count,a3.site_name FROM tb_maintain_count f3
+        inner join tb_stack a3 on a3.id = substring_index(substring_index(f3.pid_route,'05:',-1),']',1)
+        WHERE 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and f3.material_code = #{maintainCountDto.materialCode}</if>
+        <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and f3.pid_route like concat('%',#{maintainCountDto.pidRoute},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and f3.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and f3.phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and f3.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and f3.created_time &lt;= #{maintainCountDto.endTime}</if>
+        GROUP BY f3.material_code,substring_index(f3.pid_route,',',6),a3.site_name) t5) t ORDER BY t.material_code,t.p
+    </select>
+    <select id="findCount" resultType="java.lang.Double">
+        select sum(maintain_count) from tb_maintain_count
+        WHERE 1=1
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''"> and material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
+        <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and pid_route like concat('%',#{maintainCountDto.pidRoute},'%')</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.startTime!=null"> and created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and created_time &lt;= #{maintainCountDto.endTime}</if>
     </select>
 </mapper>

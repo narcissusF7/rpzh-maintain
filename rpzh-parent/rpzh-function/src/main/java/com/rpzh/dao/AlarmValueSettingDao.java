@@ -1,16 +1,13 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.dto.SettingColorAndDayDto;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.SettingColorAndDayVo;
 import org.apache.ibatis.annotations.Mapper;
 import com.rpzh.pojo.AlarmValueSetting;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Mapper
 public interface AlarmValueSettingDao {
@@ -44,4 +41,6 @@ public interface AlarmValueSettingDao {
     Integer updateColorAndAlertUpgradeDay(@Param("settingValue")Object settingValue,@Param("settingKey")String settingKey,@Param("settingName")String settingName);
 
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
+
+    AlarmValueSettingVo findByMaterialCode(@Param("mmaterialCode") String mmaterialCode);
 }

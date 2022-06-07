@@ -1,10 +1,10 @@
 package com.rpzh.dao;
 
+import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.dto.MaintainPlanDto;
-import io.swagger.models.auth.In;
+import com.rpzh.vo.MaintainCountVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import com.rpzh.pojo.MaintainPlan;
 import com.rpzh.vo.MaintainPlanVo;
 
 import java.util.Date;
@@ -55,7 +55,7 @@ public interface MaintainPlanDao {
 
     List<MaintainPlanVo> findDetails(@Param("id") Integer id);
 
-    MaintainPlanVo findDetailsNew(@Param("id") Integer id,@Param("stackId")Integer stackId);
+    MaintainPlanVo findDetailsNew(@Param("id") Integer id, @Param("stackId") Integer stackId);
 
     int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
@@ -72,4 +72,19 @@ public interface MaintainPlanDao {
     MaintainPlanVo findMaintainStackId(@Param("stackId") Integer stackId);
 
     List<Integer> findId(@Param("ids") List<Integer> ids);
+
+    int insertMaintainCount(@Param("materialCode") String materialCode, @Param("maintainCount") Double maintainCount, @Param("maintainPlanId") Integer maintainPlanId, @Param("pidRoute") String pidRoute,
+                            @Param("maintenceStyle") String maintenceStyle, @Param("phases") String phases, @Param("createdTime") Date createdTime);
+
+    int deleteMaintainCount(@Param("id") Integer id);
+
+    List<MaintainCountVo> findMaintainCountBySiteName(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+
+    List<MaintainCountVo> findFirst(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+
+    List<MaintainCountVo> findChild(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+
+    List<MaintainCountVo> findFirstMaterialCode(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+
+    Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
 }

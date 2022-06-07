@@ -22,7 +22,7 @@ public class MaintainPlanDto {
     private String materialBatchNum;
     private String materialCode;
     private Integer stageId;
-    private String materialName;
+    private String pidRoute;
     /**
      * 垛位id
      */

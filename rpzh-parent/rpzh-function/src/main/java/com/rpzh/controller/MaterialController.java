@@ -1,9 +1,5 @@
 package com.rpzh.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.rpzh.dao.AlarmValueSettingDao;
-import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.dto.MaterialCodeYearDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -14,7 +10,6 @@ import com.rpzh.vo.MaterialVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,5 +46,15 @@ public class MaterialController {
             return new Result(true, StatusCode.OK, "查询物料代码成功!", materialVo);
         }
         return new Result(false, StatusCode.ERROR, "该垛位暂无物料信息,请重新选择垛位!");
+    }
+
+    @PostMapping("/findAlarmValueSetting")
+    public Result findAlarmValueSetting(List<String> materialCodes){
+
+        if(materialCodes.size()==0){
+            return new Result(false, StatusCode.ERROR, "物料代码不能为空!");
+        }
+        AlarmValueSettingVo alarmValueSettingVo = materialService.findAlarmValueSetting(materialCodes);
+        return new Result(true, StatusCode.OK, "预警设置值成功!", alarmValueSettingVo);
     }
 }

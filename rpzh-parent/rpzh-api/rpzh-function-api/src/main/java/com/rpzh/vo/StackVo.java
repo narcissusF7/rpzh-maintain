@@ -30,6 +30,14 @@ public class StackVo implements Serializable {
     @ApiModelProperty(notes = "中文名称")
     private String nameCn;
 
+    //负责人
+    @ApiModelProperty(notes = "负责人")
+    private String principalName;
+
+    //负责人id
+    @ApiModelProperty(notes = "负责人id")
+    private Integer principalId;
+
     //区域ID
     @ApiModelProperty(notes = "区域id")
     private Integer areaId;

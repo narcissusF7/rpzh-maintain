@@ -347,7 +347,9 @@ public interface WarehouseDao {
 
     WarehouseVo findWarehouseInfo(@Param("siteId") Integer siteId);
 
-    WareAreaVo findWareAreaPrincipalName(@Param("stackId") Integer stackId);
+    StackVo findStackPrincipalName(@Param("stackId") Integer stackId);
+
+    WareAreaVo findWareAreaPrincipalName(@Param("areaId") Integer areaId);
 
     FloorVo findFloorPrincipalName(@Param("floorId") Integer floorId);
 

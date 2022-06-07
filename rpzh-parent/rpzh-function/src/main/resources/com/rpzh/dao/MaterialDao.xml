@@ -3,17 +3,12 @@
 <mapper namespace="com.rpzh.dao.MaterialDao">
     <select id="getMaintainCount" resultType="java.lang.Double">
     select
-    sum(stock_quantity) as maintainCount
+    sum(stock_box) as maintainCount
     from tb_material where stack_id = #{stackId} and is_end = '0'
 </select>
     <select id="getMaterialBatch" resultType="java.lang.String">
     select
     distinct batch
-    from tb_material where stack_id = #{stackId} and is_end = '0'
-</select>
-    <select id="getMaterialName" resultType="java.lang.String">
-    select
-    distinct material_name
     from tb_material where stack_id = #{stackId} and is_end = '0'
 </select>
     <select id="findMaterialCode" resultType="java.lang.String">
@@ -24,4 +19,9 @@
     <update id="updateMaterialStatus">
         update tb_material set is_end = '1' where stack_id = #{stackId}
     </update>
+    <select id="findCount" resultType="java.lang.Double">
+    select
+    sum(stock_box) as maintainCount
+    from tb_material where stack_id = #{stackId} and material_code = #{materialCode} and is_end = '0'
+</select>
 </mapper>

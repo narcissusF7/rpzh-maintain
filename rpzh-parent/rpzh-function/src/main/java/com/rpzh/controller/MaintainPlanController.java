@@ -2,6 +2,7 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -15,7 +16,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wbl
@@ -118,7 +119,6 @@ public class MaintainPlanController {
     @ApiOperation(value = "新建养护计划")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
-            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
@@ -149,6 +149,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     public Result insertMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto){
@@ -269,7 +270,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
-            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
@@ -301,6 +301,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     public Result updateMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
@@ -352,7 +353,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
-            @ApiImplicitParam(name = "materialName", value = "烟叶名称", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "principalIds", value = "负责人ids集合", required = true, dataType = "List"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
@@ -384,6 +384,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     public Result changeMaintainPlanStage(@ApiIgnore MaintainPlanDto maintainPlanDto) {
@@ -485,14 +486,25 @@ public class MaintainPlanController {
 
     /**
      * 养护统计报表
-     * @param maintainPlanDto
+     * @param maintainCountDto
      * @return
-     *//*
+     */
     @PostMapping(value = "/findMaintainCountReport")
-    public Result findMaintainCountReport(MaintainPlanDto maintainPlanDto) {
-        PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainCountReport(maintainPlanDto);
-        return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
+    @ApiOperation(value = "养护数量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "level", value = "位置等级", required = false, dataType = "int"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
+    })
+    public Result findMaintainCountReport(@ApiIgnore MaintainCountDto maintainCountDto) {
+        Map<String,Object> map = maintainPlanService.findMaintainCountReport(maintainCountDto);
+        return new Result(true, StatusCode.OK, "查询养护统计报表成功",map);
     }
 
-    */
 }

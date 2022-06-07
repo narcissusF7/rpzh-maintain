@@ -1,13 +1,14 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.entity.Result;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainPlanVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wbl
@@ -63,8 +64,5 @@ public interface MaintainPlanService {
 
     Integer moveStack(MaintainPlanDto maintainPlanDto);
 
-    /*
-    PageInfo<MaintainPlanVo> findMaintainCountReport(MaintainPlanDto maintainPlanDto);
-
-    Integer moveStack(MaintainPlanDto maintainPlanDto);*/
+    Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 }

@@ -1,6 +1,5 @@
 package com.rpzh.dao;
 
-import com.rpzh.pojo.NodeData;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,5 +12,5 @@ import java.util.List;
  */
 @Mapper
 public interface AirConditioningDao {
-    List<NodeData> findAirConditioningData(@Param("wareAreaId")Integer wareAreaId);
+    List<String> findAirConditioningData(@Param("wareAreaId")Integer wareAreaId);
 }

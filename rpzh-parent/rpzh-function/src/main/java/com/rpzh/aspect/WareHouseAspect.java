@@ -43,6 +43,7 @@ public class WareHouseAspect {
             }
             if (type.startsWith("add")||type.startsWith("update")||type.startsWith("del")){
                 redisTemplate.delete("maintain-locating");
+                redisTemplate.delete(redisTemplate.keys("*principalName"));
             }
         }
     }

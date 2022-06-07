@@ -1,5 +1,6 @@
 package com.rpzh.service;
 
+import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaterialVo;
 
 import java.util.List;
@@ -11,4 +12,5 @@ import java.util.List;
  */
 public interface MaterialService {
     MaterialVo findMaterialInfo(Integer stackId);
+    AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes);
 }

@@ -114,4 +114,6 @@ public class MaintainPlanVo {
 
     @ApiModelProperty(notes = "养护阶段集合")
     private List<MaintainPlanVo> maintainPlanVos;
+    @ApiModelProperty(notes = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位")
+    public String pidRoute;
 }
