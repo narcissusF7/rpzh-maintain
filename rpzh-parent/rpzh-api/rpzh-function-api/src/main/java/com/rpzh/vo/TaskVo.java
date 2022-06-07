@@ -63,9 +63,18 @@ public class TaskVo {
     @ApiModelProperty(notes = "评价")
     private String evaluate;
 
-    @ApiModelProperty(notes = "推送方式")
+    @ApiModelProperty(notes = "推送方式,M:短信,A:App")
     private String pushWay;
 
     @ApiModelProperty(notes = "处理结果")
     private String dealResult;
+
+    @ApiModelProperty(notes = "图片地址")
+    private String pictureUrl;
+
+    @ApiModelProperty(notes = "图片组名")
+    private String pictureGroup;
+
+    @ApiModelProperty(notes = "图片图片文件夹名")
+    private String pictureFilename;
 }

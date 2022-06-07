@@ -39,4 +39,25 @@ public interface TaskManagementDao {
      * @return
      */
     int mqUpdateStatus(@Param("msg")String msg, @Param("taskStatus")String taskStatus);
+
+    /**
+     * 任务中心删除任务
+     * @param ids
+     * @return
+     */
+    int delTask(@Param("ids") Long[] ids);
+
+    /**
+     * 查询任务详情
+     * @param id
+     * @return
+     */
+    TaskVo findTaskDetail(@Param("id") Long id);
+
+    /**
+     * 工作任务查询列表
+     * @param taskDto
+     * @return
+     */
+    List<TaskVo> findTaskByUser(@Param("taskDto") TaskDto taskDto);
 }
