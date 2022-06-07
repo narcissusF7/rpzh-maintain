@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 @Data
 public class NodeData{
+    private Integer id;
     private String nodeId;
     private String type;
     private Integer frequency;
@@ -25,6 +26,9 @@ public class NodeData{
     private String pidRoute;
     private String siteType;
     private Integer alertLevel;
+    private String siteX;
+    private String siteY;
+    private String siteZ;
 
 
 
@@ -32,6 +36,7 @@ public class NodeData{
     }
 
     public NodeData(ParseData parseData, NodeVo nodeVo,int count) {
+        this.id = nodeVo.getId();
         this.nodeId = parseData.getNodeId();
         this.type = parseData.getNodeType();
         this.frequency = parseData.getFrequency();
@@ -44,6 +49,11 @@ public class NodeData{
         this.siteType = nodeVo.getSiteType();
         this.alertLevel = nodeVo.getAlertLevel();
         this.pidRoute =nodeVo.getSiteRoute();
+        if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
+            this.siteX = nodeVo.getSiteX();
+            this.siteY = nodeVo.getSiteY();
+            this.siteZ = nodeVo.getSiteZ();
+        }
         switch (nodeVo.getNodeType()){
             case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
                 this.oxygen=parseData.getData().get(count);

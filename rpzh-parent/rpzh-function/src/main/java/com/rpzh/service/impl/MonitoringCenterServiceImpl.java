@@ -1,6 +1,8 @@
 package com.rpzh.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -52,7 +54,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     }
 
     /**
-     * 先通过条件查询出设备  在通过设备在缓存中获取数据，如果物料代码不为空，在进行过滤 ，最后进行排序排序
+     * 先通过条件查询出设备  在通过设备在缓存中获取数据，进行排序
      */
     @Override
     public PageInfo<NodeDataVo> findMonitoringData(MonitorCondition monitorCondition) {
@@ -77,9 +79,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
         }
 
-        nodeDataVos.addAll(setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus()));
+        nodeDataVos =setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus());
 
-        //如果设备时按预警排序  需要手动分页
+        //如果设备按预警排序  需要手动分页
         if (monitorCondition.getSortCondition() == 1) {
             //排序  按预警等级排序
             nodeDataVos = nodeDataVos.stream().sorted(Comparator.comparing(NodeDataVo::getAlertLevel).reversed()).collect(Collectors.toList());
@@ -203,9 +205,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      */
     public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos , List<NodeVo> nodeVos ,Integer status) {
         for (NodeVo nodeVo : nodeVos) {
-            //获取缓存中该设备的数据
+            //TODO 获取缓存中该设备的数据 空调数据暂时没有
             Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
-            nodeDataVos.add(new ObjectMapper().convertValue(data, NodeDataVo.class));
+            nodeDataVos.add(JSON.parseObject(data.toString(),NodeDataVo.class));
         }
         //监控状态筛选 1.正常 2.预警
         if (status==1){
@@ -234,11 +236,11 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             //从数据库中获取
             WeatherDataVo weatherDataVo = weatherDao.findNowWeather();
             //存放到缓存中
-            redisTemplate.opsForValue().set("MAINTAIN_WEATHER",weatherDataVo);
+            redisTemplate.opsForValue().set("MAINTAIN_WEATHER", JSONObject.toJSONString(weatherDataVo));
             return weatherDataVo;
         }
         //类型转换
-        WeatherDataVo weatherDataVo = new ObjectMapper().convertValue(o,WeatherDataVo.class);
+        WeatherDataVo weatherDataVo = JSONObject.parseObject(o.toString(),WeatherDataVo.class);
         return weatherDataVo;
     }
 

@@ -29,6 +29,6 @@ public class MonitorCondition {
     private Integer monitorType;
     //排序规则 0 按位置排序 1 按预警排序
     private Integer sortCondition = 0;
-    private Integer page;
-    private Integer size;
+    private Integer page =1;
+    private Integer size =10;
 }

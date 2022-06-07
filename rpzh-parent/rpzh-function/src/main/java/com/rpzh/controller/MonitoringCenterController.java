@@ -13,10 +13,7 @@ import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.WeatherDataVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -87,7 +84,7 @@ public class MonitoringCenterController {
     }
 
     @ApiOperation(
-            value = "查询故障设备列表 01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,"
+            value = "查询故障设备列表 01:设备电量故障,02:设备信号强度故障,03:设备丢包故障"
     )
     @GetMapping("/findTroubleNode")
     public Result<EarlyWarningVo> findTroubleNode() {
@@ -151,7 +148,7 @@ public class MonitoringCenterController {
             required = true
     )})
     @GetMapping("/findAlarmValue")
-    public Result<Double> findAlarmValue(NodeData nodeData){
+    public Result<Double> findAlarmValue(@ApiIgnore NodeData nodeData){
         List<Double> arrayList = monitoringCenterService.findAlarmValue(nodeData);
         return new Result<>(true,StatusCode.OK,"查询成功",arrayList);
     }
@@ -162,7 +159,7 @@ public class MonitoringCenterController {
     )
     @ApiImplicitParams({@ApiImplicitParam(
             name = "startTime",
-            value = "开始时间 默认值当天0点",
+            value = "开始时间",
             dataType = "String"
     ),@ApiImplicitParam(
             name = "endTime",
@@ -170,17 +167,17 @@ public class MonitoringCenterController {
             dataType = "String"
     ),@ApiImplicitParam(
             name = "page",
-            value = "页数  默认第一页",
+            value = "页数",
             dataType = "Integer",
             defaultValue = "1"
     ),@ApiImplicitParam(
             name = "size",
-            value = "每页数量 默认10条",
+            value = "每页数量",
             dataType = "Integer",
             defaultValue = "10"
     )})
     @GetMapping("/findWeatherData")
-    public Result<List<WeatherDataVo>> findWeatherData(MonitorCondition monitorCondition){
+    public Result<List<WeatherDataVo>> findWeatherData(@ApiIgnore MonitorCondition monitorCondition){
         PageHelper.startPage(monitorCondition.getPage(),monitorCondition.getSize());
         List<WeatherDataVo> weatherDataVos = monitoringCenterService.findWeatherData(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(weatherDataVos));
@@ -203,7 +200,10 @@ public class MonitoringCenterController {
         Map<String, HashMap<String, Double>> weatherDataVos = monitoringCenterService.findWeatherDataByDay(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",weatherDataVos);
     }
-
+    @ApiOperation(
+            value = "查询现在天气数据"
+    )
+    @GetMapping("/findNowWeather")
     public Result<WeatherDataVo> findNowWeather(){
         WeatherDataVo nowWeather = monitoringCenterService.findNowWeather();
         return new Result<>(true,StatusCode.OK,"查询成功",nowWeather);

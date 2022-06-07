@@ -270,26 +270,30 @@
         WHERE node_id = #{nodeId}
     </select>
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
-        select id,node_id from tb_node tnode,tb_material tmate
+
+        <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+        SELECT t.id , t.nodeId ,t.stackId from (
+        </if>
+        select id id,node_id nodeId,stack_id stackId from tb_node tnode
         <where>
-            <if test="monitorCondition.gatherSite!=null and monitorCondition.gatherSite!=''">
-                and tnode.gather_site like  concat('%', #{monitorCondition.gatherSite},'%')
+            <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
+                and site_route like  concat('%', #{monitorCondition.pidRoute},'%')
             </if>
-            <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-                and tmate.material_code like concat('%', #{monitorCondition.materialCode},'%')
-            </if>
-            <if test="nodeTypes!=null and nodeTypes!=''">
-                and tnode.node_type in
+            <if test="monitorCondition.nodeTypes!=null and monitorCondition.nodeTypes!=''">
+                and node_type in
                 <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
                     #{nodeType}
                 </foreach>
             </if>
             <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=null">
-                and tnode.site_type = #{monitorCondition.siteType}
+                and site_type = #{monitorCondition.siteType}
             </if>
-            and tnode.status = 1 and tnode.stack_id = tmate.stack_id
+            and status = 1
         </where>
-        order by tnode.gather_site,tnode.site_x,tnode.site_y,tnode.site_z;
+        order by site_route,site_x,site_y,site_z
+        <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+            ) t where t.stackId in (select stack_id  from tb_material where material_code like concat('%', #{monitorCondition.materialCode},'%')
+        </if>
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
         select id, type, ${tableColumn} as data ,transfer_time as transferTime
@@ -298,9 +302,9 @@
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
         select id ,`type` , temp, node_id nodeId, frequency , voltage , signal_strength signalStrength ,
         stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
-        site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route pidRoute
+        site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route pidRoute,site_x siteX,site_y siteY,site_z siteZ
         from ${tableName}
-        where node_id = #{nodeId}
+        where node_id = #{nodeId} limit 1
     </select>
     <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
         SELECT
@@ -348,6 +352,9 @@
             <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
             <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
             <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
+            <if test="nodeData.siteX!=null and nodeData.siteX!=''">site_x,</if>
+            <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
+            <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
         createdTime
         ) values (
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
@@ -366,6 +373,9 @@
         <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
         <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
         <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
+        <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>
+        <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
+        <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
         now()
         )
     </insert>
@@ -379,33 +389,46 @@
         <if test="pidRoute != null and pidRoute != ''">and site_route = #{pidRoute}</if>
     </select>
 
+    <!--<select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">-->
+        <!--SELECT-->
+        	<!--t.nodeId,-->
+        	<!--t.pidRoute-->
+        <!--FROM-->
+        	<!--(-->
+        		<!--SELECT-->
+        			<!--node_id AS nodeId,-->
+        			<!--site_route pidRoute-->
+        		<!--FROM-->
+        			<!--tb_node-->
+        		<!--WHERE-->
+                  <!--node_type in-->
+        <!--<foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">-->
+                  <!--#{nodeType}-->
+        <!--</foreach>-->
+        		<!--AND site_route =#{monitorCondition.pidRoute}-->
+            <!--UNION-->
+        		<!--SELECT-->
+        			<!--air_conditioning_no AS nodeId,-->
+        			<!--pid_route pidRoute-->
+        		<!--FROM-->
+        			<!--tb_air_conditioning-->
+        		<!--WHERE-->
+        			<!--pid_route =#{monitorCondition.pidRoute}-->
+        	<!--) as t-->
+        <!--ORDER BY-->
+        	<!--t.pidRoute-->
+    <!--</select>-->
     <select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">
         SELECT
-        	t.nodeId,
-        	t.pidRoute
+        node_id AS nodeId,
+        site_route pidRoute
         FROM
-        	(
-        		SELECT
-        			node_id AS nodeId,
-        			site_route pidRoute
-        		FROM
-        			tb_node
-        		WHERE
-                  nodeType in
+        tb_node
+        WHERE
+        node_type in
         <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
-                  #{nodeType}
+            #{nodeType}
         </foreach>
-        		AND site_route LIKE concat('%',#{monitorCondition.pidRoute},'%')
-            UNION
-        		SELECT
-        			air_conditioning_no AS nodeId,
-        			pid_route pidRoute
-        		FROM
-        			tb_air_conditioning
-        		WHERE
-        			pid_route LIKE concat('%',#{monitorCondition.pidRoute},'%')
-        	) as t
-        ORDER BY
-        	t.pidRoute
+        AND site_route =#{monitorCondition.pidRoute} order by pidRoute
     </select>
 </mapper>

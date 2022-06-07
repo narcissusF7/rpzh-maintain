@@ -17,5 +17,6 @@ public interface WeatherDao {
     @DS("clickhouse")
     Integer insertWeatherData(@Param("weatherName") String weatherName , @Param("temp") Double temp , @Param("humidity") Double humidity , @Param("precip") Double precip);
 
+    @DS("clickhouse")
     WeatherDataVo findNowWeather();
 }

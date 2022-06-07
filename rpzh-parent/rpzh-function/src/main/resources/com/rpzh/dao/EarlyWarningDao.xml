@@ -121,6 +121,6 @@
     </update>
 
     <select id="findTroubleNode" resultType="com.rpzh.vo.EarlyWarningVo">
-        select node_id , node_type , warning_val_one , warning_time_one from tb_early_warning where warning_type in ('01','02','03') and is_affirm = 2
+        select node_id nodeId, node_type nodeType, warning_val_one warningValOne, warning_time_one warningTimeOne from tb_early_warning where warning_type in ('01','02','03') and is_affirm = 2
     </select>
 </mapper>

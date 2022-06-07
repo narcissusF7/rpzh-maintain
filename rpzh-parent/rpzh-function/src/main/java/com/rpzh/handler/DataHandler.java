@@ -70,7 +70,11 @@ public class DataHandler {
      * 连续预警次数  redis存放规则
      * @param parseData
      */
-
+    /**
+     * 用来处理空调数据  暂时还没用
+     * @param parseData
+     * @param siteRoute
+     */
     public void handlerData(ParseData parseData ,String siteRoute) {
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(NodeConstant.NODE_WARE_AREA,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
@@ -339,9 +343,9 @@ public class DataHandler {
         if (value > list.get(0)) {
             level = 3;
         } else if (value > list.get(1)) {
-            level = 3;
-        } else if (value > list.get(2)) {
             level = 2;
+        } else if (value > list.get(2)) {
+            level = 1;
         } else if (list.size() > 3 && value < list.get(3)) {
             level = 1;
         }
@@ -498,7 +502,6 @@ public class DataHandler {
         }).map(vos -> {
             Object o = redisTemplate.opsForValue().get(MAINTAIN + vos.getNodeId());
             NodeData nodeData = JSON.parseObject(o.toString(),NodeData.class);
-//            NodeData nodeData = new ObjectMapper().convertValue(o, NodeData.class);
             return nodeData.getTemp();
         });
         //取平均值
