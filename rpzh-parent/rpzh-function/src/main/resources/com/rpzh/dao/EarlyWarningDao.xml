@@ -65,7 +65,7 @@
         where stack_id = #{stackId} and is_affirm = 0 ;
     </select>
     <select id="findUndoCount" resultType="java.lang.Integer">
-        select count (*) from tb_early_warning where node_id = #{nodeId} and status = 2 and warning_type = #{warningType}
+        select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm = 2 and warning_type = #{warningType}
     </select>
 
     <insert id="insertWarning">
