@@ -12,6 +12,8 @@ import lombok.Data;
 @Data
 @ApiModel(description = "预警返回数据")
 public class EarlyWarningVo {
+    @ApiModelProperty(notes ="主键id")
+    private Integer id;
     @ApiModelProperty(notes = "预警等级,1:一级预警,2:二级预警,3:三级预警")
     private Integer warningGrade;
     @ApiModelProperty(notes = "预警信息")

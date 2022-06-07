@@ -158,18 +158,14 @@ public interface NodeDao {
     @DS("clickhouse")
     List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 
-//    @DS("clickhouse")
-//    List<NodeDataVo> insertNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+    @DS("clickhouse")
+    NodeDataVo findNodeNowData(@Param("nodeId") String nodeId, @Param("tableName") String tableName);
 
-    NodeVo findNodeAndMaintainStageByNodeId(@Param("nodeId") String nodeId);
+    NodeVo findByNodeId(@Param("nodeId") String nodeId);
 
     @DS("clickhouse")
     Integer insertNodeHistory(@Param("nodeData") NodeData nodeData,@Param("tableName") String tableName);
 
-    @DS("clickhouse")
-    Integer insertWeatherData(@Param("weatherName") String weatherName , @Param("temp") Double temp , @Param("humidity") Double humidity , @Param("precip") Double precip);
-
-    List<WeatherDataVo> findWeatherData(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     Integer findNodeStatus(@Param("id") Integer id);
 

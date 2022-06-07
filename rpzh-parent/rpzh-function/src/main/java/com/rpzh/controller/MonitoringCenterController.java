@@ -144,6 +144,11 @@ public class MonitoringCenterController {
             value = "采集位置类型",
             dataType = "String",
             required = true
+    ),@ApiImplicitParam(
+            name = "pidRoute",
+            value = "位置路由",
+            dataType = "String",
+            required = true
     )})
     @GetMapping("/findAlarmValue")
     public Result<Double> findAlarmValue(NodeData nodeData){
@@ -192,21 +197,16 @@ public class MonitoringCenterController {
             name = "endTime",
             value = "结束时间 默认值为当天",
             dataType = "String"
-    ),@ApiImplicitParam(
-            name = "page",
-            value = "页数  默认第一页",
-            dataType = "Integer",
-            defaultValue = "1"
-    ),@ApiImplicitParam(
-            name = "size",
-            value = "每页数量 默认10条",
-            dataType = "Integer",
-            defaultValue = "10"
     )})
     @GetMapping("/findWeatherDataByDay")
     public Result<Map<String, HashMap<String, Double>>> findWeatherDataByDay(MonitorCondition monitorCondition){
         Map<String, HashMap<String, Double>> weatherDataVos = monitoringCenterService.findWeatherDataByDay(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",weatherDataVos);
+    }
+
+    public Result<WeatherDataVo> findNowWeather(){
+        WeatherDataVo nowWeather = monitoringCenterService.findNowWeather();
+        return new Result<>(true,StatusCode.OK,"查询成功",nowWeather);
     }
 
 

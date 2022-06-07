@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Data
 @ApiModel(description = "节点管理数据返回")
-public class NodeVo {
+public class NodeVo implements Serializable {
 
     //主键id
     @ApiModelProperty(notes = "id主键")
@@ -119,5 +120,7 @@ public class NodeVo {
     @ApiModelProperty(notes = "预警等级")
     private Integer alertLevel;
 
+    @ApiModelProperty(notes = "预警表Id")
+    private Integer alermValueSettingId;
 
 }

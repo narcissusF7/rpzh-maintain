@@ -1,6 +1,7 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.entity.Result;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.EarlyWarningVo;
@@ -27,4 +28,6 @@ public interface MonitoringCenterService {
     List<WeatherDataVo> findWeatherData(MonitorCondition monitorCondition);
 
     Map<String, HashMap<String, Double>>findWeatherDataByDay(MonitorCondition monitorCondition);
+
+    WeatherDataVo findNowWeather();
 }

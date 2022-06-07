@@ -2,19 +2,14 @@ package com.rpzh.handler;
 
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
-import com.rpzh.dao.AlarmValueSettingDao;
-import com.rpzh.dao.EarlyWarningDao;
-import com.rpzh.dao.NodeDao;
-import com.rpzh.dao.WareAreaAlarmSettingDao;
+import com.rpzh.dao.*;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
-import com.rpzh.vo.AlarmValueSettingVo;
-import com.rpzh.vo.EarlyWarningVo;
-import com.rpzh.vo.NodeVo;
+import com.rpzh.vo.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +47,9 @@ public class DataHandler {
     @Autowired
     WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
 
+    @Autowired
+    MaintainPlanDao maintainPlanDao;
+
     @Value("${node.voltage}")
     Double voltage;
     @Value("${node.signalStrength}")
@@ -60,6 +58,7 @@ public class DataHandler {
 
     public static String MAINTAIN = "MAINTAIN_";
     public static String ALERT_NUM = "ALERT_NUM_";
+    public static String MAINTAIN_CACHE_NODE = "MAINTAIN_CACHE_NODE_";
 
     /**
      * 设备推送数据处理
@@ -143,8 +142,26 @@ public class DataHandler {
         }
 
 
-        //通过设备id找到对应的设备 及养护计划阶段
-        NodeVo nodeVo = nodeDao.findNodeAndMaintainStageByNodeId(parseData.getNodeId());
+        //通过设备id找到对应的设备
+        Object o = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
+
+        NodeVo nodeVo;
+
+        if (ToolUtil.isEmpty(o)){
+            nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+
+            if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
+                //查询对应的养护计划 养护计划阶段
+                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
+                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+                //设置该预警id
+                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+            }
+            redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + parseData.getNodeId(),nodeVo);
+        }else {
+            nodeVo = new ObjectMapper().convertValue(o,NodeVo.class);
+        }
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
@@ -159,22 +176,20 @@ public class DataHandler {
             redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
         }else {//垛内设备
 
-            List<String> hashKeys = Arrays.asList(MAINTAIN + nodeVo.getMaintainStageId());
+            List<String> hashKeys = Arrays.asList(nodeVo.getMaintainStageId().toString());
 
-            putAlarmValueToCache(hashKeys,alarmColumns[0]);
+            redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0], nodeVo.getAlermValueSettingId());
 
-            //redis中的对象名
-            redisHashKey = MAINTAIN + nodeVo.getMaintainStageId();
         }
 
         //从缓存中获取预警阈值
         List<Double> list = new ArrayList<>();
         for (String alarmColumn : alarmColumns) {
-            list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
+            list.add((Double) redisTemplate.opsForHash().get(redisHashKey, alarmColumn));
         }
 
         //根据丢包个数判断需要循环几次
-        int loopCount = parseData.getPacketLossNum() > 2 ? parseData.getPacketLossNum() : 2;
+        int loopCount = parseData.getPacketLossNum() > 2 ? 2 : parseData.getPacketLossNum();
 
         //根据丢包个数处理
         for (int i = loopCount; i >= 0; --i) {
@@ -235,8 +250,9 @@ public class DataHandler {
 
             //获取缓存中的对应字段的值
             alarmColumns = AlarmValueSettingVo.getStackColumn();
+            list.clear();
             for (String alarmColumn : alarmColumns) {
-                list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
+                list.add((Double) redisTemplate.opsForHash().get(redisHashKey, alarmColumn));
             }
             //判断等级
             int level = decideValue(v, list);
@@ -254,6 +270,9 @@ public class DataHandler {
      * @return
      */
     public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn){
+        return putAlarmValueToCache(hashKeys,alarmColumn,-1);
+    }
+    public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn,Integer alarmId){
 
         for (int i = hashKeys.size()-1; i >=0 ; i--) {
             //判断缓存是否存在
@@ -262,7 +281,15 @@ public class DataHandler {
                 return MAINTAIN + hashKeys.get(i);
             }else {
                 //不存在就从数据库中查找
-                AlarmValueSettingVo alarmValueSettingVo = wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
+                AlarmValueSettingVo alarmValueSettingVo;
+                if(alarmId==-1){
+                    //TODO 这边有问题
+                    alarmValueSettingVo= wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
+                }else {
+                    alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmId);
+                }
+
+
                 //数据库中有就存在缓存中并跳出循环  没有就向上查找
                 if (!ToolUtil.isEmpty(alarmValueSettingVo)){
 
@@ -376,14 +403,11 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
 
         //判断是否是仓间设备
-        if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())) {
+        if (NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())) {
             //截取位置路由   位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位
-            HashMap hashMap = new ObjectMapper().convertValue(data, HashMap.class);
-            Object o = hashMap.get("04");
-            if (ToolUtil.isEmpty(o)) {
-                //设置所在仓间
-                earlyWarning.setAreaId(Integer.parseInt(o.toString()));
-            }
+            String s = nodeVo.getSiteRoute().split("04:")[1].split("]")[0];
+            //设置所在仓间
+            earlyWarning.setAreaId(Integer.parseInt(s));
         } else {
             //设置所在垛位
             earlyWarning.setStackId(nodeVo.getStackId());
@@ -430,8 +454,10 @@ public class DataHandler {
      * @param siteRoute 位置路由
      * @return
      */
-    private List<String> getHashKeys(String siteRoute){
+    public List<String> getHashKeys(String siteRoute){
+        //TODO 重新测一下
         siteRoute.replace("]","");
+        siteRoute.replace("[","");
         //将位置路由转成键值对 键:(垛 区 层 楼 仓库) 值 键对应的id
         Map<String,String> map = new HashMap<>();
         String[] split = siteRoute.split(",");
@@ -453,8 +479,19 @@ public class DataHandler {
      * @return 该设备类型的数据均值
      */
     private Double getAvg(List<NodeVo> nodeVos , String nodeType){
-
-        Stream<Double> stream = nodeVos.stream().filter(s -> nodeType.equals(s.getNodeType())).map(vos -> {
+        Stream<Double> stream = nodeVos.stream().filter(s -> nodeType.equals(s.getNodeType())).filter(s->{//过滤掉找不到数据的设备
+            Object o = redisTemplate.opsForValue().get(MAINTAIN + s.getNodeId());
+            if (ToolUtil.isEmpty(o)){
+                NodeDataVo nodeDataVo = nodeDao.findNodeNowData(s.getNodeId(),NodeTypeEnum.getNodeType(s.getNodeType()).getTableName());
+                if (ToolUtil.isEmpty(nodeDataVo)){
+                    return false;
+                }else {
+                    redisTemplate.opsForValue().set(MAINTAIN + s.getNodeId(),nodeDataVo);
+                    return true;
+                }
+            }
+            return true;
+        }).map(vos -> {
             Object o = redisTemplate.opsForValue().get(MAINTAIN + vos.getNodeId());
             NodeData nodeData = new ObjectMapper().convertValue(o, NodeData.class);
             return nodeData.getTemp();
@@ -474,6 +511,9 @@ public class DataHandler {
      * @param siteType
      */
     private Integer decideEarlyWarning(EarlyWarningVo earlyWarningVo ,EarlyWarning earlyWarning , ParseData parseData ,Integer level ,Double data ,String evnType ,String siteType){
+        if (level==0){
+            redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId(),0);
+        }
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
             //获取缓存中的连续预警次数

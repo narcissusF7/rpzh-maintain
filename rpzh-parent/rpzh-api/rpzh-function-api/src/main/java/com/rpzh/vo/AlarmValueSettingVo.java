@@ -134,6 +134,6 @@ public class AlarmValueSettingVo {
         return new String[0];
     }
     public static String[] getStackColumn() {
-        return new String[]{"coreTempHighEnvTempThree","coreTempHighEnvTempTwo","coreTempHighEnvTempOne","coreTempLowerEnvTemp"};
+        return new String[]{"coreTempHighEnvTempThree","coreTempHighEnvTempTwo","coreTempHighEnvTempOne","coreTempLowEnvTemp"};
     }
 }

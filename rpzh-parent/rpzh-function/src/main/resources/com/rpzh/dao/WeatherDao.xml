@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.WeatherDao">
+    <insert id="insertWeatherData">
+        insert into tb_weather_history (weather_name,temp,humidity,precip,created_time)values (#{weatherName},#{temp},#{humidity},#{precip},now())
+    </insert>
+
+    <select id="findWeatherData" resultType="com.rpzh.vo.WeatherDataVo">
+        select
+        weather_name as weatherName ,
+        temp as temp,
+        humidity as humidity ,
+        precip as precip ,
+        created_time as createdTime
+        from tb_weather_history
+        <where>
+            <if test="monitorCondition.startTime!=null and monitorCondition.startTime!=''">
+                and created_time &gt;= #{monitorCondition.startTime}
+            </if>
+
+            <if test="monitorCondition.endTime!=null and monitorCondition.endTime!=''">
+                and created_time &lt;= #{monitorCondition.endTime}
+            </if>
+        </where>
+    </select>
+    <select id="findNowWeather"  resultType="com.rpzh.vo.WeatherDataVo">
+        select
+        weather_name as weatherName ,
+        temp as temp,
+        humidity as humidity ,
+        precip as precip ,
+        created_time as createdTime
+        from tb_weather_history order by createdTime limit 1;
+    </select>
+</mapper>

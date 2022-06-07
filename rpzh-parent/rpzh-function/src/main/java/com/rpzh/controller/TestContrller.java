@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.handler.DataHandler;
+import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
 import com.rpzh.vo.NodeVo;
 import io.swagger.annotations.Api;
@@ -34,6 +36,9 @@ public class TestContrller {
 
     @Autowired
     private NodeService nodeService;
+
+    @Autowired
+    private DataHandler dataHandler;
 
     @ApiOperation(value = "测试用例方法", tags = "测试用例方法")
     @PostMapping("/one")
@@ -128,5 +133,50 @@ public class TestContrller {
         String endTime = nodeDto.getEndTime();
         List<NodeVo> list = nodeService.testFindNode(nodeId,nodeType,createTime,startTime,endTime);
         return new Result<>(true, StatusCode.OK, "测试方法4",list);
+    }
+
+
+    @ApiOperation(value = "数据推送测试4")
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型",
+            required = true,
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "Data",
+            value = "数据",
+            dataType = "String",
+            allowMultiple = true
+    ), @ApiImplicitParam(
+            name = "DateTime",
+            value = "传输时间",
+            dataType = "String",
+            allowMultiple = true
+    ), @ApiImplicitParam(
+            name = "frequency",
+            value = "频率",
+            dataType = "Double"
+    ), @ApiImplicitParam(
+            name = "voltage",
+            value = "电压",
+            dataType = "Double"
+    ), @ApiImplicitParam(
+            name = "signalStrength",
+            value = "信号强度",
+            dataType = "Double"
+    ), @ApiImplicitParam(
+            name = "packetLossNum",
+            value = "丢包个数",
+            dataType = "Integer"
+    )})
+    @PostMapping("testParseData")
+    public Result testParseData(@ApiIgnore ParseData parseData){
+        dataHandler.handlerData(parseData);
+        return new Result<>(true, StatusCode.OK, "测试方法4");
     }
 }

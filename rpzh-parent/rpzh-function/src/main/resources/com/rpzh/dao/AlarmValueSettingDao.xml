@@ -197,7 +197,7 @@ FROM tb_general_setting limit 1
     </select>
     <select id="findByMaintainStageId" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select
-            id as id,
+            talarm.id as id,
             stack_oxygen_upper_one as stackOxygenUpperOne,
             stack_oxygen_upper_two as stackOxygenUpperTwo,
             stack_oxygen_upper_three as stackOxygenUpperThree,
@@ -231,8 +231,9 @@ FROM tb_general_setting limit 1
             core_temp_high_env_temp_three as coreTempHighEnvTempThree,
             core_temp_low_env_temp as coreTempLowEnvTemp,
             early_warning_rule_name as earlyWarningRuleName
-        from tb_alarm_value_setting
-        where id = #{id}
+        from tb_alarm_value_setting talarm,tb_maintain_plan_stage tstage
+        where tstage.id = #{id} and tstage.alarm_value_setting_id = talarm.id
     </select>
+
 
 </mapper>

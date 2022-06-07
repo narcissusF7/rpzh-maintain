@@ -14,7 +14,7 @@
         select id , warning_grade as warningGrade from tb_early_warning where node_id =#{stackId} and is_affirm = 2 and node_id is null;
     </select>
     <select id="findWarningThreshold" resultType="java.lang.String">
-        select setting_value from tb_general_setting where setting_key = #{settingKey}
+        select setting_value from tb_general_setting where setting_key = #{settingKey} order by id
     </select>
     <select id="findUndoEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
         select node_id,warning_grade from tb_general_setting where is_affirm = 0 order by warning_grade desc;
@@ -83,21 +83,27 @@
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">stack_id,</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">area_id,</if>
         is_affirm
-        ) values {
-        <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">#{earlyWarning.warningType}</if>
+        ) values (
+        <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">#{earlyWarning.warningType},</if>
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null">#{earlyWarning.nodeId},</if>
         <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">#{earlyWarning.nodeType},</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">#{earlyWarning.warningValOne},</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">#{earlyWarning.warningTimeOne},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">#{earlyWarning.warningValTwo},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">#{earlyWarning.warningTimeTwo},</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">#{earlyWarning.warningValThree},</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">#{earlyWarning.warningTimeThree},</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
+            #{earlyWarning.warningValOne},</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
+            sysdate(),</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
+            #{earlyWarning.warningValTwo},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
+            sysdate(),</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
+            #{earlyWarning.warningValThree},</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
+            sysdate(),</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
         2
-        }
+        )
     </insert>
 
     <update id="updateWarning">

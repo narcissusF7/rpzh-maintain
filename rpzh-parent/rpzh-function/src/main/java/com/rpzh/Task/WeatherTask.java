@@ -2,6 +2,7 @@ package com.rpzh.Task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.WeatherDao;
 import com.rpzh.util.PortDataUtils;
 import com.rpzh.vo.WeatherDataVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,12 @@ import org.springframework.stereotype.Component;
 public class WeatherTask {
 
     @Autowired
-    NodeDao nodeDao;
+    WeatherDao weatherDao;
 
     @Autowired
     RedisTemplate redisTemplate;
 
-    //TODO 需要修改location=101230201
-    private static String weatherUrl = "https://devapi.qweather.com/v7/weather/now?location=101230201&key=8fdc54a3ac93474cbe6ae1efa42493fd";
+    private static String weatherUrl = "https://devapi.qweather.com/v7/weather/now?location=101210401&key=8fdc54a3ac93474cbe6ae1efa42493fd";
 
     /**
      * 天气数据redis 存放规则  redisTemplate.opsForValue().set("MAINTAIN_WEATHER",weatherDataVo);
@@ -35,7 +35,7 @@ public class WeatherTask {
         Double humidity = nowWeather.getDouble("humidity");
         Double precip = nowWeather.getDouble("precip");
 
-        nodeDao.insertWeatherData(weatherName,temp,humidity,precip);
+        weatherDao.insertWeatherData(weatherName,temp,humidity,precip);
 
         WeatherDataVo weatherDataVo = new WeatherDataVo();
         weatherDataVo.setTemp(temp);

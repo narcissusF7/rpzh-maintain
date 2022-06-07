@@ -7,6 +7,7 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.Result;
 import com.rpzh.enums.NodeOperationEnum;
+import com.rpzh.handler.DataHandler;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
@@ -16,6 +17,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -39,6 +41,8 @@ public class NodeOperateAspect {
 
     @Autowired
     NodeOperationService operationService;
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @AfterReturning(value = "execution(* com.rpzh.controller.NodeController.*(..))||execution(* com.rpzh.controller.MaintainPlanController..*(..)))", returning = "result")
     public void NodeOperateLog(JoinPoint pjp, Result<T> result){
@@ -160,6 +164,7 @@ public class NodeOperateAspect {
 
         if (!StringUtils.isEmpty(nodeDto.getNodeId())){
             nodeOperationDto.setNodeId(nodeDto.getNodeId());
+            redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeDto.getNodeId());
         }
         if (nodeDto.getSiteId()!=null){
             nodeOperationDto.setSiteId(nodeDto.getSiteId());

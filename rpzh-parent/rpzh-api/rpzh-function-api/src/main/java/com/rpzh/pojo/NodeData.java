@@ -22,6 +22,7 @@ public class NodeData implements Serializable {
     private Double oxygen=0d;
     private String dateTime;
     private String gatherSite;
+    private String pidRoute;
     private String siteType;
     private Integer alertLevel;
 
@@ -42,6 +43,7 @@ public class NodeData implements Serializable {
         this.gatherSite = nodeVo.getGatherSite();
         this.siteType = nodeVo.getSiteType();
         this.alertLevel = nodeVo.getAlertLevel();
+        this.pidRoute =nodeVo.getSiteRoute();
         switch (nodeVo.getNodeType()){
             case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
                 this.oxygen=parseData.getData().get(count);

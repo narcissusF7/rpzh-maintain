@@ -355,7 +355,16 @@
         select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
     </select>
     <select id="findMaintainStackId" resultType="com.rpzh.vo.MaintainPlanVo">
-        SELECT t.stack_name,t.material_code,t.material_name,t2.alarm_value_setting_id FROM tb_maintain_plan t LEFT
-      JOIN tb_maintain_plan_stage t2 ON t.stage_id=t2.id WHERE stack_id = #{stackId} AND is_end = 0;
+        SELECT
+        	t.id id,
+        	t.material_code materialCode,
+        	t2.id stageId,
+        	t2.alarm_value_setting_id alarmValueSettingId
+        FROM
+        	tb_maintain_plan t
+        LEFT JOIN tb_maintain_plan_stage t2 ON t.stage_id = t2.id
+        WHERE
+            stack_id = #{stackId} AND
+        	is_end = 0;
     </select>
 </mapper>

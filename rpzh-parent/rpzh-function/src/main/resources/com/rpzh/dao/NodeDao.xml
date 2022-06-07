@@ -295,40 +295,37 @@
         select id, type, ${tableColumn} as data ,transfer_time as transferTime
         from ${tableName} where node_id in #{nodeDto.nodeId}
     </select>
-    <select id="findNodeAndMaintainStageByNodeId" resultType="com.rpzh.vo.NodeVo">
+    <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
+        select id ,`type` , temp, node_id nodeId, frequency , voltage , signal_strength signalStrength ,
+        stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
+        site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route pidRoute
+        from ${tableName}
+        where node_id = #{nodeId}
+    </select>
+    <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
         SELECT
-            tnode.id,
-            tnode.node_id nodeId,
-            tnode.node_type nodeType,
-            tnode.STATUS,
-            tnode.gather_site gatherSite,
-            tnode.stack,
-            tnode.site_type siteType,
-            tnode.site_id siteId,
-            tnode.site_x siteX,
-            tnode.site_y siteY,
-            tnode.site_z siteZ,
-            tnode.site_route siteRoute,
-            tnode.into_stack_time intoStackTime,
-            tnode.created_time createdTime,
-            tnode.created_user createdUser,
-            tnode.last_updated_time lastUpdateTime,
-            tnode.last_updated_user lastUpdateUser,
-            tnode.stack_id stackId,
-            tplan.stage_id maintainStageId,
-            tstack.area_id wareAreaId
+            id,
+            node_id nodeId,
+            node_type nodeType,
+            STATUS,
+            gather_site gatherSite,
+            stack,
+            site_type siteType,
+            site_id siteId,
+            site_x siteX,
+            site_y siteY,
+            site_z siteZ,
+            site_route siteRoute,
+            into_stack_time intoStackTime,
+            created_time createdTime,
+            created_user createdUser,
+            last_updated_time lastUpdateTime,
+            last_updated_user lastUpdateUser,
+            stack_id stackId
         FROM
-            tb_node tnode,tb_maintran_plan tplan,tb_stack tstack
+            tb_node
         <where>
             and node_id = #{nodeId}
-            and tnode.stackId = tplan.stackId,
-            and tstack.stackId = tplan.stackId,
-            <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
-                and into_stack_time &gt;= #{nodeDto.startTime}
-            </if>
-            <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
-                and into_stack_time &lt;= #{nodeDto.endTime}
-            </if>
         </where>
     </select>
 
@@ -351,49 +348,28 @@
             <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
             <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
             <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
-            createdTime
-        ) values {
-            <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
-            <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
-            <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
-            <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
-            <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
-            <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
-            <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
-            <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
-            <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
-            <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
-            <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
-            <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
-            <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
-            <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
-            <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
-            <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
-            sysdate()
-        }
-    </insert>
-    <insert id="insertWeatherData">
-        insert into tb_weather_history (weather_name,temp,humidity,precip,created_time)values (#{weatherName},#{temp},#{humidity},#{precip},now())
+        createdTime
+        ) values (
+        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
+        <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
+        <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
+        <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
+        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
+        <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
+        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
+        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
+        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
+        <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
+        <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
+        <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
+        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
+        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
+        <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
+        <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
+        now()
+        )
     </insert>
 
-    <select id="findWeatherData" resultType="com.rpzh.vo.WeatherDataVo">
-        select
-               weather_name as weatherName ,
-               temp as temp,
-               humidity as humidity ,
-               precip as precip ,
-               created_time as createdTime
-        from tb_weather_history
-        <where>
-            <if test="monitorCondition.startTime!=null and monitorCondition.startTime!=''">
-                and created_time &gt;= #{monitorCondition.startTime}
-            </if>
-
-            <if test="monitorCondition.endTime!=null and monitorCondition.endTime!=''">
-                and created_time &lt;= #{monitorCondition.endTime}
-            </if>
-        </where>
-    </select>
     <select id="findNodeStatus" resultType="java.lang.Integer">
         select status from tb_node where id = #{id}
     </select>
