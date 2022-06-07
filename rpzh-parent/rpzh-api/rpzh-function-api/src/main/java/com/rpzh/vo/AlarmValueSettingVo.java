@@ -124,7 +124,7 @@ public class AlarmValueSettingVo {
                 case "01":
                     return new String[]{"stackOxygenUpperThree","stackOxygenUpperTwo","stackOxygenUpperOne","stackOxygenLower",};
                 case "03":
-                    return new String[]{"stackTempUpperThree","stackTempUpperTwo","stackTempUpper0ne","stackTempLower"
+                    return new String[]{"stackTempUpperThree","stackTempUpperTwo","stackTempUpperOne","stackTempLower"
                             ,"stackMoistureUpperThree","stackMoistureUpperTwo","stackMoistureUpperOne", "stackMoistureLower"};
                 case "04":
                     return new String[]{"stackTempUpperThree","stackTempUpperTwo","tempCoreChipUpperOne","tempCoreChipLower"};

@@ -8,7 +8,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class NodeData implements Serializable {
+public class NodeData{
     private String nodeId;
     private String type;
     private Integer frequency;
