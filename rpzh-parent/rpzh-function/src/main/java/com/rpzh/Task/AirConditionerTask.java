@@ -23,7 +23,7 @@ public class AirConditionerTask {
 
     //TODO 需要接口地址
     private static String weatherUrl = "";
-    @Scheduled(cron="${time.cron}")
+//    @Scheduled(cron="${time.cron}")
     void handleAirConditionerData() {
 
         String s = PortDataUtils.GetPortData(weatherUrl);
