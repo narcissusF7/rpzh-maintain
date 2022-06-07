@@ -96,15 +96,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int size = taskDto.getSize();
         //静态分页
         PageHelper.startPage(page, size);
-        //获取当前时间
-        String nowTime = DateUtil.dateNew(new Date()).toString();
-        //获取传入的状态,如果状态是3,查询过期的任务
-        String status = taskDto.getStatus();
-        if ("3".equals(status)){
-            taskDto.setExpiresTime(nowTime);
-        }
         List<TaskVo> taskVoList = taskManagementDao.findTask(taskDto);
-
         return new PageInfo<TaskVo>(taskVoList);
     }
 
@@ -120,5 +112,50 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String taskStatus = "0";
         int mqUpdateFlag = taskManagementDao.mqUpdateStatus(msg,taskStatus);
         return mqUpdateFlag;
+    }
+
+    /**
+     * 批量删除任务
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    public int delTask(Long[] ids) {
+        int delFlag = taskManagementDao.delTask(ids);
+        return delFlag;
+    }
+
+    /**
+     * 查询任务详情
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public TaskVo findTaskDetail(Long id) {
+        TaskVo taskVo = taskManagementDao.findTaskDetail(id);
+        return taskVo;
+    }
+
+    /**
+     * 工作任务查询任务列表
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public PageInfo<TaskVo> findTaskByUser(TaskDto taskDto) {
+        //获取用户信息,只查询自己的任务
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        //设置负责人,只能看到自己的任务
+        taskDto.setPrincipal(username);
+        int page = taskDto.getPage();
+        int size = taskDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<TaskVo> taskVoList = taskManagementDao.findTaskByUser(taskDto);
+        return new PageInfo<TaskVo>(taskVoList);
     }
 }

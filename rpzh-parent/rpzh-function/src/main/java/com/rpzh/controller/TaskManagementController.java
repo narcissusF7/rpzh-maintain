@@ -39,7 +39,7 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "新建任务", tags = "任务管理中心")
+    @ApiOperation(value = "发布任务菜单新建任务", tags = "任务管理中心")
     @PostMapping("/addTask")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
@@ -79,7 +79,7 @@ public class TaskManagementController {
 
 
     /**
-     * 查询任务列表
+     * 查询任务列表,管理员查询任务列表,可以查询所有的任务
      * @param taskDto
      * @return
      */
@@ -91,9 +91,9 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
-            @ApiImplicitParam(name = "status", value = "任务状态",required = false,dataType = "String"),
-            @ApiImplicitParam(name = "page", value = "分页开始页",required = false,dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "分页每页显示",required = false,dataType = "Integer"),
+            @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "分页开始页",required = true,dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "分页每页显示",required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "principal", value = "负责人",required = false,dataType = "String")
     })
     @PostMapping("/findTask")
@@ -103,11 +103,78 @@ public class TaskManagementController {
     }
 
 
+    /**
+     * 批量删除任务
+     * @param ids
+     * @return
+     */
+    @ApiOperation(value = "发布任务菜单删除任务", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "任务主键id,id按照逗号隔开,例如1,2,3",required = true,dataType = "Long[]")
+    })
+    @PostMapping("/delTask")
+    public Result delTask(@ApiIgnore Long[] ids){
+        if (ToolUtil.isEmpty(ids)){
+            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+        }
+        int delFlag = taskManagementService.delTask(ids);
+        return new Result(true, StatusCode.OK, "删除成功");
+    }
 
 
+    /**
+     * 查询任务的详情
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "发布任务菜单查询任务详情", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务主键id",required = true,dataType = "Long")
+    })
+    @PostMapping("/findTaskDetail")
+    public Result<TaskVo> findTaskDetail(Long id){
+        if (ToolUtil.isEmpty(id)){
+            return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
+        }
+        TaskVo taskVo = taskManagementService.findTaskDetail(id);
+        return new Result<TaskVo>(true, StatusCode.OK, "查询成功", taskVo);
+    }
 
 
+    /**
+     * 工作任务查询列表
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单查询任务任务列表", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
+                    "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "taskNum", value = "任务编号", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
+            @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "分页开始页",required = true,dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "分页每页显示",required = true,dataType = "Integer")
+    })
+    @PostMapping("/findTaskByUser")
+    public Result<PageInfo<TaskVo>> findTaskByUser(@ApiIgnore TaskDto taskDto){
+        PageInfo<TaskVo> pageInfo = taskManagementService.findTaskByUser(taskDto);
+        return new Result<>(true,StatusCode.ERROR,"查询成功",pageInfo);
+    }
 
+
+    /**
+     * 任务处理
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单任务处理", tags = "任务管理中心")
+    @PostMapping("/taskDispose")
+    public Result taskDispose(@ApiIgnore TaskDto taskDto){
+        return null;
+    }
 
 
 }

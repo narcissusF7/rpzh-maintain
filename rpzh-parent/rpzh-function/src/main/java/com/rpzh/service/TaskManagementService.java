@@ -31,4 +31,25 @@ public interface TaskManagementService {
      * @return
      */
     int mqUpdateStatus(String msg);
+
+    /**
+     * 批量删除任务
+     * @param ids
+     * @return
+     */
+    int delTask(Long[] ids);
+
+    /**
+     * 查询任务详情
+     * @param id
+     * @return
+     */
+    TaskVo findTaskDetail(Long id);
+
+    /**
+     * 工作任务查询任务列表
+     * @param taskDto
+     * @return
+     */
+    PageInfo<TaskVo> findTaskByUser(TaskDto taskDto);
 }
