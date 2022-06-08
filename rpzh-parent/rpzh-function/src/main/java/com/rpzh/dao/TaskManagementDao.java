@@ -60,4 +60,18 @@ public interface TaskManagementDao {
      * @return
      */
     List<TaskVo> findTaskByUser(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 任务处理
+     * @param taskDto
+     * @return
+     */
+    int taskDispose(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 任务评价
+     * @param taskDto
+     * @return
+     */
+    int taskEvaluate(@Param("taskDto") TaskDto taskDto);
 }

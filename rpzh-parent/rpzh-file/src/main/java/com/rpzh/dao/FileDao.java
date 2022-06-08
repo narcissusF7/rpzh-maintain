@@ -21,5 +21,5 @@ public interface FileDao {
      * @param taskNum
      * @return
      */
-    int updateFilePictureUrl(@Param("path") String path,@Param("group") String group,@Param("fileName") String fileName,@Param("taskNum") String taskNum);
+    int updateFilePictureUrl(@Param("path") String path,@Param("group") String group,@Param("fileName") String fileName,@Param("id") String id);
 }

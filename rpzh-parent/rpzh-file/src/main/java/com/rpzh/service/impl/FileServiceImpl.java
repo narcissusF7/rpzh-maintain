@@ -25,12 +25,12 @@ public class FileServiceImpl implements FileService {
      * @param path
      * @param group
      * @param fileName
-     * @param taskNum
+     * @param id
      * @return
      */
     @Override
-    public int updateFilePictureUrl(String path, String group, String fileName, String taskNum) {
-        int updateFlag = fileDao.updateFilePictureUrl(path,group,fileName,taskNum);
+    public int updateFilePictureUrl(String path, String group, String fileName, String id) {
+        int updateFlag = fileDao.updateFilePictureUrl(path,group,fileName,id);
         return updateFlag;
     }
 }

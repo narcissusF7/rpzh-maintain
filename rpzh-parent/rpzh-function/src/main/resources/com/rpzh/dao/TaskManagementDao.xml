@@ -64,7 +64,6 @@
    <result property="detail" column="task_detail"/>
    <result property="principal" column="principal"/>
    <result property="status" column="status"/>
-   <result property="dealTime" column="deal_time"/>
    <result property="dealMethod" column="deal_method"/>
    <result property="finishTime" column="finish_time"/>
    <result property="createdUser" column="created_user"/>
@@ -144,4 +143,23 @@
   </if>
   </where>
 </select>
+<update id="taskDispose">
+  UPDATE tb_task
+   <set>
+       <if test="taskDto.dealMethod != null and taskDto.dealMethod != ''">deal_method = #{taskDto.dealMethod},</if>
+       <if test="taskDto.dealResult != null and taskDto.dealResult != ''">deal_result = #{taskDto.dealResult},</if>
+       status = #{taskDto.status},
+       finish_time = #{taskDto.finishTime}
+   </set>
+  WHERE id = #{taskDto.id}
+</update>
+<update id="taskEvaluate">
+  UPDATE tb_task
+   <set>
+    <if test="taskDto.evaluate != null and taskDto.evaluate != ''">evaluate = #{taskDto.evaluate},</if>
+    evaluate_user = #{taskDto.evaluateUser},
+    evaluate_time = #{taskDto.evaluateTime}
+   </set>
+  WHERE id = #{taskDto.id}
+</update>
 </mapper>

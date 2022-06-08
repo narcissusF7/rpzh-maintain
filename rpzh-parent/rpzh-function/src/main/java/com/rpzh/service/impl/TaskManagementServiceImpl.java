@@ -158,4 +158,43 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         List<TaskVo> taskVoList = taskManagementDao.findTaskByUser(taskDto);
         return new PageInfo<TaskVo>(taskVoList);
     }
+
+    /**
+     * 任务处理
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public int taskDispose(TaskDto taskDto) {
+        //获取当前时间,任务完成的时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //设置完成时间
+        taskDto.setFinishTime(nowTime);
+        //设置任务状态为完成
+        taskDto.setStatus("1");
+        int updateFlag = taskManagementDao.taskDispose(taskDto);
+        return updateFlag;
+    }
+
+    /**
+     * 任务评价
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public int taskEvaluate(TaskDto taskDto) {
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        //设置评价人
+        taskDto.setEvaluateUser(username);
+        //获取当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //设置任务评价时间
+        taskDto.setEvaluateTime(nowTime);
+        int updateFlag = taskManagementDao.taskEvaluate(taskDto);
+        return updateFlag;
+    }
 }

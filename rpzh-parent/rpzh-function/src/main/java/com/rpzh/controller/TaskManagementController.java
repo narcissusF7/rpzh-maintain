@@ -171,10 +171,40 @@ public class TaskManagementController {
      * @return
      */
     @ApiOperation(value = "工作任务菜单任务处理", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "dealMethod", value = "处理措施", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String")
+    })
     @PostMapping("/taskDispose")
     public Result taskDispose(@ApiIgnore TaskDto taskDto){
-        return null;
+        String id = taskDto.getId();
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "请选择要处理的任务");
+        }
+        int updateFlag = taskManagementService.taskDispose(taskDto);
+        return new Result(true,StatusCode.OK,"任务处理成功");
     }
+
+    /**
+     * 任务评价
+     * @param taskDto
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "evaluate", value = "评价内容", required = true,dataType = "String")
+    })
+    @ApiOperation(value = "发布任务菜单查看详情任务评价", tags = "任务管理中心")
+    @PostMapping("/taskEvaluate")
+    public Result taskEvaluate(@ApiIgnore TaskDto taskDto){
+        if (ToolUtil.isEmpty(taskDto.getId())){
+            return new Result(false, StatusCode.ERROR, "请选择一个任务");
+        }
+        int updateFlag = taskManagementService.taskEvaluate(taskDto);
+        return new Result(true, StatusCode.OK, "评价成功");
+    }
+
 
 
 }

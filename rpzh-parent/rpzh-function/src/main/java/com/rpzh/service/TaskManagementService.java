@@ -52,4 +52,18 @@ public interface TaskManagementService {
      * @return
      */
     PageInfo<TaskVo> findTaskByUser(TaskDto taskDto);
+
+    /**
+     * 任务处理
+     * @param taskDto
+     * @return
+     */
+    int taskDispose(TaskDto taskDto);
+
+    /**
+     * 任务评价
+     * @param taskDto
+     * @return
+     */
+    int taskEvaluate(TaskDto taskDto);
 }

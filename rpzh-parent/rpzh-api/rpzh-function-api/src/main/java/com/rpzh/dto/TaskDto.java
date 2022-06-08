@@ -13,6 +13,9 @@ import lombok.Data;
 @Data
 public class TaskDto {
 
+    //主键id
+    private String id;
+
     //任务编号
     private String taskNum;
 
@@ -24,6 +27,12 @@ public class TaskDto {
 
     //推送方式
     private String pushWay;
+
+    //处理措施
+    private String dealMethod;
+
+    //处理结果
+    private String dealResult;
 
     //发起时间
     private String createdTime;
@@ -37,8 +46,20 @@ public class TaskDto {
     //过期时间
     private String expiresTime;
 
+    //任务完成时间
+    private String finishTime;
+
     //任务详情
     private String detail;
+
+    //任务评价
+    private String evaluate;
+
+    //评价人
+    private String evaluateUser;
+
+    //任务评价时间
+    private String evaluateTime;
 
     //负责人
     private String principal;

@@ -29,7 +29,7 @@ import java.io.*;
 @RestController
 @CrossOrigin
 @RequestMapping("/maintain/file")
-@Api(value = "文件操作", tags = "文件操作")
+@Api(value = "任务管理中心", tags = "任务管理中心")
 public class FileController {
 
 
@@ -47,15 +47,15 @@ public class FileController {
      * @return
      * @throws IOException
      */
-    @ApiOperation(value = "图片文件上传", tags = "文件操作")
+    @ApiOperation(value = "任务处理图片文件上传", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "文件", required = true,dataType = "File"),
-            @ApiImplicitParam(name = "taskNum", value = "任务编号", required = true,dataType = "String")
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String")
     })
     @PostMapping("/upload")
-    public Result upload(@ApiIgnore @RequestParam("file") MultipartFile file,@ApiIgnore String taskNum) throws IOException {
-        if (ToolUtil.isEmpty(taskNum)){
-            return new Result(false, StatusCode.ERROR, "任务编号不能为空");
+    public Result upload(@ApiIgnore @RequestParam("file") MultipartFile file,@ApiIgnore String id) throws IOException {
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "请选择一个任务");
         }
         //todo 文件格式控制
         //封装一个FastDFSFile
@@ -76,7 +76,7 @@ public class FileController {
         String group = uploads[0];
         //图片文件名
         String fileName = uploads[1];
-        int updateFlag = fileService.updateFilePictureUrl(path,group,fileName,taskNum);
+        int updateFlag = fileService.updateFilePictureUrl(path,group,fileName,id);
         return new Result(true, StatusCode.OK, "文件上传成功");
     }
 
@@ -86,7 +86,7 @@ public class FileController {
      * @param fileName
      * @return
      */
-    @ApiOperation(value = "图片删除", tags = "文件操作")
+    @ApiOperation(value = "图片删除", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupName", value = "组名", required = true,dataType = "String"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true,dataType = "String")
@@ -106,7 +106,7 @@ public class FileController {
      * @param fileName
      * @return
      */
-    @ApiOperation(value = "查看图片信息", tags = "文件操作")
+    @ApiOperation(value = "查看图片信息", tags = "任务管理中心")
     @PostMapping("/getFileInfo")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupName", value = "组名", required = true,dataType = "String"),

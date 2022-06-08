@@ -8,6 +8,6 @@ UPDATE tb_task
          <if test="group != null and group != ''">picture_group = #{group},</if>
          picture_filename = #{fileName}
      </set>
-    WHERE task_num = #{taskNum}
+    WHERE id = #{id}
 </update>
 </mapper>

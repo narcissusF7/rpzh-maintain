@@ -13,8 +13,8 @@ public interface FileService {
      * @param path
      * @param group
      * @param fileName
-     * @param taskNum
+     * @param id
      * @return
      */
-    int updateFilePictureUrl(String path, String group, String fileName, String taskNum);
+    int updateFilePictureUrl(String path, String group, String fileName, String id);
 }
