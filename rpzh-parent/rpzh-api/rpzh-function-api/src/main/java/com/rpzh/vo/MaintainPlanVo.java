@@ -83,8 +83,6 @@ public class MaintainPlanVo {
     private String changeStatus;
     @ApiModelProperty(notes = "是否是新建养护计划  1:是,0:否")
     private Integer version;
-    @ApiModelProperty(notes = "烟叶名称")
-    private String materialName;
     @ApiModelProperty(notes = "预警设置信息")
     private AlarmValueSettingVo alarmValueSettingVo;
 

@@ -22,23 +22,11 @@ public interface AlarmValueSettingDao {
 
     Integer findMaxId();
 
-    SettingColorAndDayVo findColorAndAlertUpgradeDay();
-
-    int insertColorAndAlertUpgradeDay(@Param("settingKey") String settingKey, @Param("settingValue") String settingValue, @Param("settingName") String settingName);
-
-    Integer updateStatus(@Param("alarmValueSetting") AlarmValueSetting alarmValueSetting);
-
-    Integer delete(@Param("alarmValueSettingId") Integer alarmValueSettingId);
-
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
-
-    List<AlarmValueSettingVo> findAlarmValueSettingTable(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
     Integer isExistEarlyWarningRuleName(@Param("earlyWarningRuleName") String earlyWarningRuleName);
 
     String findEarlyWarningRuleName(@Param("id")Integer id);
-
-    Integer updateColorAndAlertUpgradeDay(@Param("settingValue")Object settingValue,@Param("settingKey")String settingKey,@Param("settingName")String settingName);
 
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
 

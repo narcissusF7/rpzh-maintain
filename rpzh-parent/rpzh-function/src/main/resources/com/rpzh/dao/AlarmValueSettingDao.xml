@@ -13,11 +13,11 @@
         temp_core_chip_upper_three as tempCoreChipUpperThree,
         temp_core_chip_lower as tempCoreChipLower,
         stack_temp_upper_one as stackTempUpperOne,
-        stack_temp_upper_two as stackTempUppertwo,
+        stack_temp_upper_two as stackTempUpperTwo,
         stack_temp_upper_three as stackTempUpperThree,
         stack_temp_lower as stackTempLower,
         stack_moisture_upper_one as stackMoistureUpperOne,
-        stack_moisture_upper_two as stackMoistureUppertwo,
+        stack_moisture_upper_two as stackMoistureUpperTwo,
         stack_moisture_upper_three as stackMoistureUpperThree,
         stack_moisture_lower as stackMoistureLower,
         core_temp_high_env_temp_one as coreTempHighEnvTempOne,
@@ -41,11 +41,11 @@
        temp_core_chip_upper_three as tempCoreChipUpperThree,
        temp_core_chip_lower as tempCoreChipLower,
        stack_temp_upper_one as stackTempUpperOne,
-       stack_temp_upper_two as stackTempUppertwo,
+       stack_temp_upper_two as stackTempUpperTwo,
        stack_temp_upper_three as stackTempUpperThree,
        stack_temp_lower as stackTempLower,
        stack_moisture_upper_one as stackMoistureUpperOne,
-       stack_moisture_upper_two as stackMoistureUppertwo,
+       stack_moisture_upper_two as stackMoistureUpperTwo,
        stack_moisture_upper_three as stackMoistureUpperThree,
        stack_moisture_lower as stackMoistureLower,
        core_temp_high_env_temp_one as coreTempHighEnvTempOne,
@@ -148,24 +148,6 @@
     <select id="findMaxId" resultType="java.lang.Integer">
         select max(Id) from tb_alarm_value_setting
     </select>
-    <select id = "findColorAndAlertUpgradeDay" resultType="com.rpzh.vo.SettingColorAndDayVo">
-SELECT
-(SELECT setting_value FROM tb_general_setting WHERE setting_key = 'warningThreshold' AND setting_name = 'oneToTwo') oneToTwoDay,
-(SELECT setting_value FROM tb_general_setting WHERE setting_key = 'warningThreshold' AND setting_name = 'twoToThree') twoToThreeDay,
-(SELECT setting_value FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'one') colorOne,
-(SELECT setting_value  FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'two') colorTwo,
-(SELECT setting_value FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'three') colorThree
-FROM tb_general_setting limit 1
-</select>
-    <update id="updateColorAndAlertUpgradeDay">
-        update tb_general_setting set setting_value = #{settingValue} where setting_key = #{settingKey} AND setting_name = #{settingName}
-    </update>
-    <insert id="insertColorAndAlertUpgradeDay">
-    insert into tb_general_setting(setting_key,setting_value,setting_name) values(#{settingKey},#{settingValue},#{settingName})
-</insert>
-    <update id="updateStatus">
-        update tb_alarm_value_setting set status = '0',updated_time=#{alarmValueSettingDto.updatedTime},update_user=#{alarmValueSettingDto.updateUser} where id = #{alarmValueSettingDto.alarmValueSettingId}
-    </update>
     <delete id="deleteIds">
         delete from tb_alarm_value_setting where
         id in
@@ -173,28 +155,6 @@ FROM tb_general_setting limit 1
             #{alarmValueSettingId}
         </foreach>
     </delete>
-    <delete id="delete">
-        delete from tb_alarm_value_setting where id = #{alarmValueSettingId}
-    </delete>
-    <select id="findAlarmValueSettingTable" resultType="com.rpzh.vo.AlarmValueSettingVo">
-        select
-        id as id,
-        early_warning_rule_name as earlyWarningRuleName,
-        material_code as materialCode,
-        maintence_style as maintenceStyle,
-        create_user as createUser,
-        status as status,
-        updated_time as updatedTime
-        from tb_alarm_value_setting
-        where 1=1
-        <if test = "alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">and early_warning_rule_name like concat('%', #{alarmValueSettingDto.earlyWarningRuleName}, '%')</if>
-        <if test = "alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">and material_code like concat('%', #{alarmValueSettingDto.materialCode}, '%')</if>
-        <if test = "alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">and maintence_style = #{alarmValueSettingDto.maintenceStyle}</if>
-        <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and create_user = #{alarmValueSettingDto.createUser}</if>
-        <if test = "alarmValueSettingDto.status != null and alarmValueSettingDto.status != ''">and status = #{alarmValueSettingDto.status}</if>
-        <if test = "alarmValueSettingDto.startTime != null">and updated_time >= #{alarmValueSettingDto.startTime}</if>
-        <if test = "alarmValueSettingDto.endTime != null">and updated_time &lt;= #{alarmValueSettingDto.endTime}</if>
-    </select>
     <select id="findByMaintainStageId" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select
             talarm.id as id,
@@ -208,14 +168,15 @@ FROM tb_general_setting limit 1
             warehouse_oxygen_lower as warehouseOxygenLower,
             temp_core_chip_upper_one as tempCoreChipUpperOne,
             temp_core_chip_upper_two as tempCoreChipUpperTwo,
+            temp_core_chip_upper_two as tempCoreChipUpperTwo,
             temp_core_chip_upper_three as tempCoreChipUpperThree,
             temp_core_chip_lower as tempCoreChipLower,
             stack_temp_upper_one as stackTempUpperOne,
-            stack_temp_upper_two as stackTempUppertwo,
+            stack_temp_upper_two as stackTempUpperTwo,
             stack_temp_upper_three as stackTempUpperThree,
             stack_temp_lower as stackTempLower,
             stack_moisture_upper_one as stackMoistureUpperOne,
-            stack_moisture_upper_two as stackMoistureUppertwo,
+            stack_moisture_upper_two as stackMoistureUpperTwo,
             stack_moisture_upper_three as stackMoistureUpperThree,
             stack_moisture_lower as stackMoistureLower,
             warehouse_temp_upper_one as warehouseTempUpperOne,
@@ -249,11 +210,11 @@ FROM tb_general_setting limit 1
             temp_core_chip_upper_three as tempCoreChipUpperThree,
             temp_core_chip_lower as tempCoreChipLower,
             stack_temp_upper_one as stackTempUpperOne,
-            stack_temp_upper_two as stackTempUppertwo,
+            stack_temp_upper_two as stackTempUpperTwo,
             stack_temp_upper_three as stackTempUpperThree,
             stack_temp_lower as stackTempLower,
             stack_moisture_upper_one as stackMoistureUpperOne,
-            stack_moisture_upper_two as stackMoistureUppertwo,
+            stack_moisture_upper_two as stackMoistureUpperTwo,
             stack_moisture_upper_three as stackMoistureUpperThree,
             stack_moisture_lower as stackMoistureLower,
             warehouse_temp_upper_one as warehouseTempUpperOne,

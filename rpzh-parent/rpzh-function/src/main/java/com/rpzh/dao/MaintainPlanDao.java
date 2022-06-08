@@ -63,8 +63,6 @@ public interface MaintainPlanDao {
 
     Integer isExistStackId(@Param("stackId") Integer stackId);
 
-    Integer isExistAlarmValueSetting(@Param("id") Integer id);
-
     Integer updateStackByStackId(@Param("id") Integer id, @Param("stackId") Integer stackId);
 
     Integer findStackCountByStackId(Integer stackId);

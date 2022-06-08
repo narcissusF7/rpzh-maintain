@@ -98,9 +98,7 @@ public class AlarmValueSettingDto {
 
     private String phases;
     private String maintenceStyle;
-    private String tobaccoYear;
     private String materialCode;
-    private String materialBatchNum;
 
     /**
      * 制定时间
@@ -123,7 +121,7 @@ public class AlarmValueSettingDto {
     private Integer alarmValueSettingId;
 
     private Integer size=10;
-    private Integer page=0;
+    private Integer page=1;
     private Integer status;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
@@ -170,8 +168,8 @@ public class AlarmValueSettingDto {
       this.coreTempLowEnvTemp = maintainPlanDto.getCoreTempLowEnvTemp();
       this.updatedTime = maintainPlanDto.getUpdatedTime();
       this.updateUser = maintainPlanDto.getUpdateUser();
-        this.createdTime = maintainPlanDto.getCreatedTime();
-        this.createUser = maintainPlanDto.getCreateUser();
+      this.createdTime = maintainPlanDto.getCreatedTime();
+      this.createUser = maintainPlanDto.getCreateUser();
       this.alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
     }
 }

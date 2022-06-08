@@ -248,7 +248,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         alarmValueSettingVo.setWarehouseMoistureUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
         alarmValueSettingVo.setWarehouseMoistureLower(alarmValueSettingVo1.getWarehouseMoistureLower());
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
-        log.debug("alarmValueSettingVo1:{}",alarmValueSettingVo1);
         alarmValueSettingVo1 = null;
         Integer areaId = stackVo.getAreaId();
         List<String> conditioningDatas = airConditioningDao.findAirConditioningData(areaId);

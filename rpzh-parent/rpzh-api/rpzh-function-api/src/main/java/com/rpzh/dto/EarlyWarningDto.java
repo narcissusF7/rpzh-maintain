@@ -53,10 +53,10 @@ public class EarlyWarningDto implements Serializable {
     private Integer maintainPlanId;
 
     //分页开始页面
-    private int page;
+    private int page=1;
 
     //分页每页显示
-    private int size;
+    private int size=10;
 
 
 }

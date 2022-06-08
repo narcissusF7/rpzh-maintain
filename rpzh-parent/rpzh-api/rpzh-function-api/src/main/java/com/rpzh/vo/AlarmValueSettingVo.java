@@ -93,6 +93,10 @@ public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "预警规则名称")
     private String earlyWarningRuleName;
 
+    private String materialCodes;
+    private String maintenceStyle;
+
+
     @ApiModelProperty(notes = "预警设置id")
     private Integer id;
     @ApiModelProperty(notes = "制定人")
