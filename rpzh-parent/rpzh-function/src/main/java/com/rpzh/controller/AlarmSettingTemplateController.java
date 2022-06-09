@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * @Author: zyq
  * @Date: 2022/05/07/13:46
- * @Description: 功能
+ * @Description: 预警规则模板
  */
 @RestController
 @CrossOrigin

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @Author: zyq
  * @Date: 2022/05/07/13:46
- * @Description: 功能
+ * @Description: 仓间预警规则
  */
 @RestController
 @CrossOrigin
