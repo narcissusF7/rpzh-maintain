@@ -15,6 +15,8 @@ import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.AlarmSettingTemplateVo;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.SettingColorAndDayVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,6 +33,9 @@ import java.util.List;
 public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateService {
     @Resource
     private AlarmSettingTemplateDao alarmSettingTemplateDao;
+    @Autowired
+    RedisTemplate redisTemplate;
+    private static final String CACHE_KEY_REDIS_MAINTAIN = "MAINTAIN_";
     @Override
     public PageInfo<AlarmValueSettingVo> findAlarmSettingTemplateTable(AlarmValueSettingDto alarmValueSettingDto) {
         Integer size = alarmValueSettingDto.getSize();
@@ -88,6 +93,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     @Override
     public Result updateOrInsertColorAndAlertUpgradeDay(SettingColorAndDayDto settingColorAndDayDto) {
         Integer count = alarmSettingTemplateDao.findCount();
+        //删除掉缓存中的预警升级阈值
+        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
+        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"TwoToThree");
         if(count>0){
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getColorOne(),"color","one");
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getColorTwo(),"color","two");

@@ -112,21 +112,6 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     }
 
     /**
-     * 修改预警升级阈值
-     * @param thresholdMap  oneToTwo:? ,towToThree:?
-     */
-    @Override
-    @Transactional
-    public Integer updateWarningThreshold(Map<String, Integer> thresholdMap) {
-        AtomicInteger flag = new AtomicInteger();
-        thresholdMap.keySet().forEach((key) -> flag.addAndGet(earlyWarningDao.updateWarningThreshold(thresholdMap.get(key), key)));
-        //删除掉缓存中的预警升级阈值
-        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
-        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"TwoToThree");
-        return flag.get();
-    }
-
-    /**
      * 查询预警升级阈值
      */
     @Override

@@ -93,27 +93,6 @@ public class MonitoringCenterController {
     }
 
     @ApiOperation(
-            value = "修改预警升级阈值"
-    )
-    @ApiImplicitParams({@ApiImplicitParam(
-            name = "oneToTwo",
-            value = "一级升二级时间阈值",
-            dataType = "Integer"
-    ),@ApiImplicitParam(
-            name = "twoToThree",
-            value = "二级升三级级时间阈值",
-            dataType = "Integer"
-    )})
-    @PostMapping({"/updateWarningThreshold"})
-    public Result updateWarningThreshold(Integer oneToTwo ,Integer twoToThree) {
-        Map<String,Integer> map = new HashMap<>();
-        map.put("oneToTwo",oneToTwo);
-        map.put("twoToThree",twoToThree);
-        Integer flag = monitoringCenterService.updateWarningThreshold(map);
-        return flag > 0 ? new Result(true, StatusCode.OK, "修改成功") : new Result(false, StatusCode.ERROR, "修改失败");
-    }
-
-    @ApiOperation(
             value = "查询预警升级阈值"
     )
     @GetMapping({"/findWarningThreshold"})

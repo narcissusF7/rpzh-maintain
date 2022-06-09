@@ -19,8 +19,6 @@ public interface MonitoringCenterService {
 
     List<EarlyWarningVo> findTroubleNode();
 
-    Integer updateWarningThreshold(Map<String, Integer> map);
-
     Map<String, String> findWarningThreshold();
 
     List<Double> findAlarmValue(NodeData nodeData);
