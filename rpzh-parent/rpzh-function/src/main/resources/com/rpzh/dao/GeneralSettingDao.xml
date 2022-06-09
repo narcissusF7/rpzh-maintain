@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.GeneralSettingDao">
+
+    <!--<insert id="insertGeneralSetting">-->
+      <!--INSERT INTO tb_general_setting (-->
+	    <!--setting_key, setting_value, setting_name-->
+      <!--)-->
+      <!--VALUES(-->
+      	<!--#{generalSetting.settingKey},#{generalSetting.settingValue},#{generalSetting.settingName}-->
+      <!--)-->
+    <!--</insert>-->
+    <update id="updateGeneralSetting">
+        update tb_general_setting set setting_value = #{generalSetting.settingValue}
+        where setting_name = #{generalSetting.settingName}
+    </update>
+    <!--<delete id="deleteGeneralSetting"></delete>-->
+    <select id="findGeneralSetting" resultType="com.rpzh.pojo.GeneralSetting">
+        select setting_key settingKey ,setting_value settingValue ,setting_name settingName  from tb_general_setting
+        <where>
+            <if test="generalSetting.settingKey !='' and generalSetting.settingKey !=null">
+                and id =#{generalSetting.settingKey}
+            </if>
+            <if test="generalSetting.settingName !='' and generalSetting.settingName !=null">
+                and id =#{generalSetting.settingName}
+            </if>
+        </where>
+    </select>
+</mapper>

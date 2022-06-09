@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.PestMonitoringDao">
+
+    <insert id="addPestBoard">
+        INSERT INTO tb_pest_board (
+        <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">pest_board_id,</if>
+        <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">board_type,</if>
+        <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">principal_id,</if>
+        <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">site_id,</if>
+        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">site_type,,</if>
+        <if test="pestBoardDto.siteName!='' and pestBoardDto.siteName!=null">site_name,</if>
+        <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">site_route,</if>
+        <if test="pestBoardDto.siteX!='' and pestBoardDto.siteX!=null">site_x,</if>
+        <if test="pestBoardDto.siteY!='' and pestBoardDto.siteY!=null">site_y,</if>
+        <if test="pestBoardDto.siteZ!='' and pestBoardDto.siteZ!=null">site_z,</if>
+        <if test="pestBoardDto.useDays!='' and pestBoardDto.useDays!=null">use_days,</if>
+        <if test="pestBoardDto.useTimeStart!='' and pestBoardDto.useTimeStart!=null">use_time_start,</if>
+        <if test="pestBoardDto.useTimeEnd!='' and pestBoardDto.useTimeEnd!=null">use_time_end,</if>
+        <if test="pestBoardDto.lastUpdatedUser!='' and pestBoardDto.lastUpdatedUser!=null">last_updated_user,</if>
+        <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">created_user_id,</if>
+        <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">last_updated_user_id,</if>
+        <if test="pestBoardDto.remark!='' and pestBoardDto.remark!=null">remark,</if>
+            created_time,
+            last_updated_time
+        )
+        VALUE
+        (
+        <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">#{pestBoardDto.pestBoardId},</if>
+        <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">#{pestBoardDto.boardType},</if>
+        <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">#{pestBoardDto.principalId},</if>
+        <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">#{pestBoardDto.siteId},</if>
+        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">,#{pestBoardDto.siteType},</if>
+        <if test="pestBoardDto.siteName!='' and pestBoardDto.siteName!=null">#{pestBoardDto.siteName},</if>
+        <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">#{pestBoardDto.siteRoute},</if>
+        <if test="pestBoardDto.siteX!='' and pestBoardDto.siteX!=null">#{pestBoardDto.siteX},</if>
+        <if test="pestBoardDto.siteY!='' and pestBoardDto.siteY!=null">#{pestBoardDto.siteY},</if>
+        <if test="pestBoardDto.siteZ!='' and pestBoardDto.siteZ!=null">#{pestBoardDto.siteZ},</if>
+        <if test="pestBoardDto.useDays!='' and pestBoardDto.useDays!=null">#{pestBoardDto.useDays},</if>
+        <if test="pestBoardDto.useTimeStart!='' and pestBoardDto.useTimeStart!=null">#{pestBoardDto.useTimeStart},</if>
+        <if test="pestBoardDto.useTimeEnd!='' and pestBoardDto.useTimeEnd!=null">#{pestBoardDto.useTimeEnd},</if>
+        <if test="pestBoardDto.lastUpdatedUser!='' and pestBoardDto.lastUpdatedUser!=null">#{pestBoardDto.lastUpdatedUser},</if>
+        <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">#{pestBoardDto.createdUserId},</if>
+        <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">#{pestBoardDto.lastUpdatedUserId},</if>
+        <if test="pestBoardDto.remark!='' and pestBoardDto.remark!=null">#{pestBoardDto.remark},</if>
+        sysdate(),
+        sysdate()
+        )
+    </insert>
+    <update id="updatePestMonitor">
+        update tb_pest_monitor set prewarning_value_one   = #{pestMonitoringRuleDto.valueOne},
+                                   prewarning_value_two   = #{pestMonitoringRuleDto.valueTwo},
+                                   prewarning_value_three = #{pestMonitoringRuleDto.valueThree},
+                                   prewarning_color_one   = #{pestMonitoringRuleDto.colorOne},
+                                   prewarning_color_two   = #{pestMonitoringRuleDto.colorTwo},
+                                   prewarning_color_three = #{pestMonitoringRuleDto.colorThree} where id =1;
+    </update>
+    <update id="updateWeekPatrol">
+        update tb_pest_patrol set
+          monday   = #{map.1},
+          tuesday  = #{map.2},
+          wednesday= #{map.3},
+          thursday = #{map.4},
+          friday   = #{map.5},
+          saturday = #{map.6},
+          sunday   = #{map.7}
+    </update>
+    <delete id="deletePestBoard">
+        delete from tb_pest_board where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="delSpecialStack">
+        delete from tb_pest_stack_monitor where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="findSpecialStackId" resultType="java.lang.Integer">
+        select stack_id from tb_pest_stack_monitor where stack_id in
+        <foreach collection="stackIds" item="stackId" open="(" separator="," close=")">
+            #{stackId}
+        </foreach>
+    </select>
+    <select id="findWeekPatrol" resultType="java.util.Map">
+        select * from tb_pest_patrol limit 1;
+    </select>
+    <select id="findPestMonitorValue" resultType="java.util.Map">
+        select  prewarning_value_one   valueOne,
+                prewarning_value_two   valueTwo,
+                prewarning_value_three valueThree,
+                prewarning_color_one   colorOne,
+                prewarning_color_two   colorTwo,
+                prewarning_color_three colorThree
+        from tb_pest_monitor
+    </select>
+    <select id="findSpecialStack" resultType="java.util.Map">
+        select  id , stack_id stacId , prewarning_value_one   valueOne,
+                prewarning_value_two   valueTwo,
+                prewarning_value_three valueThree
+        from tb_pest_stack_monitor
+    </select>
+    <update id="updateSpecialStack">
+        update tb_pest_stack_monitor set prewarning_value_one = #{valueOne} , prewarning_value_two = #{valueTwo},prewarning_value_three = #{valueThree} where stack_id = #{stackId}
+    </update>
+
+    <insert id="addSpecialStack">
+        insert into tb_pest_stack_monitor (stack_id,prewarning_value_one,prewarning_value_two,prewarning_value_three) values (#{stackId},#{valueOne},#{valueTwo},#{valueThree})
+    </insert>
+
+</mapper>

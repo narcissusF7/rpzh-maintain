@@ -84,6 +84,7 @@ public class NodeOperateAspect {
         /*
           判断是否是枚举中的类型 不是的话退出切面
           1.添加 2.删除 3.修改 4.替换 5.入垛（批量） 6.解垛 7.翻垛 8.移垛
+          //TODO 出库报警
          */
             switch (NodeOperationEnum.getTypeNum(type)){
 

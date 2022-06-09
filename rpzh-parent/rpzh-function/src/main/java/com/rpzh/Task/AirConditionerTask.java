@@ -29,7 +29,7 @@ public class AirConditionerTask {
         String s = PortDataUtils.GetPortData(weatherUrl);
         JSONObject dataOfJson = JSONObject.parseObject(s);
         //数据整理成parseData
-
-        dataHandler.handlerData(new ParseData());
+        String siteRoute="";
+        dataHandler.handlerData(new ParseData(),siteRoute);
     }
 }

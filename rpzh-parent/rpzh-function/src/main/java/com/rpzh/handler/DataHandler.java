@@ -282,7 +282,7 @@ public class DataHandler {
     public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn,Integer alarmId){
 
         for (int i = hashKeys.size()-1; i >=0 ; i--) {
-            //判断缓存是否存在
+            //            //判断缓存是否存在
             Boolean hasKey = redisTemplate.opsForHash().hasKey(MAINTAIN + hashKeys.get(i), alarmColumn);
             if (hasKey) {
                 return MAINTAIN + hashKeys.get(i);
@@ -290,7 +290,6 @@ public class DataHandler {
                 //不存在就从数据库中查找
                 AlarmValueSettingVo alarmValueSettingVo;
                 if(alarmId==-1){
-                    //TODO 这边有问题
                     alarmValueSettingVo= wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
                 }else {
                     alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmId);
@@ -464,7 +463,6 @@ public class DataHandler {
      * @return
      */
     public List<String> getHashKeys(String siteRoute){
-        //TODO 重新测一下
         //将位置路由转成键值对 键:(垛 区 层 楼 仓库) 值 键对应的id
         Map<String,String> map = new HashMap<>();
         String[] strings = siteRoute.split(",");

@@ -205,7 +205,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      */
     public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos , List<NodeVo> nodeVos ,Integer status) {
         for (NodeVo nodeVo : nodeVos) {
-            //TODO 获取缓存中该设备的数据 空调数据暂时没有
+            //TODO 获取缓存中该设备的数据 空调数据暂时没有 sql暂用只找仓间温湿度的数据
             Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
             nodeDataVos.add(JSON.parseObject(data.toString(),NodeDataVo.class));
         }
