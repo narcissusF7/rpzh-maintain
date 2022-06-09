@@ -11,6 +11,7 @@ import com.rpzh.feign.UserFeign;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -178,6 +179,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public MaintainPlanVo findMaintainPlan(Integer id) {
+        System.out.println(id);
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         maintainPlanVo.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
         maintainPlanVo.setPrincipalName(maintainPlanVo.getPrincipalName());
@@ -206,49 +208,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer stackId = maintainPlanVo.getStackId();
         StackVo stackVo = warehouseDao.findPidRoute(stackId);
         String pidRoute = stackVo.getPidRoute();
-        String[] pidRoutes = pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(",");
-        AlarmValueSettingVo alarmValueSettingVo1 = new AlarmValueSettingVo();
-        int k = 0;
-        for (String routes : pidRoutes) {
-            String[] route = routes.split(":");
-            if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0]+route[1]))){
-                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
-                k =1;
-                break;
-            }
-        }
-        if(k == 0){
-            for (String routes : pidRoutes) {
-                String[] route = routes.split(":");
-                alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
-                if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
-                    for (Field field : fields) {
-                        try {
-                            field.setAccessible(true);
-                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                            redisTemplate.opsForHash().put(MAINTAIN + route[0]+route[1], field.getName(), field.get(alarmValueSettingVo1));
-                        } catch (IllegalAccessException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        alarmValueSettingVo.setWarehouseOxygenUpperOne(alarmValueSettingVo1.getWarehouseOxygenUpperOne());
-        alarmValueSettingVo.setWarehouseOxygenUpperTwo(alarmValueSettingVo1.getWarehouseOxygenUpperTwo());
-        alarmValueSettingVo.setWarehouseOxygenUpperThree(alarmValueSettingVo1.getWarehouseOxygenUpperThree());
-        alarmValueSettingVo.setWarehouseOxygenLower(alarmValueSettingVo1.getWarehouseOxygenLower());
-        alarmValueSettingVo.setWarehouseTempUpperOne(alarmValueSettingVo1.getWarehouseTempUpperOne());
-        alarmValueSettingVo.setWarehouseTempUpperTwo(alarmValueSettingVo1.getWarehouseTempUpperTwo());
-        alarmValueSettingVo.setWarehouseTempUpperThree(alarmValueSettingVo1.getWarehouseTempUpperThree());
-        alarmValueSettingVo.setWarehouseTempLower(alarmValueSettingVo1.getWarehouseTempLower());
-        alarmValueSettingVo.setWarehouseMoistureUpperOne(alarmValueSettingVo1.getWarehouseMoistureUpperOne());
-        alarmValueSettingVo.setWarehouseMoistureUpperTwo(alarmValueSettingVo1.getWarehouseMoistureUpperTwo());
-        alarmValueSettingVo.setWarehouseMoistureUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
-        alarmValueSettingVo.setWarehouseMoistureLower(alarmValueSettingVo1.getWarehouseMoistureLower());
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
-        alarmValueSettingVo1 = null;
+        log.debug("alarmValueSettingVo1:{}",alarmValueSettingVo);
         Integer areaId = stackVo.getAreaId();
         List<String> conditioningDatas = airConditioningDao.findAirConditioningData(areaId);
         Map<String, Object> nodeDate = getNodeDate("05", stackId, null);
@@ -308,8 +270,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         for (NodeVo nodeVo : nodeVos) {
             String nodeType = nodeVo.getNodeType();
             String nodeId = nodeVo.getNodeId();
-            NodeData nodeData = new ObjectMapper().convertValue(redisTemplate.opsForValue().get(MAINTAIN + nodeId), NodeData.class);
-            if (ToolUtil.isNotEmpty(nodeData)) {
+            Object nodeInfo = redisTemplate.opsForValue().get(MAINTAIN + nodeId);
+            if(ToolUtil.isNotEmpty(nodeInfo)){
+            NodeData nodeData = JSON.parseObject(nodeInfo.toString(), NodeData.class);
                 switch (nodeType) {
                     case "01":
                         o2Sum = o2Sum + nodeData.getOxygen();
@@ -348,8 +311,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         }
         return nodeDataMap;
     }
-
-
 
     @Override
     public Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
@@ -599,5 +560,84 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         map.put("sum",sum);
         map.put("list",new PageInfo(maintainCountVos));
         return map;
+    }
+
+    @Override
+    public AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes,Integer stackId) {
+        AlarmValueSettingVo alarmValueSettingVo = null;
+        for (String materialCode : materialCodes) {
+            alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(materialCode);
+            if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
+                break;
+            }
+        }
+        if(ToolUtil.isEmpty(alarmValueSettingVo)){
+            alarmValueSettingVo = new AlarmValueSettingVo();
+        }
+        StackVo stackVo = warehouseDao.findPidRoute(stackId);
+        String pidRoute = stackVo.getPidRoute();
+        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
+        return alarmValueSettingVo;
+    }
+
+    public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute,Field[] fields){
+        String[] pidRoutes = pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(",");
+        AlarmValueSettingVo alarmValueSettingVo1=null;
+        //从下往上找
+        for (int i = pidRoutes.length - 1; i >= 0; i--) {
+            String[] route = pidRoutes[i].split(":");
+            if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0]+route[1]))){
+                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
+                break;
+            }
+        }
+        if(ToolUtil.isEmpty(alarmValueSettingVo1)){
+            for (String routes : pidRoutes) {
+                String[] route = routes.split(":");
+                alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
+                if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
+                    for (Field field : fields) {
+                        try {
+                            field.setAccessible(true);
+                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                            redisTemplate.opsForHash().put(MAINTAIN + route[0]+route[1], field.getName(), field.get(alarmValueSettingVo1));
+                        } catch (IllegalAccessException exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
+            alarmValueSettingVo.setWarehouseOxygenUpperOne(alarmValueSettingVo1.getWarehouseOxygenUpperOne());
+            alarmValueSettingVo.setWarehouseOxygenUpperTwo(alarmValueSettingVo1.getWarehouseOxygenUpperTwo());
+            alarmValueSettingVo.setWarehouseOxygenUpperThree(alarmValueSettingVo1.getWarehouseOxygenUpperThree());
+            alarmValueSettingVo.setWarehouseOxygenLower(alarmValueSettingVo1.getWarehouseOxygenLower());
+            alarmValueSettingVo.setWarehouseTempUpperOne(alarmValueSettingVo1.getWarehouseTempUpperOne());
+            alarmValueSettingVo.setWarehouseTempUpperTwo(alarmValueSettingVo1.getWarehouseTempUpperTwo());
+            alarmValueSettingVo.setWarehouseTempUpperThree(alarmValueSettingVo1.getWarehouseTempUpperThree());
+            alarmValueSettingVo.setWarehouseTempLower(alarmValueSettingVo1.getWarehouseTempLower());
+            alarmValueSettingVo.setWarehouseMoistureUpperOne(alarmValueSettingVo1.getWarehouseMoistureUpperOne());
+            alarmValueSettingVo.setWarehouseMoistureUpperTwo(alarmValueSettingVo1.getWarehouseMoistureUpperTwo());
+            alarmValueSettingVo.setWarehouseMoistureUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
+            alarmValueSettingVo.setWarehouseMoistureLower(alarmValueSettingVo1.getWarehouseMoistureLower());
+        }
+        if(ToolUtil.isEmpty(alarmValueSettingVo1)){
+            alarmValueSettingVo.setWarehouseOxygenUpperOne(AlertSettingSetDefault.warehouseOxygenUpperOne);
+            alarmValueSettingVo.setWarehouseOxygenUpperTwo(AlertSettingSetDefault.warehouseOxygenUpperTwo);
+            alarmValueSettingVo.setWarehouseOxygenUpperThree(AlertSettingSetDefault.warehouseOxygenUpperThree);
+            alarmValueSettingVo.setWarehouseOxygenLower(AlertSettingSetDefault.warehouseOxygenLower);
+            alarmValueSettingVo.setWarehouseTempUpperOne(AlertSettingSetDefault.warehouseTempUpperOne);
+            alarmValueSettingVo.setWarehouseTempUpperTwo(AlertSettingSetDefault.warehouseTempUpperTwo);
+            alarmValueSettingVo.setWarehouseTempUpperThree(AlertSettingSetDefault.warehouseTempUpperThree);
+            alarmValueSettingVo.setWarehouseTempLower(AlertSettingSetDefault.warehouseTempLower);
+            alarmValueSettingVo.setWarehouseMoistureUpperOne(AlertSettingSetDefault.warehouseMoistureUpperOne);
+            alarmValueSettingVo.setWarehouseMoistureUpperTwo(AlertSettingSetDefault.warehouseMoistureUpperTwo);
+            alarmValueSettingVo.setWarehouseMoistureUpperThree(AlertSettingSetDefault.warehouseMoistureUpperThree);
+            alarmValueSettingVo.setWarehouseMoistureLower(AlertSettingSetDefault.warehouseMoistureLower);
+        }
+        return alarmValueSettingVo;
     }
 }

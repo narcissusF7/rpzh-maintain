@@ -65,4 +65,6 @@ public interface MaintainPlanService {
     Integer moveStack(MaintainPlanDto maintainPlanDto);
 
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
+
+    AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes,Integer stackId);
 }

@@ -12,5 +12,4 @@ import java.util.List;
  */
 public interface MaterialService {
     MaterialVo findMaterialInfo(Integer stackId);
-    AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes);
 }

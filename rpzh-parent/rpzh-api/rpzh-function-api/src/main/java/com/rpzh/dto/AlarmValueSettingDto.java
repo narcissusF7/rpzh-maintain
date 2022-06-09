@@ -57,7 +57,7 @@ public class AlarmValueSettingDto {
     /**
      * 仓间温度
      */
-    private Double warehouseTempUpper0ne;
+    private Double warehouseTempUpperOne;
     private Double warehouseTempUpperTwo;
     private Double warehouseTempUpperThree;
     private Double warehouseTempLower;
@@ -77,6 +77,10 @@ public class AlarmValueSettingDto {
     private Double coreTempHighEnvTempTwo;
     private Double coreTempHighEnvTempThree;
     private Double coreTempLowEnvTemp;
+
+    private String siteType;
+    private Integer level;
+    private Integer stackId;
 
     /**
      * 预警颜色
@@ -127,7 +131,6 @@ public class AlarmValueSettingDto {
     private Date startTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
-
     public AlarmValueSettingDto(MaintainPlanDto maintainPlanDto){
       this.stackOxygenUpperOne =maintainPlanDto.getStackOxygenUpperOne();
       this.stackOxygenUpperTwo =maintainPlanDto.getStackOxygenUpperTwo();
@@ -149,7 +152,7 @@ public class AlarmValueSettingDto {
       this.stackMoistureUpperTwo=maintainPlanDto.getStackMoistureUpperTwo();
       this.stackMoistureUpperThree=maintainPlanDto.getStackMoistureUpperThree();
       this.stackMoistureLower=maintainPlanDto.getStackMoistureLower();
-      this.warehouseTempUpper0ne=maintainPlanDto.getWarehouseTempUpper0ne();
+      this.warehouseTempUpperOne=maintainPlanDto.getWarehouseTempUpper0ne();
       this.warehouseTempUpperTwo=maintainPlanDto.getWarehouseTempUpperTwo();
       this.warehouseTempUpperThree=maintainPlanDto.getWarehouseTempUpperThree();
       this.warehouseTempLower=maintainPlanDto.getWarehouseTempLower();

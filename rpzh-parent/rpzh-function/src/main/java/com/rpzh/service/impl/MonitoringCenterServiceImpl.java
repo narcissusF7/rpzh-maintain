@@ -14,12 +14,11 @@ import com.rpzh.dao.NodeDao;
 import com.rpzh.dao.WeatherDao;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.DataHandler;
-import com.rpzh.pojo.AlarmValueSetting;
+import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.*;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -178,7 +177,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 //数据库获取
                 AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findByMaintainStageId(nodeData.getMaintainStageId());
                 //获取所有的字段
-                Field[] fields = AlarmValueSetting.class.getDeclaredFields();
+                Field[] fields = WareAreaAlarmSettingDto.class.getDeclaredFields();
                 for (Field field : fields) {
                     try {
                         //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值

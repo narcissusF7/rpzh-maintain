@@ -30,9 +30,6 @@ public class MaterialServiceImpl implements MaterialService {
 
     public static String MAINTAIN ="MAINTAIN_";
 
-    @Resource
-    private AlarmValueSettingDao alarmValueSettingDao;
-
     @Override
     public MaterialVo findMaterialInfo(Integer stackId) {
         MaterialVo materialVo = new MaterialVo();
@@ -95,17 +92,6 @@ public class MaterialServiceImpl implements MaterialService {
         String pidRoute = warehouseDao.findPidRoute(stackId).getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
         materialVo.setPidRoute(pidRoute);
         return materialVo;
-    }
-
-    @Override
-    public AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes) {
-        for (String materialCode : materialCodes) {
-            AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(materialCode);
-            if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
-                return alarmValueSettingVo;
-            }
-        }
-        return new AlarmValueSettingVo();
     }
 
 }

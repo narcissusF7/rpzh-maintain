@@ -109,9 +109,9 @@ public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "养护阶段")
     private String phases;
 
-    //位置类型,1:仓库, 2: 楼号, 3: 层, 4: 区
+    @ApiModelProperty(notes = "位置类型,1:仓库, 2: 楼号, 3: 层, 4: 区")
     private Integer siteType;
-    //采集id
+    @ApiModelProperty(notes = "位置id")
     private Integer siteId;
 
     public static String[] getColumn(String type,String siteType) {

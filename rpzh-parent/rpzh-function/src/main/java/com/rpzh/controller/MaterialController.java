@@ -49,12 +49,11 @@ public class MaterialController {
     }
 
     @PostMapping("/findAlarmValueSetting")
-    public Result findAlarmValueSetting(List<String> materialCodes){
-
+    public Result findAlarmValueSetting(@RequestParam(value ="materialCodes")List<String> materialCodes,@RequestParam(value ="stackId")Integer stackId){
         if(materialCodes.size()==0){
             return new Result(false, StatusCode.ERROR, "物料代码不能为空!");
         }
-        AlarmValueSettingVo alarmValueSettingVo = materialService.findAlarmValueSetting(materialCodes);
-        return new Result(true, StatusCode.OK, "预警设置值成功!", alarmValueSettingVo);
+        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(materialCodes,stackId);
+        return new Result(true, StatusCode.OK, "查询预警设置值成功!", alarmValueSettingVo);
     }
 }

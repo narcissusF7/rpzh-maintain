@@ -7,7 +7,6 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.StringUtils;
@@ -47,50 +46,6 @@ public class MaintainPlanController {
      */
     @Resource
     private MaintainPlanService maintainPlanService;
-
-    public static String MAINTAIN = "MAINTAIN_";
-    @Resource
-    private RedisTemplate redisTemplate;
-
-    @PostMapping("/testZyq")
-    public Result testZyq(){
-        NodeData nodeData = new NodeData();
-        nodeData.setOxygen(23.01);
-        redisTemplate.opsForValue().set(MAINTAIN + "13113131", nodeData);
-        nodeData.setOxygen(27.04);
-        redisTemplate.opsForValue().set(MAINTAIN + "83DD43E1", nodeData);
-        nodeData.setOxygen(23.07);
-        redisTemplate.opsForValue().set(MAINTAIN + "83DD43E0", nodeData);
-        nodeData.setOxygen(23.02);
-        redisTemplate.opsForValue().set(MAINTAIN + "83EE8902", nodeData);
-        nodeData.setOxygen(28.01);
-        redisTemplate.opsForValue().set(MAINTAIN + "83DD43DE", nodeData);
-        nodeData = new NodeData();
-        nodeData.setTemp(33.13);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDA", nodeData);
-        nodeData.setTemp(35.25);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFD9", nodeData);
-        nodeData.setTemp(36.38);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFD8", nodeData);
-        nodeData = new NodeData();
-        nodeData.setTemp(39.49);
-        nodeData.setHumiture(17.35);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDB", nodeData);
-        nodeData.setTemp(30.22);
-        nodeData.setHumiture(16.11);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDE", nodeData);
-        nodeData.setTemp(32.33);
-        nodeData.setHumiture(17.22);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDC", nodeData);
-        nodeData = new NodeData();
-        nodeData.setTemp(43.56);
-        nodeData.setHumiture(18.11);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDD", nodeData);
-        nodeData.setTemp(52.33);
-        nodeData.setHumiture(19.22);
-        redisTemplate.opsForValue().set(MAINTAIN + "88FFDFDF", nodeData);
-        return new Result<>(true, StatusCode.OK, "查询成功");
-    }
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -336,9 +291,7 @@ public class MaintainPlanController {
         phases.add("养护阶段");
         phases.add("充氮杀虫阶段");
         phases.add("磷化铝杀虫阶段");
-        if("机械调控方式".equals(maintenceStyle)){
-            phases.add("充氮保质阶段");
-        }
+        phases.add("充氮保质阶段");
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 
