@@ -9,6 +9,7 @@ import com.rpzh.dto.TaskDto;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.TaskVo;
+import com.sun.xml.bind.v2.model.core.ID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
@@ -59,6 +60,32 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         //设置任务编号
         taskDto.setTaskNum(uuid);
+        //获取位置路径,这是父路径
+        String siteRoute = taskDto.getSiteRoute();
+        //获取当前位置id
+        String siteId = taskDto.getSiteId();
+        if (siteRoute.contains("04")){
+            //如果包含04,拼接05加位置id [00:0],[01:1],[02:1],[03:1],[04:1],[05:2]
+            String siteRouteC = siteRoute + ",[05:" + siteId + "]";
+            //设置位置路径
+            taskDto.setTaskSiteRoute(siteRouteC);
+        }else if (siteRoute.contains("03")){
+            String siteRouteC = siteRoute + ",[04:" + siteId + "]";
+            //设置位置路径
+            taskDto.setTaskSiteRoute(siteRouteC);
+        }else if (siteRoute.contains("02")){
+            String siteRouteC = siteRoute + ",[03:" + siteId + "]";
+            //设置位置路径
+            taskDto.setTaskSiteRoute(siteRouteC);
+        }else if (siteRoute.contains("01")){
+            String siteRouteC = siteRoute + ",[02:" + siteId + "]";
+            //设置位置路径
+            taskDto.setTaskSiteRoute(siteRouteC);
+        }else {
+            String siteRouteC = siteRoute + ",[01:" + siteId + "]";
+            //设置位置路径
+            taskDto.setTaskSiteRoute(siteRouteC);
+        }
         //获取当前时间
         String nowDayTime = DateUtil.dateNew(new Date()).toString();
         taskDto.setCreatedTime(nowDayTime);
@@ -72,14 +99,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //当前时间与结束时间相差的毫秒字符串
         String betweenMsStr = String.valueOf(betweenMs);
         //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
-        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
+        /*rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
                 //消息过期设置
                 message.getMessageProperties().setExpiration(betweenMsStr);
                 return message;
             }
-        });
+        });*/
         log.info("新建任务发送消息成功:"+uuid+":结束时间:"+endTime+":相差时间为:"+betweenMsStr);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;

@@ -25,7 +25,8 @@
        `create_time`,
    </if>
    task_address,
-  `push_way`
+   site_route,
+    push_way
   )
   VALUES
   	(
@@ -51,6 +52,7 @@
      #{taskDto.createdTime},
    </if>
       #{taskDto.taskAddress},
+      #{taskDto.taskSiteRoute},
       #{taskDto.pushWay}
   	)
   </insert>

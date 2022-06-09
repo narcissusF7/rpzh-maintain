@@ -25,6 +25,15 @@ public class TaskDto {
     //任务地点
     private String taskAddress;
 
+    //位置路径
+    private String siteRoute;
+
+    //当前位置id
+    private String siteId;
+
+    //任务位置路径
+    private String taskSiteRoute;
+
     //推送方式
     private String pushWay;
 

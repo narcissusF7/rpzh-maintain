@@ -45,7 +45,9 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
                     "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = true,dataType = "String"),
             @ApiImplicitParam(name = "principal", value = "负责人", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "taskAddress", value = "任务地点", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "taskAddress", value = "任务地点名字", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务地点位置路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "当前位置id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = true,dataType = "String"),
             @ApiImplicitParam(name = "detail", value = "任务详情",required = true,dataType = "String"),
@@ -60,6 +62,12 @@ public class TaskManagementController {
         }
         if (ToolUtil.isEmpty(taskDto.getTaskAddress())){
             return new Result(false, StatusCode.ERROR, "任务地址不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteRoute())){
+            return new Result(false, StatusCode.ERROR, "任务位置路径不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteId())){
+            return new Result(false, StatusCode.ERROR, "当前位置id不能为空");
         }
         if (ToolUtil.isEmpty(taskDto.getEndTime())){
             return new Result(false, StatusCode.ERROR, "结束时间不能为空");
@@ -206,5 +214,16 @@ public class TaskManagementController {
     }
 
 
+    /**
+     * 任务进度统计
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单查看详情任务评价", tags = "任务管理中心")
+    @PostMapping("/taskScheduleCount")
+    public Result<TaskVo> taskScheduleCount(@ApiIgnore TaskDto taskDto){
+
+        return null;
+    }
 
 }
