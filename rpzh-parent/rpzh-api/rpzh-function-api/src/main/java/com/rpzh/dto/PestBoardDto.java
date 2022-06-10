@@ -13,6 +13,8 @@ public class PestBoardDto {
     private String boardType;
     //负责人id
     private Integer principalId;
+    //负责人
+    private Integer principalName;
     //位置id
     private Integer siteId;
     //位置类型

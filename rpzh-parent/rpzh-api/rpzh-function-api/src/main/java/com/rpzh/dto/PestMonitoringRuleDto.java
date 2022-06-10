@@ -12,7 +12,9 @@ public class PestMonitoringRuleDto {
     private String colorTwo;
     private String colorThree;
     private Integer replacePeriod;
-    private Integer[] stackIds;
+    private String[] siteRoutes;
+    private Integer[] siteIds;
+    private String[] siteNames;
     private String[] stackWarningValues;
     private String[] delIds;
 }
