@@ -2,10 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.EarlyWarningDao">
 
-    <update id="updateWarningThreshold">
-        update tb_general_setting set setting_value = #{settingValue} where setting_name =#{settingName}
-    </update>
-
     <select id="findUndoEarlyWarningByNodeId" resultType="com.rpzh.vo.EarlyWarningVo">
         select id , warning_grade as warningGrade from tb_early_warning where node_id =#{nodeId} and is_affirm = 2
         <if test="warningType!='' and warningType!=null">
@@ -77,12 +73,12 @@
         <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">warning_type,</if>
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null"> node_id,</if>
         <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">node_type,</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one,</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_time_one,</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two,</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two,</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three,</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three,</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one,warning_val,</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_time_one,warning_time,</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two,warning_val,</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two,warning_time,</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three,warning_val,</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three,warning_time,</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade,</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">stack_id,</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">area_id,</if>
@@ -92,17 +88,17 @@
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null">#{earlyWarning.nodeId},</if>
         <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">#{earlyWarning.nodeType},</if>
         <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
-            #{earlyWarning.warningValOne},</if>
+            #{earlyWarning.warningValOne},#{earlyWarning.warningValOne},</if>
         <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
-            sysdate(),</if>
+            sysdate(),sysdate(),</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
-            #{earlyWarning.warningValTwo},</if>
+            #{earlyWarning.warningValTwo},#{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
-            sysdate(),</if>
+            sysdate(),sysdate(),</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
-            #{earlyWarning.warningValThree},</if>
+            #{earlyWarning.warningValThree},#{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
-            sysdate(),</if>
+            sysdate(),sysdate(),</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
@@ -113,14 +109,88 @@
     <update id="updateWarning">
         update tb_early_warning set
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade = #{earlyWarning.warningGrade},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate()</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate()</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_val = #{earlyWarning.warningValTwo},</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_val = #{earlyWarning.warningValThree},</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate(),warning_time = sysdate()</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate(),warning_time = sysdate()</if>
         where id = #{earlyWarning.id}
     </update>
 
     <select id="findTroubleNode" resultType="com.rpzh.vo.EarlyWarningVo">
         select node_id nodeId, node_type nodeType, warning_val_one warningValOne, warning_time_one warningTimeOne from tb_early_warning where warning_type in ('01','02','03') and is_affirm = 2
+    </select>
+
+    <select id="findHistoryWarningData" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT
+        t1.node_id,t1.warning_type,t1.warning_grade,t1.warning_val,t1.principal_name,t1.deal_suggestion,t1.deal_time,t1.remark,t1.area_id,t1.stack_id,
+        (CASE
+        WHEN (stack_id IS NULL ) THEN (SELECT site_name FROM tb_ware_area t WHERE t.id = t1.area_id)
+        WHEN (area_id IS NULL) THEN (SELECT site_name FROM tb_stack t WHERE t.id = t1.stack_id) END) AS siteName
+        FROM tb_early_warning t1
+        WHERE t1.is_deal = '1'
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t1.warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t1.warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t1.node_id = #{earlyWarningDto.nodeId}</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t1.principal_name = #{earlyWarningDto.principalName}</if>
+        <if test="earlyWarningDto.startTime != null">and t1.deal_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and t1.deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        ORDER BY t1.area_id DESC,t1.stack_id
+    </select>
+
+    <select id="findHistoryWarningInfo" resultType="com.rpzh.vo.EarlyWarningVo">
+        select
+        t.node_id as nodeId,
+        t.warning_type as warningType,
+        t.warning_grade as warningGrade,
+        t.warning_val as warningVal,
+        t.principal_name as principalName,
+        t.siteName as siteName,
+        t.deal_suggestion as dealSuggestion,
+        t.deal_time as dealTime,
+        t.remark as remark
+        from(
+        select
+        t1.node_id,t1.warning_type,t1.warning_grade,t1.warning_val,t1.principal_name,t1.deal_suggestion,t1.deal_time,t1.remark,
+        t2.site_name as siteName
+        from tb_early_warning t1
+        left join tb_ware_area t2 on t2.id = t1.area_id
+        where t1.is_deal = '1'
+        <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and t1.area_id = #{earlyWarningDto.stackId}</if>
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t1.warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t1.warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t1.node_id = #{earlyWarningDto.nodeId}</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t1.principal_name = #{earlyWarningDto.principalName}</if>
+        <if test="earlyWarningDto.startTime != null">and t1.deal_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and t1.deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        ORDER BY t1.area_id
+        ) t union
+        select
+        t3.node_id as nodeId,
+        t3.warning_type as warningType,
+        t3.warning_grade as warningGrade,
+        t3.warning_val as warningVal,
+        t3.principal_name as principalName,
+        t3.siteName as siteName,
+        t3.deal_suggestion as dealSuggestion,
+        t3.deal_time as dealTime,
+        t3.remark as remark
+        from(
+        select
+        t4.node_id,t4.warning_type,t4.warning_grade,t4.warning_val,t4.principal_name,t4.deal_suggestion,t4.deal_time,t4.remark,
+        t5.site_name as siteName
+        from tb_early_warning t4
+        left join tb_stack t5 on t5.id = t4.stack_id
+        where t4.is_deal = '1'
+        <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
+            and t4.stack_id in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        </if>
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t4.warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t4.warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t4.node_id = #{earlyWarningDto.nodeId}</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t4.principal_name = #{earlyWarningDto.principalName}</if>
+        <if test="earlyWarningDto.startTime != null">and t4.deal_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and t4.deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        ORDER BY t4.stack_id
+        ) t3
     </select>
 </mapper>

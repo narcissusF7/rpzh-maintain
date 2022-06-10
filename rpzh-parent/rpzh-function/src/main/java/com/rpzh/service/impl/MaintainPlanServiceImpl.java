@@ -11,7 +11,6 @@ import com.rpzh.feign.UserFeign;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
-import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -487,28 +486,26 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Double sum = maintainPlanDao.findCount(maintainCountDto);
         //00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位',
         PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
-        String level = maintainCountDto.getLevel();
         String pidRoute = maintainCountDto.getPidRoute();
         Integer stackId = maintainCountDto.getStackId();
         String materialCode = maintainCountDto.getMaterialCode();
         List<MaintainCountVo> maintainCountVos = new ArrayList<MaintainCountVo>();
         //位置不为空
-        if(level !=null && pidRoute !=null && stackId !=null){
-            maintainCountDto.setPidRoute(pidRoute +",[0"+level+":"+stackId+"]");
+        if(pidRoute !=null && stackId !=null){
+            pidRoute = pidRoute + ",[0"+ pidRoute.split(",").length +":"+stackId+"]";
+            maintainCountDto.setPidRoute(pidRoute);
             maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto);
         }
         //位置为空且物料代码也为空
-        if(level ==null && pidRoute ==null && stackId ==null && materialCode==null){
-            maintainCountDto.setPidRoute(pidRoute +",[0"+level+":"+stackId+"]");
+        if(pidRoute ==null && stackId ==null && materialCode==null){
             maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto);
         }
         //物料代码不为空而位置为空
-        if(level ==null && pidRoute ==null && stackId ==null && materialCode!=null){
+        if(pidRoute ==null && stackId ==null && materialCode!=null){
             maintainCountVos = maintainPlanDao.findFirstMaterialCode(maintainCountDto);
             for (MaintainCountVo maintainCountVo : maintainCountVos) {
                 maintainCountDto.setMaterialCode(maintainCountVo.getMaterialCode());
                 List<MaintainCountVo> maintainCountVoOne = maintainPlanDao.findFirst(maintainCountDto);
-                List<String> siteNameVos = new ArrayList<>();
                 maintainCountVo.setMaintainCountVos(new ArrayList<>());
                 for (int b = 0; b < maintainCountVoOne.size(); b++) {
                     String siteRoute = maintainCountVoOne.get(b).getPidRoute();

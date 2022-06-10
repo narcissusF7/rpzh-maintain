@@ -1,18 +1,17 @@
 package com.rpzh.service.impl;
 
-import com.rpzh.dao.AlarmValueSettingDao;
-import com.rpzh.dao.EarlyWarningDao;
-import com.rpzh.dao.MaintainPlanDao;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.*;
 import com.rpzh.dto.EarlyWarningDto;
-import com.rpzh.entity.Result;
-import com.rpzh.entity.StatusCode;
-import com.rpzh.entity.ToolUtil;
-import com.rpzh.entity.WarningTypeDefault;
+import com.rpzh.entity.*;
 import com.rpzh.service.EarlyWarningService;
+import com.rpzh.util.StringUtils;
 import com.rpzh.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +27,45 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     private MaintainPlanDao maintainPlanDao;
     @Resource
     private AlarmValueSettingDao alarmValueSettingDao;
+    @Resource
+    private WarehouseDao warehouseDao;
+
+    @Override
+    public PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto) {
+        String pidRoute = earlyWarningDto.getPidRoute();
+        Integer stackId = earlyWarningDto.getStackId();
+        String endTime = earlyWarningDto.getEndTime();
+        if(ToolUtil.isNotEmpty(endTime)){
+            earlyWarningDto.setEndTime(endTime.replace("00:00:00","23:59:59"));
+        }
+        List<EarlyWarningVo> earlyWarningInfos = new ArrayList<>();
+        if(StringUtils.isNotEmpty(pidRoute)){
+            int length = pidRoute.split(",").length;
+            List<Integer> stackIds = new ArrayList<>();
+            switch (length){
+                case 4:
+                    stackIds = warehouseDao.findStackByAreId(stackId);
+                    if(ToolUtil.isEmpty(stackIds)){
+                        stackIds.add(0);
+                    }
+                    earlyWarningDto.setStackIds(stackIds);
+                    break;
+                case 5:
+                    stackIds.add(stackId);
+                    earlyWarningDto.setStackIds(stackIds);
+                    break;
+                default:
+                    break;
+            }
+            PageHelper.startPage(earlyWarningDto.getPage(), earlyWarningDto.getSize());
+            earlyWarningInfos = earlyWarningDao.findHistoryWarningInfo(earlyWarningDto);
+            return new PageInfo<>(earlyWarningInfos);
+        }
+        PageHelper.startPage(earlyWarningDto.getPage(), earlyWarningDto.getSize());
+        earlyWarningInfos = earlyWarningDao.findHistoryWarningData(earlyWarningDto);
+        return new PageInfo<>(earlyWarningInfos);
+    }
+
     @Override
     public Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto) {
         List<WarningCountVo> warningCount = earlyWarningDao.findEarlyWarningCount(earlyWarningDto);

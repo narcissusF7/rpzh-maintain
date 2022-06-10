@@ -1,7 +1,9 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
+import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.WarningVo;
 
 import java.util.List;
@@ -14,5 +16,6 @@ import java.util.List;
 public interface EarlyWarningService {
     Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto);
     Result findEarlyWarning(EarlyWarningDto earlyWarningDto);
+    PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto);
     Result findDetailsEarlyWarning(EarlyWarningDto earlyWarningDto);
 }

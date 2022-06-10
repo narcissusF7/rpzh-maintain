@@ -3,6 +3,8 @@ package com.rpzh.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,17 +28,19 @@ public class EarlyWarningDto implements Serializable {
 
     private Integer nodeId;
 
+    private String pidRoute;
+
     private BigDecimal warningVal;
 
     private LocalDateTime warningTime;
+
+    private String siteName;
 
     private String startTime;
 
     private String endTime;
 
     private String materialCode;
-
-    private String materialName;
 
     private Integer principalId;
 
@@ -49,6 +53,8 @@ public class EarlyWarningDto implements Serializable {
     private String dealSuggestion;
 
     private Integer stackId;
+
+    private List<Integer> stackIds;
 
     private Integer maintainPlanId;
 

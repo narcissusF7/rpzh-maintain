@@ -444,7 +444,6 @@ public class MaintainPlanController {
     @PostMapping(value = "/findMaintainCountReport")
     @ApiOperation(value = "养护数量")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "level", value = "位置等级", required = false, dataType = "int"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = false, dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),

@@ -2,7 +2,7 @@ package com.rpzh.feign.impl;
 
 import com.rpzh.entity.Result;
 import com.rpzh.feign.UserFeign;
-import com.rpzh.vo.PrincipalNameVo;
+
 
 import java.util.List;
 

@@ -33,8 +33,6 @@ public class MaintainCountDto {
      */
     private String phases;
 
-    private String level;
-
     private String pidRoute;
 
     private Integer index;

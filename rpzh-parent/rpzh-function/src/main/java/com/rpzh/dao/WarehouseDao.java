@@ -308,10 +308,10 @@ public interface WarehouseDao {
     /**
      * 查询垛位信息
      *
-     * @param warehouseNodeId
+     * @param stackId
      * @return
      */
-    StackVo findStackById(@Param("warehouseNodeId") Integer warehouseNodeId);
+    StackVo findStackById(@Param("stackId") Integer stackId);
 
     /**
      * 查询仓库类型
@@ -366,4 +366,6 @@ public interface WarehouseDao {
     List<StackVo> findAllStack();
 
     StackVo findPidRoute(@Param("stackId") Integer id);
+
+    List<Integer> findStackByAreId(@Param("areaId")Integer areaId);
 }

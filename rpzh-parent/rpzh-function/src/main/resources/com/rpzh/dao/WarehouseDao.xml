@@ -575,12 +575,10 @@
   `area_id` as areaId,
   `pid_route` as pidRoute,
   `site_name` as siteName,
-  `material_code` as materialCode,
-  `year` as year,
   `stack_type` as stackType,
   `remark` as remark
   FROM `tb_stack`
-  where id = #{warehouseNodeId}
+  where id = #{stackId}
 </select>
 <select id="findWareType" resultType="java.lang.String">
  SELECT ware_type
@@ -710,6 +708,13 @@
     area_id as areaId
     from tb_stack
     where id = #{stackId}
+  </select>
+
+    <select id="findStackByAreId" resultType="java.lang.Integer">
+    select
+    id as id
+    from tb_stack
+    where area_id = #{areaId}
   </select>
 
 </mapper>
