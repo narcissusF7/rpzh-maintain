@@ -66,6 +66,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseDto.setUsername(username);
         String nowTime = DateUtil.dateNew(new Date()).toString();
         warehouseDto.setCreatedTime(nowTime);
+        //2022 06 13 ljj 添加上大仓库的位置名称
+        warehouseDto.setSiteName(warehouseDto.getName());
         int addFlag = warehouseDao.addWarehouse(warehouseDto);
         return addFlag;
     }

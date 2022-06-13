@@ -14,14 +14,14 @@ public class PestMonitoringRuleVo {
     @ApiModelProperty(notes = "虫情板替换周期")
     Integer replacePeriod;
     @ApiModelProperty(notes = "预警值，预警颜色值")
-    Map<String,String> pestMonitorValues;
+    Map<String,Object> pestMonitorValues;
     @ApiModelProperty(notes = "特殊垛位的数据 stackId 垛位id ，valueOne 一级预警值 valueTwo 二级预警值，valueThree 三级预警值")
     List<Map<String ,String>> specialStacks;
 
     public PestMonitoringRuleVo() {
     }
 
-    public PestMonitoringRuleVo(Map<String, Integer> weekPatrol, Integer replacePeriod, Map<String, String> pestMonitorValues, List<Map<String, String>> specialStacks) {
+    public PestMonitoringRuleVo(Map<String, Integer> weekPatrol, Integer replacePeriod, Map<String, Object> pestMonitorValues, List<Map<String, String>> specialStacks) {
         this.weekPatrol = weekPatrol;
         this.replacePeriod = replacePeriod;
         this.pestMonitorValues = pestMonitorValues;

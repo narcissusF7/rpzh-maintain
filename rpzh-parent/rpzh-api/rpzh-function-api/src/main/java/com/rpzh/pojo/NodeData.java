@@ -5,8 +5,6 @@ import com.rpzh.parse.ParseData;
 import com.rpzh.vo.NodeVo;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @Data
 public class NodeData{
     private Integer id;
@@ -21,7 +19,7 @@ public class NodeData{
     private Double temp=0d;
     private Double humiture=0d;
     private Double oxygen=0d;
-    private String dateTime;
+    private String transferTime;
     private String gatherSite;
     private String pidRoute;
     private String siteType;
@@ -29,6 +27,8 @@ public class NodeData{
     private String siteX;
     private String siteY;
     private String siteZ;
+    private String materialCode;
+    private String warningType;
 
 
 
@@ -49,6 +49,8 @@ public class NodeData{
         this.siteType = nodeVo.getSiteType();
         this.alertLevel = nodeVo.getAlertLevel();
         this.pidRoute =nodeVo.getSiteRoute();
+        this.materialCode = nodeVo.getMaterialCode();
+        this.transferTime = parseData.getDateTime().get(count);
         if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
             this.siteX = nodeVo.getSiteX();
             this.siteY = nodeVo.getSiteY();

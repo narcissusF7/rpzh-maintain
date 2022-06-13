@@ -17,13 +17,13 @@ public class NodeDataVo {
     )
     @ApiModelProperty(notes = "传感器id")
     private String nodeId;
-    @ApiModelProperty(notes = "设备类别id")
+    @ApiModelProperty(notes = "设备类别id  01  03  04")
     private String type;
     @Excel(
             name = "设备类别",
             orderNum = "2"
     )
-    @ApiModelProperty(notes = "设备类别")
+    @ApiModelProperty(notes = "设备类别 01 氧气  03 温湿度  04 包芯温度")
     private String typeName;
     @Excel(
             name = "数据上传时间",
@@ -84,24 +84,24 @@ public class NodeDataVo {
             orderNum = "7"
     )
     @ApiModelProperty(notes = "坐标X")
-    private Integer siteX;
+    private String siteX;
     @Excel(
             name = "坐标Y",
             orderNum = "8"
     )
     @ApiModelProperty(notes = "坐标Y")
-    private Integer siteY;
+    private String siteY;
     @Excel(
             name = "坐标Z",
             orderNum = "9"
     )
     @ApiModelProperty(notes = "坐标Z")
-    private Integer siteZ;
+    private String siteZ;
     @ApiModelProperty(notes = "位置路由")
     private String siteRoute;
     @ApiModelProperty(notes = "垛位名称")
     private String stack;
-    @ApiModelProperty(notes = "预警等级")
+    @ApiModelProperty(notes = "预警等级 0 正常 >0 预警")
     private Integer alertLevel;
     //物料代码
     @ApiModelProperty(notes = "物料代码")
@@ -110,8 +110,27 @@ public class NodeDataVo {
     private Integer maintainPlanId;
     @ApiModelProperty(notes = "养护计划阶段id")
     private Integer maintainStageId;
+    @ApiModelProperty(notes = "预警颜色")
+    private String worningColor;
+
+    @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
+    private String warningType;
 
 
+    public void setType(String type){
+        this.type = type;
+        switch (type){
+            case "01":
+                this.typeName = "氧气设备";
+                break;
+            case "03":
+                this.typeName = "温湿度设备";
+                break;
+            case "04":
+                this.typeName = "包芯温度设备";
+                break;
+        }
+    }
 
     public Double getData() {
         switch(this.type) {

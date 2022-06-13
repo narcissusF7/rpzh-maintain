@@ -131,7 +131,7 @@ public class AlarmValueSettingVo {
                     return new String[]{"stackTempUpperThree","stackTempUpperTwo","stackTempUpperOne","stackTempLower"
                             ,"stackMoistureUpperThree","stackMoistureUpperTwo","stackMoistureUpperOne", "stackMoistureLower"};
                 case "04":
-                    return new String[]{"stackTempUpperThree","stackTempUpperTwo","tempCoreChipUpperOne","tempCoreChipLower"};
+                    return new String[]{"tempCoreChipUpperThree","tempCoreChipUpperTwo","tempCoreChipUpperOne","tempCoreChipLower"};
             }
         }
 

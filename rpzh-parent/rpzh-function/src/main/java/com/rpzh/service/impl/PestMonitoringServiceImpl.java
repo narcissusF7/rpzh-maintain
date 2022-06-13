@@ -1,12 +1,17 @@
 package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.PestMonitoringDao;
+import com.rpzh.dao.RfidRelationshipDao;
 import com.rpzh.dto.PestBoardDto;
+import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -16,19 +21,28 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.PestData;
 import com.rpzh.service.PestMonitoringService;
+import com.rpzh.util.MonitorCondition;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.PestBoardVo;
+import com.rpzh.vo.PestDataVo;
 import com.rpzh.vo.PestMonitoringRuleVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 虫情监控服务实现类
+ * @Author liujj
+ * @create 2022-06-08 11:31
+ * @Description: good good study,day day up
+ */
 @Service
 public class PestMonitoringServiceImpl implements PestMonitoringService {
 
@@ -45,10 +59,15 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
     EarlyWarningDao earlyWarningDao;
 
     @Autowired
+    RfidRelationshipDao rfidRelationshipDao;
+
+    @Autowired
     DataHandler dataHandler;
 
     public static final String SPECIAL_SITE_ROUTE = "SPECIAL_SITE_ROUTE";
     public static final String GENERAL_PEST_WARNING_VALUE = "GENERAL_PEST_WARNING_VALUE";
+
+    public static final String PEST_MONITOR = "PEST_MONITOR_";
 
     /**
      * 添加虫情板
@@ -69,6 +88,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //拼接成自己的路由id
         pestBoardDto.setSiteRoute(pestBoardDto.getSiteRoute() + ",[0" + siteLevel + ":" + pestBoardDto.getSiteId() + "]");
         Integer addFalg = pestMonitoringDao.addPestBoard(pestBoardDto);
+        //向rfid关系表插入数据
+        rfidRelationshipDao.addRfidRelationship(pestBoardDto.getRfid(),pestBoardDto.getSiteType(),pestBoardDto.getSiteId());
         return addFalg;
     }
 
@@ -80,7 +101,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     @Override
     public Integer deletePestBoard(Integer[] ids) {
-        Integer delFalg = pestMonitoringDao.deletePestBoard(ids);
+        Integer delFalg = pestMonitoringDao.deletePestBoard(Arrays.asList(ids));
         return delFalg;
     }
 
@@ -107,37 +128,41 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         generalSettingDao.updateGeneralSetting(generalSetting);
         //虫情巡查时间修改
         Integer[] weekPatrol = pestMonitoringRuleDto.getWeekPatrol();
-        Map<Integer, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>();
         for (int i = 0; i < weekPatrol.length; i++) {
-            map.put(i + 1, weekPatrol[i]);
+            map.put("x"+(i + 1), weekPatrol[i]);
         }
         pestMonitoringDao.updateWeekPatrol(map);
 
         //特殊位置删除
-        pestMonitoringDao.delSpecialSite(Arrays.asList(pestMonitoringRuleDto.getDelIds()));
-
-        //删除缓存中的特殊位置
-        redisTemplate.opsForHash().delete(SPECIAL_SITE_ROUTE);
+        if (!ToolUtil.isEmpty(pestMonitoringRuleDto.getDelIds())){
+            pestMonitoringDao.delSpecialSite(Arrays.asList(pestMonitoringRuleDto.getDelIds()));
+            //删除缓存中的特殊位置
+            redisTemplate.opsForHash().delete(SPECIAL_SITE_ROUTE);
+        }
 
         //特殊位置 如果数据库存在  就修改 否则就添加
         Integer[] siteIds = pestMonitoringRuleDto.getSiteIds();
-        List<String> siteRoutes = Arrays.asList(pestMonitoringRuleDto.getSiteRoutes());
-        for (int i = 0; i < siteRoutes.size(); i++) {
-            String siteRoute = siteRoutes.get(i);
-            siteRoutes.set(i, siteRoute + ",[0" + siteRoute.split(",").length + ":" + siteIds[i] + "]");
-        }
-        List<String> list = pestMonitoringDao.findSpecialSiteRoute(siteRoutes);
-        for (int i = 0; i < siteIds.length; i++) {
-            String[] split = pestMonitoringRuleDto.getStackWarningValues()[i].split("|");
-            if (list.contains(siteRoutes.get(i))) {
-                pestMonitoringDao.updateSpecialSiteRoute(siteRoutes.get(i), split[0], split[1], split[2], pestMonitoringRuleDto.getSiteNames()[i]);
-
-            } else {
-                pestMonitoringDao.addSpecialSiteRoute(siteRoutes.get(i), split[0], split[1], split[2], pestMonitoringRuleDto.getSiteNames()[i]);
+        if (!ToolUtil.isEmpty(siteIds)){
+            List<String> siteRoutes = Arrays.asList(pestMonitoringRuleDto.getSiteRoutes());
+            for (int i = 0; i < siteRoutes.size(); i++) {
+                String siteRoute = siteRoutes.get(i);
+                siteRoutes.set(i, siteRoute + ",[0" + siteRoute.split(",").length + ":" + siteIds[i] + "]");
             }
-            //将特殊位置的位置路由存到缓存中
-            redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, siteRoutes.get(i), pestMonitoringRuleDto.getStackWarningValues()[i]);
+            List<String> list = pestMonitoringDao.findSpecialSiteRoute(siteRoutes);
+            for (int i = 0; i < siteIds.length; i++) {
+                String[] split = pestMonitoringRuleDto.getStackWarningValues()[i].split("|");
+                if (list.contains(siteRoutes.get(i))) {
+                    pestMonitoringDao.updateSpecialSiteRoute(siteRoutes.get(i), split[0], split[1], split[2], pestMonitoringRuleDto.getSiteNames()[i]);
+
+                } else {
+                    pestMonitoringDao.addSpecialSiteRoute(siteRoutes.get(i), split[0], split[1], split[2], pestMonitoringRuleDto.getSiteNames()[i]);
+                }
+                //将特殊位置的位置路由存到缓存中
+                redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, siteRoutes.get(i), pestMonitoringRuleDto.getStackWarningValues()[i]);
+            }
         }
+
         return updateFlag;
     }
 
@@ -156,7 +181,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         Integer settingValue = Integer.parseInt(generalSettingDao.findGeneralSetting(generalSetting).get(0).getSettingValue());
 
         //虫情预警值 预警颜色查询
-        Map<String, String> pestMonitorValues = pestMonitoringDao.findPestMonitorValue();
+        Map<String, Object> pestMonitorValues = pestMonitoringDao.findPestMonitorValue();
 
         //查询特殊垛位
         List<Map<String, String>> specialStacks = pestMonitoringDao.findSpecialSite();
@@ -173,7 +198,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     @Override
     public Result exportPestData(List<Map<Integer, String>> pestDatas, String siteType) {
-        //TODO 存放时应该判断预警等级
         //存放虫情数据
         List<PestData> pestDataList = new ArrayList<>();
         for (int i = 0; i < pestDatas.size(); i++) {
@@ -181,86 +205,21 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             //0 虫情板点位id 1 采集位置 2 采集时间 3 甲虫数量 4 粉螟数量
             Map<Integer, String> integerStringMap = pestDatas.get(i);
             String pestBoardId = integerStringMap.get(0).trim();
-
             String gatherSite = integerStringMap.get(1).trim();
             String gatherTime = integerStringMap.get(2).trim();
-            Integer beetleCount = Integer.parseInt(integerStringMap.get(3).trim());
+            Double xsxl3 = Double.parseDouble(integerStringMap.get(3).trim());
+            Integer beetleCount = xsxl3.intValue();
             Integer mealwormCount = null;
 
             if (NodeConstant.NODE_STACK.equals(siteType)) {
-                mealwormCount = Integer.parseInt(integerStringMap.get(4).trim());
+                Double y = Double.parseDouble(integerStringMap.get(4).trim());
+                mealwormCount = y.intValue();
                 if (ToolUtil.isEmpty(mealwormCount)) {
                     return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
                 }
             }
 
-            //通过 pestBoardId 找到对应的虫情板信息
-            PestBoardVo pestBoardVo = pestMonitoringDao.findPestBoardByPestBoardId(pestBoardId);
-
-            //存放特殊位置的位置路由
-            List<String> siteRoutes;
-
-            //获取缓存中的虫情预警特殊位置
-            Object o = redisTemplate.opsForHash().entries(SPECIAL_SITE_ROUTE);
-            //如果缓存中不存在
-            if (ToolUtil.isEmpty(o)) {
-                //查找数据库 并放置到缓存中
-                List<Map<String, String>> specialSites = pestMonitoringDao.findSpecialSite();
-                siteRoutes = new ArrayList<>();
-                specialSites.forEach(map -> {
-                    //添加特殊位置位置路由
-                    siteRoutes.add(map.get("siteRoute"));
-
-                    //放到缓存中
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(map.get("valueOne")).append("|").append("valueTwo").append("|").append("valueThree");
-                    redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, map.get("siteRoute"), sb.toString());
-                });
-//                redisTemplate.opsForValue().set(SPECIAL_SITE_ROUTE, JSONObject.toJSONString(siteRoutes));
-            } else {
-                siteRoutes = new ArrayList<>(((Map) o).keySet());
-            }
-
-            String s = "";
-
-            //通过特殊位置的路由值是否被当前包含，包含的话取最长的那条路径
-            Stream<String> stringStream = siteRoutes.stream().filter(siteRoute -> pestBoardVo.getSiteRoute().contains(siteRoute));
-            if (stringStream.count() == 1) {
-                s = stringStream.collect(Collectors.toList()).get(0);
-            } else if (stringStream.count() > 1) {
-                //取长的位置路由
-                s = stringStream.max((x, y) -> x.length() - y.length()).get();
-            }
-
-            //该数据预警等级
-            int level = 0;
-            //如果s为空 代表非特殊位置
-            if ("".equals(s)) {
-                //获取缓存中的通用虫情预警设置
-                String values = (String) redisTemplate.opsForValue().get(GENERAL_PEST_WARNING_VALUE);
-                //分割后获取每个预警等级阈值
-                String[] split = values.split("|");
-                //求出对应的预警等级
-                level = decideValue(beetleCount, split);
-
-                //判断是否预警
-                level = decideEarlyWarning(pestBoardVo, level, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING);
-            } else {
-                //仓间甲虫
-                String values = (String) redisTemplate.opsForHash().get(SPECIAL_SITE_ROUTE, s);
-                String[] split = values.split("|");
-                level = decideValue(beetleCount, split);
-                level = decideEarlyWarning(pestBoardVo, level, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
-                if (ToolUtil.isEmpty(mealwormCount)) {
-                    //仓间粉螟
-                    int mealwormLevel = decideValue(mealwormCount, split);
-                    mealwormLevel = decideEarlyWarning(pestBoardVo,mealwormLevel,mealwormCount,WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING);
-                    if (mealwormLevel > level) {
-                        level = mealwormLevel;
-                    }
-                }
-            }
-
+            Integer level = decideLevel(pestBoardId, beetleCount, mealwormCount);
 
             if (ToolUtil.isEmpty(pestBoardId) || ToolUtil.isEmpty(gatherSite) || ToolUtil.isEmpty(gatherTime) || ToolUtil.isEmpty(beetleCount)) {
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
@@ -278,7 +237,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
         //把最新的数据存到缓存中
         pestDataList.forEach(pestData -> {
-            redisTemplate.opsForValue().set(pestData.getPestBoardId(),JSONObject.toJSONString(pestData));
+            redisTemplate.opsForValue().set(PEST_MONITOR+pestData.getPestBoardId(),JSONObject.toJSONString(pestData));
         });
 
         return new Result(true, StatusCode.OK, "导入成功");
@@ -299,18 +258,44 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         List<Map<String, String>> list = pestMonitoringDao.findByPrincipalName(username);
         for (int i = 0; i < list.size(); i++) {
             Map<String, String> map = list.get(i);
+            SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
             if (NodeConstant.NODE_STACK.equals(map.get("siteType"))) {
                 //垛内
-                stackList.add(new PestData(map.get("pestBoardId"), map.get("site_name"), new Date().toString(), 0, 0));
+                stackList.add(new PestData(map.get("pestBoardId"), map.get("site_name"), ft.format(new Date()), 0, 0));
             } else {
                 //仓间
-                warekList.add(new PestData(map.get("pestBoardId"), map.get("site_name"), new Date().toString(), 0, 0, 0));
+                warekList.add(new PestData(map.get("pestBoardId"), map.get("site_name"), ft.format(new Date()), 0, 0, 0));
             }
         }
         pestMonitoringDao.exportPestData(stackList, NodeConstant.NODE_STACK);
         pestMonitoringDao.exportPestData(warekList, NodeConstant.NODE_WARE_AREA);
+
+        stackList.forEach(pestData -> {
+            redisTemplate.opsForValue().set(PEST_MONITOR+pestData.getPestBoardId(),JSONObject.toJSONString(pestData));
+        });
+        warekList.forEach(pestData -> {
+            redisTemplate.opsForValue().set(PEST_MONITOR+pestData.getPestBoardId(),JSONObject.toJSONString(pestData));
+        });
+
         return new Result(true, StatusCode.OK, "一键导入成功");
     }
+
+    /**
+     * 查询虫情板信息
+     * @param pestBoardDto
+     * @return
+     */
+    @Override
+    public List<PestBoardVo> findPestBoard(PestBoardDto pestBoardDto) {
+        if (!ToolUtil.isEmpty(pestBoardDto.getSiteRoute())){
+            //拼接完整的位置路由
+            String siteRoute = pestBoardDto.getSiteRoute()+",[0"+pestBoardDto.getSiteRoute().split(",").length+":"+pestBoardDto.getSiteId()+"]";
+            pestBoardDto.setSiteRoute(siteRoute);
+        }
+
+        return pestMonitoringDao.findPestBoard(pestBoardDto);
+    }
+
 
     /**
      * 判断等级
@@ -380,9 +365,162 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 //将该预警记录插入到数据库中
                 earlyWarningDao.insertWarning(earlyWarning);
             }
+            return earlyWarning.getWarningGrade();
+        }else {
+            return 0;
         }
-        return earlyWarning.getWarningGrade();
+
     }
 
+    /**
+     * 虫情数据实时监控
+     * @param monitorCondition
+     * @return
+     */
+    @Override
+    public PageInfo<PestDataVo> findPestDataHistory(MonitorCondition monitorCondition) {
+        if (!ToolUtil.isEmpty(monitorCondition.getPidRoute())){
+            monitorCondition.setPidRoute(monitorCondition.getPidRoute()+",[0"+monitorCondition.getPidRoute().split(",").length+":"+monitorCondition.getSiteId()+"]");
+        }
+        //虫情点位数据集
+        List<PestDataVo> pestDataVos = new ArrayList<>();
+        int pageNum = monitorCondition.getPage();
+        int pageSize = monitorCondition.getSize();
 
+        if (monitorCondition.getSortCondition() == 0&& monitorCondition.getMonitorStatus() ==0) {
+            //正常排序
+            PageHelper.startPage(pageNum, pageSize);
+        }
+        //通过监控条件查找
+        List<String> pestBoardIds = pestMonitoringDao.findPestBoardId(monitorCondition);
+
+        //从缓存中获取对应的数据
+        pestBoardIds.forEach(pestBoardId ->{
+            Object o = redisTemplate.opsForValue().get(PEST_MONITOR + pestBoardId);
+            if (!ToolUtil.isEmpty(o)){
+                pestDataVos.add(JSONObject.parseObject(o.toString(),PestDataVo.class));
+            }
+        });
+        //根据监控类型过滤
+        Stream<PestDataVo> stream =pestDataVos.stream();
+        if (monitorCondition.getMonitorStatus()==1){
+            //预警数据
+            stream = stream.filter(pestDataVo -> pestDataVo.getAlertLevel()>0);
+        }else if (monitorCondition.getMonitorStatus()==2){
+            //预警数据
+            stream =stream.filter(pestDataVo -> pestDataVo.getAlertLevel()==0);
+        }
+        if (monitorCondition.getSortCondition() == 1){
+            //按预警等级排序
+            stream = stream.sorted(Comparator.comparing(PestDataVo::getAlertLevel).reversed());
+        }
+        List<PestDataVo> collect = stream.collect(Collectors.toList());
+        Page<PestDataVo> page = manuallyPage(collect, monitorCondition.getPage(), monitorCondition.getSize());
+        return  new PageInfo<>(page);
+    }
+
+    /**
+     * 手动分页
+     * @param list 需要分页的数据
+     * @param pageNum 当前页
+     * @param pageSize 每页数量
+     * @return
+     */
+    public Page<PestDataVo> manuallyPage(List<PestDataVo> list ,Integer pageNum , Integer pageSize){
+        //创建一个page类
+        Page<PestDataVo> page = new Page<>(pageNum, pageSize);
+        //总数量
+        int total = list.size();
+        page.setTotal(total);
+        //起始下标
+        int startIndex = (pageNum - 1) * pageSize;
+        //终止下标
+        int endIndex = Math.min(startIndex + pageSize, total);
+        //截取数量
+        page.addAll(list.subList(startIndex, endIndex));
+
+        return page;
+    }
+
+    @Override
+    public List<PestDataVo> findPestDataHistoryByOne(PestDataDto pestDataDto) {
+        return pestMonitoringDao.findPestDataHistoryByOne(pestDataDto);
+    }
+
+    public List<String> getSpecialSiteRoute(){
+        //存放特殊位置的位置路由
+        List<String> siteRoutes;
+
+        //获取缓存中的虫情预警特殊位置
+        Object o = redisTemplate.opsForHash().entries(SPECIAL_SITE_ROUTE);
+        //如果缓存中不存在
+        if (ToolUtil.isEmpty(o)) {
+            //查找数据库 并放置到缓存中
+            List<Map<String, String>> specialSites = pestMonitoringDao.findSpecialSite();
+            siteRoutes = new ArrayList<>();
+            specialSites.forEach(map -> {
+                //添加特殊位置位置路由
+                siteRoutes.add(map.get("siteRoute"));
+
+                //放到缓存中
+                StringBuffer sb = new StringBuffer();
+                sb.append(map.get("valueOne")).append("|").append("valueTwo").append("|").append("valueThree");
+                redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, map.get("siteRoute"), sb.toString());
+            });
+        } else {
+            siteRoutes = new ArrayList<>(((Map) o).keySet());
+        }
+        return siteRoutes;
+    }
+
+    public Integer decideLevel(String pestBoardId,Integer beetleCount,Integer mealwormCount){
+        //通过 pestBoardId 找到对应的虫情板信息
+        PestBoardVo pestBoardVo = pestMonitoringDao.findPestBoardByPestBoardId(pestBoardId);
+        //查找特殊位置
+        List<String> siteRoutes = getSpecialSiteRoute();
+
+        //通过特殊位置的路由值是否被当前包含，包含的话取最长的那条路径
+        Stream<String> stringStream = siteRoutes.stream().filter(siteRoute -> pestBoardVo.getSiteRoute().contains(siteRoute));
+
+        String s = stringStream.max((x, y) -> x.length() - y.length()).orElse("");
+
+        //该数据预警等级
+        int level = 0;
+        //如果s为空 代表非特殊位置
+        if ("".equals(s)) {
+            //获取缓存中的通用虫情预警设置
+            String values = (String) redisTemplate.opsForValue().get(GENERAL_PEST_WARNING_VALUE);
+            //分割后获取每个预警等级阈值
+            String[] split = values.split("\\|");
+            //求出对应的预警等级
+            level = decideValue(beetleCount, split);
+
+            //判断是否预警
+            level = decideEarlyWarning(pestBoardVo, level, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING);
+        } else {
+            //仓间甲虫
+            String values = (String) redisTemplate.opsForHash().get(SPECIAL_SITE_ROUTE, s);
+            String[] split = values.split("|");
+            level = decideValue(beetleCount, split);
+            level = decideEarlyWarning(pestBoardVo, level, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
+            if (ToolUtil.isEmpty(mealwormCount)) {
+                //仓间粉螟
+                int mealwormLevel = decideValue(mealwormCount, split);
+                mealwormLevel = decideEarlyWarning(pestBoardVo,mealwormLevel,mealwormCount,WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING);
+                if (mealwormLevel > level) {
+                    level = mealwormLevel;
+                }
+            }
+        }
+        return level;
+    }
+
+    @Override
+    public Integer addPestHistory(PestDataDto pestDataDto) {
+        Integer level = decideLevel(pestDataDto.getPestBoardId(), pestDataDto.getBeetleCount(), pestDataDto.getMealwormCount());
+        pestDataDto.setAlertLevel(level);
+        Integer addFlag = pestMonitoringDao.addPestHistory(pestDataDto);
+
+        return addFlag;
+    }
 }

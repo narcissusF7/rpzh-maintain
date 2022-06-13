@@ -9,7 +9,7 @@ public class MonitorCondition {
     //物料代码
     private String materialCode;
     //监控状态
-    private Integer monitorStatus;
+    private Integer monitorStatus = 0;
     //多个设备类型
     private String[] nodeTypes;
     //采集位置类型 04 仓间 05 非仓间

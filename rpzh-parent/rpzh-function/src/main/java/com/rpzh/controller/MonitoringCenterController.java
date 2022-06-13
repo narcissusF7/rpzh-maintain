@@ -3,11 +3,16 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.constant.NodeConstant;
+import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
+import com.rpzh.service.NodeService;
+import com.rpzh.util.EasyPoiUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.NodeDataVo;
@@ -18,10 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 监控中心控制类
@@ -36,6 +43,8 @@ import java.util.Map;
 public class MonitoringCenterController {
     @Resource
     MonitoringCenterService monitoringCenterService;
+    @Resource
+    NodeService nodeService;
 
     @ApiOperation(
             value = "查询监控数据列表"
@@ -51,13 +60,17 @@ public class MonitoringCenterController {
             dataType = "String"
     ), @ApiImplicitParam(
             name = "sortCondition",
-            value = "排序规则",
+            value = "排序规则 0 按位置排序 1 按预警等级排序",
             dataType = "Integer",
             defaultValue = "0"
     ), @ApiImplicitParam(
-            name = "gatherSite",
-            value = "采集位置",
+            name = "pidRoute",
+            value = "位置路由",
             dataType = "String"
+    ), @ApiImplicitParam(
+            name = "siteId",
+            value = "所选的位置id",
+            dataType = "Integer"
     ), @ApiImplicitParam(
             name = "nodeTypes",
             value = "设备类型数组 查询全部 包芯监控传输04（包温） 05（包水）  垛内/仓间监控传其他01（氧气）,02（二氧化碳）,03（环境温湿度）,06（磷化氢）",
@@ -66,7 +79,7 @@ public class MonitoringCenterController {
             allowMultiple = true
     ), @ApiImplicitParam(
             name = "monitorStatus",
-            value = "监控状态",
+            value = "监控状态 0 全部 1预警 2 正常",
             dataType = "String"
     ), @ApiImplicitParam(
             name = "page",
@@ -80,7 +93,7 @@ public class MonitoringCenterController {
     @GetMapping({"/findMonitoringData"})
     public Result<NodeDataVo> findMonitoringData(@ApiIgnore MonitorCondition monitorCondition) {
         PageInfo<NodeDataVo> pageInfo = monitoringCenterService.findMonitoringData(monitorCondition);
-        return new Result(true, StatusCode.OK, "查询成功", pageInfo);
+        return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
 
     @ApiOperation(
@@ -112,7 +125,7 @@ public class MonitoringCenterController {
             required = true
     ),@ApiImplicitParam(
             name = "type",
-            value = "设备类型",
+            value = "设备类型  01氧气 03温湿度 04 包芯氧气",
             dataType = "String",
             required = true
     ),@ApiImplicitParam(
@@ -122,14 +135,14 @@ public class MonitoringCenterController {
             required = true
     ),@ApiImplicitParam(
             name = "pidRoute",
-            value = "位置路由",
+            value = "位置路由 ",
             dataType = "String",
             required = true
     )})
     @GetMapping("/findAlarmValue")
-    public Result<Double> findAlarmValue(@ApiIgnore NodeData nodeData){
-        List<Double> arrayList = monitoringCenterService.findAlarmValue(nodeData);
-        return new Result<>(true,StatusCode.OK,"查询成功",arrayList);
+    public Result<Map<String,Double>> findAlarmValue(@ApiIgnore NodeData nodeData){
+        Map<String,Double> map = monitoringCenterService.findAlarmValue(nodeData);
+        return new Result<>(true,StatusCode.OK,"查询成功",map);
     }
 
 
@@ -167,15 +180,15 @@ public class MonitoringCenterController {
     )
     @ApiImplicitParams({@ApiImplicitParam(
             name = "startTime",
-            value = "开始时间 默认值一星期前",
+            value = "开始时间",
             dataType = "String"
     ),@ApiImplicitParam(
             name = "endTime",
-            value = "结束时间 默认值为当天",
+            value = "结束时间",
             dataType = "String"
     )})
     @GetMapping("/findWeatherDataByDay")
-    public Result<Map<String, HashMap<String, Double>>> findWeatherDataByDay(MonitorCondition monitorCondition){
+    public Result<Map<String, HashMap<String, Double>>> findWeatherDataByDay(@ApiIgnore MonitorCondition monitorCondition){
         Map<String, HashMap<String, Double>> weatherDataVos = monitoringCenterService.findWeatherDataByDay(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",weatherDataVos);
     }
@@ -188,6 +201,124 @@ public class MonitoringCenterController {
         return new Result<>(true,StatusCode.OK,"查询成功",nowWeather);
     }
 
+    @ApiOperation(
+            value = "查询设备历史数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型 01氧气 03温湿度 04 包芯氧气",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "page",
+            value = "当前页数",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "size",
+            value = "每页数量",
+            dataType = "Integer"
+    )})
+    @GetMapping({"/findNodeHistory"})
+    public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
+        int page = nodeDto.getPage();
+        int size = nodeDto.getSize();
+        PageHelper.startPage(page, size);
+        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataVos));
+    }
 
+
+    @ApiOperation(
+            value = "查询设备历史数据(日数据)"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型  01氧气 03温湿度 04 包芯氧气",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "dataType",
+            value = "数据类型(温湿度湿度数据 传4 其他随意)",
+            dataType = "Integer",
+            required = true
+    )})
+    @GetMapping({"/findNodeHistoryGraph"})
+    public Result<Map<String, HashMap<String, Double>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
+        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
+                item.getTransferTime().split(" ")[0])));
+        Map<String, HashMap<String, Double>> historyGraphData = new HashMap();
+        if (nodeDto.getDataType() == NodeConstant.HUMITURE_NUMBER) {
+            collect.forEach((k, value) -> {
+                HashMap<String, Double> map = new HashMap();
+                map.put("max", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get());
+                map.put("min", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get());
+                map.put("avg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble());
+                historyGraphData.put(k, map);
+            });
+        } else {
+            collect.forEach((k, value) -> {
+                HashMap<String, Double> map = new HashMap();
+                map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get());
+                map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get());
+                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble());
+                historyGraphData.put(k, map);
+            });
+        }
+
+        return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
+    }
+
+    @ApiOperation(
+            value = "导出历史数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "nodeId",
+            value = "设备id",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型  01氧气 03温湿度 04 包芯氧气",
+            dataType = "String",
+            required = true
+    )})
+    @GetMapping({"/exportNodeHistory"})
+    public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
+        List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
+        EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
+        List<String> columns = new ArrayList<>();
+        //把要导出的字段添加到集合中
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())) {
+            columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
+            if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
+                columns.add("humiture");
+            }
+        }
+        //显示要导出的字段
+        nodeHistory.forEach((item) -> {
+            easyPoiUtil.t = item;
+            columns.forEach((column) -> {
+                try {
+                    easyPoiUtil.hihdColumn(column, false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            });
+        });
+        String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
+        EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
+    }
 }
 

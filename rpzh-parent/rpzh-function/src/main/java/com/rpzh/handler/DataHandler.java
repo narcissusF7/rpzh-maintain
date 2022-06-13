@@ -12,7 +12,6 @@ import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.vo.*;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -56,6 +55,8 @@ public class DataHandler {
     Double voltage;
     @Value("${node.signalStrength}")
     Integer signalStrength;
+
+    String warningType = "";
 
 
     public static String MAINTAIN = "MAINTAIN_";
@@ -117,12 +118,12 @@ public class DataHandler {
         //给nodeData赋值
         nodeData.setNodeId(parseData.getNodeId());
         nodeData.setType(parseData.getNodeType());
-        nodeData.setDateTime(parseData.getDateTime().get(0));
+        nodeData.setTransferTime(parseData.getDateTime().get(0));
         nodeData.setTemp(parseData.getData().get(0));
         nodeData.setHumiture(parseData.getData().get(1));
         nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
         nodeData.setPidRoute(siteRoute);
-
+        nodeData.setWarningType(warningType.substring(1));
         //向数据库插入当前数据
         Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history");
 
@@ -132,19 +133,26 @@ public class DataHandler {
 
     }
 
+    /**
+     * 正常数据处理
+     * @param parseData
+     */
     public void handlerData(ParseData parseData) {
-
+        warningType = "";
         //判断电量
         if (parseData.getVoltage() < voltage) {
+            warningType= warningType +","+WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN;
             //判断数据库中该设备是否存在未处理的低电量预警
             nodeMalfunction(parseData, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData.getVoltage());
         }
         //判断信号强度
         if (parseData.getSignalStrength() < signalStrength) {
+            warningType= warningType +","+WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN;
             nodeMalfunction(parseData, WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN, parseData.getSignalStrength().doubleValue());
         }
         //判断丢包个数
         if (parseData.getPacketLossNum() > 0) {
+            warningType= warningType +","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN;
             nodeMalfunction(parseData, WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN, parseData.getPacketLossNum().doubleValue());
         }
 
@@ -232,6 +240,7 @@ public class DataHandler {
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);
+            nodeData.setWarningType(warningType.substring(1));
             //向数据库插入当前数据
             Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
 
@@ -522,6 +531,7 @@ public class DataHandler {
         }
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
+            warningType = warningType+","+earlyWarningVo.getWarningType();
             //获取缓存中的连续预警次数
             Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId()+evnType);
             int i;
@@ -570,27 +580,29 @@ public class DataHandler {
                 //判断是否是仓间设备
                 boolean isNodeStack =  NodeConstant.NODE_STACK.equals(siteType);
                 //如果不为空即该设备为温湿度设备
+                String type="";
                 if (!ToolUtil.isEmpty(evnType)) {
                     //温湿度 温度预警
                     if ("temp".equals(evnType)) {
-                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING);
+                        type = isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING;
                         //温湿度 湿度预警
                     } else if ("humidity".equals(evnType)) {
-                        earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING);
+                        type = isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING;
                     }
                 } else {
                     switch (parseData.getNodeType()) {
                         //氧气设备
                         case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING);
+                            type = isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING;
                             break;
                         //包芯温度设备
                         case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
-                            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING);
+                            type = WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING;
                             break;
                     }
                 }
-
+                earlyWarning.setWarningType(type);
+                warningType = warningType +","+type;
                 //设置设备id
                 earlyWarning.setNodeId(parseData.getNodeId());
                 //设置设备类型

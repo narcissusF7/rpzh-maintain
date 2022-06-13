@@ -14,7 +14,7 @@ public class PestBoardDto {
     //负责人id
     private Integer principalId;
     //负责人
-    private Integer principalName;
+    private String principalName;
     //位置id
     private Integer siteId;
     //位置类型
@@ -43,8 +43,16 @@ public class PestBoardDto {
     private String lastUpdatedUser;
     //添加人
     private String createdUser;
+    //添加人
+    private String createdUserId;
     //最后修改人id
     private Integer lastUpdatedUserId;
     //备注
     private String remark;
+
+    private Integer page =1;
+
+    private Integer size =10;
+
+    private String rfid;
 }

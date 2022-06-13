@@ -292,11 +292,24 @@
         </where>
         order by site_route,site_x,site_y,site_z
         <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            ) t where t.stackId in (select stack_id  from tb_material where material_code like concat('%', #{monitorCondition.materialCode},'%')
+            ) t where t.stackId in (select stack_id  from tb_material where material_code like concat('%', #{monitorCondition.materialCode},'%'))
         </if>
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
-        select id, type, ${tableColumn} as data ,transfer_time as transferTime
+        select id, type, ${tableColumn},transfer_time as transferTime,node_id nodeId,
+               frequency,
+               voltage,
+               signal_strength signalStrength,
+               stack_id stackId,
+               maintain_plan_id maintainPlanId,
+               maintain_stage_id maintainStageId,
+               gather_site gatherSite,
+               site_type siteType,
+               alert_level alertLevel,
+               pid_route pidRoute,
+               site_x siteX,
+               site_y SiteY,
+               site_z SiteZ
         from ${tableName} where node_id in #{nodeDto.nodeId}
     </select>
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
@@ -308,29 +321,30 @@
     </select>
     <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
         SELECT
-            id,
-            node_id nodeId,
-            node_type nodeType,
-            STATUS,
-            gather_site gatherSite,
-            stack,
-            site_type siteType,
-            site_id siteId,
-            site_x siteX,
-            site_y siteY,
-            site_z siteZ,
-            site_route siteRoute,
-            into_stack_time intoStackTime,
-            created_time createdTime,
-            created_user createdUser,
-            last_updated_time lastUpdateTime,
-            last_updated_user lastUpdateUser,
-            stack_id stackId
+            tnode.id,
+	        tnode.node_id nodeId,
+	        tnode.node_type nodeType,
+	        tnode.STATUS,
+	        tnode.gather_site gatherSite,
+	        tnode.stack,
+	        tnode.site_type siteType,
+	        tnode.site_id siteId,
+	        tnode.site_x siteX,
+	        tnode.site_y siteY,
+	        tnode.site_z siteZ,
+	        tnode.site_route siteRoute,
+	        tnode.into_stack_time intoStackTime,
+	        tnode.created_time createdTime,
+	        tnode.created_user createdUser,
+	        tnode.last_updated_time lastUpdateTime,
+	        tnode.last_updated_user lastUpdateUser,
+	        tnode.stack_id stackId,
+            GROUP_CONCAT(DISTINCT tmate.material_code ORDER BY tmate.material_code) materialCode
         FROM
-            tb_node
-        <where>
-            and node_id = #{nodeId}
-        </where>
+            tb_node tnode, tb_material tmate
+        where  tnode.stack_id = tmate.stack_id
+        and node_id = #{nodeId}
+        group by tnode.id
     </select>
 
 
@@ -349,12 +363,13 @@
             <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
             <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
             <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
-            <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">transfer_time,</if>
+            <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">transfer_time,</if>
             <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
             <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
             <if test="nodeData.siteX!=null and nodeData.siteX!=''">site_x,</if>
             <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
             <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
+            <if test="nodeData.warningType!=null and nodeData.warningType!=''">warning_type,</if>
         createdTime
         ) values (
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
@@ -370,12 +385,13 @@
         <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
         <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
         <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
-        <if test="nodeData.dateTime!=null and nodeData.dateTime!=''">#{nodeData.dateTime},</if>
+        <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">#{nodeData.transferTime},</if>
         <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
         <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
         <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>
         <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
         <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
+        <if test="nodeData.warningType!=null and nodeData.warningType!=''">#{nodeData.warningType},</if>
         now()
         )
     </insert>
@@ -429,6 +445,10 @@
         <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
             #{nodeType}
         </foreach>
-        AND site_route =#{monitorCondition.pidRoute} order by pidRoute
+        AND
+        <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
+            site_route like concat ('',#{monitorCondition.pidRoute},'%')
+        </if>
+          order by pidRoute
     </select>
 </mapper>

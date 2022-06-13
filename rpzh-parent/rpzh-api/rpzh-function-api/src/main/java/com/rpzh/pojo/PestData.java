@@ -1,3 +1,4 @@
+
 package com.rpzh.pojo;
 
 import lombok.Data;
@@ -10,35 +11,35 @@ public class PestData {
     private  String gatherTime;
     private  Integer beetleCount;
     private  Integer mealwormCount;
-    private  Integer alartLevel;
+    private  Integer alertLevel;
 
     public PestData() {
     }
 
-    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount,Integer alartLevel) {
+    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount,Integer alertLevel) {
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
         this.beetleCount = beetleCount;
         this.mealwormCount = mealwormCount;
-        this.alartLevel = alartLevel;
+        this.alertLevel = alertLevel;
     }
 
-    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount,Integer alartLevel) {
+    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount,Integer alertLevel) {
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
         this.beetleCount = beetleCount;
-        this.alartLevel = alartLevel;
+        this.alertLevel = alertLevel;
     }
 
-    public PestData(Integer id, String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount ,Integer alartLevel) {
+    public PestData(Integer id, String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount ,Integer alertLevel) {
         this.id = id;
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
         this.beetleCount = beetleCount;
         this.mealwormCount = mealwormCount;
-        this.alartLevel = alartLevel;
+        this.alertLevel = alertLevel;
     }
 }

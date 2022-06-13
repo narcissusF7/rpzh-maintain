@@ -21,7 +21,7 @@ public interface MonitoringCenterService {
 
     Map<String, String> findWarningThreshold();
 
-    List<Double> findAlarmValue(NodeData nodeData);
+    Map<String,Double> findAlarmValue(NodeData nodeData);
 
     List<WeatherDataVo> findWeatherData(MonitorCondition monitorCondition);
 

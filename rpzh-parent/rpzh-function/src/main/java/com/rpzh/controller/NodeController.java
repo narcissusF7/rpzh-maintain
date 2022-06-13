@@ -10,35 +10,25 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.enums.NodeTypeEnum;
-import com.rpzh.service.MaterialService;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.service.NodeService;
-import com.rpzh.util.EasyPoiUtil;
-import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeOperationVo;
 import com.rpzh.vo.NodeVo;
 import io.swagger.annotations.*;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 节点管理
  *
- * @Author liubc
+ * @Author liubc ljj
  * @create 2022/3/3 9:39
  * @Description: good good study,day day up   /node/deleteNode
  */
@@ -52,8 +42,6 @@ public class NodeController {
     NodeOperationService operationService;
     @Autowired
     private NodeService nodeService;
-    @Autowired
-    private MaterialService materialService;
 
     @PostMapping("/addNode")
     @ApiOperation(value = "添加设备")
@@ -557,124 +545,4 @@ public class NodeController {
         return new Result(true, StatusCode.OK, "查询成功", nodeOperationVos);
     }
 
-
-    @ApiOperation(
-            value = "查询设备历史数据"
-    )
-    @ApiImplicitParams({@ApiImplicitParam(
-            name = "nodeId",
-            value = "设备id",
-            dataType = "String",
-            required = true
-    ), @ApiImplicitParam(
-            name = "nodeType",
-            value = "设备类型,默认:01",
-            dataType = "String",
-            required = true
-    ), @ApiImplicitParam(
-            name = "page",
-            value = "当前页数",
-            dataType = "Integer"
-    ), @ApiImplicitParam(
-            name = "size",
-            value = "每页数量",
-            dataType = "Integer"
-    )})
-    @GetMapping({"/findNodeHistory"})
-    public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        PageHelper.startPage(page, size);
-        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
-        return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataVos));
-    }
-
-    @ApiOperation(
-            value = "查询设备历史数据(日数据)"
-    )
-    @ApiImplicitParams({@ApiImplicitParam(
-            name = "nodeId",
-            value = "设备id",
-            dataType = "String",
-            required = true
-    ), @ApiImplicitParam(
-            name = "nodeType",
-            value = "设备类型,默认:01",
-            dataType = "String",
-            required = true
-    ), @ApiImplicitParam(
-            name = "dataType",
-            value = "数据类型",
-            dataType = "Integer",
-            required = true
-    )})
-    @GetMapping({"/findNodeHistoryGraph"})
-    public Result<Map<String, HashMap<String, Double>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
-        List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
-        Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
-                item.getTransferTime().split(" ")[0])));
-        Map<String, HashMap<String, Double>> historyGraphData = new HashMap();
-        if (nodeDto.getDataType() == NodeConstant.HUMITURE_NUMBER) {
-            collect.forEach((k, value) -> {
-                HashMap<String, Double> map = new HashMap();
-                map.put("max", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get());
-                map.put("min", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get());
-                map.put("avg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble());
-                historyGraphData.put(k, map);
-            });
-        } else {
-            collect.forEach((k, value) -> {
-                HashMap<String, Double> map = new HashMap();
-                map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get());
-                map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get());
-                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble());
-                historyGraphData.put(k, map);
-            });
-        }
-
-        return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
-    }
-
-    @ApiOperation(
-            value = "导出历史数据"
-    )
-    @ApiImplicitParams({@ApiImplicitParam(
-            name = "nodeId",
-            value = "设备id",
-            dataType = "String",
-            required = true
-    ), @ApiImplicitParam(
-            name = "nodeType",
-            value = "设备类型",
-            dataType = "String",
-            required = true
-    )})
-    @GetMapping({"/exportNodeHistory"})
-    public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
-        List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
-        EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
-        List<String> columns = new ArrayList<>();
-        //把要导出的字段添加到集合中
-        if (ToolUtil.isEmpty(nodeDto.getNodeType())) {
-            columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
-            if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
-                columns.add("humiture");
-            }
-        }
-
-        //显示要导出的字段
-        nodeHistory.forEach((item) -> {
-            easyPoiUtil.t = item;
-            columns.forEach((column) -> {
-                try {
-                    easyPoiUtil.hihdColumn(column, false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            });
-        });
-        String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
-        EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
-    }
 }

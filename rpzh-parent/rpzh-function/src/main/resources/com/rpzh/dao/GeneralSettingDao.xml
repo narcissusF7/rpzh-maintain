@@ -19,10 +19,10 @@
         select setting_key settingKey ,setting_value settingValue ,setting_name settingName  from tb_general_setting
         <where>
             <if test="generalSetting.settingKey !='' and generalSetting.settingKey !=null">
-                and id =#{generalSetting.settingKey}
+                and setting_key =#{generalSetting.settingKey}
             </if>
             <if test="generalSetting.settingName !='' and generalSetting.settingName !=null">
-                and id =#{generalSetting.settingName}
+                and setting_name =#{generalSetting.settingName}
             </if>
         </where>
     </select>

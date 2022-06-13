@@ -7,32 +7,33 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
-import com.rpzh.dao.AlarmValueSettingDao;
-import com.rpzh.dao.EarlyWarningDao;
-import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.*;
 
-import com.rpzh.dao.WeatherDao;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
+import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
 public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     private static final String CACHE_KEY_REDIS_MAINTAIN = "MAINTAIN_";
+
+    private static final String GENERAL_SETTING_VALUE = "GENERAL_SETTING_VALUE_";
+
     @Autowired
     AlarmValueSettingDao alarmValueSettingDao;
     @Autowired
@@ -45,6 +46,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     @Autowired
     RedisTemplate redisTemplate;
+
+    @Autowired
+    GeneralSettingDao generalSettingDao;
 
     @Autowired
     DataHandler dataHandler;
@@ -62,10 +66,23 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         int pageNum = monitorCondition.getPage();
         int pageSize = monitorCondition.getSize();
 
-        if (monitorCondition.getSortCondition() == 0) {
-            //如果不是仓间温湿度设备并且正常排序 相当于在查找设备时凭借上limit
-            PageHelper.startPage(pageNum, pageSize);
+        Map entries = redisTemplate.opsForHash().entries(GENERAL_SETTING_VALUE + "COLOR");
+        if (ToolUtil.isEmpty(entries)){
+            GeneralSetting generalSetting = new GeneralSetting();
+            generalSetting.setSettingKey("color");
+            List<GeneralSetting> generalSettings = generalSettingDao.findGeneralSetting(generalSetting);
+            entries = new HashMap();
+            entries.put("one",generalSettings.get(0).getSettingValue());
+            entries.put("two",generalSettings.get(1).getSettingValue());
+            entries.put("three",generalSettings.get(2).getSettingValue());
+
         }
+
+
+        if (!ToolUtil.isEmpty(monitorCondition.getPidRoute())){
+            monitorCondition.setPidRoute(monitorCondition.getPidRoute()+",[0"+monitorCondition.getPidRoute().split(",").length+":"+monitorCondition.getSiteId()+"]");
+        }
+
         List<NodeVo> nodeVos;
         //判断是否包含仓间的温湿度设备
         if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())&& Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)){
@@ -80,25 +97,26 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
         nodeDataVos =setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus());
 
-        //如果设备按预警排序  需要手动分页
-        if (monitorCondition.getSortCondition() == 1) {
-            //排序  按预警等级排序
-            nodeDataVos = nodeDataVos.stream().sorted(Comparator.comparing(NodeDataVo::getAlertLevel).reversed()).collect(Collectors.toList());
-            //创建一个page类
-            Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
-            //总数量
-            int total = nodeDataVos.size();
-            page.setTotal(total);
-            //起始下标
-            int startIndex = (pageNum - 1) * pageSize;
-            //终止下标
-            int endIndex = Math.min(startIndex + pageSize, total);
-            //截取数量
-            page.addAll(nodeDataVos.subList(startIndex, endIndex));
-            return new PageInfo<>(page);
-        } else {
-            return new PageInfo<>(nodeDataVos);
+        Stream<NodeDataVo> stream =nodeDataVos.stream();
+        if (monitorCondition.getSortCondition() == 1){
+            //按预警等级排序
+            stream = stream.sorted(Comparator.comparing(NodeDataVo::getAlertLevel).reversed());
         }
+        List<NodeDataVo> collect = stream.collect(Collectors.toList());
+
+        for (int i = 0; i < collect.size(); i++) {
+            if (collect.get(i).getAlertLevel()==1){
+                collect.get(i).setWorningColor(entries.get("one").toString());
+            }else if (collect.get(i).getAlertLevel()==2){
+                collect.get(i).setWorningColor(entries.get("two").toString());
+            }else if (collect.get(i).getAlertLevel()==3){
+                collect.get(i).setWorningColor(entries.get("three").toString());
+            }else {
+                collect.get(i).setWorningColor("");
+            }
+        }
+        Page<NodeDataVo> page = manuallyPage(collect, pageNum, pageSize);
+        return new PageInfo<>(page);
     }
 
     /**
@@ -140,11 +158,11 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      * @return
      */
     @Override
-    public List<Double> findAlarmValue(NodeData nodeData) {
+    public Map<String,Double> findAlarmValue(NodeData nodeData) {
         //该设备需要预警的字段
         String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), nodeData.getSiteType());
         //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
-        List<Double> arrayList = new ArrayList<>();
+        Map<String,Double> map = new HashMap<>();
         //如果是仓间设备
         if (NodeConstant.NODE_WARE_AREA.equals(nodeData.getSiteType())){
             //将位置路由转成map 然后再拼接kv 作为redis的对象名
@@ -153,7 +171,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             String redisHashKey = dataHandler.putAlarmValueToCache(hashKeys, column[0]);
             //获取这些字段的预警值
             for (String alarmColumn : column) {
-                arrayList.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
+                map.put(alarmColumn,Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
             }
         }else {
             Boolean hasKey = redisTemplate.opsForHash().hasKey(CACHE_KEY_REDIS_MAINTAIN + nodeData.getMaintainStageId(), column[0]);
@@ -173,11 +191,11 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 }
             }
             for (int i = 0; i < column.length; i++) {
-                arrayList.add(Double.parseDouble(Objects.requireNonNull(redisTemplate.opsForHash().get(CACHE_KEY_REDIS_MAINTAIN+ + nodeData.getMaintainStageId(), column[0])).toString()));
+                map.put(column[i],Double.parseDouble(Objects.requireNonNull(redisTemplate.opsForHash().get(CACHE_KEY_REDIS_MAINTAIN+ + nodeData.getMaintainStageId(), column[i])).toString()));
             }
         }
 
-        return arrayList;
+        return map;
     }
 
     /**
@@ -191,7 +209,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         for (NodeVo nodeVo : nodeVos) {
             //TODO 获取缓存中该设备的数据 空调数据暂时没有 sql暂用只找仓间温湿度的数据
             Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
-            nodeDataVos.add(JSON.parseObject(data.toString(),NodeDataVo.class));
+            if (!ToolUtil.isEmpty(data)){
+                nodeDataVos.add(JSON.parseObject(data.toString(),NodeDataVo.class));
+            }
         }
         //监控状态筛选 1.正常 2.预警
         if (status==1){
@@ -261,6 +281,22 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             historyGraphData.put(k, map);
         });
         return historyGraphData;
+    }
+
+    public Page<NodeDataVo> manuallyPage(List<NodeDataVo> list ,Integer pageNum , Integer pageSize){
+        //创建一个page类
+        Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
+        //总数量
+        int total = list.size();
+        page.setTotal(total);
+        //起始下标
+        int startIndex = (pageNum - 1) * pageSize;
+        //终止下标
+        int endIndex = Math.min(startIndex + pageSize, total);
+        //截取数量
+        page.addAll(list.subList(startIndex, endIndex));
+
+        return page;
     }
 }
 

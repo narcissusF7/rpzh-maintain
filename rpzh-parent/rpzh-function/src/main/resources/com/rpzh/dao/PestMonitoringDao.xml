@@ -7,16 +7,14 @@
         <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">pest_board_id,</if>
         <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">board_type,</if>
         <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">principal_id,</if>
+        <if test="pestBoardDto.principalName!='' and pestBoardDto.principalName!=null">principal_name,</if>
         <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">site_id,</if>
-        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">site_type,,</if>
+        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">site_type,</if>
         <if test="pestBoardDto.siteName!='' and pestBoardDto.siteName!=null">site_name,</if>
         <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">site_route,</if>
         <if test="pestBoardDto.siteX!='' and pestBoardDto.siteX!=null">site_x,</if>
         <if test="pestBoardDto.siteY!='' and pestBoardDto.siteY!=null">site_y,</if>
         <if test="pestBoardDto.siteZ!='' and pestBoardDto.siteZ!=null">site_z,</if>
-        <if test="pestBoardDto.useDays!='' and pestBoardDto.useDays!=null">use_days,</if>
-        <if test="pestBoardDto.useTimeStart!='' and pestBoardDto.useTimeStart!=null">use_time_start,</if>
-        <if test="pestBoardDto.useTimeEnd!='' and pestBoardDto.useTimeEnd!=null">use_time_end,</if>
         <if test="pestBoardDto.lastUpdatedUser!='' and pestBoardDto.lastUpdatedUser!=null">last_updated_user,</if>
         <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">created_user_id,</if>
         <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">last_updated_user_id,</if>
@@ -29,8 +27,9 @@
         <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">#{pestBoardDto.pestBoardId},</if>
         <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">#{pestBoardDto.boardType},</if>
         <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">#{pestBoardDto.principalId},</if>
+        <if test="pestBoardDto.principalName!='' and pestBoardDto.principalName!=null">#{pestBoardDto.principalName},</if>
         <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">#{pestBoardDto.siteId},</if>
-        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">,#{pestBoardDto.siteType},</if>
+        <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">#{pestBoardDto.siteType},</if>
         <if test="pestBoardDto.siteName!='' and pestBoardDto.siteName!=null">#{pestBoardDto.siteName},</if>
         <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">#{pestBoardDto.siteRoute},</if>
         <if test="pestBoardDto.siteX!='' and pestBoardDto.siteX!=null">#{pestBoardDto.siteX},</if>
@@ -57,13 +56,13 @@
     </update>
     <update id="updateWeekPatrol">
         update tb_pest_patrol set
-          monday   = #{map.1},
-          tuesday  = #{map.2},
-          wednesday= #{map.3},
-          thursday = #{map.4},
-          friday   = #{map.5},
-          saturday = #{map.6},
-          sunday   = #{map.7}
+          monday   = #{map.x1},
+          tuesday  = #{map.x2},
+          wednesday= #{map.x3},
+          thursday = #{map.x4},
+          friday   = #{map.x5},
+          saturday = #{map.x6},
+          sunday   = #{map.x7}
     </update>
     <delete id="deletePestBoard">
         delete from tb_pest_board where id in
@@ -107,7 +106,54 @@
         select pest_board_id pestBoardId , site_type siteType,site_name siteName from tb_pest_board where principal_name = #{principalName}
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
-        select site_route siteRoute  from tb_pest_board where pest_board_id =#{pestBoardId}
+        select pest_board_id pestBoardId, site_route siteRoute  from tb_pest_board where pest_board_id =#{pestBoardId}
+    </select>
+    <select id="findPestBoard" resultType="com.rpzh.vo.PestBoardVo">
+      SELECT
+        	id  as id,
+        	pest_board_id  as pestBoardId,
+        	board_type  as boardType,
+        	principal_id  as principalId,
+        	principal_name  as principalName,
+        	site_id  as siteId,
+        	site_type  as siteType,
+        	site_name  as siteName,
+        	site_route  as siteRoute,
+        	site_x  as siteX,
+        	site_y  as siteY,
+        	site_z  as siteZ,
+        	created_user  as createdUser,
+        	created_time  as createdTime,
+        	last_updated_time  as lastUpdatedTime,
+        	last_updated_user  as lastUpdatedUser,
+        	last_updated_user_id  as lastUpdatedUserId,
+        	remark  as remark
+        FROM
+        	tb_pest_board
+        <where>
+            <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">
+                and pest_board_id like concat('%', #{pestBoardDto.pestBoardId}, '%')
+            </if>
+            <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">
+                and site_route like concat('',#{pestBoardDto.siteRoute}, '%')
+            </if>
+            <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">
+                and principal_id = #{pestBoardDto.principalId}
+            </if>
+        </where>
+        order by principal_id
+    </select>
+    <select id="findPestBoardId" resultType="java.lang.String">
+        select pest_board_id from tb_pest_board
+        <where>
+            <if test="monitorCondition.pidRoute!='' and monitorCondition.pidRoute!=null">
+                and site_route like concat('',#{monitorCondition.pidRoute}, '%');
+            </if>
+            <if test="monitorCondition.siteType!='' and monitorCondition.siteType!=null">
+                and site_type = #{monitorCondition.siteType}
+            </if>
+        </where>
+        order by site_route,site_x,site_y,site_z
     </select>
     <update id="updateSpecialSiteRoute">
         update tb_pest_stack_monitor set prewarning_value_one = #{valueOne} , prewarning_value_two = #{valueTwo},prewarning_value_three = #{valueThree},site_name = #{siteName} where site_route = #{siteRoute}
@@ -118,20 +164,45 @@
     </insert>
     <insert id="exportPestData">
         INSERT INTO tb_pest_data_history
-        (pest_board_id,gather_site,gather_time,beetle_count,alart_level
+        (pest_board_id,gather_site,gather_time,beetle_count,alert_level
         <if test="siteType!='04'">
             ,mealworm_count
         </if>
         )
         VALUES
         <foreach collection="pestDataList" item="pestData" separator=",">
-            (#{pestData.pestBoardId},#{pestData.gatherSite},#{pestData.gatherTime},#{pestData.beetleCount}
+            (#{pestData.pestBoardId},#{pestData.gatherSite},#{pestData.gatherTime},#{pestData.beetleCount},#{pestData.alertLevel}
             <if test="siteType!='04'">
                 ,#{pestData.mealwormCount}
             </if>
-            ,#{pestData.alartLevel}
             )
         </foreach>
     </insert>
+    <insert id="addPestHistory">
+        insert into tb_pest_data_history (pest_board_id,gather_site,gather_time,beetle_count,alert_level
+        <if test="pestDataDto.mealwormCount!='' and pestDataDto.mealwormCount!=null">
+            ,mealworm_count
+        </if>
+        )VALUES(
+        #{pestDataDto.pestBoardId},#{pestDataDto.gatherSite},sysdate(),#{pestDataDto.beetleCount},#{pestDataDto.alertLevel}
+        <if test="pestDataDto.mealwormCount!='' and pestDataDto.mealwormCount!=null">
+            ,#{pestDataDto.mealwormCount}
+        </if>
+        )
+    </insert>
+
+    <select id="findPestDataHistoryByOne" resultType="com.rpzh.vo.PestDataVo">
+        select pest_board_id pestBoardId,gather_site gatherSite , gather_time gatherTime ,beetle_count beetleCount,
+        <if test="pestDataDto.siteType=='04'">
+            mealworm_count mealwormCount
+        </if>
+        alert_level alertLevel from tb_pest_data_history where pest_board_id = #{pestDataDto.pestBoardId}
+        <if test="pestDataDto.beginTime!='' and pestDataDto.beginTime!=null">
+            and gather_time >= #{pestDataDto.beginTime}
+        </if>
+        <if test="pestDataDto.endTime!='' and pestDataDto.endTime!=null">
+            and gather_time  &lt;= #{pestDataDto.endTime}
+        </if>
+    </select>
 
 </mapper>

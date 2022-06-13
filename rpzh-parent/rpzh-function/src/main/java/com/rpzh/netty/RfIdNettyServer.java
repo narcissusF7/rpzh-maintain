@@ -21,11 +21,11 @@ public class RfIdNettyServer {
     @Resource
     private RfIdNettyServerFilter rfIdNettyServerFilter;
 
-//    @PostConstruct
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    ChannelFuture channelFuture;
+    @PostConstruct
     public void init () throws Exception{
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
             //创建服务端的启动对象，设置参数
             ServerBootstrap bootstrap = new ServerBootstrap();
             //设置两个线程组boosGroup和workerGroup
@@ -46,10 +46,14 @@ public class RfIdNettyServer {
                     }*/ rfIdNettyServerFilter);//给workerGroup的EventLoop对应的管道设置处理器
             log.info("java技术爱好者的服务端已经准备就绪...");
             //绑定端口号，启动服务端
-            ChannelFuture channelFuture = bootstrap.bind(6666).sync();
+            channelFuture = bootstrap.bind(6666).sync();
+    }
+
+    public void exitNetty() throws Exception{
+        try{
             //对关闭通道进行监听
             channelFuture.channel().closeFuture().sync();
-        } finally {
+        }finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }

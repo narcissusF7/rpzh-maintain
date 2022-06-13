@@ -303,6 +303,12 @@ public class NodeServiceImpl implements NodeService {
         return updateFlag.get();
     }
 
+    /**
+     * 批量修改设备
+     * @param stackId
+     * @param nodeDtoList
+     * @return
+     */
     public Integer updateNodes(Integer stackId, List<NodeDto> nodeDtoList) {
         nodeDtoList.stream().forEach((nodeDto) -> {
             nodeDto.setStackId(stackId);
@@ -310,17 +316,31 @@ public class NodeServiceImpl implements NodeService {
         return updateNodes(nodeDtoList);
     }
 
+    /**
+     * 通过垛位查询垛位下的所有设备
+     * @param stackId
+     * @return
+     */
     @Override
     public List<NodeVo> findNodeByStackId(Integer stackId) {
         return nodeDao.findNodeByStackId(stackId);
     }
 
+    /**
+     * 查询设备状态
+     * @param id
+     * @return
+     */
     @Override
     public Integer findNodeStatus(Integer id) {
-
         return nodeDao.findNodeStatus(id);
     }
 
+    /**
+     * 查询设备历史记录
+     * @param nodeDto
+     * @return
+     */
     @Override
     public List<NodeDataVo> findNodeHistory(NodeDto nodeDto) {
         NodeTypeEnum nodeType = NodeTypeEnum.getNodeType(nodeDto.getNodeType());

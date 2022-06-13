@@ -123,4 +123,7 @@ public class NodeVo implements Serializable {
     @ApiModelProperty(notes = "预警表Id")
     private Integer alermValueSettingId;
 
+    @ApiModelProperty(notes = "物料代码")
+    private String materialCode;
+
 }

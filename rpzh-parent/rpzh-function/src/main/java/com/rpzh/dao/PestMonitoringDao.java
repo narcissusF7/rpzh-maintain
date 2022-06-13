@@ -1,12 +1,16 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.PestBoardDto;
+import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
 import com.rpzh.pojo.PestData;
+import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.PestBoardVo;
+import com.rpzh.vo.PestDataVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +19,11 @@ public interface PestMonitoringDao {
 
     Integer addPestBoard(@Param("pestBoardDto") PestBoardDto pestBoardDto);
 
-    Integer deletePestBoard(Integer[] ids);
+    Integer deletePestBoard(@Param("ids") List<Integer> ids);
 
     Integer updatePestMonitor(@Param("pestMonitoringRuleDto") PestMonitoringRuleDto pestMonitoringRuleDto);
 
-    Integer updateWeekPatrol(@Param("map") Map<Integer, Integer> map);
+    Integer updateWeekPatrol(@Param("map") Map<String, Integer> map);
 
     List<String> findSpecialSiteRoute(@Param("siteRoutes") List<String> asList);
 
@@ -29,7 +33,7 @@ public interface PestMonitoringDao {
 
     Map<String,Integer> findWeekPatrol();
 
-    Map<String, String> findPestMonitorValue();
+    Map<String, Object> findPestMonitorValue();
 
     List<Map<String, String>> findSpecialSite();
 
@@ -40,4 +44,12 @@ public interface PestMonitoringDao {
     List<Map<String ,String>> findByPrincipalName(@Param("principalName") String principalName);
 
     PestBoardVo findPestBoardByPestBoardId(@Param("pestBoardId") String pestBoardId);
+
+    List<PestBoardVo> findPestBoard(@Param("pestBoardDto") PestBoardDto pestBoardDto);
+
+    List<String> findPestBoardId(@Param("monitorCondition") MonitorCondition monitorCondition);
+
+    List<PestDataVo> findPestDataHistoryByOne(@Param("pestDataDto") PestDataDto pestDataDto);
+
+    Integer addPestHistory(@Param("pestDataDto") PestDataDto pestDataDto);
 }
