@@ -45,6 +45,9 @@
         sysdate(),
         sysdate()
         )
+        <selectKey keyProperty="pestBoardDto.id" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
     </insert>
     <update id="updatePestMonitor">
         update tb_pest_monitor set prewarning_value_one   = #{pestMonitoringRuleDto.valueOne},
@@ -203,6 +206,34 @@
         <if test="pestDataDto.endTime!='' and pestDataDto.endTime!=null">
             and gather_time  &lt;= #{pestDataDto.endTime}
         </if>
+    </select>
+    <select id="findPestBoardCount" resultType="java.lang.Integer">
+        select count(*) from tb_pest_board where pest_board_id = #{pestBoardId}
+    </select>
+    <select id="findPestBoardByRfid" resultType="com.rpzh.entity.Result">
+        select
+            tboard.id  as id,
+        	tboard.pest_board_id  as pestBoardId,
+        	tboard.board_type  as boardType,
+        	tboard.principal_id  as principalId,
+        	tboard.principal_name  as principalName,
+        	tboard.site_id  as siteId,
+        	tboard.site_type  as siteType,
+        	tboard.site_name  as siteName,
+        	tboard.site_route  as siteRoute,
+        	tboard.site_x  as siteX,
+        	tboard.site_y  as siteY,
+        	tboard.site_z  as siteZ,
+        	tboard.created_user  as createdUser,
+        	tboard.created_time  as createdTime,
+        	tboard.last_updated_time  as lastUpdatedTime,
+        	tboard.last_updated_user  as lastUpdatedUser,
+        	tboard.last_updated_user_id  as lastUpdatedUserId,
+        	tboard.remark  as remark
+        FROM
+        	tb_pest_board tboard,tb_rfid_relationship trfid
+        where
+        tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
     </select>
 
 </mapper>

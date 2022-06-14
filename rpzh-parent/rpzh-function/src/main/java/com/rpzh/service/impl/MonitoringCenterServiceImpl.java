@@ -106,13 +106,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
         for (int i = 0; i < collect.size(); i++) {
             if (collect.get(i).getAlertLevel()==1){
-                collect.get(i).setWorningColor(entries.get("one").toString());
+                collect.get(i).setWarningColor(entries.get("one").toString());
             }else if (collect.get(i).getAlertLevel()==2){
-                collect.get(i).setWorningColor(entries.get("two").toString());
+                collect.get(i).setWarningColor(entries.get("two").toString());
             }else if (collect.get(i).getAlertLevel()==3){
-                collect.get(i).setWorningColor(entries.get("three").toString());
+                collect.get(i).setWarningColor(entries.get("three").toString());
             }else {
-                collect.get(i).setWorningColor("");
+                collect.get(i).setWarningColor("");
             }
         }
         Page<NodeDataVo> page = manuallyPage(collect, pageNum, pageSize);

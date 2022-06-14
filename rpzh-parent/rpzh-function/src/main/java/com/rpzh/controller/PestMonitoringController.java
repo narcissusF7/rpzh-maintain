@@ -55,8 +55,8 @@ public class PestMonitoringController {
     })
     @PostMapping("/addPestBoard")
     public Result addPestBoard(@ApiIgnore PestBoardDto pestBoardDto){
-        pestMonitoringService.addPestBoard(pestBoardDto);
-        return new Result(true, StatusCode.OK,"添加成功");
+
+        return pestMonitoringService.addPestBoard(pestBoardDto);
     }
     @ApiOperation("删除虫情板")
     @ApiImplicitParam(name = "ids", value = "id集", dataType = "Integer", required = true,allowMultiple = true)
@@ -208,5 +208,10 @@ public class PestMonitoringController {
         pestMonitoringService.addPestHistory(pestDataDto);
         return new Result(true,StatusCode.OK,"添加成功");
     }
-    //TODO 扫描RFID获取位置 物联网上做还是养护上做
+    @ApiOperation("通过rfid查询虫情板数据")
+    @GetMapping("/findPestBoardByRfid")
+    @ApiImplicitParam(name = "rfid", value = "rfid", dataType = "String", required = true)
+    public Result findPestBoardByRfid(String rfid){
+        return pestMonitoringService.findPestBoardByRfid(rfid);
+    }
 }

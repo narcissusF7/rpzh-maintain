@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public interface PestMonitoringService {
 
-    Integer addPestBoard(PestBoardDto pestBoardDto);
+    Result addPestBoard(PestBoardDto pestBoardDto);
 
     Integer deletePestBoard(Integer[] ids);
 
@@ -40,4 +40,6 @@ public interface PestMonitoringService {
     List<PestDataVo> findPestDataHistoryByOne(PestDataDto pestDataDto);
 
     Integer addPestHistory(PestDataDto pestDataDto);
+
+    Result findPestBoardByRfid(String rfid);
 }

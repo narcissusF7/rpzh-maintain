@@ -111,7 +111,7 @@ public class NodeDataVo {
     @ApiModelProperty(notes = "养护计划阶段id")
     private Integer maintainStageId;
     @ApiModelProperty(notes = "预警颜色")
-    private String worningColor;
+    private String warningColor;
 
     @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
     private String warningType;

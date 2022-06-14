@@ -3,6 +3,7 @@ package com.rpzh.dao;
 import com.rpzh.dto.PestBoardDto;
 import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
+import com.rpzh.entity.Result;
 import com.rpzh.pojo.PestData;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.PestBoardVo;
@@ -52,4 +53,8 @@ public interface PestMonitoringDao {
     List<PestDataVo> findPestDataHistoryByOne(@Param("pestDataDto") PestDataDto pestDataDto);
 
     Integer addPestHistory(@Param("pestDataDto") PestDataDto pestDataDto);
+
+    Integer findPestBoardCount(@Param("pestBoardId") String pestBoardId);
+
+    Result findPestBoardByRfid(@Param("rfid") String rfid);
 }

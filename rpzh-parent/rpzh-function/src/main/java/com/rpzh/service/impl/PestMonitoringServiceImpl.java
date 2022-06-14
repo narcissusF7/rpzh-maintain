@@ -76,7 +76,31 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @return
      */
     @Override
-    public Integer addPestBoard(PestBoardDto pestBoardDto) {
+    public Result addPestBoard(PestBoardDto pestBoardDto) {
+        if (ToolUtil.isEmpty(pestBoardDto.getPestBoardId())){
+            return new Result(false, StatusCode.ERROR,"虫情点位id不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getSiteRoute())){
+            return new Result(false, StatusCode.ERROR,"位置路由不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getRfid())){
+            return new Result(false, StatusCode.ERROR,"rfid不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getSiteId())){
+            return new Result(false, StatusCode.ERROR,"位置id不能为空");
+        }
+
+        Integer pestBoardCount = pestMonitoringDao.findPestBoardCount(pestBoardDto.getPestBoardId());
+
+        if (pestBoardCount>0){
+            return new Result(false, StatusCode.ERROR,"虫情点位id已存在");
+        }
+        Integer rfidCount = rfidRelationshipDao.findRfidCount(pestBoardDto.getRfid());
+
+        if (rfidCount>0){
+            return new Result(false, StatusCode.ERROR,"该rfid已存在");
+        }
+
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -87,10 +111,14 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         pestBoardDto.setSiteType(siteLevel == 4 ? NodeConstant.NODE_WARE_AREA : NodeConstant.NODE_STACK);
         //拼接成自己的路由id
         pestBoardDto.setSiteRoute(pestBoardDto.getSiteRoute() + ",[0" + siteLevel + ":" + pestBoardDto.getSiteId() + "]");
-        Integer addFalg = pestMonitoringDao.addPestBoard(pestBoardDto);
-        //向rfid关系表插入数据
-        rfidRelationshipDao.addRfidRelationship(pestBoardDto.getRfid(),pestBoardDto.getSiteType(),pestBoardDto.getSiteId());
-        return addFalg;
+        synchronized (this){
+            //通过selectKey 将主键id返回到Bean中
+            pestMonitoringDao.addPestBoard(pestBoardDto);
+            //向rfid关系表插入数据
+            rfidRelationshipDao.addRfidRelationship(pestBoardDto.getRfid(),"02",pestBoardDto.getId());
+        }
+
+        return new Result(true,StatusCode.OK,"添加成功");
     }
 
     /**
@@ -101,7 +129,10 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     @Override
     public Integer deletePestBoard(Integer[] ids) {
+        //删除虫情板
         Integer delFalg = pestMonitoringDao.deletePestBoard(Arrays.asList(ids));
+        //删除rfid与虫情板的绑定关系
+        rfidRelationshipDao.deleteRfidRelationship(Arrays.asList(ids),"02");
         return delFalg;
     }
 
@@ -218,9 +249,10 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                     return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
                 }
             }
-
+            //判断预警等级
             Integer level = decideLevel(pestBoardId, beetleCount, mealwormCount);
 
+            //判断表格中是否存在空数据
             if (ToolUtil.isEmpty(pestBoardId) || ToolUtil.isEmpty(gatherSite) || ToolUtil.isEmpty(gatherTime) || ToolUtil.isEmpty(beetleCount)) {
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
             } else {
@@ -230,6 +262,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                     pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount, level);
                 }
             }
+            //将当前行数据存到list中
             pestDataList.add(pestData);
         }
         //执行数据库操作
@@ -522,5 +555,10 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         Integer addFlag = pestMonitoringDao.addPestHistory(pestDataDto);
 
         return addFlag;
+    }
+
+    @Override
+    public Result findPestBoardByRfid(String rfid) {
+        return pestMonitoringDao.findPestBoardByRfid(rfid);
     }
 }
