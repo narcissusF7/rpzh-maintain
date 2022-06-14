@@ -18,4 +18,5 @@ public interface EarlyWarningService {
     Result findEarlyWarning(EarlyWarningDto earlyWarningDto);
     PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto);
     Result findDetailsEarlyWarning(EarlyWarningDto earlyWarningDto);
+    Result findWarningCount(EarlyWarningDto earlyWarningDto);
 }

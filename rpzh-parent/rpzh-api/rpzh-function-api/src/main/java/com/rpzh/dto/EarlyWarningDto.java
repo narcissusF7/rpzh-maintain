@@ -3,6 +3,7 @@ package com.rpzh.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import io.swagger.annotations.ApiModel;
@@ -36,9 +37,9 @@ public class EarlyWarningDto implements Serializable {
 
     private String siteName;
 
-    private String startTime;
+    private Date startTime;
 
-    private String endTime;
+    private Date endTime;
 
     private String materialCode;
 
@@ -57,6 +58,11 @@ public class EarlyWarningDto implements Serializable {
     private List<Integer> stackIds;
 
     private Integer maintainPlanId;
+
+    private Integer count;
+
+    // 时间类型,1:日,2:周,3:月,4:年   默认为月
+    private Integer dayType = 3;
 
     //分页开始页面
     private int page=1;

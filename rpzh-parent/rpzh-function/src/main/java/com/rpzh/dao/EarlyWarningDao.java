@@ -5,10 +5,12 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.WarningCountVo;
+import com.rpzh.vo.WarningOrDealVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface EarlyWarningDao {
@@ -37,4 +39,16 @@ public interface EarlyWarningDao {
     List<EarlyWarningVo> findHistoryWarningInfo(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<EarlyWarningVo> findHistoryWarningData(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningOrDealVo> findCountByMonth();
+
+    Integer findSum(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningOrDealVo> findCountByWarningType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningOrDealVo> findCountByDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningOrDealVo> findCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningOrDealVo> findCountByIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 }
