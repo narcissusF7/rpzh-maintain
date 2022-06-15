@@ -173,6 +173,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         });
 
         Map<String,Object> map = new HashMap<>();
+        map.put("count",earlyWarningDto.getCount());
         map.put("count_type",count);
         map.put("countInfo",countInfo);
         map.put("dealCount",dealCount);
@@ -205,68 +206,91 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     }
     @Override
     public Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto) {
+        List<EarlyWarningVo> earlyWarningVos;
         List<WarningCountVo> warningCount = earlyWarningDao.findEarlyWarningCount(earlyWarningDto);
+        EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
+        Map<String,Object> map = new HashMap<>();
         if(warningCount.size()==0){
-            return new Result<>(true, StatusCode.OK, "查询成功,无预警信息");
+            warningCount = new ArrayList<>();
+            earlyWarningVos = new ArrayList<>();
+            map.put("warningCount",warningCount);
+            map.put("earlyWarningVos",earlyWarningVos);
+            map.put("earlyWarningVo",earlyWarningVo);
+            return new Result<>(true, StatusCode.OK, "查询成功,无预警信息",map);
+        }
+        for (int i = 1; i <= 3; i++) {
+            if (!warningCount.get(i - 1).getWarningType().equals("0" + i)) {
+                WarningCountVo warningCountVo = new WarningCountVo();
+                warningCountVo.setWarningType("0"+i);
+                warningCountVo.setOneWarningCount(0);
+                warningCountVo.setTwoWarningCount(0);
+                warningCountVo.setThreeWarningCount(0);
+                warningCount.add(i - 1, warningCountVo);
+            }
+        }
+        Integer oneWarning = warningCount.get(0).getOneWarningCount()+warningCount.get(1).getOneWarningCount()+warningCount.get(2).getOneWarningCount();
+        Integer twoWarning = warningCount.get(0).getTwoWarningCount()+warningCount.get(1).getTwoWarningCount()+warningCount.get(2).getTwoWarningCount();
+        Integer threeWarning = warningCount.get(0).getThreeWarningCount()+warningCount.get(1).getThreeWarningCount()+warningCount.get(2).getThreeWarningCount();
+        warningCount.remove(2);
+        warningCount.remove(1);
+        if(oneWarning ==0 && twoWarning ==0 && threeWarning ==0){
+            warningCount.remove(0);
+        }
+        if(oneWarning !=0 || twoWarning !=0 || threeWarning !=0){
+            warningCount.get(0).setWarningType("0"+1);
+            warningCount.get(0).setOneWarningCount(oneWarning);
+            warningCount.get(0).setTwoWarningCount(twoWarning);
+            warningCount.get(0).setThreeWarningCount(threeWarning);
         }
         String warningType = warningCount.get(0).getWarningType();
         earlyWarningDto.setWarningType(warningType);
-        String type = "";
-        for (WarningCountVo warningCountVo : warningCount) {
-            type = type+" "+warningCountVo.getWarningType();
-        }
-        WarningCountVo warningCountVo = new WarningCountVo();
-        if(!type.contains("01")){
-            warningCountVo.setWarningType("01");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("02")){
-            warningCountVo.setWarningType("02");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("03")){
-            warningCountVo.setWarningType("03");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("04")){
-            warningCountVo.setWarningType("04");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("05")){
-            warningCountVo.setWarningType("05");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("06")){
-            warningCountVo.setWarningType("06");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("07")){
-            warningCountVo.setWarningType("07");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("08")){
-            warningCountVo.setWarningType("08");
-            warningCount.add(warningCountVo);
-        }
-        if(!type.contains("09")){
-            warningCountVo.setWarningType("09");
-            warningCount.add(warningCountVo);
-        }
-        WarningVo warningVo = new WarningVo();
-        warningVo.setWarningCount(warningCount);
-        List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findEarlyWarning(earlyWarningDto);
+
         if(warningType.equals("01")){
-            earlyWarningVos.forEach(p -> p.setWarningNews("设备丢包"));
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByNode(earlyWarningDto);
+            EarlyWarningVo earlyWarning = earlyWarningVos.get(0);
+            Integer areaId = earlyWarning.getAreaId();
+            Integer stackId = earlyWarning.getStackId();
+            earlyWarningVos.forEach(p -> p.setWarningNews("设备故障"));
+            earlyWarningVo.setWarningType("01");
+            earlyWarningVo.setWarningTime(earlyWarning.getWarningTime());
+            if(ToolUtil.isNotEmpty(stackId)){
+                earlyWarningVo.setSiteName(warehouseDao.findStackById(stackId).getSiteName());
+                earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
+            }
+            if(ToolUtil.isNotEmpty(areaId)){
+                earlyWarningVo.setSiteName(warehouseDao.findWareArea(areaId).getSiteName());
+            }
         }
-        warningVo.setEarlyWarning(earlyWarningVos);
-        return new Result<>(true, StatusCode.OK, "查询成功",warningVo);
+        //05:仓间甲虫预警,07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警,14:仓间粉螟预警
+        else if(warningType.equals("05") || warningType.equals("07") || warningType.equals("09") || warningType.equals("11") || warningType.equals("14")){
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByAreaType(earlyWarningDto);
+            EarlyWarningVo earlyWarning = earlyWarningVos.get(0);
+            Integer areaId = earlyWarning.getAreaId();
+            earlyWarningVo.setWarningType(warningType);
+            earlyWarningVo.setWarningTime(earlyWarning.getWarningTime());
+            earlyWarningVo.setSiteName(warehouseDao.findWareArea(areaId).getSiteName());
+        }
+        //04:垛内甲虫预警,06:垛内氧气预警,08:垛内温度预警,10:垛内湿度预警,12:包芯温度预警,13:平均包芯高于环境预警
+        else{
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByStackType(earlyWarningDto);
+            EarlyWarningVo earlyWarning = earlyWarningVos.get(0);
+            Integer stackId = earlyWarning.getStackId();
+            earlyWarningVo.setWarningType(warningType);
+            earlyWarningVo.setWarningTime(earlyWarning.getWarningTime());
+            earlyWarningVo.setSiteName(warehouseDao.findStackById(stackId).getSiteName());
+            earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
+        }
+        map.put("warningCount",warningCount);
+        map.put("earlyWarningVos",earlyWarningVos);
+        map.put("earlyWarningVo",earlyWarningVo);
+        return new Result<>(true, StatusCode.OK, "查询成功",map);
     }
     @Override
     public Result findEarlyWarning(EarlyWarningDto earlyWarningDto) {
         if(ToolUtil.isEmpty(earlyWarningDto.getWarningType())){
             return new Result<>(false, StatusCode.ERROR, "预警类型不能为空");
         }
-        List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findEarlyWarning(earlyWarningDto);
+        List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findEarlyWarningByNode(earlyWarningDto);
         if(earlyWarningDto.getWarningType().equals("01")){
             earlyWarningVos.forEach(p -> p.setWarningNews("设备丢包"));
         }

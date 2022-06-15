@@ -1,6 +1,7 @@
 package com.rpzh.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -26,9 +27,11 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes = "设备id")
     private String nodeId;
     @ApiModelProperty(notes = "垛位id")
-    private String stackId;
+    private Integer stackId;
     @ApiModelProperty(notes = "位置名称")
     private String siteName;
+    @ApiModelProperty(notes = "物料等级")
+    private String materialCode;
     @ApiModelProperty(notes = "负责人")
     private String principalName;
     @ApiModelProperty(notes = "是否确认,0:误报,1:已预警,2,未确认")
@@ -58,4 +61,6 @@ public class EarlyWarningVo {
     private String remark;
     @ApiModelProperty(notes = "处理措施")
     private String dealSuggestion;
+    @ApiModelProperty(notes = "仓间id")
+    private Integer areaId;
 }

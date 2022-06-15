@@ -1,5 +1,6 @@
 package com.rpzh.controller;
 
+import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -7,6 +8,9 @@ import com.rpzh.service.MaintainPlanService;
 import com.rpzh.service.MaterialService;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaterialVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -33,6 +37,10 @@ public class MaterialController {
      * @return
      */
     @PostMapping(value = "/findMaterialInfo")
+    @ApiOperation(value = "通过位置id查找物料信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "stackId", value = "垛位Id", required = true, dataType = "Integer")
+    })
     public Result findMaterialInfo(Integer stackId){
         if(stackId == null){
             return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
@@ -49,11 +57,18 @@ public class MaterialController {
     }
 
     @PostMapping("/findAlarmValueSetting")
-    public Result findAlarmValueSetting(@RequestParam(value ="materialCodes")List<String> materialCodes,@RequestParam(value ="stackId")Integer stackId){
-        if(materialCodes.size()==0){
+    @ApiOperation(value = "根据物流代码、养护方式、养护阶段查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "String")
+    })
+    public Result findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto){
+        if(ToolUtil.isEmpty(alarmValueSettingDto.getMaterialCodes()) || ToolUtil.isEmpty(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "物料代码不能为空!");
         }
-        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(materialCodes,stackId);
+        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(alarmValueSettingDto);
         return new Result(true, StatusCode.OK, "查询预警设置值成功!", alarmValueSettingVo);
     }
 }

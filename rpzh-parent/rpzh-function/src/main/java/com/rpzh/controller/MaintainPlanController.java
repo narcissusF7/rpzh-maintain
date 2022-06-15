@@ -287,7 +287,9 @@ public class MaintainPlanController {
         phases.add("养护阶段");
         phases.add("充氮杀虫阶段");
         phases.add("磷化铝杀虫阶段");
-        phases.add("充氮保质阶段");
+        if(maintenceStyle.equals("机械调控")) {
+            phases.add("充氮保质阶段");
+        }
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 

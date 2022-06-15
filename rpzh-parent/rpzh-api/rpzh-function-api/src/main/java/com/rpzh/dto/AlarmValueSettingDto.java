@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zyq
@@ -103,7 +104,8 @@ public class AlarmValueSettingDto {
     private String phases;
     private String maintenceStyle;
     private String materialCode;
-
+    private List<String> materialCodes;
+    private String pidRoute;
     /**
      * 制定时间
      */
@@ -131,6 +133,7 @@ public class AlarmValueSettingDto {
     private Date startTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
+    public AlarmValueSettingDto(){}
     public AlarmValueSettingDto(MaintainPlanDto maintainPlanDto){
       this.stackOxygenUpperOne =maintainPlanDto.getStackOxygenUpperOne();
       this.stackOxygenUpperTwo =maintainPlanDto.getStackOxygenUpperTwo();

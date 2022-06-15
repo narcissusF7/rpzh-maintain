@@ -4,9 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.EarlyWarningVo;
-import com.rpzh.vo.WarningVo;
-
-import java.util.List;
 
 /**
  * @Author: zyq

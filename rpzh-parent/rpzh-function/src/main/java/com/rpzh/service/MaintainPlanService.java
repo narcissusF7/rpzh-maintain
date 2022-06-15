@@ -1,6 +1,7 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.entity.Result;
 import com.rpzh.dto.MaintainPlanDto;
@@ -66,5 +67,5 @@ public interface MaintainPlanService {
 
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 
-    AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes,Integer stackId);
+    AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto);
 }

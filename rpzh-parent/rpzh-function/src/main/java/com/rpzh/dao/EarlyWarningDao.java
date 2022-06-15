@@ -16,7 +16,7 @@ import java.util.Set;
 public interface EarlyWarningDao {
     List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<EarlyWarningVo> findEarlyWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<EarlyWarningVo> findEarlyWarningByNode(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
@@ -51,4 +51,8 @@ public interface EarlyWarningDao {
     List<WarningOrDealVo> findCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<WarningOrDealVo> findCountByIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findEarlyWarningByStackType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findEarlyWarningByAreaType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 }

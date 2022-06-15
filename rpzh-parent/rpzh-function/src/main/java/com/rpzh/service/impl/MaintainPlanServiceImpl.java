@@ -573,10 +573,12 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
-    public AlarmValueSettingVo findAlarmValueSetting(List<String> materialCodes,Integer stackId) {
+    public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
+        List<String> materialCodes = alarmValueSettingDto.getMaterialCodes();
         for (String materialCode : materialCodes) {
-            alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(materialCode);
+            alarmValueSettingDto.setMaterialCode(materialCode);
+            alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(alarmValueSettingDto);
             if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
                 break;
             }
@@ -584,8 +586,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         if(ToolUtil.isEmpty(alarmValueSettingVo)){
             alarmValueSettingVo = new AlarmValueSettingVo();
         }
-        StackVo stackVo = warehouseDao.findPidRoute(stackId);
-        String pidRoute = stackVo.getPidRoute();
+        //向上查找仓间预警数值
+        String pidRoute = alarmValueSettingDto.getPidRoute();
         Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
         alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
         return alarmValueSettingVo;

@@ -10,8 +10,6 @@ import java.util.List;
 @Mapper
 public interface AlarmValueSettingDao {
 
-    AlarmValueSettingVo findAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
-
     AlarmValueSettingVo findAlarmValueSettingById(@Param("alarmValueSettingId") Integer alarmValueSettingId);
 
     Integer updateAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
@@ -22,11 +20,7 @@ public interface AlarmValueSettingDao {
 
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 
-    Integer isExistEarlyWarningRuleName(@Param("earlyWarningRuleName") String earlyWarningRuleName);
-
-    String findEarlyWarningRuleName(@Param("id")Integer id);
-
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
 
-    AlarmValueSettingVo findByMaterialCode(@Param("materialCode") String materialCode);
+    AlarmValueSettingVo findByMaterialCode(@Param("alarmValueSettingDto")AlarmValueSettingDto alarmValueSettingDto);
 }
