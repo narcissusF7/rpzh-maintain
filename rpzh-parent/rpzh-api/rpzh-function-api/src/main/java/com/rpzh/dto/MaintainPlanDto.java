@@ -194,5 +194,5 @@ public class MaintainPlanDto {
     /**
      * 该养护计划下的所有设备
      */
-    NodeDto[] nodeDtoList;
+    List<String> nodeDtoList;
 }

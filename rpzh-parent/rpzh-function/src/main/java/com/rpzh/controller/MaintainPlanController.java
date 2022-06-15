@@ -1,6 +1,8 @@
 package com.rpzh.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.rabbitmq.client.Return;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.dto.NodeDto;
@@ -429,14 +431,7 @@ public class MaintainPlanController {
     })
     @PostMapping({"/moveStack"})
     public Result moveStack(MaintainPlanDto maintainPlanDto) {
-        //TODO  根据情况修改
-        NodeDto[] nodeDtoList = maintainPlanDto.getNodeDtoList();
-        if (maintainPlanDto.getStackId().equals(nodeDtoList[0].getStackId())) {
-            return new Result<>(false, StatusCode.ERROR, "垛位没有移动!");
-        } else {
-            Integer result = maintainPlanService.moveStack(maintainPlanDto);
-            return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);
-        }
+        return maintainPlanService.moveStack(maintainPlanDto);
     }
 
 

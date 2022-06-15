@@ -1,6 +1,7 @@
 package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.*;
 import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.*;
@@ -463,34 +464,42 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     @Transactional
-    public Integer moveStack(MaintainPlanDto maintainPlanDto) {
-        //该养护计划下的所有设备
-        List<NodeDto> nodeDtoList = Arrays.asList(maintainPlanDto.getNodeDtoList());
-        //新的垛位id
-        Integer stackId = maintainPlanDto.getStackId();
-        //新的位置路由
-        String siteRoute = maintainPlanDto.getPidRoute()+",[05:"+stackId+"]";
-        //新的位置名称
-        String siteName = maintainPlanDto.getSiteName();
+    public Result moveStack(MaintainPlanDto maintainPlanDto) {
 
-        //判断目标垛位是否存在养护计划
-        Integer count = maintainPlanDao.findStackCountByStackId(stackId);
-        if (count > 0) {
-            return -1;
+        List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        List<NodeDto> nodeDtos = new ArrayList<>();
+        nodeDtoList.forEach(nodeDtostr ->
+                nodeDtos.add(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
+        if (maintainPlanDto.getStackId().equals(nodeDtos.get(0).getStackId())) {
+            return new Result(false, StatusCode.ERROR, "垛位没有移动!");
         } else {
-            //修改养护计划
-            Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
-            if (flag > 0) {
-                //修改垛位信息
-                nodeDtoList.forEach((nodeDto) -> {
-                    nodeDto.setStackId(stackId);
-                    nodeDto.setSiteRoute(siteRoute);
-                    nodeDto.setGatherSite(siteName);
-                    nodeDto.setStack(siteName);
-                    nodeDao.updateNode(nodeDto);
-                });
+            //新的垛位id
+            Integer stackId = maintainPlanDto.getStackId();
+            //新的位置路由
+            String siteRoute = maintainPlanDto.getPidRoute()+",[05:"+stackId+"]";
+            //新的位置名称
+            String siteName = maintainPlanDto.getSiteName();
+
+            //判断目标垛位是否存在养护计划
+            Integer count = maintainPlanDao.findStackCountByStackId(stackId);
+            if (count > 0) {
+                return new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!");
+            } else {
+                //修改养护计划
+                Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
+                if (flag > 0) {
+                    //修改垛位信息
+                    nodeDtos.forEach((nodeDto) -> {
+                        nodeDto.setStackId(stackId);
+                        nodeDto.setSiteRoute(siteRoute);
+                        nodeDto.setGatherSite(siteName);
+                        nodeDto.setStack(siteName);
+                        nodeDao.updateNode(nodeDto);
+                    });
+                    return new Result(true, StatusCode.OK, "移垛成功!");
+                }
+                return new Result(false, StatusCode.ERROR, "养护计划修改失败!");
             }
-            return flag;
         }
     }
 

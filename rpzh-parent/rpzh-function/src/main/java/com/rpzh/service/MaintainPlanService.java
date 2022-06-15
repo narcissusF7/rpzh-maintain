@@ -63,7 +63,7 @@ public interface MaintainPlanService {
 
     PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto);
 
-    Integer moveStack(MaintainPlanDto maintainPlanDto);
+    Result moveStack(MaintainPlanDto maintainPlanDto);
 
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 
