@@ -91,7 +91,7 @@ public class NodeController {
             dataType = "String"
     ), @ApiImplicitParam(
             name = "nodeType",
-            value = "设备类型,默认:01",
+            value = "设备类型",
             required = true,
             dataType = "String"
     ), @ApiImplicitParam(
@@ -335,7 +335,7 @@ public class NodeController {
             //设置主键id
             nodeDto.setId(Integer.parseInt(map.get("id").toString()));
             //如果是垛内设备
-            if ("5".equals(map.get("level"))) {
+            if (Integer.parseInt(map.get("level").toString())==5) {
                 //设置设备所在垛位的id
                 nodeDto.setStackId(Integer.parseInt(map.get("stackId").toString()));
                 //设置采集位置类型
@@ -359,7 +359,7 @@ public class NodeController {
                 }
 
                 //如果是仓间设备
-            } else if ("4".equals(map.get("level"))) {
+            } else if (Integer.parseInt(map.get("level").toString())==4) {
                 //设置位置路由
                 nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[04:"+map.get("stackId")+"]");
                 //设置采集位置
@@ -508,7 +508,11 @@ public class NodeController {
 //    }
     @ApiOperation(value = "翻垛")
     @PostMapping({"/flipStack"})
-    @ApiImplicitParam(name = "data",value = "翻垛的数据集",dataType = "String",required = true)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "data",value = "翻垛的数据集 ",dataType = "String",required = true),
+            @ApiImplicitParam(name = "",value = "翻垛的数据集 ",dataType = "String",required = true),
+            @ApiImplicitParam(name = "data",value = "翻垛的数据集 ",dataType = "String",required = true),
+    })
     public Result flipStack(String data) {
 
         Integer updateFlag = nodeService.updateNodes(data);

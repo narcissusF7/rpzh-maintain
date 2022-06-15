@@ -1,5 +1,6 @@
 package com.rpzh.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
@@ -13,14 +14,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpRequest;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author liubc
@@ -153,7 +154,7 @@ public class TestContrller {
             dataType = "String",
             allowMultiple = true
     ), @ApiImplicitParam(
-            name = "DateTime",
+            name = "dateTime",
             value = "传输时间",
             dataType = "String",
             allowMultiple = true
@@ -177,6 +178,13 @@ public class TestContrller {
     @PostMapping("testParseData")
     public Result testParseData(@ApiIgnore ParseData parseData){
         dataHandler.handlerData(parseData);
+        return new Result<>(true, StatusCode.OK, "测试方法4");
+    }
+    @PostMapping("five")
+    public Result five(String map){
+//        dataHandler.handlerData(parseData);
+
+        JSONObject.parseObject(map,Map.class);
         return new Result<>(true, StatusCode.OK, "测试方法4");
     }
 }

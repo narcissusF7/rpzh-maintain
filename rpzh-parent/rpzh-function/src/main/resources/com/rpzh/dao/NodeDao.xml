@@ -178,6 +178,7 @@
             <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
             <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
             <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+            <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
             <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
             <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
             STATUS = '1',

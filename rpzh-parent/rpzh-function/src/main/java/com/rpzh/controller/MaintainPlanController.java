@@ -25,10 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author wbl
@@ -419,16 +416,21 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询历史汇总单成功",maintainPlanVos);
     }
 
-    /**
-     * 移垛
-     * @param maintainPlanDto
-     * @return
-     */
+    @ApiOperation(value = "移垛")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", dataType = "Integer",required = true),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
+            @ApiImplicitParam(name = "nodeDtoList", value = "该养护计划下的所有垛位", required = true,allowMultiple = true,dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
+            @ApiImplicitParam(name = "siteName", value = "位置名称",dataType = "String"),
+            @ApiImplicitParam(name = "xxxx", value = "nodeDto扩展说明  id|nodeId|nodeType|x|y|z  用，隔开",dataType ="int")
+    })
     @PostMapping({"/moveStack"})
-    public Result<T> moveStack(@RequestBody MaintainPlanDto maintainPlanDto) {
-        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
-        if (maintainPlanDto.getStackId().equals(((NodeDto) nodeDtoList.get(0)).getStackId())) {
-            return new Result<>(false, 20001, "垛位没有移动!");
+    public Result moveStack(MaintainPlanDto maintainPlanDto) {
+        //TODO  根据情况修改
+        NodeDto[] nodeDtoList = maintainPlanDto.getNodeDtoList();
+        if (maintainPlanDto.getStackId().equals(nodeDtoList[0].getStackId())) {
+            return new Result<>(false, StatusCode.ERROR, "垛位没有移动!");
         } else {
             Integer result = maintainPlanService.moveStack(maintainPlanDto);
             return result == -1 ? new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!") : new Result<>(true, StatusCode.OK, "移垛成功!", result);

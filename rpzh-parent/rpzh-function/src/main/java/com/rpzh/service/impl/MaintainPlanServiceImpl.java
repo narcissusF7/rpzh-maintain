@@ -464,16 +464,29 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     @Transactional
     public Integer moveStack(MaintainPlanDto maintainPlanDto) {
-        List<NodeDto> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        //该养护计划下的所有设备
+        List<NodeDto> nodeDtoList = Arrays.asList(maintainPlanDto.getNodeDtoList());
+        //新的垛位id
         Integer stackId = maintainPlanDto.getStackId();
+        //新的位置路由
+        String siteRoute = maintainPlanDto.getPidRoute()+",[05:"+stackId+"]";
+        //新的位置名称
+        String siteName = maintainPlanDto.getSiteName();
+
+        //判断目标垛位是否存在养护计划
         Integer count = maintainPlanDao.findStackCountByStackId(stackId);
         if (count > 0) {
             return -1;
         } else {
+            //修改养护计划
             Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
             if (flag > 0) {
+                //修改垛位信息
                 nodeDtoList.forEach((nodeDto) -> {
                     nodeDto.setStackId(stackId);
+                    nodeDto.setSiteRoute(siteRoute);
+                    nodeDto.setGatherSite(siteName);
+                    nodeDto.setStack(siteName);
                     nodeDao.updateNode(nodeDto);
                 });
             }

@@ -134,12 +134,11 @@ public class NodeOperateAspect {
                     break;
                 case NodeConstant.MOVE_STACK_NODE_OPERATE_NUMBER:
                     MaintainPlanDto maintainPlanDto = (MaintainPlanDto) args[0];
-                    nodeDtos = maintainPlanDto.getNodeDtoList();
+                    nodeDtos = Arrays.asList(maintainPlanDto.getNodeDtoList());
                     nodeDtos.forEach(nodeDto1 ->
                             setValue(nodeOperationDto,nodeDto1,
                                     "养护计划"+maintainPlanDto.getId() +"移垛至垛位"+maintainPlanDto.getStackId()+"，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos)
                     );
-
                 default:
                     break;
 
