@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -334,6 +335,14 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public Integer findNodeStatus(Integer id) {
         return nodeDao.findNodeStatus(id);
+    }
+
+    @Override
+    public Result flipStack(MaintainPlanDto maintainPlanDto) {
+        List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
+        nodeDtoList.forEach(nodeDtostr ->
+                    nodeDao.updateNode(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
+        return new Result(true,StatusCode.OK,"翻垛成功");
     }
 
     /**

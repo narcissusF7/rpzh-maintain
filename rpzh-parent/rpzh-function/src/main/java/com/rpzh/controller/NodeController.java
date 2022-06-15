@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.ExcelUtils;
@@ -497,26 +498,18 @@ public class NodeController {
         return new Result(true, StatusCode.OK, "查询成功", nodeVoList);
     }
 
-
-//    @ApiOperation(
-//            value = "翻垛"
-//    )
-//    @PostMapping({"/flipStack"})
-//    public Result flipStack(@RequestBody @ApiIgnore List<NodeDto> nodeDtoList) {
-//        Integer updateFlag = nodeService.updateNodes(nodeDtoList);
-//        return new Result(true, StatusCode.OK, "翻垛成功");
-//    }
     @ApiOperation(value = "翻垛")
     @PostMapping({"/flipStack"})
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "data",value = "翻垛的数据集 ",dataType = "String",required = true),
-            @ApiImplicitParam(name = "",value = "翻垛的数据集 ",dataType = "String",required = true),
-            @ApiImplicitParam(name = "data",value = "翻垛的数据集 ",dataType = "String",required = true),
-    })
-    public Result flipStack(String data) {
+            @ApiImplicitParam(name = "id", value = "养护计划id", dataType = "Integer",required = true),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
+            @ApiImplicitParam(name = "nodeDtoList", value = "该养护计划下的所有垛位", required = true,allowMultiple = true,dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
+            @ApiImplicitParam(name = "siteName", value = "位置名称",dataType = "String")
 
-        Integer updateFlag = nodeService.updateNodes(data);
-        return new Result(true, StatusCode.OK, "翻垛成功");
+    })
+    public Result flipStack(MaintainPlanDto maintainPlanDto) {
+        return nodeService.flipStack(maintainPlanDto);
     }
 
     @ApiOperation(

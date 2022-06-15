@@ -427,7 +427,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "nodeDtoList", value = "该养护计划下的所有垛位", required = true,allowMultiple = true,dataType = "String"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
             @ApiImplicitParam(name = "siteName", value = "位置名称",dataType = "String"),
-            @ApiImplicitParam(name = "xxxx", value = "nodeDto扩展说明  id|nodeId|nodeType|x|y|z  用，隔开",dataType ="int")
     })
     @PostMapping({"/moveStack"})
     public Result moveStack(MaintainPlanDto maintainPlanDto) {

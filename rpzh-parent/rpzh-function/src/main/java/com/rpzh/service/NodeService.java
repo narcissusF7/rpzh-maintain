@@ -1,6 +1,7 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.NodeDataVo;
@@ -126,6 +127,7 @@ public interface NodeService {
     List<NodeVo> testFindNode(String nodeId, String nodeType, String createTime,String startTime,String endTime);
 
     Integer updateNodes(List<NodeDto> nodeDtoList);
+
     Integer updateNodes(String data);
 
     List<NodeDataVo> findNodeHistory(NodeDto nodeDto);
@@ -133,4 +135,6 @@ public interface NodeService {
     List<NodeVo> findNodeByStackId(Integer stackId);
 
     Integer findNodeStatus(Integer id);
+
+    Result flipStack(MaintainPlanDto maintainPlanDto);
 }

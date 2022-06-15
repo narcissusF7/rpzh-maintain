@@ -79,6 +79,10 @@ public class NodeOperateAspect {
 
             List<NodeDto> nodeDtos;
 
+            MaintainPlanDto maintainPlanDto;
+
+            List<String> nodeDtoList;
+
             List<NodeOperationDto> nodeOperationDtos = new ArrayList<>();
 
         /*
@@ -126,21 +130,23 @@ public class NodeOperateAspect {
                     setValue(nodeOperationDto,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
                     break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
-                    nodeDtos = (List<NodeDto>) args[0];
-                    nodeDtos.forEach(nodeDto1 ->
-                            setValue(nodeOperationDto,nodeDto1,
-                                    "垛位"+nodeDto1.getStack() +"翻垛，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos)
-                    );
-                    break;
-                case NodeConstant.MOVE_STACK_NODE_OPERATE_NUMBER:
-                    MaintainPlanDto maintainPlanDto = (MaintainPlanDto) args[0];
-                    List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
+                    maintainPlanDto = (MaintainPlanDto) args[0];
+                    nodeDtoList = maintainPlanDto.getNodeDtoList();
                     nodeDtoList.forEach(nodeDtostr ->{
                         NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
-                                setValue(nodeOperationDto,nodeDto1,
-                                        "养护计划"+maintainPlanDto.getId() +"移垛至垛位"+maintainPlanDto.getStackId()+"，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
-                            }
-                            );
+                        setValue(nodeOperationDto,nodeDto1,
+                                "垛位"+nodeDto1.getStack() +"翻垛，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
+                    });
+
+                    break;
+                case NodeConstant.MOVE_STACK_NODE_OPERATE_NUMBER:
+                    maintainPlanDto = (MaintainPlanDto) args[0];
+                    nodeDtoList = maintainPlanDto.getNodeDtoList();
+                    nodeDtoList.forEach(nodeDtostr ->{
+                        NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
+                        setValue(nodeOperationDto,nodeDto1,
+                                "养护计划"+maintainPlanDto.getId() +"移垛至垛位"+maintainPlanDto.getStackId()+"，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
+                    });
                 default:
                     break;
 
