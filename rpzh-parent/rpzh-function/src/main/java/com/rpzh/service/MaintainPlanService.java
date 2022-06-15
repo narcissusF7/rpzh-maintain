@@ -68,4 +68,8 @@ public interface MaintainPlanService {
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 
     AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto);
+
+    MaintainPlanVo beforeChangeMaintainPlanStage(Integer id);
+
+    List<String> beforeChangePhases(Integer stackId,String maintenceStyle);
 }

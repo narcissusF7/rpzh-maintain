@@ -204,13 +204,23 @@ public class MaintainPlanController {
     }
 
     @PostMapping("/beforeUpdateMaintainPlan")
-    @ApiOperation(value = "更改养护计划前回显")
+    @ApiOperation(value = "更改前回显")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
     public Result<MaintainPlanVo> beforeUpdateMaintainPlan(Integer id){
         MaintainPlanVo maintainPlan = maintainPlanService.beforeUpdateMaintainPlan(id);
-        return new Result<MaintainPlanVo>(true, StatusCode.OK, "回显成功",maintainPlan);
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "更改前回显成功",maintainPlan);
+    }
+
+    @PostMapping("/beforeChangeMaintainPlanStage")
+    @ApiOperation(value = "转段前回显")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
+    })
+    public Result<MaintainPlanVo> beforeChangeMaintainPlanStage(Integer id){
+        MaintainPlanVo maintainPlan = maintainPlanService.beforeChangeMaintainPlanStage(id);
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "转段前回显成功",maintainPlan);
     }
     /**
      * 更改养护计划
@@ -292,6 +302,17 @@ public class MaintainPlanController {
         if(maintenceStyle.equals("机械调控")) {
             phases.add("充氮保质阶段");
         }
+        return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
+    }
+
+    @PostMapping("/beforeChangePhases")
+    @ApiOperation(value = "转段时的养护阶段列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "Integer")
+    })
+    public Result beforeChangePhases(Integer stackId,String maintenceStyle){
+        List<String> phases = maintainPlanService.beforeChangePhases(stackId, maintenceStyle);
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 

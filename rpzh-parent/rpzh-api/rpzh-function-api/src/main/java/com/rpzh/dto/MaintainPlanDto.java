@@ -19,7 +19,6 @@ public class MaintainPlanDto {
      * 物料代码
      */
     private List<String> materialCodes;
-    private String materialBatchNum;
     private String materialCode;
     private Integer stageId;
     private String pidRoute;

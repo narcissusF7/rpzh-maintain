@@ -28,6 +28,9 @@
        from tb_alarm_value_setting
        where id = #{alarmValueSettingId}
    </select>
+    <update id="changeStatus">
+        update tb_alarm_value_setting set update_user=#{alarmValueSettingDto.updateUser} and updated_time=#{alarmValueSettingDto.updatedTime} and status = '0' where id = #{alarmValueSettingDto.alarmValueSettingId}
+    </update>
     <update id="updateAlarmValueSetting">
         update tb_alarm_value_setting
         <set>
@@ -112,7 +115,7 @@
         )
     </insert>
     <select id="findMaxId" resultType="java.lang.Integer">
-        select max(Id) from tb_alarm_value_setting
+        select max(Id) from tb_alarm_value_setting where early_warning_rule_name = #{earlyWarningRuleName}
     </select>
     <delete id="deleteIds">
         delete from tb_alarm_value_setting where

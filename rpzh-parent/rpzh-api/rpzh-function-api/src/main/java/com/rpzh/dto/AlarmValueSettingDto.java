@@ -119,11 +119,6 @@ public class AlarmValueSettingDto {
     private String createUser;
     private String updateUser;
 
-    /**
-     * 物料代码与烟叶年份
-     */
-    private String materialCodeYear;
-
     private Integer alarmValueSettingId;
 
     private Integer size=10;

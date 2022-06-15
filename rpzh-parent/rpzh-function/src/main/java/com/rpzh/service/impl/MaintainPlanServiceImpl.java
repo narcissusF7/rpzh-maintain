@@ -15,6 +15,7 @@ import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -72,7 +73,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
         Integer stackId = maintainPlanDto.getStackId();
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
-        maintainPlanDto.setPrincipalId(principalIds.toString().replaceAll("\\[","").replaceAll("\\]","").replaceAll(" ",""));
+        maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
         maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",",materialCodes));
@@ -80,18 +81,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String createUser = TokenDecode.getUserInfo().get("username");
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(nowDate);
-        String hours = new SimpleDateFormat("HH:mm:ss").format(new Date());
-        maintainPlanDto.setOxygenReductionTime(maintainPlanDto.getOxygenReductionTime().replace("00:00:00", hours));
-        Date date = null;
-        date = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+        Date date  = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
-        maintainPlanDto.setAftercareDateStart(maintainPlanDto.getAftercareDateStart().replace("00:00:00", hours));
-        maintainPlanDto.setExpireTime(maintainPlanDto.getExpireTime().replace("00:00:00", hours));
         maintainPlanDao.insertMaintainPlan(maintainPlanDto);
         Integer id =maintainPlanDao.findMaxPlanId(stackId);
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
-        String pidRoute = maintainPlanDto.getPidRoute();
+        String pidRoute = maintainPlanDto.getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
         for (String materialCode : materialCodes) {
             Double count = materialDao.findCount(stackId, materialCode);
             maintainPlanDao.insertMaintainCount(materialCode,count,id,pidRoute,maintenceStyle,phases,nowDate);
@@ -99,7 +95,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setId(id);
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-        Integer alarmValueSettingId = alarmValueSettingDao.findMaxId();
+        Integer alarmValueSettingId = alarmValueSettingDao.findMaxId(alarmValueSettingDto.getEarlyWarningRuleName());
         maintainPlanDto.setAlarmValueSettingId(alarmValueSettingId);
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
         Integer stageId = maintainPlanDao.findMaxStageId(id);
@@ -210,7 +206,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String pidRoute = stackVo.getPidRoute();
         alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
-        log.debug("alarmValueSettingVo1:{}",alarmValueSettingVo);
         Integer areaId = stackVo.getAreaId();
         List<String> conditioningDatas = airConditioningDao.findAirConditioningData(areaId);
         Map<String, Object> nodeDate = getNodeDate("05", stackId, null);
@@ -255,6 +250,40 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         return maintainPlanVo;
+    }
+
+    @Override
+    public MaintainPlanVo beforeChangeMaintainPlanStage(Integer id) {
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
+        MaintainPlanVo maintainPlanVo1 = new MaintainPlanVo();
+        String pidRoute = warehouseDao.findPidRoute(maintainPlanVo.getStackId()).getPidRoute();
+        maintainPlanVo1.setAlarmValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+        maintainPlanVo1.setStackId(maintainPlanVo.getStackId());
+        maintainPlanVo1.setPidRoute(pidRoute);
+        maintainPlanVo1.setMaterialCode(maintainPlanVo.getMaterialCode());
+        maintainPlanVo1.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
+        maintainPlanVo1.setStackName(maintainPlanVo.getStackName());
+        maintainPlanVo1.setPrincipalIds(Arrays.asList(maintainPlanVo.getPrincipalId().split(",")));
+        maintainPlanVo1.setMaintenceStyle(maintainPlanVo.getMaintenceStyle());
+        return maintainPlanVo1;
+    }
+
+    @Override
+    public List<String> beforeChangePhases(Integer stackId,String maintenceStyle) {
+        List<String> phases = new ArrayList<>();
+        phases.add("养护阶段");
+        phases.add("充氮杀虫阶段");
+        phases.add("磷化铝杀虫阶段");
+        if(maintenceStyle.equals("机械调控")) {
+            phases.add("充氮保质阶段");
+        }
+        List<String> phases1 = maintainPlanDao.findPhases(stackId, maintenceStyle);
+        for (String s : phases1) {
+            if(phases.contains(s)){
+                phases.remove(s);
+            }
+        }
+        return phases;
     }
 
     public Map<String,Object> getNodeDate(String siteType,Integer stackId,String pidRoute){
@@ -320,20 +349,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         Integer stackId = maintainPlanDto.getStackId();
-        maintainPlanDto.setPrincipalId(principalIds.toString().replaceAll("\\[","").replaceAll("\\]","").replaceAll(" ",""));
+        maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
         maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
         String updateUser = TokenDecode.getUserInfo().get("username");
         Date nowDate = new Date();
         maintainPlanDto.setUpdateUser(updateUser);
         maintainPlanDto.setUpdatedTime(nowDate);
-        String hours = new SimpleDateFormat("HH:mm:ss").format(nowDate);
-        maintainPlanDto.setOxygenReductionTime(maintainPlanDto.getOxygenReductionTime().replace("00:00:00", hours));
-        Date date = null;
-        date = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+        Date date = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
-        maintainPlanDto.setAftercareDateStart(maintainPlanDto.getAftercareDateStart().replace("00:00:00", hours));
-        maintainPlanDto.setExpireTime(maintainPlanDto.getExpireTime().replace("00:00:00", hours));
         maintainPlanDao.updateMaintainPlan(maintainPlanDto);
         maintainPlanDao.updateMaintainPlanStage(maintainPlanDto);
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
@@ -370,11 +394,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             redisTemplate.opsForHash().delete(MAINTAIN + maintainPlanDto.getStageId());
         }
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
-        maintainPlanDto.setPrincipalId(principalIds.toString().replaceAll("\\[","").replaceAll("\\]","").replaceAll(" ",""));
+        List<String> materialCodes = maintainPlanDto.getMaterialCodes();
+        maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
+        maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
         maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
         String createUser = TokenDecode.getUserInfo().get("username");
-        List<String> materialCodes = maintainPlanDto.getMaterialCodes();
-        maintainPlanDto.setMaterialCode(String.join(",",materialCodes));
         Date date = new Date();
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(date);
@@ -382,24 +406,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setUpdateUser(createUser);
         maintainPlanDto.setVersion(0);
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
-        alarmValueSettingDao.updateAlarmValueSetting(alarmValueSettingDto);
+        alarmValueSettingDao.changeStatus(alarmValueSettingDto);
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findMaxId());
-        String hours = new SimpleDateFormat("HH:mm:ss").format(new Date());
-        maintainPlanDto.setOxygenReductionTime(maintainPlanDto.getOxygenReductionTime().replace("00:00:00", hours));
-        date = new Date(date.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findMaxId(maintainPlanDto.getEarlyWarningRuleName()));
+        date = new Date(new Date().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
-        maintainPlanDto.setAftercareDateStart(maintainPlanDto.getAftercareDateStart().replace("00:00:00", hours));
-        maintainPlanDto.setExpireTime(maintainPlanDto.getExpireTime().replace("00:00:00", hours));
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
         maintainPlanDto.setStageId(maintainPlanDao.findMaxStageId(maintainPlanDto.getId()));
-        Date aftercareDateStart = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getAftercareDateStart();
-        int day = new Long((new Date().getTime() - aftercareDateStart.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
+        Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
+        int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
         maintainPlanDto.setMaintainDays(day);
         maintainPlanDto.setAftercareDateEnd(new Date());
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
-        String pidRoute = maintainPlanDto.getPidRoute();
+        String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";
         Integer id = maintainPlanDto.getId();
         Integer stackId = maintainPlanDto.getStackId();
         maintainPlanDao.deleteMaintainCount(id);

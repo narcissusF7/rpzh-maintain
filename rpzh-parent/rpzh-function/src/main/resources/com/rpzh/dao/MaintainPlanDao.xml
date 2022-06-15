@@ -473,4 +473,8 @@
         <if test="maintainCountDto.startTime!=null"> and created_time >= #{maintainCountDto.startTime}</if>
         <if test="maintainCountDto.endTime!=null"> and created_time &lt;= #{maintainCountDto.endTime}</if>
     </select>
+    <select id="findPhases" resultType="java.lang.String">
+        select t.phases from tb_maintain_plan_stage t
+        inner join tb_maintain_plan t1 on t1.stack_id = #{stackId} and t1.is_end = '0' and t1.maintence_style = #{maintenceStyle} and t1.id=t.maintain_plan_id
+    </select>
 </mapper>

@@ -16,11 +16,13 @@ public interface AlarmValueSettingDao {
 
     Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findMaxId();
+    Integer findMaxId(@Param("earlyWarningRuleName")String earlyWarningRuleName);
 
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);
 
-    AlarmValueSettingVo findByMaterialCode(@Param("alarmValueSettingDto")AlarmValueSettingDto alarmValueSettingDto);
+    AlarmValueSettingVo findByMaterialCode(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    int changeStatus(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 }

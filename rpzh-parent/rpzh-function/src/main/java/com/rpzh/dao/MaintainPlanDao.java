@@ -85,4 +85,6 @@ public interface MaintainPlanDao {
     List<MaintainCountVo> findFirstMaterialCode(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
 
     Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+
+    List<String> findPhases(@Param("stackId")Integer stackId,@Param("maintenceStyle")String maintenceStyle);
 }
