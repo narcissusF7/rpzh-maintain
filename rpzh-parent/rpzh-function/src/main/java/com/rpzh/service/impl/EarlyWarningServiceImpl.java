@@ -1,25 +1,20 @@
 package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.*;
 import com.rpzh.dao.*;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.*;
-import com.rpzh.enums.NodeTypeEnum;
-import com.rpzh.enums.WarehouseNodeType;
+import com.rpzh.enums.*;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.EarlyWarningService;
-import com.rpzh.util.DateTypeUtils;
-import com.rpzh.util.StringUtils;
+import com.rpzh.util.*;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -87,7 +82,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Override
     public Result findWarningCount(EarlyWarningDto earlyWarningDto) {
         String pidRoute = earlyWarningDto.getPidRoute();
-        Integer stackId = earlyWarningDto.getStackId();
+        Integer siteId = earlyWarningDto.getSiteId();
         Date endTime = earlyWarningDto.getEndTime();
         //结束时间不为空
         if(ToolUtil.isNotEmpty(endTime)){
@@ -111,14 +106,15 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             List<Integer> stackIds = new ArrayList<>();
             switch (length) {
                 case 4:
-                    stackIds = warehouseDao.findStackByAreId(stackId);
+                    stackIds = warehouseDao.findStackByAreId(siteId);
+                    earlyWarningDto.setAreaId(siteId);
                     if (ToolUtil.isEmpty(stackIds)) {
                         stackIds.add(0);
                     }
                     earlyWarningDto.setStackIds(stackIds);
                     break;
                 case 5:
-                    stackIds.add(stackId);
+                    stackIds.add(siteId);
                     earlyWarningDto.setStackIds(stackIds);
                     break;
                 default:
@@ -126,7 +122,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
         }
         //查询预警总数量
-        earlyWarningDto.setCount(earlyWarningDao.findSum(earlyWarningDto));
+        Integer sum = earlyWarningDao.findSum(earlyWarningDto);
+        earlyWarningDto.setCount(sum);
         //报警类型所占的百分比
         List<WarningOrDealVo> count = earlyWarningDao.findCountByWarningType(earlyWarningDto);
         if(count.size()>0) {
@@ -149,22 +146,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         //已处理和未处理所占的比率
         List<WarningOrDealVo> dealCount = earlyWarningDao.findCountByDeal(earlyWarningDto);
         //查询各种报警类型的数量
-        List<WarningOrDealVo> countInfo =getMonthCountInfo();
-        //报警数量统计
-        List<WarningOrDealVo> dayCount = earlyWarningDao.findCountByDay(earlyWarningDto);
+        List<WarningOrDealVo> countInfo =getMonthCountInfo(earlyWarningDto);
         Integer dayType = earlyWarningDto.getDayType();
-        if(dayCount.size()>0) {
-            Map<String, WarningOrDealVo> listDate = DateTypeUtils.getDayCountList(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime(), dayType);
-            for (WarningOrDealVo warningOrDealVo : dayCount) {
-                listDate.put(warningOrDealVo.getDayType(), warningOrDealVo);
-            }
-            dayCount = new ArrayList<>();
-            for (Map.Entry<String, WarningOrDealVo> map : listDate.entrySet()) {
-                dayCount.add(map.getValue());
-            }
-        }
         //报警处理率统计
         List<WarningOrDealVo> isDealCount = earlyWarningDao.findCountByIsDeal(earlyWarningDto);
+        List<Date> listTime = new ArrayList<>();
+        listTime.add(earlyWarningDto.getStartTime());
+        listTime.add(endTime);
         if(isDealCount.size()>0) {
             Map<String, WarningOrDealVo> listDate = DateTypeUtils.getIsDealCountList(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime(), dayType);
             for (WarningOrDealVo warningOrDealVo : isDealCount) {
@@ -190,9 +178,22 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     return -1;
             }
         });
-
+        earlyWarningDto.setStartTime(listTime.get(0));
+        earlyWarningDto.setEndTime(listTime.get(1));
+        //报警数量统计
+        List<WarningOrDealVo> dayCount = earlyWarningDao.findCountByDay(earlyWarningDto);
+        if(dayCount.size()>0) {
+            Map<String, WarningOrDealVo> listDate = DateTypeUtils.getDayCountList(listTime.get(0),listTime.get(1), dayType);
+            for (WarningOrDealVo warningOrDealVo : dayCount) {
+                listDate.put(warningOrDealVo.getDayType(), warningOrDealVo);
+            }
+            dayCount = new ArrayList<>();
+            for (Map.Entry<String, WarningOrDealVo> map : listDate.entrySet()) {
+                dayCount.add(map.getValue());
+            }
+        }
         Map<String,Object> map = new HashMap<>();
-        map.put("count",earlyWarningDto.getCount());
+        map.put("count",sum);
         map.put("count_type",count);
         map.put("countInfo",countInfo);
         map.put("dealCount",dealCount);
@@ -208,136 +209,371 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
 
     @Resource
     private NodeDao nodeDao;
-    @Override
-    public Result findNodeData(EarlyWarningDto earlyWarningDto) {
-        String warningType = earlyWarningDto.getWarningType();
-        String pidRoute = "";
-        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-        Integer areaId = earlyWarningDto.getAreaId();
-        Integer stackId = earlyWarningDto.getStackId();
-        EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
-        AlarmValueSettingVo alarmValueSettingVo1 = null;
-        Map<String,Object> map =new HashMap<>();
-        String nodeId = earlyWarningDto.getNodeId();
-        String time = earlyWarningDao.findMaxTime(nodeId);
-        if(ToolUtil.isNotEmpty(areaId)) {
-            pidRoute = warehouseDao.findWareArea(areaId).getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
-            if (warningType.equals("07") || warningType.equals("09") || warningType.equals("11")) {
-                String[] pidRoutes = pidRoute.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
-                //从下往上找
-                for (int i = pidRoutes.length - 1; i >= 0; i--) {
-                    String[] route = pidRoutes[i].split(":");
-                    if (ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0] + route[1]))) {
-                        alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0] + route[1]).entries()), AlarmValueSettingVo.class);
-                        break;
-                    }
-                }
-                if (ToolUtil.isEmpty(alarmValueSettingVo1)) {
-                    for (String routes : pidRoutes) {
-                        String[] route = routes.split(":");
-                        alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0] + route[1]);
-                        if (ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
-                            for (Field field : fields) {
-                                try {
-                                    field.setAccessible(true);
-                                    //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                                    redisTemplate.opsForHash().put(MAINTAIN + route[0] + route[1], field.getName(), field.get(alarmValueSettingVo1));
-                                } catch (IllegalAccessException exception) {
-                                    exception.printStackTrace();
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingVo1;
-                //07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警
-                switch (warningType) {
-                    case "07":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseOxygenUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseOxygenUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseOxygenUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseOxygenLower());
-                        break;
-                    case "09":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseTempUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseTempUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseTempUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseTempLower());
-                        break;
-                    case "11":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseMoistureUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseMoistureUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseMoistureUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseMoistureLower());
-                        break;
-                }
+
+    public AlarmValueSettingVo getWareArea(Field[] fields,Integer areaId){
+        String pidRoute = warehouseDao.findWareArea(areaId).getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
+        String[] pidRoutes = pidRoute.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
+        AlarmValueSettingVo alarmValueSettingVo1 = new AlarmValueSettingVo();
+        //从下往上找
+        for (int i = pidRoutes.length - 1; i >= 0; i--) {
+            String[] route = pidRoutes[i].split(":");
+            if (ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0] + route[1]))) {
+                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0] + route[1]).entries()), AlarmValueSettingVo.class);
+                break;
             }
         }
-        if(ToolUtil.isNotEmpty(stackId)){
-            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanByStack(stackId);
-            if(warningType.equals("06") || warningType.equals("08") || warningType.equals("10") || warningType.equals("12") || warningType.equals("13")){
-                if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + maintainPlanVo.getStageId()))){
-                    alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + maintainPlanVo.getStageId()).entries()),AlarmValueSettingVo.class);
-                }else {
-                    alarmValueSettingVo1 = alarmValueSettingDao.findAlarmValueSettingById(maintainPlanVo.getAlarmValueSettingId());
-                    //获取所有的字段
+        if (ToolUtil.isEmpty(alarmValueSettingVo1)) {
+            for (String routes : pidRoutes) {
+                String[] route = routes.split(":");
+                alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0] + route[1]);
+                if (ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
                     for (Field field : fields) {
                         try {
                             field.setAccessible(true);
                             //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                            redisTemplate.opsForHash().put(MAINTAIN + maintainPlanVo.getStageId(), field.getName(), field.get(alarmValueSettingVo1));
+                            redisTemplate.opsForHash().put(MAINTAIN + route[0] + route[1], field.getName(), field.get(alarmValueSettingVo1));
                         } catch (IllegalAccessException exception) {
                             exception.printStackTrace();
                         }
                     }
+                    break;
                 }
-                AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingVo1;
-                switch (warningType){
-                    case "06":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackOxygenUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackOxygenUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackOxygenUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getStackOxygenLower());
+            }
+        }
+        return alarmValueSettingVo1;
+    }
+
+    public AlarmValueSettingVo getStack(Field[] fields,Integer stageId,Integer alarmValueSettingId){
+        AlarmValueSettingVo alarmValueSettingVo1 = new AlarmValueSettingVo();
+            if (ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + stageId))) {
+                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + stageId).entries()), AlarmValueSettingVo.class);
+            } else {
+                alarmValueSettingVo1 = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
+                //获取所有的字段
+                for (Field field : fields) {
+                    try {
+                        field.setAccessible(true);
+                        //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                        redisTemplate.opsForHash().put(MAINTAIN + stageId, field.getName(), field.get(alarmValueSettingVo1));
+                    } catch (IllegalAccessException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+         return alarmValueSettingVo1;
+    }
+
+    public Map<String,Object> getDataBySiteId(EarlyWarningDto earlyWarningDto){
+        String warningType = earlyWarningDto.getWarningType();
+        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
+        Integer stackId = earlyWarningDto.getStackId();
+        Integer areaId = earlyWarningDto.getAreaId();
+        String affirm = earlyWarningDto.getIsAffirm();
+        String warningTime = earlyWarningDto.getTime();
+        List<EarlyWarningVo> warningDatas = new ArrayList<>();
+        EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
+        EarlyWarningVo warningInfo = new EarlyWarningVo();
+        WareAreaVo wareArea = warehouseDao.findWareArea(areaId);
+        if(warningType.equals("01")){
+            earlyWarningVo.setWarningType("01");
+            earlyWarningVo.setWarningTime(warningTime);
+            List<String> type = new ArrayList<>();
+            type.add("01");type.add("02");type.add("03");
+            if(ToolUtil.isNotEmpty(stackId)){
+                earlyWarningVo.setSiteName(warehouseDao.findStackById(stackId).getSiteName());
+                earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
+                warningDatas = earlyWarningDao.findWarningDataByNode(affirm, stackId, null,type);
+            }
+            if(ToolUtil.isNotEmpty(areaId)){
+                earlyWarningVo.setSiteName(wareArea.getSiteName());
+                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,null,areaId,type);
+            }
+            for (EarlyWarningVo warningData : warningDatas) {
+                switch (warningData.getWarningType()){
+                    case "01":
+                        warningData.setWarningNews("设备电量电量低");
                         break;
-                    case "07":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackTempUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackTempUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackTempUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getStackTempLower());
+                    case "02":
+                        warningData.setWarningNews("设备信号强度差");
                         break;
-                    case "10":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackMoistureUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackMoistureUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackMoistureUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getStackMoistureLower());
-                        break;
-                    case "12":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getTempCoreChipUpperOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getTempCoreChipUpperTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getTempCoreChipUpperThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getTempCoreChipLower());
-                        break;
-                    case "13":
-                        earlyWarningVo.setUpperOne(alarmValueSettingVo.getCoreTempHighEnvTempOne());
-                        earlyWarningVo.setUpperTwo(alarmValueSettingVo.getCoreTempHighEnvTempTwo());
-                        earlyWarningVo.setUpperThree(alarmValueSettingVo.getCoreTempHighEnvTempThree());
-                        earlyWarningVo.setLower(alarmValueSettingVo.getCoreTempLowEnvTemp());
+                    case "03":
+                        warningData.setWarningNews("设备丢包");
                         break;
                 }
             }
-            map.put("maintainPlan",maintainPlanVo);
+            //预警记录
+            warningInfo.setWarningTime(warningTime);
+            warningInfo.setWarningType("01");
+            warningInfo.setWarningNews("故障");
         }
+        //05:仓间甲虫预警,07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警,14:仓间粉螟预警
+        else if(warningType.equals("05") || warningType.equals("07") || warningType.equals("09") || warningType.equals("11") || warningType.equals("14")){
+            earlyWarningVo.setWarningType(warningType);
+            earlyWarningVo.setWarningTime(warningTime);
+            earlyWarningVo.setSiteName(wareArea.getSiteName());
+            String pidRoute = wareArea.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
+            if(warningType.equals("07") || warningType.equals("09") || warningType.equals("11")){
+                List type = Arrays.asList(warningType);
+                AlarmValueSettingVo alarmValueSettingVo = getWareArea(fields,areaId);
+                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,null,areaId,type);
+                //07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警
+                switch (warningType){
+                    case "07":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseOxygenUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseOxygenUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseOxygenUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getWarehouseOxygenLower());
+                        });
+                        break;
+                    case "09":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseTempUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseTempUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseTempUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getWarehouseTempLower());
+                        });
+                        break;
+                    case "11":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseMoistureUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseMoistureUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseMoistureUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getWarehouseMoistureLower());
+                        });
+                        break;
+                }
+            }
+            if(warningType.equals("05") || warningType.equals("14")){
+                warningDatas = earlyWarningDao.findWarningDataByArea(affirm,areaId,warningType);
+                PestMonitoringRuleVo pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                String[] pidRoutes = pidRoute.split(",");
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3];
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2];
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] ;
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pestStackMonitor = pestMonitoringDao.findPestMonitor();
+                }
+                PestMonitoringRuleVo pestStackMonitor1 = pestStackMonitor;
+                warningDatas.forEach((warningData)->{
+                    warningData.setUpperOne(pestStackMonitor1.getValueOne());
+                    warningData.setUpperTwo(pestStackMonitor1.getValueTwo());
+                    warningData.setUpperThree(pestStackMonitor1.getValueThree());
+                });
+            }
+            Integer id = warningDatas.get(0).getId();
+            warningInfo = earlyWarningDao.findById(id);
+        }
+        //04:垛内甲虫预警,06:垛内氧气预警,08:垛内温度预警,10:垛内湿度预警,12:包芯温度预警,13:平均包芯高于环境预警
+        else{
+            earlyWarningVo.setWarningType(warningType);
+            earlyWarningVo.setWarningTime(warningTime);
+            StackVo stack = warehouseDao.findStackById(stackId);
+            earlyWarningVo.setSiteName(stack.getSiteName());
+            earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
+            String pidRoute = stack.getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
+            if(warningType.equals("06") || warningType.equals("08") || warningType.equals("10") || warningType.equals("12") || warningType.equals("13")){
+                List type = Arrays.asList(warningType);
+                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,stackId,null,type);
+                MaintainPlanVo maintainPlanVo = alarmValueSettingDao.findByMaintainStackId(stackId);
+                AlarmValueSettingVo alarmValueSettingVo = getStack(fields, maintainPlanVo.getStageId(),maintainPlanVo.getAlarmValueSettingId());
+                switch (warningType){
+                    case "06":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getStackOxygenUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getStackOxygenUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getStackOxygenUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getStackOxygenLower());
+                        });
+                        break;
+                    case "07":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getStackTempUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getStackTempUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getStackTempUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getStackTempLower());
+                        });
+                        break;
+                    case "10":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getStackMoistureUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getStackMoistureUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getStackMoistureUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getStackMoistureLower());
+                        });
+                        break;
+                    case "12":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getTempCoreChipUpperOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getTempCoreChipUpperTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getTempCoreChipUpperThree());
+                            warningData.setLower(alarmValueSettingVo.getTempCoreChipLower());
+                        });
+                        break;
+                    case "13":
+                        warningDatas.forEach((warningData)->{
+                            warningData.setUpperOne(alarmValueSettingVo.getCoreTempHighEnvTempOne());
+                            warningData.setUpperTwo(alarmValueSettingVo.getCoreTempHighEnvTempTwo());
+                            warningData.setUpperThree(alarmValueSettingVo.getCoreTempHighEnvTempThree());
+                            warningData.setLower(alarmValueSettingVo.getCoreTempLowEnvTemp());
+                        });
+                        break;
+                }
+            }
+            if(warningType.equals("04")){
+                warningDatas = earlyWarningDao.findWarningDataByStack(affirm,stackId,warningType);
+                PestMonitoringRuleVo pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                String[] pidRoutes = pidRoute.split(",");
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3] + ","  + pidRoutes[4];
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3];
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2];
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] ;
+                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
+                }
+                if(ToolUtil.isEmpty(pestStackMonitor)){
+                    pestStackMonitor = pestMonitoringDao.findPestMonitor();
+                }
+                PestMonitoringRuleVo pestStackMonitor1 = pestStackMonitor;
+                warningDatas.forEach((warningData)->{
+                    warningData.setUpperOne(pestStackMonitor1.getValueOne());
+                    warningData.setUpperTwo(pestStackMonitor1.getValueTwo());
+                    warningData.setUpperThree(pestStackMonitor1.getValueThree());
+                });
+            }
+            Integer id = warningDatas.get(0).getId();
+            warningInfo = earlyWarningDao.findById(id);
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("warningInfo",warningInfo);
         map.put("earlyWarningVo",earlyWarningVo);
-        NodeTypeEnum nodeType = NodeTypeEnum.getNodeType(earlyWarningDto.getNodeType());
-        List<NodeData> nodeData = nodeDao.findNodeData(nodeId, nodeType.getTableName(), nodeType.getTableColumn());
-        map.put("nodeData",nodeData);
-        map.put("time",time);
-        return new Result<>(true, StatusCode.OK, "查询成功,无预警信息",map);
+        map.put("warningDatas",warningDatas);
+        return map;
     }
 
-    public List<WarningOrDealVo> getMonthCountInfo(){
-        List<WarningOrDealVo> countInfo =earlyWarningDao.findCountByMonth();
+    @Override
+    public Result findEarlyWarningBySiteId(EarlyWarningDto earlyWarningDto) {
+        Date endTime = earlyWarningDto.getEndTime();
+        //结束时间不为空
+        if(ToolUtil.isNotEmpty(endTime)){
+            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
+        }
+        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
+        if(ToolUtil.isEmpty(earlyWarningDto.getStartTime()) && ToolUtil.isEmpty(earlyWarningDto.getEndTime())){
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, 0);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            earlyWarningDto.setStartTime(calendar.getTime());
+            calendar.add(Calendar.MONTH, 1);
+            earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
+        }
+        Map<String, Object> map = getDataBySiteId(earlyWarningDto);
+        return new Result<>(true, StatusCode.OK, "查询成功",map);
+    }
+
+    @Override
+    public Result findNodeData(EarlyWarningDto earlyWarningDto) {
+        String warningType = earlyWarningDto.getWarningType();
+        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
+        Integer areaId = earlyWarningDto.getAreaId();
+        Integer stackId = earlyWarningDto.getStackId();
+        EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
+        Map<String, Object> map = new HashMap<>();
+        String nodeId = earlyWarningDto.getNodeId();
+        String time = earlyWarningDao.findMaxTime(nodeId);
+        AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
+        if (ToolUtil.isNotEmpty(areaId)) {
+            alarmValueSettingVo = getWareArea(fields, areaId);
+            //07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警
+            switch (warningType) {
+                case "07":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseOxygenUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseOxygenUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseOxygenUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseOxygenLower());
+                    break;
+                case "09":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseTempUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseTempUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseTempUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseTempLower());
+                    break;
+                case "11":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getWarehouseMoistureUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getWarehouseMoistureUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getWarehouseMoistureUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getWarehouseMoistureLower());
+                    break;
+            }
+        }
+        if (ToolUtil.isNotEmpty(stackId)) {
+            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanByStack(stackId);
+            alarmValueSettingVo = getStack(fields, maintainPlanVo.getStageId(),maintainPlanVo.getAlarmValueSettingId());
+            switch (warningType) {
+                case "06":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackOxygenUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackOxygenUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackOxygenUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getStackOxygenLower());
+                    break;
+                case "07":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackTempUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackTempUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackTempUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getStackTempLower());
+                    break;
+                case "10":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getStackMoistureUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getStackMoistureUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getStackMoistureUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getStackMoistureLower());
+                    break;
+                case "12":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getTempCoreChipUpperOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getTempCoreChipUpperTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getTempCoreChipUpperThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getTempCoreChipLower());
+                    break;
+                case "13":
+                    earlyWarningVo.setUpperOne(alarmValueSettingVo.getCoreTempHighEnvTempOne());
+                    earlyWarningVo.setUpperTwo(alarmValueSettingVo.getCoreTempHighEnvTempTwo());
+                    earlyWarningVo.setUpperThree(alarmValueSettingVo.getCoreTempHighEnvTempThree());
+                    earlyWarningVo.setLower(alarmValueSettingVo.getCoreTempLowEnvTemp());
+                    break;
+                }
+            map.put("maintainPlan", maintainPlanVo);
+        }
+        map.put("earlyWarningVo", earlyWarningVo);
+        NodeTypeEnum nodeType = NodeTypeEnum.getNodeType(earlyWarningDto.getNodeType());
+        List<NodeData> nodeData = nodeDao.findNodeData(nodeId, nodeType.getTableName(), nodeType.getTableColumn());
+        map.put("nodeData", nodeData);
+        map.put("time", time);
+        return new Result<>(true, StatusCode.OK, "查询成功,无预警信息", map);
+    }
+
+    public List<WarningOrDealVo> getMonthCountInfo(EarlyWarningDto earlyWarningDto){
+        List<WarningOrDealVo> countInfo =earlyWarningDao.findCountByMonth(earlyWarningDto);
         List<String> type = new ArrayList<>();
         countInfo.forEach((countVo) ->{type.add(countVo.getWarningType());});
         for (int i = 1; i < 15;i++) {
@@ -449,29 +685,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return new Result<>(true, StatusCode.OK, "查询成功",map);
     }
 
-    @Override
-    public Result findEarlyWarningBySiteId(EarlyWarningDto earlyWarningDto) {
-        Date endTime = earlyWarningDto.getEndTime();
-        //结束时间不为空
-        if(ToolUtil.isNotEmpty(endTime)){
-            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
-        }
-        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
-        if(ToolUtil.isEmpty(earlyWarningDto.getStartTime()) && ToolUtil.isEmpty(earlyWarningDto.getEndTime())){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            earlyWarningDto.setStartTime(calendar.getTime());
-            calendar.add(Calendar.MONTH, 1);
-            earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
-        }
-        Map<String, Object> map = getDataBySiteId(earlyWarningDto);
-        return new Result<>(true, StatusCode.OK, "查询成功",map);
-    }
-
     public Map<String,Object> getData(EarlyWarningDto earlyWarningDto){
         String warningType = earlyWarningDto.getWarningType();
         List<EarlyWarningVo> earlyWarningVos;
@@ -511,253 +724,4 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return map;
     }
 
-    public Map<String,Object> getDataBySiteId(EarlyWarningDto earlyWarningDto){
-        String warningType = earlyWarningDto.getWarningType();
-        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-        Integer stackId = earlyWarningDto.getStackId();
-        Integer areaId = earlyWarningDto.getAreaId();
-        String affirm = earlyWarningDto.getIsAffirm();
-        String warningTime = earlyWarningDto.getTime();
-        List<EarlyWarningVo> warningDatas = new ArrayList<>();
-        EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
-        EarlyWarningVo warningInfo = new EarlyWarningVo();
-        if(warningType.equals("01")){
-            earlyWarningVo.setWarningType("01");
-            earlyWarningVo.setWarningTime(warningTime);
-            List<String> type = new ArrayList<>();
-            type.add("01");type.add("02");type.add("03");
-            if(ToolUtil.isNotEmpty(stackId)){
-                earlyWarningVo.setSiteName(warehouseDao.findStackById(stackId).getSiteName());
-                earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
-                warningDatas = earlyWarningDao.findWarningDataByNode(affirm, stackId, null,type);
-            }
-            if(ToolUtil.isNotEmpty(areaId)){
-                earlyWarningVo.setSiteName(warehouseDao.findWareArea(areaId).getSiteName());
-                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,null,areaId,type);
-            }
-            for (EarlyWarningVo warningData : warningDatas) {
-                switch (warningData.getWarningType()){
-                    case "01":
-                        warningData.setWarningNews("设备电量电量低");
-                        break;
-                    case "02":
-                        warningData.setWarningNews("设备信号强度差");
-                        break;
-                    case "03":
-                        warningData.setWarningNews("设备丢包");
-                        break;
-                }
-            }
-            //预警记录
-            warningInfo.setWarningTime(warningTime);
-            warningInfo.setWarningType("01");
-            warningInfo.setWarningNews("故障");
-        }
-        //05:仓间甲虫预警,07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警,14:仓间粉螟预警
-        else if(warningType.equals("05") || warningType.equals("07") || warningType.equals("09") || warningType.equals("11") || warningType.equals("14")){
-            earlyWarningVo.setWarningType(warningType);
-            earlyWarningVo.setWarningTime(warningTime);
-            WareAreaVo wareArea = warehouseDao.findWareArea(areaId);
-            earlyWarningVo.setSiteName(wareArea.getSiteName());
-            String pidRoute = wareArea.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
-            AlarmValueSettingVo alarmValueSettingVo1=null;
-            if(warningType.equals("07") || warningType.equals("09") || warningType.equals("11")){
-                List type = Arrays.asList(warningType);
-                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,null,areaId,type);
-                String[] pidRoutes = pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(",");
-                //从下往上找
-                for (int i = pidRoutes.length - 1; i >= 0; i--) {
-                    String[] route = pidRoutes[i].split(":");
-                    if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0]+route[1]))){
-                        alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
-                        break;
-                    }
-                }
-                if(ToolUtil.isEmpty(alarmValueSettingVo1)){
-                    for (String routes : pidRoutes) {
-                        String[] route = routes.split(":");
-                        alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
-                        if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
-                            for (Field field : fields) {
-                                try {
-                                    field.setAccessible(true);
-                                    //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                                    redisTemplate.opsForHash().put(MAINTAIN + route[0]+route[1], field.getName(), field.get(alarmValueSettingVo1));
-                                } catch (IllegalAccessException exception) {
-                                    exception.printStackTrace();
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingVo1;
-                //07:仓间氧气预警,09:仓间温度预警,11:仓间湿度预警
-                switch (warningType){
-                    case "07":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseOxygenUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseOxygenUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseOxygenUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getWarehouseOxygenLower());
-                        });
-                        break;
-                    case "09":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseTempUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseTempUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseTempUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getWarehouseTempLower());
-                        });
-                        break;
-                    case "11":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getWarehouseMoistureUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getWarehouseMoistureUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getWarehouseMoistureUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getWarehouseMoistureLower());
-                        });
-                        break;
-                }
-            }
-            if(warningType.equals("05") || warningType.equals("14")){
-                warningDatas = earlyWarningDao.findWarningDataByArea(affirm,areaId,warningType);
-                PestMonitoringRuleVo pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                String[] pidRoutes = pidRoute.split(",");
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3];
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2];
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] ;
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pestStackMonitor = pestMonitoringDao.findPestMonitor();
-                }
-                PestMonitoringRuleVo pestStackMonitor1 = pestStackMonitor;
-                warningDatas.forEach((warningData)->{
-                    warningData.setUpperOne(pestStackMonitor1.getValueOne());
-                    warningData.setUpperTwo(pestStackMonitor1.getValueTwo());
-                    warningData.setUpperThree(pestStackMonitor1.getValueThree());
-                });
-            }
-            Integer id = warningDatas.get(0).getId();
-            warningInfo = earlyWarningDao.findById(id);
-        }
-        //04:垛内甲虫预警,06:垛内氧气预警,08:垛内温度预警,10:垛内湿度预警,12:包芯温度预警,13:平均包芯高于环境预警
-        else{
-            earlyWarningVo.setWarningType(warningType);
-            earlyWarningVo.setWarningTime(warningTime);
-            StackVo stack = warehouseDao.findStackById(stackId);
-            earlyWarningVo.setSiteName(stack.getSiteName());
-            earlyWarningVo.setMaterialCode(maintainPlanDao.findMaintainStackId(stackId).getMaterialCode());
-            String pidRoute = stack.getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
-            AlarmValueSettingVo alarmValueSettingVo1=null;
-            if(warningType.equals("06") || warningType.equals("08") || warningType.equals("10") || warningType.equals("12") || warningType.equals("13")){
-                List type = Arrays.asList(warningType);
-                warningDatas = earlyWarningDao.findWarningDataByNode(affirm,stackId,null,type);
-                MaintainPlanVo maintainPlanVo = alarmValueSettingDao.findByMaintainStackId(stackId);
-                if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + maintainPlanVo.getStageId()))){
-                    alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + maintainPlanVo.getStageId()).entries()),AlarmValueSettingVo.class);
-                }else {
-                    alarmValueSettingVo1 = alarmValueSettingDao.findAlarmValueSettingById(maintainPlanVo.getAlarmValueSettingId());
-                    //获取所有的字段
-                    for (Field field : fields) {
-                        try {
-                            field.setAccessible(true);
-                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                            redisTemplate.opsForHash().put(MAINTAIN + maintainPlanVo.getStageId(), field.getName(), field.get(alarmValueSettingVo1));
-                        } catch (IllegalAccessException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                }
-                AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingVo1;
-                switch (warningType){
-                    case "06":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getStackOxygenUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getStackOxygenUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getStackOxygenUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getStackOxygenLower());
-                        });
-                        break;
-                    case "07":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getStackTempUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getStackTempUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getStackTempUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getStackTempLower());
-                        });
-                        break;
-                    case "10":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getStackMoistureUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getStackMoistureUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getStackMoistureUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getStackMoistureLower());
-                        });
-                        break;
-                    case "12":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getTempCoreChipUpperOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getTempCoreChipUpperTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getTempCoreChipUpperThree());
-                            warningData.setLower(alarmValueSettingVo.getTempCoreChipLower());
-                        });
-                        break;
-                    case "13":
-                        warningDatas.forEach((warningData)->{
-                            warningData.setUpperOne(alarmValueSettingVo.getCoreTempHighEnvTempOne());
-                            warningData.setUpperTwo(alarmValueSettingVo.getCoreTempHighEnvTempTwo());
-                            warningData.setUpperThree(alarmValueSettingVo.getCoreTempHighEnvTempThree());
-                            warningData.setLower(alarmValueSettingVo.getCoreTempLowEnvTemp());
-                        });
-                        break;
-                }
-            }
-            if(warningType.equals("04")){
-                warningDatas = earlyWarningDao.findWarningDataByStack(affirm,stackId,warningType);
-                PestMonitoringRuleVo pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                String[] pidRoutes = pidRoute.split(",");
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3] + ","  + pidRoutes[4];
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + ","  + pidRoutes[3];
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2];
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] ;
-                    pestStackMonitor = pestMonitoringDao.findPestStackMonitor(pidRoute);
-                }
-                if(ToolUtil.isEmpty(pestStackMonitor)){
-                    pestStackMonitor = pestMonitoringDao.findPestMonitor();
-                }
-                PestMonitoringRuleVo pestStackMonitor1 = pestStackMonitor;
-                warningDatas.forEach((warningData)->{
-                    warningData.setUpperOne(pestStackMonitor1.getValueOne());
-                    warningData.setUpperTwo(pestStackMonitor1.getValueTwo());
-                    warningData.setUpperThree(pestStackMonitor1.getValueThree());
-                });
-            }
-            Integer id = warningDatas.get(0).getId();
-            warningInfo = earlyWarningDao.findById(id);
-        }
-        Map<String,Object> map = new HashMap<>();
-        map.put("warningInfo",warningInfo);
-        map.put("earlyWarningVo",earlyWarningVo);
-        map.put("warningDatas",warningDatas);
-        return map;
-    }
 }

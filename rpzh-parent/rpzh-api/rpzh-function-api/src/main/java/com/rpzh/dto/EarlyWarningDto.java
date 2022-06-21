@@ -63,6 +63,8 @@ public class EarlyWarningDto implements Serializable {
 
     private List<Integer> stackIds;
 
+    private Integer siteId;
+
     private Integer maintainPlanId;
 
     private Integer count;

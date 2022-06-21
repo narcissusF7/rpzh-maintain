@@ -2,22 +2,17 @@ package com.rpzh.controller;
 
 
 import com.github.pagehelper.PageInfo;
-import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
-import com.rpzh.service.AlarmValueSettingService;
 import com.rpzh.service.WareAreaAlarmSettingService;
-import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 

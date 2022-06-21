@@ -50,12 +50,6 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     public PageInfo<AlarmValueSettingVo> findAlarmSettingTemplateTable(AlarmValueSettingDto alarmValueSettingDto) {
         Integer size = alarmValueSettingDto.getSize();
         Integer page = alarmValueSettingDto.getPage();
-        if(size ==null){
-            size =10;
-        }
-        if(page==null){
-            page = 1;
-        }
         PageHelper.startPage(page, size);
         List<AlarmValueSettingVo> alarmValueSettingVos = alarmSettingTemplateDao.findAlarmSettingTemplateTable(alarmValueSettingDto);
         return new PageInfo(alarmValueSettingVos);
@@ -74,8 +68,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     @Override
     public void insertAlarmSettingTemplate(AlarmSettingTemplateDto alarmSettingTemplateDto) {
         String earlyWarningRuleName = alarmSettingTemplateDto.getEarlyWarningRuleName();
-        List<String> materialCodes = alarmSettingTemplateDto.getMaterialCodes();
-        String materialCode = String.join(",",materialCodes);
+        String materialCode = String.join(",",alarmSettingTemplateDto.getMaterialCodes());
         Date date = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
         String alarmValueSettingDto1 = alarmSettingTemplateDto.getAlarmValueSettingDto();
@@ -155,24 +148,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         String ipAddr = IpUtils.getIpAddr(Objects.requireNonNull(IpUtils.getRequest()));
         for (int i = 0; i < alarmValueSettingDtos.size(); i++) {
             AlarmValueSettingDto alarmValueSettingDto = alarmValueSettingDtos.get(i);
-            AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateById(alarmValueSettingDto.getAlarmValueSettingId(), materialCode, earlyWarningRuleName);
-            if (ToolUtil.isEmpty(alarmValueSettingVo)) {
-                alarmValueSettingDto.setMaterialCode(materialCode);
-                alarmValueSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
-                alarmValueSettingDto.setUpdatedTime(date);
-                alarmValueSettingDto.setUpdateUser(createUser);
-                alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
-                LogAlarmSettingDto logAlarmSettingDto = new LogAlarmSettingDto();
-                logAlarmSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
-                logAlarmSettingDto.setLogDate(date);
-                logAlarmSettingDto.setLogUserName(createUser);
-                logAlarmSettingDto.setLogType(UPDATETYPE);
-                logAlarmSettingDto.setPhases(alarmValueSettingDto.getPhases());
-                logAlarmSettingDto.setLogIp(ipAddr);
-                logAlarmSettingDto.setMaterialCode(materialCode);
-                alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
-            }
+            AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateById(alarmValueSettingDto.getAlarmValueSettingId());
             if(ToolUtil.isNotEmpty(alarmValueSettingVo)) {
+                boolean flag = alarmValueSettingVo.getEarlyWarningRuleName().equalsIgnoreCase(earlyWarningRuleName) && alarmValueSettingVo.getMaterialCodes().equals(materialCode);
                 boolean o2StackFlag = alarmValueSettingVo.getStackOxygenUpperOne().equals(alarmValueSettingDto.getStackOxygenUpperOne()) && alarmValueSettingVo.getStackOxygenUpperTwo().equals(alarmValueSettingDto.getStackOxygenUpperTwo()) &&
                         alarmValueSettingVo.getStackOxygenUpperThree().equals(alarmValueSettingDto.getStackOxygenUpperThree()) && alarmValueSettingVo.getStackOxygenLower().equals(alarmValueSettingDto.getStackOxygenLower());
                 boolean tempCoreFlag = alarmValueSettingVo.getTempCoreChipUpperOne().equals(alarmValueSettingDto.getTempCoreChipUpperOne()) && alarmValueSettingVo.getTempCoreChipUpperTwo().equals(alarmValueSettingDto.getTempCoreChipUpperTwo()) &&
@@ -183,7 +161,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
                         alarmValueSettingVo.getStackMoistureUpperThree().equals(alarmValueSettingDto.getStackMoistureUpperThree()) && alarmValueSettingVo.getStackMoistureLower().equals(alarmValueSettingDto.getStackMoistureLower());
                 boolean coreHighEnvFlag = alarmValueSettingVo.getCoreTempHighEnvTempOne().equals(alarmValueSettingDto.getCoreTempHighEnvTempOne()) && alarmValueSettingVo.getCoreTempHighEnvTempTwo().equals(alarmValueSettingDto.getCoreTempHighEnvTempTwo()) &&
                         alarmValueSettingVo.getCoreTempHighEnvTempThree().equals(alarmValueSettingDto.getCoreTempHighEnvTempThree()) && alarmValueSettingVo.getCoreTempLowEnvTemp().equals(alarmValueSettingDto.getCoreTempLowEnvTemp());
-                if (!(o2StackFlag && tempCoreFlag && tempStackFlag && moistureStackFlag && coreHighEnvFlag)) {
+                if (!(o2StackFlag && tempCoreFlag && tempStackFlag && moistureStackFlag && coreHighEnvFlag && flag)) {
+                    alarmValueSettingDto.setMaterialCode(materialCode);
+                    alarmValueSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
                     alarmValueSettingDto.setUpdatedTime(date);
                     alarmValueSettingDto.setUpdateUser(createUser);
                     alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);

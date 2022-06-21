@@ -36,7 +36,7 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findHistoryWarningData(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<WarningOrDealVo> findCountByMonth();
+    List<WarningOrDealVo> findCountByMonth(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     Integer findSum(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 

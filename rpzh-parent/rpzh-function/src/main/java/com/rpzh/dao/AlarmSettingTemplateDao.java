@@ -42,7 +42,7 @@ public interface AlarmSettingTemplateDao {
 
     int updateAlarmSettingTemplate(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    AlarmValueSettingVo findAlarmSettingTemplateById(@Param("alarmValueSettingId") Integer id, @Param("materialCode") String materialCode, @Param("earlyWarningRuleName") String earlyWarningRuleName);
+    AlarmValueSettingVo findAlarmSettingTemplateById(@Param("alarmValueSettingId") Integer id);
 
     int insertLogAlarmSetting(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
 
