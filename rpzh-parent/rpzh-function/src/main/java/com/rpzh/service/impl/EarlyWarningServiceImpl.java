@@ -614,7 +614,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
         }
         List<EarlyWarningVo> earlyWarningVos;
-        List<EarlyWarningVo> warningDatas = new ArrayList<>();
+        List<EarlyWarningVo> warningDatas;
         List<WarningCountVo> warningCount = earlyWarningDao.findEarlyWarningCount(earlyWarningDto);
         EarlyWarningVo earlyWarningVo = new EarlyWarningVo();
         EarlyWarningVo warningInfo = new EarlyWarningVo();
@@ -631,6 +631,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             return new Result<>(true, StatusCode.OK, "查询成功,无预警信息",map);
         }
         String warningType = earlyWarningDto.getWarningType();
+        //将设备电量故障(01),设备信号强度故障(02),设备丢包故障(03)归类为设备故障,预警类型(01-14)是按顺序排列
         if(ToolUtil.isEmpty(warningType)) {
             Integer oneWarning=0;
             if(warningCount.get(0).getWarningType().equals("01")||warningCount.get(0).getWarningType().equals("02")||warningCount.get(0).getWarningType().equals("03")){

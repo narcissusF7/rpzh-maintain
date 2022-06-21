@@ -59,7 +59,7 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false)
     })
-    public Result findEarlyWarningByWarningType(EarlyWarningDto earlyWarningDto){
+    public Result findEarlyWarningByWarningType(@ApiIgnore EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findEarlyWarningByWarningType(earlyWarningDto);
     }
 
@@ -72,7 +72,7 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "affirm", value = "是否处理", dataType = "String",required = true),
             @ApiImplicitParam(name = "warningTime", value = "预警时间",dataType = "String",required = true)
     })
-    public Result findEarlyWarningBySiteId(EarlyWarningDto earlyWarningDto){
+    public Result findEarlyWarningBySiteId(@ApiIgnore EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findEarlyWarningBySiteId(earlyWarningDto);
     }
 
@@ -98,7 +98,7 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "String",required = false),
             @ApiImplicitParam(name = "areaId", value = "仓间id", dataType = "String",required = false)
     })
-    public Result findNodeData(EarlyWarningDto earlyWarningDto){
+    public Result findNodeData(@ApiIgnore EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findNodeData(earlyWarningDto);
     }
 
