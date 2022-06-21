@@ -42,8 +42,9 @@ public class TaskManagementController {
     @ApiOperation(value = "发布任务菜单新建任务", tags = "任务管理中心")
     @PostMapping("/addTask")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
-                    "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务," +
+                    "07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务," +
+                    "13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = true,dataType = "String"),
             @ApiImplicitParam(name = "principal", value = "负责人", required = true,dataType = "String"),
             @ApiImplicitParam(name = "taskAddress", value = "任务地点名字", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteRoute", value = "任务地点位置路径", required = true,dataType = "String"),
@@ -148,6 +149,28 @@ public class TaskManagementController {
         return new Result<TaskVo>(true, StatusCode.OK, "查询成功", taskVo);
     }
 
+    /**
+     * 根据位置id和任务类型查询任务详情
+     * @param
+     * @return
+     */
+    @ApiOperation(value = "根据位置id和任务类型查询任务详情", tags = "预警类型")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "stackId", value = "垛位id",required = true,dataType = "Integer"),
+            @ApiImplicitParam(name = "areaId", value = "仓间id",required = true,dataType = "Integer"),
+            @ApiImplicitParam(name = "type", value = "预警类型",required = true,dataType = "String")
+    })
+    @PostMapping("/findTaskDetailBySiteId")
+    public Result<TaskVo> findTaskDetailBySiteId(Integer stackId,Integer areaId,String type){
+        if (ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(areaId)){
+            return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
+        }
+        if (ToolUtil.isEmpty(type)){
+            return new Result<>(false, StatusCode.ERROR, "任务类型不能为空");
+        }
+        TaskVo taskVo = taskManagementService.findTaskDetailBySiteId(stackId,areaId,type);
+        return new Result<TaskVo>(true, StatusCode.OK, "查询成功", taskVo);
+    }
 
     /**
      * 工作任务查询列表

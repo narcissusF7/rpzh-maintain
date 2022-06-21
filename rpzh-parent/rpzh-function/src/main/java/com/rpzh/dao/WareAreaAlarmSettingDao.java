@@ -1,7 +1,9 @@
 package com.rpzh.dao;
 
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -21,4 +23,6 @@ public interface WareAreaAlarmSettingDao {
     WareAreaAlarmSettingVo findWareAreaAlarmSettingById(@Param("wareAreaAlarmSettingDto") WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
 
     int updateWareAreaAlarmSetting(@Param("wareAreaAlarmSettingDto") WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
+
+    List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
 }

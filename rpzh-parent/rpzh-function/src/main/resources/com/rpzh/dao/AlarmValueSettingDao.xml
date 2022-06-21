@@ -164,6 +164,13 @@
         from tb_alarm_value_setting talarm,tb_maintain_plan_stage tstage
         where tstage.id = #{id} and tstage.alarm_value_setting_id = talarm.id
     </select>
+    <select id="findByMaintainStackId" resultType="com.rpzh.vo.MaintainPlanVo">
+        select
+            t1.alarm_value_setting_id as alarmValueSettingId,
+            t2.stage_id as stageId
+        from tb_maintain_plan_stage t1,tb_maintain_plan t2
+        where  t1.id = t2.stage_id and t2.stack_id = #{stackId}
+    </select>
     <select id="findByMaterialCode" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select
             stack_oxygen_upper_one as stackOxygenUpperOne,

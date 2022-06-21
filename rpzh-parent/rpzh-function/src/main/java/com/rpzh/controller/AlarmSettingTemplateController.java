@@ -3,6 +3,7 @@ package com.rpzh.controller;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.AlarmSettingTemplateDto;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.SettingColorAndDayDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -159,5 +160,17 @@ public class AlarmSettingTemplateController {
     public Result updateAlarmSettingTemplate(@ApiIgnore AlarmSettingTemplateDto alarmSettingTemplateDto) {
         alarmSettingTemplateService.updateAlarmSettingTemplate(alarmSettingTemplateDto);
         return new Result<>(true, StatusCode.OK, "更改预警设置模板成功!");
+    }
+
+    @PostMapping(value = "/findLogData")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "size", value = "每页数量,默认为10", required = false,dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "当前页，默认为第一页", required = false,dataType = "Integer")
+    })
+    @ApiOperation(value = "查询操作日志")
+    public Result findLogData(LogAlarmSettingDto logAlarmSettingDto) {
+        return alarmSettingTemplateService.findLogData(logAlarmSettingDto);
     }
 }

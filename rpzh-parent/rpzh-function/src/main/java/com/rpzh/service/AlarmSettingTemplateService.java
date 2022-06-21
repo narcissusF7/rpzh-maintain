@@ -3,6 +3,7 @@ package com.rpzh.service;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.AlarmSettingTemplateDto;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.SettingColorAndDayDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.AlarmSettingTemplateVo;
@@ -31,4 +32,6 @@ public interface AlarmSettingTemplateService {
     AlarmSettingTemplateVo findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle);
 
     void updateAlarmSettingTemplate(AlarmSettingTemplateDto alarmSettingTemplateDto);
+
+    Result findLogData(LogAlarmSettingDto logAlarmSettingDto);
 }

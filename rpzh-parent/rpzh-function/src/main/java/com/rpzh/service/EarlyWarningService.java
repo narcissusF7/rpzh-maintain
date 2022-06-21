@@ -12,8 +12,11 @@ import com.rpzh.vo.EarlyWarningVo;
  */
 public interface EarlyWarningService {
     Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto);
-    Result findEarlyWarning(EarlyWarningDto earlyWarningDto);
+    Result findEarlyWarningByWarningType(EarlyWarningDto earlyWarningDto);
+    Result findEarlyWarningBySiteId(EarlyWarningDto earlyWarningDto);
     PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto);
-    Result findDetailsEarlyWarning(EarlyWarningDto earlyWarningDto);
     Result findWarningCount(EarlyWarningDto earlyWarningDto);
+    Integer misreport(Integer id);
+
+    Result findNodeData(EarlyWarningDto earlyWarningDto);
 }

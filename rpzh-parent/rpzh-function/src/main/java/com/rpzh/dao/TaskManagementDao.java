@@ -74,4 +74,12 @@ public interface TaskManagementDao {
      * @return
      */
     int taskEvaluate(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 根据位置位置路由和任务类型查询任务详情
+     *
+     * @param siteRoute
+     * @return
+     */
+    TaskVo findTaskDetailBySiteId(@Param("siteRoute") String siteRoute, @Param("type") String type);
 }

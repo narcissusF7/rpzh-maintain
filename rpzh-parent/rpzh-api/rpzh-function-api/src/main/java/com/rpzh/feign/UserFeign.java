@@ -21,5 +21,12 @@ public interface UserFeign {
      * @return
      */
     @PostMapping("/getUsernameById")
-    public Result<List<String>> findUsernameById(@RequestParam("ids")List<Integer> ids);
+    public Result findUsernameById(@RequestParam("ids")List<Integer> ids);
+
+    /**
+     * 根据id查询手机号
+     * @return
+     */
+    @PostMapping("/findPhoneNumberById")
+    public Result findPhoneNumberById(@RequestParam("id") String id);
 }

@@ -452,4 +452,8 @@
         </if>
           order by pidRoute
     </select>
+    <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
+        select * from
+        (select ${tableColumn},transfer_time as transferTime from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
+    </select>
 </mapper>

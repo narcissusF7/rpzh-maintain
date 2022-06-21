@@ -173,12 +173,6 @@ FROM tb_general_setting limit 1
        from tb_alarm_setting_template
        where material_code = #{materialCode} and maintence_style= #{maintenceStyle}
 </select>
-    <select id="findCountByMaintenceStyle" resultType="java.lang.Integer">
-    select
-       count(*)
-       from tb_alarm_setting_template
-       where material_code = #{materialCode} and early_warning_rule_name = #{earlyWarningRuleName}
-</select>
     <update id="updateAlarmSettingTemplate">
         update tb_alarm_setting_template
         <set>
@@ -234,6 +228,41 @@ FROM tb_general_setting limit 1
        core_temp_high_env_temp_three as coreTempHighEnvTempThree,
        core_temp_low_env_temp as coreTempLowEnvTemp
        from tb_alarm_setting_template
-       where id = #{alarmValueSettingId}
+       where id = #{alarmValueSettingId} and material_code = #{materialCode} and early_warning_rule_name = #{earlyWarningRuleName}
    </select>
+    <insert id="insertLogAlarmSetting">
+        insert into log_alarm_setting
+        (
+        <if test="logAlarmSettingDto.logUserName!= null and logAlarmSettingDto.logUserName!= ''">log_user_name,</if>
+        <if test="logAlarmSettingDto.logIp!= null and logAlarmSettingDto.logIp!= ''">log_ip,</if>
+        <if test="logAlarmSettingDto.logType!= null and logAlarmSettingDto.logType!= ''">log_type,</if>
+        <if test="logAlarmSettingDto.earlyWarningRuleName!= null and logAlarmSettingDto.earlyWarningRuleName!= ''">early_warning_rule_name,</if>
+        <if test="logAlarmSettingDto.phases!= null and logAlarmSettingDto.phases!= ''">phases,</if>
+        <if test="logAlarmSettingDto.alarmValueSettingId!= null and logAlarmSettingDto.alarmValueSettingId!= ''">alarmValueSetting_id,</if>
+        <if test="logAlarmSettingDto.materialCode!= null and logAlarmSettingDto.materialCode!= ''">material_code,</if>
+        log_date
+        )
+        values (
+        <if test="logAlarmSettingDto.logUserName!= null and logAlarmSettingDto.logUserName!= ''">#{logAlarmSettingDto.logUserName},</if>
+        <if test="logAlarmSettingDto.logIp!= null and logAlarmSettingDto.logIp!= ''">#{logAlarmSettingDto.logIp},</if>
+        <if test="logAlarmSettingDto.logType!= null and logAlarmSettingDto.logType!= ''">#{logAlarmSettingDto.logType},</if>
+        <if test="logAlarmSettingDto.earlyWarningRuleName!= null and logAlarmSettingDto.earlyWarningRuleName!= ''">#{logAlarmSettingDto.earlyWarningRuleName},</if>
+        <if test="logAlarmSettingDto.phases!= null and logAlarmSettingDto.phases!= ''">#{logAlarmSettingDto.phases},</if>
+        <if test="logAlarmSettingDto.alarmValueSettingId!= null and logAlarmSettingDto.alarmValueSettingId!= ''">#{logAlarmSettingDto.alarmValueSettingId},</if>
+        <if test="logAlarmSettingDto.materialCode!= null and logAlarmSettingDto.materialCode!= ''">#{logAlarmSettingDto.materialCode},</if>
+        #{logAlarmSettingDto.logDate}
+        )
+    </insert>
+    <select id="findLogData" resultType="com.rpzh.vo.LogAlarmSettingVo">
+        select
+        id as id,
+        log_ip as logIp,
+        log_type as logType,
+        early_warning_rule_name as earlyWarningRuleName,
+        phases as phases,
+        log_user_name as logUserName,
+        log_date as logDate
+        from log_alarm_setting
+        where early_warning_rule_name = #{logAlarmSettingDto.earlyWarningRuleName} and material_code = #{logAlarmSettingDto.materialCode}
+    </select>
 </mapper>

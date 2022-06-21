@@ -18,11 +18,22 @@ import java.util.Date;
 public class EarlyWarningVo {
     @ApiModelProperty(notes ="主键id")
     private Integer id;
+    @ApiModelProperty(notes ="上限一级")
+    private Double upperOne;
+    @ApiModelProperty(notes ="上限二级")
+    private Double upperTwo;
+    @ApiModelProperty(notes ="上限三级")
+    private Double upperThree;
+    @ApiModelProperty(notes = "下限")
+    private Double lower;
+    private String siteX;
+    private String siteY;
+    private String siteZ;
     @ApiModelProperty(notes = "预警等级,1:一级预警,2:二级预警,3:三级预警")
     private Integer warningGrade;
     @ApiModelProperty(notes = "预警信息")
     private String warningNews;
-    @ApiModelProperty(notes = "预警类型 01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内虫数预警,05:仓间虫数预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警")
+    @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
     private String warningType;
     @ApiModelProperty(notes = "设备id")
     private String nodeId;

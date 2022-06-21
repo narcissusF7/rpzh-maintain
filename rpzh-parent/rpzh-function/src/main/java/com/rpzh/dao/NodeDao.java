@@ -172,4 +172,7 @@ public interface NodeDao {
     List<NodeVo> findNodeIdBySiteType(@Param("siteType") String siteType,@Param("stackId")Integer stackId,@Param("pidRoute")String pidRoute);
 
     List<NodeVo> findHumitureDevice(@Param("monitorCondition") MonitorCondition monitorCondition);
+
+    @DS("clickhouse")
+    List<NodeData> findNodeData(@Param("nodeId") String nodeId,@Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 }

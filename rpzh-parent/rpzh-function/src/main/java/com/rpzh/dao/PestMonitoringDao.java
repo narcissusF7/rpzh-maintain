@@ -8,6 +8,7 @@ import com.rpzh.pojo.PestData;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.PestBoardVo;
 import com.rpzh.vo.PestDataVo;
+import com.rpzh.vo.PestMonitoringRuleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -28,11 +29,11 @@ public interface PestMonitoringDao {
 
     List<String> findSpecialSiteRoute(@Param("siteRoutes") List<String> asList);
 
-    Integer updateSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne")String valueOne,@Param("valueTwo")String valueTwo,@Param("valueThree")String valueThree,@Param("siteName") String siteName);
+    Integer updateSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne") String valueOne, @Param("valueTwo") String valueTwo, @Param("valueThree") String valueThree, @Param("siteName") String siteName);
 
-    Integer addSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne")String valueOne,@Param("valueTwo")String valueTwo,@Param("valueThree")String valueThree,@Param("siteName") String siteName);
+    Integer addSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne") String valueOne, @Param("valueTwo") String valueTwo, @Param("valueThree") String valueThree, @Param("siteName") String siteName);
 
-    Map<String,Integer> findWeekPatrol();
+    Map<String, Integer> findWeekPatrol();
 
     Map<String, Object> findPestMonitorValue();
 
@@ -40,9 +41,9 @@ public interface PestMonitoringDao {
 
     Integer delSpecialSite(@Param("ids") List<String> asList);
 
-    Integer exportPestData(@Param("pestDataList") List<PestData> pestDataList,@Param("siteType") String siteType);
+    Integer exportPestData(@Param("pestDataList") List<PestData> pestDataList, @Param("siteType") String siteType);
 
-    List<Map<String ,String>> findByPrincipalName(@Param("principalName") String principalName);
+    List<Map<String, String>> findByPrincipalName(@Param("principalName") String principalName);
 
     PestBoardVo findPestBoardByPestBoardId(@Param("pestBoardId") String pestBoardId);
 
@@ -57,4 +58,8 @@ public interface PestMonitoringDao {
     Integer findPestBoardCount(@Param("pestBoardId") String pestBoardId);
 
     Result findPestBoardByRfid(@Param("rfid") String rfid);
+
+    PestMonitoringRuleVo findPestStackMonitor(@Param("pidRoute") String pidRoute);
+
+    PestMonitoringRuleVo findPestMonitor();
 }

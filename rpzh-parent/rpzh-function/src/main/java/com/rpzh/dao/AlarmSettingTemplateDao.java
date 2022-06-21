@@ -1,7 +1,9 @@
 package com.rpzh.dao;
 
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.SettingColorAndDayVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -40,7 +42,9 @@ public interface AlarmSettingTemplateDao {
 
     int updateAlarmSettingTemplate(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    AlarmValueSettingVo findAlarmSettingTemplateById(@Param("alarmValueSettingId") Integer id);
+    AlarmValueSettingVo findAlarmSettingTemplateById(@Param("alarmValueSettingId") Integer id, @Param("materialCode") String materialCode, @Param("earlyWarningRuleName") String earlyWarningRuleName);
 
-    Integer findCountByMaintenceStyle(@Param("materialCode") String materialCode, @Param("earlyWarningRuleName") String earlyWarningRuleName);
+    int insertLogAlarmSetting(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
+
+    List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto")LogAlarmSettingDto logAlarmSettingDto);
 }

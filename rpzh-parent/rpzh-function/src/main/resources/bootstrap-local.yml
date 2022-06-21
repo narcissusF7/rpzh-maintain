@@ -67,6 +67,21 @@ logging:
     root: info
     org.springframework: info
     com.rpzh.dao: DEBUG  #sql日志打印
+printTime:
+  cron: 0/10 * * * * ?
+
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000   #连接超时时间
+          strategy: SEMAPHORE              #线程池隔离采用信号量隔离
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
 # mqtt 连接配置
 mqtt:
   host: tcp://183.250.89.188

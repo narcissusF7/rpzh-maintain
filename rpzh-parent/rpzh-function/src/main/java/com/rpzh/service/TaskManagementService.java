@@ -47,6 +47,14 @@ public interface TaskManagementService {
     TaskVo findTaskDetail(Long id);
 
     /**
+     * 根据位置id和任务类型查询任务详情
+     *
+     * @param stackId
+     * @return
+     */
+    TaskVo findTaskDetailBySiteId(Integer stackId,Integer areaId,String type);
+
+    /**
      * 工作任务查询任务列表
      * @param taskDto
      * @return

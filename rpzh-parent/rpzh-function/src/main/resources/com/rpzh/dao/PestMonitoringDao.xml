@@ -236,4 +236,16 @@
         tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
     </select>
 
+    <select id="findPestStackMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">
+        select prewarning_value_one as valueOne,
+            prewarning_value_two as valueTwo,
+            prewarning_value_three as  valueThree
+        from tb_pest_stack_monitor where site_route = #{pidRoute}
+    </select>
+    <select id="findPestMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">
+        select prewarning_value_one as valueOne,
+               prewarning_value_two as valueTwo,
+               prewarning_value_three as  valueThree
+        from tb_pest_monitor
+    </select>
 </mapper>

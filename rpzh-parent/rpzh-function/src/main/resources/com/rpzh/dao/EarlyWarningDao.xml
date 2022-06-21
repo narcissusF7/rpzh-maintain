@@ -31,8 +31,8 @@
         <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
-        group by warning_type
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
+        group by warning_type order by warning_type
     </select>
     <select id="findEarlyWarningByNode" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
@@ -49,7 +49,7 @@
         where warning_type in ('01','02','03')
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         GROUP BY is_affirm,area_id,stack_id) t2
         ON t.warning_grade = t2.warning_grade AND (t2.stack_id = t.stack_id OR t2.area_id = t.area_id) GROUP BY t.is_affirm,t.area_id,t.stack_id ORDER BY t.is_affirm DESC,group_concat(t.warning_grade) DESC
     </select>
@@ -69,7 +69,7 @@
         where warning_type = #{earlyWarningDto.warningType}
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         GROUP BY is_affirm,stack_id) t2
         ON t.warning_grade = t2.warning_grade AND t2.stack_id = t.stack_id  GROUP BY t.is_affirm,t.stack_id ORDER BY t.is_affirm DESC,group_concat(t.warning_grade) DESC
     </select>
@@ -89,20 +89,41 @@
         where warning_type = #{earlyWarningDto.warningType}
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal_name = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         GROUP BY is_affirm,area_id) t2
         ON t.warning_grade = t2.warning_grade AND t2.area_id = t.area_id GROUP BY t.is_affirm,t.area_id ORDER BY t.is_affirm DESC,group_concat(t.warning_grade) DESC
     </select>
 
-
-
-
-    <select id="findEarlyWarningByStack" resultType="com.rpzh.vo.EarlyWarningVo">
-        select id, warning_type warningType , node_id nodeId , node_type nodeType , warning_val_one warningValOne ,
-               warning_time_one warningTimeOne , warning_val_two warningValTwo , warning_time_two warningTimeTwo ,
-               warning_val_three warningValThree , warning_time_three warningTimeThree , warning_grade warningGrade ,
-                stack_id stackId from tb_early_warning
-        where stack_id = #{stackId} and is_affirm = 0
+    <select id="findWarningDataByNode" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT
+        t.id as id,
+         t.node_id as nodeId,
+         t.node_type as nodeType,
+        t.warning_type as warningType,t.warning_val as warningVal,
+         t2.site_x as siteX,t2.site_y as siteY,t2.site_z as siteZ FROM tb_early_warning t INNER JOIN tb_node t2  ON t.node_id =t2.node_id
+         WHERE (t.node_id,warning_time) IN
+         (SELECT node_id,MAX(warning_time) FROM tb_early_warning WHERE warning_type IN <foreach collection="type" item="t" open="(" separator="," close=")">#{t}</foreach>
+        AND is_affirm = #{affirm}
+          <if test="areaId!=null and areaId!=''"> and area_id = #{areaId}</if>
+          <if test="stackId!=null and stackId!=''"> and stack_id = #{stackId}</if>
+          GROUP BY node_id)
+    </select>
+    <select id="findWarningDataByStack" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT
+        id as id,
+        warning_val as warningVal
+         FROM tb_early_warning
+        WHERE (warning_time) IN
+        (SELECT MAX(warning_time) FROM tb_early_warning WHERE warning_type = #{warningType} AND is_affirm = #{affirm} and stack_id = #{stackId})
+    </select>
+    <select id="findWarningDataByArea" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT
+        id as id,
+        warning_val as warningVal
+        FROM tb_early_warning
+        WHERE (warning_time) IN
+        (SELECT MAX(warning_time) FROM tb_early_warning WHERE warning_type = #{warningType} AND is_affirm = #{affirm} and area_id = #{areaId}
+        GROUP BY node_id)
     </select>
     <select id="findUndoCount" resultType="java.lang.Integer">
         select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm = 2 and warning_type = #{warningType}
@@ -167,13 +188,14 @@
         WHEN (stack_id IS NULL ) THEN (SELECT site_name FROM tb_ware_area t WHERE t.id = t1.area_id)
         WHEN (area_id IS NULL) THEN (SELECT site_name FROM tb_stack t WHERE t.id = t1.stack_id) END) AS siteName
         FROM tb_early_warning t1
-        WHERE t1.is_deal = '1'
+        WHERE t1.is_affirm &lt;&gt; '2'
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t1.warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t1.warning_grade = #{earlyWarningDto.warningGrade}</if>
         <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t1.node_id = #{earlyWarningDto.nodeId}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t1.principal_name = #{earlyWarningDto.principalName}</if>
         <if test="earlyWarningDto.startTime != null">and t1.deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and t1.deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.endTime != null">and t1.
+            _time &lt;= #{earlyWarningDto.endTime}</if>
         ORDER BY t1.area_id DESC,t1.stack_id
     </select>
 
@@ -194,7 +216,7 @@
         t2.site_name as siteName
         from tb_early_warning t1
         left join tb_ware_area t2 on t2.id = t1.area_id
-        where t1.is_deal = '1'
+        where t1.is_affirm &lt;&gt; '2'
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and t1.area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t1.warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t1.warning_grade = #{earlyWarningDto.warningGrade}</if>
@@ -220,7 +242,7 @@
         t5.site_name as siteName
         from tb_early_warning t4
         left join tb_stack t5 on t5.id = t4.stack_id
-        where t4.is_deal = '1'
+        where t4.is_affirm &lt;&gt; '2'
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
             and t4.stack_id in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>
         </if>
@@ -236,9 +258,9 @@
     <select id="findCountByMonth" resultType="com.rpzh.vo.WarningOrDealVo">
         SELECT
         warning_type AS warningType,
-        DATE_FORMAT(deal_time,'%Y%m') AS dealTime,
+        DATE_FORMAT(warning_time,'%Y%m') AS dealTime,
         COUNT(warning_type) AS COUNT
-        FROM tb_early_warning WHERE DATE_FORMAT(deal_time,'%Y%m') =DATE_FORMAT(CURDATE(),'%Y%m') GROUP BY warning_type,dealTime
+        FROM tb_early_warning WHERE DATE_FORMAT(warning_time,'%Y%m') =DATE_FORMAT(CURDATE(),'%Y%m') GROUP BY warning_type,dealTime
     </select>
     <select id="findSum" resultType="java.lang.Integer">
         SELECT COUNT(t.id) FROM
@@ -246,8 +268,8 @@
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         union
         select id from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
@@ -255,8 +277,8 @@
         </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         ) t
     </select>
     <select id="findCountByWarningType" resultType="com.rpzh.vo.WarningOrDealVo">
@@ -265,8 +287,8 @@
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         union
         select id,warning_type from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
@@ -274,81 +296,130 @@
         </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         ) t group by t.warning_type
     </select>
     <select id="findCountByDeal" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT t.is_deal as deal,truncate(COUNT(t.id)/#{earlyWarningDto.count},2) as percentage FROM
-        (select id,is_deal from tb_early_warning where 1=1
+        SELECT t.is_t1.is_affirm as deal,truncate(COUNT(t.id)/#{earlyWarningDto.count},2) as percentage FROM
+        (select id,is_affirm from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         union
-        select id,is_deal from tb_early_warning where 1=1
+        select id,is_affirm from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
             and stack_id in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>
         </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t group by t.is_deal
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
+        ) t group by t.is_affirm
     </select>
     <select id="findCountByDay" resultType="com.rpzh.vo.WarningOrDealVo">
         SELECT
         (CASE #{earlyWarningDto.dayType}
-        WHEN '1' THEN DATE_FORMAT(t.deal_time,'%m%d')
-        WHEN '2' THEN DATE_FORMAT(t.deal_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
-        WHEN '3' THEN DATE_FORMAT(t.deal_time,'%Y%m')
-        WHEN '4' THEN DATE_FORMAT(t.deal_time,'%Y') END) as dayType,
+        WHEN '1' THEN DATE_FORMAT(t.warning_time,'%m%d')
+        WHEN '2' THEN DATE_FORMAT(t.warning_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
+        WHEN '3' THEN DATE_FORMAT(t.warning_time,'%Y%m')
+        WHEN '4' THEN DATE_FORMAT(t.warning_time,'%Y') END) as dayType,
         COUNT(id) as count FROM
-        (select id,deal_time from tb_early_warning where 1=1
+        (select id,warning_time from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         union
-        select id,deal_time from tb_early_warning where 1=1
+        select id,warning_time from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
             and stack_id in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>
         </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         ) t group by
         dayType
     </select>
+    <select id="findById" resultType="com.rpzh.vo.EarlyWarningVo">
+        select
+        warning_val_one as warningValOne,
+        warning_time_one as warningTimeOne,
+        warning_val_two as warningValTwo,
+        warning_time_two as warningTimeTwo,
+        warning_val_three as warningValThree,
+        warning_time_three as warningTimeThree
+        from  tb_early_warning where id =#{id}
+    </select>
     <select id="findCountByIsDeal" resultType="com.rpzh.vo.WarningOrDealVo">
         SELECT
-        t.is_deal as deal,
+        t.is_affirm as deal,
         (CASE #{earlyWarningDto.dayType}
-        WHEN '1' THEN DATE_FORMAT(t.deal_time,'%m%d')
-        WHEN '2' THEN DATE_FORMAT(t.deal_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
-        WHEN '3' THEN DATE_FORMAT(t.deal_time,'%Y%m')
-        WHEN '4' THEN DATE_FORMAT(t.deal_time,'%Y') END) AS dayType,
+        WHEN '1' THEN DATE_FORMAT(t.warning_time,'%m%d')
+        WHEN '2' THEN DATE_FORMAT(t.warning_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
+        WHEN '3' THEN DATE_FORMAT(t.warning_time,'%Y%m')
+        WHEN '4' THEN DATE_FORMAT(t.warning_time,'%Y') END) AS dayType,
         COUNT(id) AS count FROM
-        (select id,deal_time,is_deal from tb_early_warning where 1=1
+        (select id,warning_time,is_affirm from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackId != null and earlyWarningDto.stackId != ''">and area_id = #{earlyWarningDto.stackId}</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         union
-        select id,deal_time,is_deal from tb_early_warning where 1=1
+        select id,warning_time,is_affirm from tb_early_warning where 1=1
         <if test="earlyWarningDto.stackIds != null and earlyWarningDto.stackIds != ''">
             and stack_id in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>
         </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         ) t
         GROUP BY
-        dayType,t.is_deal ORDER BY dayType
+        dayType,t.is_affirm ORDER BY dayType
+    </select>
+
+    <update id="misreport">
+        update tb_early_warning set is_affirm = '1',is_affirm = '0' where id = #{id}
+    </update>
+
+    <select id="findTime" resultType="com.rpzh.vo.TimeVo">
+        select first_time AS firstTime,second_time AS secondTime from tb_send_time
+    </select>
+    <insert id="insertTime">
+        insert into tb_send_time(first_time,second_time) values(#{firstTime},#{secondTime})
+    </insert>
+    <update id="updateTime">
+        update tb_send_time set first_time = #{firstTime},second_time =#{secondTime}
+    </update>
+    <select id="findStack" resultType="java.lang.Integer">
+        SELECT stack_id from tb_early_warning where is_affirm = '2' and stack_id is not null group by stack_id order by stack_id
+    </select>
+    <select id="findSendStack" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
+(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and stack_id = #{stackId} and warning_type not in ('01','02','03') GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
+    </select>
+    <select id="findArea" resultType="java.lang.Integer">
+        SELECT area_id from tb_early_warning where is_affirm = '2' and area_id is not null group by area_id order by area_id
+    </select>
+    <select id="findSendArea" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
+(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and area_id = #{areaId} and warning_type not in ('01','02','03') GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
+    </select>
+    <select id="findSendStackByWarningThree" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
+(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and stack_id = #{stackId} and warning_type not in ('01','02','03') and warning_grade = '3' GROUP BY node_id) ORDER BY warning_type,warning_grade
+    </select>
+    <select id="findSendAreaByWarningThree" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
+(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and area_id = #{areaId} and warning_type not in ('01','02','03') and warning_grade = '3' GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
+    </select>
+    <select id="findMaxTime" resultType="java.lang.String">
+        select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId}
     </select>
 </mapper>

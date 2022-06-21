@@ -2,6 +2,7 @@ package com.rpzh.dao;
 
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.MaintainPlanVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,7 +17,7 @@ public interface AlarmValueSettingDao {
 
     Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findMaxId(@Param("earlyWarningRuleName")String earlyWarningRuleName);
+    Integer findMaxId(@Param("earlyWarningRuleName") String earlyWarningRuleName);
 
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 
@@ -25,4 +26,6 @@ public interface AlarmValueSettingDao {
     AlarmValueSettingVo findByMaterialCode(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
     int changeStatus(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    MaintainPlanVo findByMaintainStackId(@Param("stackId")Integer stackId);
 }

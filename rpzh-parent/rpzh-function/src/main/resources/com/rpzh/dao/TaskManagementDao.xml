@@ -164,4 +164,10 @@
    </set>
   WHERE id = #{taskDto.id}
 </update>
+
+<select id="findTaskDetailBySiteId" resultMap="findTask">
+  SELECT id,task_num,type,task_detail,task_address,principal,end_time,create_time,status
+  FROM tb_task
+  where site_route= #{siteRoute} and type = #{type} and status = '0'
+</select>
 </mapper>

@@ -2,24 +2,36 @@ package com.rpzh.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.Task.SendTask;
+import com.rpzh.Task.SendTwoTask;
+import com.rpzh.dao.EarlyWarningDao;
+import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
+import com.rpzh.feign.UserFeign;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
 import com.rpzh.vo.NodeVo;
+import com.rpzh.vo.TimeVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +44,7 @@ import java.util.Map;
 @RequestMapping("/maintain/test")
 @CrossOrigin
 @Api(value = "测试用例类", tags = "测试用例类", description = "测试用例类")
+@Slf4j
 public class TestContrller {
 
 
@@ -187,4 +200,46 @@ public class TestContrller {
         JSONObject.parseObject(map,Map.class);
         return new Result<>(true, StatusCode.OK, "测试方法4");
     }
+
+    @Autowired
+    private SendTask sendTask;
+
+    @Autowired
+    private SendTwoTask sendTwoTask;
+    @Resource
+    private EarlyWarningDao earlyWarningDao;
+    @Resource
+    private RedisTemplate redisTemplate;
+    @GetMapping("/updateCron")
+    public String updateCron(String firstTime,String secondTime) {
+        if(ToolUtil.isEmpty(firstTime) || ToolUtil.isEmpty(secondTime)) {
+            return "";
+        }
+        TimeVo timeVo = earlyWarningDao.findTime();
+        if(ToolUtil.isNotEmpty(timeVo)){
+            earlyWarningDao.updateTime(firstTime,secondTime);
+        }
+        if(ToolUtil.isEmpty(timeVo)){
+            earlyWarningDao.insertTime(firstTime,secondTime);
+        }
+        log.debug(firstTime);
+        String[] times = firstTime.split(":");
+        int hours = Integer.parseInt(times[0]);
+        int minutes = Integer.parseInt(times[1]);
+        int seconds = Integer.parseInt(times[2]);
+        /*String cron = seconds + " " + minutes + " " + hours + " * * ?";*/
+        String cron ="*/" + seconds + " * * * * ?";
+        sendTask.setCron(cron);
+        redisTemplate.opsForValue().set("firstTime",cron);
+        times = secondTime.split(":");
+        hours = Integer.parseInt(times[0]);
+        minutes = Integer.parseInt(times[1]);
+        seconds = Integer.parseInt(times[2]);
+        /*String cron = seconds + " " + minutes + " " + hours + " * * ?";*/
+        cron ="*/" + seconds + " * * * * ?";
+        redisTemplate.opsForValue().set("secondTime",cron);
+        sendTwoTask.setCron(cron);
+        return "ok";
+    }
+
 }

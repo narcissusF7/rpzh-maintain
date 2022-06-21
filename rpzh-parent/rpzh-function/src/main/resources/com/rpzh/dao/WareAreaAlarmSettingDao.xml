@@ -4,6 +4,7 @@
 
     <select id="findBySite" resultType="com.rpzh.vo.AlarmValueSettingVo">
         SELECT
+        id as id,
             warehouse_oxygen_upper_one as warehouseOxygenUpperOne,
             warehouse_oxygen_upper_two as warehouseOxygenUpperTwo,
             warehouse_oxygen_upper_three as warehouseOxygenUpperThree,
@@ -131,4 +132,15 @@
         </set>
         where id = #{wareAreaAlarmSettingDto.id}
     </update>
+    <select id="findLogData" resultType="com.rpzh.vo.LogAlarmSettingVo">
+        select
+        id as id,
+        log_ip as logIp,
+        log_type as logType,
+        alarmValueSetting_id as alarmValueSettingId,
+        log_user_name as logUserName,
+        log_date as logDate
+        from log_alarm_setting
+        where alarmValueSetting_id = #{logAlarmSettingDto.alarmValueSettingId}
+    </select>
 </mapper>

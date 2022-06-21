@@ -17,6 +17,12 @@ public class PestMonitoringRuleVo {
     Map<String,Object> pestMonitorValues;
     @ApiModelProperty(notes = "特殊垛位的数据 stackId 垛位id ，valueOne 一级预警值 valueTwo 二级预警值，valueThree 三级预警值")
     List<Map<String ,String>> specialStacks;
+    @ApiModelProperty(notes = "一级预警值")
+    Double valueOne;
+    @ApiModelProperty(notes = "二级预警值")
+    Double valueTwo;
+    @ApiModelProperty(notes = "三级预警值")
+    Double valueThree;
 
     public PestMonitoringRuleVo() {
     }

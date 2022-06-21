@@ -14,6 +14,5 @@ public class AlarmSettingTemplateDto {
     private String earlyWarningRuleName;
     private List<String> materialCodes;
     private String alarmValueSettingDto;
-    private List<String> alarmValueSettingDtos;
     private String maintenceStyle;
 }

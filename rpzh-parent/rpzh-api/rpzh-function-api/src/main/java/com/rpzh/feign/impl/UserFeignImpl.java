@@ -13,7 +13,12 @@ import java.util.List;
  */
 public class UserFeignImpl implements UserFeign {
     @Override
-    public Result<List<String>> findUsernameById(List<Integer> ids) {
+    public Result findUsernameById(List<Integer> ids) {
+        throw new RuntimeException("服务器异常");
+    }
+
+    @Override
+    public Result findPhoneNumberById(String id) {
         throw new RuntimeException("服务器异常");
     }
 }

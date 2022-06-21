@@ -74,7 +74,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer stackId = maintainPlanDto.getStackId();
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
         maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
-        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
+        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData().toString()));
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",",materialCodes));
         Date nowDate = new Date();
@@ -350,7 +350,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         Integer stackId = maintainPlanDto.getStackId();
         maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
-        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
+        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData().toString()));
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
         String updateUser = TokenDecode.getUserInfo().get("username");
         Date nowDate = new Date();
@@ -397,7 +397,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
         maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
-        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData()));
+        maintainPlanDto.setPrincipalName(String.join(",",userFeign.findUsernameById(principalIds).getData().toString()));
         String createUser = TokenDecode.getUserInfo().get("username");
         Date date = new Date();
         maintainPlanDto.setCreateUser(createUser);

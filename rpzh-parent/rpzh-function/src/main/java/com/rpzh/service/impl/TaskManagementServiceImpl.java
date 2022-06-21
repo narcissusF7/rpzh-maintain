@@ -5,10 +5,15 @@ import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.TaskManagementDao;
+import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.TaskDto;
+import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.TokenDecode;
+import com.rpzh.vo.StackVo;
 import com.rpzh.vo.TaskVo;
+import com.rpzh.vo.WareAreaVo;
 import com.sun.xml.bind.v2.model.core.ID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
@@ -18,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +41,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
     @Autowired
     private TaskManagementDao taskManagementDao;
+
+    @Resource
+    private WarehouseDao warehouseDao;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -162,6 +171,25 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     @Override
     public TaskVo findTaskDetail(Long id) {
         TaskVo taskVo = taskManagementDao.findTaskDetail(id);
+        return taskVo;
+    }
+
+    /**
+     * 根据位置id和任务类型查询任务详情
+     *
+     * @param stackId
+     * @return
+     */
+    @Override
+    public TaskVo findTaskDetailBySiteId(Integer stackId,Integer areaId,String type) {
+        String siteRoute = "";
+        if(ToolUtil.isNotEmpty(stackId)){
+            siteRoute = warehouseDao.findStackById(stackId).getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
+        }
+        if(ToolUtil.isNotEmpty(areaId)) {
+            siteRoute = warehouseDao.findWareArea(areaId).getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
+        }
+        TaskVo taskVo = taskManagementDao.findTaskDetailBySiteId(siteRoute,type);
         return taskVo;
     }
 

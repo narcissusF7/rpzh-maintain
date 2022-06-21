@@ -86,5 +86,9 @@ public interface MaintainPlanDao {
 
     Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
 
-    List<String> findPhases(@Param("stackId")Integer stackId,@Param("maintenceStyle")String maintenceStyle);
+    List<String> findPhases(@Param("stackId") Integer stackId, @Param("maintenceStyle") String maintenceStyle);
+
+    String findPrincipalId(@Param("stackId") Integer stackId);
+
+    MaintainPlanVo findMaintainPlanByStack(@Param("stackId") Integer stackId);
 }

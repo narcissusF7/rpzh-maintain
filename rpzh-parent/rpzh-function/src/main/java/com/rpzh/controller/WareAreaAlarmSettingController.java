@@ -3,6 +3,7 @@ package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.AlarmValueSettingDto;
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -118,5 +119,16 @@ public class WareAreaAlarmSettingController {
     public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         wareAreaAlarmSettingService.updateWareAreaAlarmSetting(wareAreaAlarmSettingDto);
         return new Result<>(true, StatusCode.OK, "修改仓间预警规则成功!");
+    }
+
+    @PostMapping(value = "/findLogData")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "alarmValueSettingId", value = "仓间预警id", required = false,dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量,默认为10", required = false,dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "当前页，默认为第一页", required = false,dataType = "Integer")
+    })
+    @ApiOperation(value = "查询仓间操作日志")
+    public Result findLogData(LogAlarmSettingDto logAlarmSettingDto) {
+        return wareAreaAlarmSettingService.findLogData(logAlarmSettingDto);
     }
 }

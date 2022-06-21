@@ -60,6 +60,28 @@
         left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
         WHERE t1.id= #{id}
     </select>
+    <select id="findMaintainPlanByStack" resultType="com.rpzh.vo.MaintainPlanVo">
+        SELECT
+            t1.id as id,
+            t1.material_code AS materialCode,
+            t3.site_name as stackName,
+            t1.maintence_style as maintenceStyle,
+            t2.phases as phases,
+            t2.maintain_days AS maintainDays,
+            t2.aftercare_date_start AS aftercareDateStart,
+            t2.oxygen_reduction_time AS oxygenReductionTime,
+            t2.created_time AS createdTime,
+            t1.principal_name AS principalName,
+            t2.expire_time AS expireTime,
+            t2.maintain_count as maintainCount,
+            t1.principal_ids as principalId,
+            t2.id as stageId,
+            t2.alarm_value_setting_id AS alarmValueSettingId
+        FROM tb_maintain_plan t1
+        left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
+        left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
+        WHERE t1.stack_id= #{stackId}
+    </select>
     <select id="findVersion" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         version as version,
@@ -476,5 +498,8 @@
     <select id="findPhases" resultType="java.lang.String">
         select t.phases from tb_maintain_plan_stage t
         inner join tb_maintain_plan t1 on t1.stack_id = #{stackId} and t1.is_end = '0' and t1.maintence_style = #{maintenceStyle} and t1.id=t.maintain_plan_id
+    </select>
+    <select id="findPrincipalId" resultType="java.lang.String">
+        select principal_ids from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'
     </select>
 </mapper>

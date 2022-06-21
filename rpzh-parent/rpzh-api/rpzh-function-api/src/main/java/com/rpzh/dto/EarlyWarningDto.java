@@ -27,13 +27,17 @@ public class EarlyWarningDto implements Serializable {
 
     private String warningType;
 
-    private Integer nodeId;
+    private String nodeType;
+
+    private String nodeId;
 
     private String pidRoute;
 
     private BigDecimal warningVal;
 
     private LocalDateTime warningTime;
+
+    private String time;
 
     private String siteName;
 
@@ -54,6 +58,8 @@ public class EarlyWarningDto implements Serializable {
     private String dealSuggestion;
 
     private Integer stackId;
+
+    private Integer areaId;
 
     private List<Integer> stackIds;
 

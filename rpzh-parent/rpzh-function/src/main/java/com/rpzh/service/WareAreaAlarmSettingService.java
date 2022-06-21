@@ -1,6 +1,7 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
@@ -19,4 +20,5 @@ public interface WareAreaAlarmSettingService {
     PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
     Result findWareAreaAlarmSettingById(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
     void updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
+    Result findLogData(LogAlarmSettingDto logAlarmSettingDto);
 }

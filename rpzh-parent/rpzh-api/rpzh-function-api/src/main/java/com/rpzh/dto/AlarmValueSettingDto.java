@@ -18,10 +18,10 @@ public class AlarmValueSettingDto {
     /**
      * 垛内氧气
      */
-    private Double stackOxygenUpperOne;
-    private Double stackOxygenUpperTwo;
-    private Double stackOxygenUpperThree;
-    private Double stackOxygenLower;
+    private Double stackOxygenUpperOne=0d;
+    private Double stackOxygenUpperTwo=0d;
+    private Double stackOxygenUpperThree=0d;
+    private Double stackOxygenLower=0d;
 
     /**
      * 仓间氧气
@@ -34,26 +34,26 @@ public class AlarmValueSettingDto {
     /**
      * 包芯温度
      */
-    private Double tempCoreChipUpperOne;
-    private Double tempCoreChipUpperTwo;
-    private Double tempCoreChipUpperThree;
-    private Double tempCoreChipLower;
+    private Double tempCoreChipUpperOne=0d;
+    private Double tempCoreChipUpperTwo=0d;
+    private Double tempCoreChipUpperThree=0d;
+    private Double tempCoreChipLower=0d;
 
     /**
      * 垛内温度
      */
-    private Double stackTempUpperOne;
-    private Double stackTempUpperTwo;
-    private Double stackTempUpperThree;
-    private Double stackTempLower;
+    private Double stackTempUpperOne=0d;
+    private Double stackTempUpperTwo=0d;
+    private Double stackTempUpperThree=0d;
+    private Double stackTempLower=0d;
 
     /**
      * 垛内水分
      */
-    private Double stackMoistureUpperOne;
-    private Double stackMoistureUpperTwo;
-    private Double stackMoistureUpperThree;
-    private Double stackMoistureLower;
+    private Double stackMoistureUpperOne=0d;
+    private Double stackMoistureUpperTwo=0d;
+    private Double stackMoistureUpperThree=0d;
+    private Double stackMoistureLower=0d;
 
     /**
      * 仓间温度
@@ -64,20 +64,20 @@ public class AlarmValueSettingDto {
     private Double warehouseTempLower;
 
     /**
-     * 垛内水分
+     * 仓间水分
      */
-    private Double warehouseMoistureUpperOne;
-    private Double warehouseMoistureUpperTwo;
-    private Double warehouseMoistureUpperThree;
-    private Double warehouseMoistureLower;
+    private Double warehouseMoistureUpperOne=0d;
+    private Double warehouseMoistureUpperTwo=0d;
+    private Double warehouseMoistureUpperThree=0d;
+    private Double warehouseMoistureLower=0d;
 
     /**
      * 平均包芯高于环境
      */
-    private Double coreTempHighEnvTempOne;
-    private Double coreTempHighEnvTempTwo;
-    private Double coreTempHighEnvTempThree;
-    private Double coreTempLowEnvTemp;
+    private Double coreTempHighEnvTempOne=0d;
+    private Double coreTempHighEnvTempTwo=0d;
+    private Double coreTempHighEnvTempThree=0d;
+    private Double coreTempLowEnvTemp=0d;
 
     private String siteType;
     private Integer level;

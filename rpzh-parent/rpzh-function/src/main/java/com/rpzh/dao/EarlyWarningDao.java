@@ -2,14 +2,12 @@ package com.rpzh.dao;
 
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.pojo.EarlyWarning;
-import com.rpzh.vo.EarlyWarningVo;
-import com.rpzh.vo.NodeVo;
-import com.rpzh.vo.WarningCountVo;
-import com.rpzh.vo.WarningOrDealVo;
+import com.rpzh.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Mapper
@@ -25,8 +23,6 @@ public interface EarlyWarningDao {
     List<String> findWarningThreshold(@Param("settingKey") String settingKey);
 
     List<EarlyWarningVo> findUndoEarlyWarning();
-
-    EarlyWarningVo findEarlyWarningByStack(@Param("stackId") String stackId);
 
     Integer insertWarning(@Param("earlyWarning") EarlyWarning earlyWarning);
 
@@ -55,4 +51,34 @@ public interface EarlyWarningDao {
     List<EarlyWarningVo> findEarlyWarningByStackType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<EarlyWarningVo> findEarlyWarningByAreaType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findWarningDataByNode(@Param("affirm") String affirm, @Param("stackId") Integer stackId, @Param("areaId") Integer areaId, @Param("type") List<String> type);
+
+    List<EarlyWarningVo> findWarningDataByStack(@Param("affirm") String affirm, @Param("stackId") Integer stackId, @Param("warningType") String warningType);
+
+    List<EarlyWarningVo> findWarningDataByArea(@Param("affirm") String affirm, @Param("areaId") Integer areaId, @Param("warningType") String warningType);
+
+    EarlyWarningVo findById(@Param("id") Integer id);
+
+    Integer misreport(@Param("id") Integer id);
+
+    TimeVo findTime();
+
+    int insertTime(@Param("firstTime") String firstTime, @Param("secondTime") String secondTime);
+
+    int updateTime(@Param("firstTime") String firstTime, @Param("secondTime") String secondTime);
+
+    List<EarlyWarningVo> findSendStack(@Param("stackId") Integer stackId);
+
+    List<Integer> findStack();
+
+    List<Integer> findArea();
+
+    List<EarlyWarningVo> findSendArea(@Param("areaId") Integer areaId);
+
+    List<EarlyWarningVo> findSendStackByWarningThree(@Param("stackId") Integer stackId);
+
+    List<EarlyWarningVo> findSendAreaByWarningThree(@Param("areaId") Integer areaId);
+
+    String findMaxTime(@Param("nodeId")String nodeId);
 }
