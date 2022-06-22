@@ -576,8 +576,8 @@ public class WarehouseServiceImpl implements WarehouseService {
      * @return
      */
     @Override
-    public List<BuildingVo> findAllBulid() {
-        return warehouseDao.findAllBulid();
+    public List<BuildingVo> findAllBulid(Set<Integer> buildingIds) {
+        return warehouseDao.findAllBulid(buildingIds);
     }
 
     /**
@@ -585,14 +585,14 @@ public class WarehouseServiceImpl implements WarehouseService {
      * @return
      */
     @Override
-    public List<FloorVo> findAllFloor() {
+    public List<FloorVo> findAllFloor(Set<Integer> floorIds) {
 
-        return warehouseDao.findAllFloor();
+        return warehouseDao.findAllFloor(floorIds);
     }
 
     @Override
-    public List<WareAreaVo> findAllWareArea() {
-        return warehouseDao.findAllWareArea();
+    public List<WareAreaVo> findAllWareArea(Set<Integer> areaIds) {
+        return warehouseDao.findAllWareArea(areaIds);
     }
 
     @Override
@@ -613,19 +613,14 @@ public class WarehouseServiceImpl implements WarehouseService {
             //查询所有仓库
             warehouseVos = findAllWarehouse(null);
             //查询所有楼栋
-            List<BuildingVo> buildingVos = findAllBulid();
+            List<BuildingVo> buildingVos = findAllBulid(null);
             //查询所有楼层
-            List<FloorVo> floorVos = findAllFloor();
+            List<FloorVo> floorVos = findAllFloor(null);
             //查询所有区间
-            List<WareAreaVo> wareAreaVos = findAllWareArea();
+            List<WareAreaVo> wareAreaVos = findAllWareArea(null);
             //查询所有垛位
             List<StackVo> stackVos = findAllStack();
 
-            //原始的数据 未经过stream处理
-//            redisTemplate.opsForHash().put("buildingVos","buildingVos",buildingVos);
-//            redisTemplate.opsForHash().put("floorVos","floorVos",floorVos);
-//            redisTemplate.opsForHash().put("wareAreaVos","wareAreaVos",wareAreaVos);
-//            redisTemplate.opsForHash().put("stackVos","stackVos",stackVos);
             //将所有的垛位放到对应的区间去
             wareAreaVos.stream().forEach(wareAreaVo ->{
                 stackVos.stream().collect(Collectors.groupingBy(stackVo -> stackVo.getAreaId())).forEach((key, value)->{
@@ -660,6 +655,65 @@ public class WarehouseServiceImpl implements WarehouseService {
             redisTemplate.opsForHash().put("maintain-locating","locating",warehouseVos);
         }
 
+        return warehouseVos;
+    }
+
+    @Override
+    public List<WarehouseVo> locatingMaintain() {
+            //查询没有养护计划的垛位
+            List<StackVo> stackVos = warehouseDao.findStackNotInMaintainPlan();
+            Set<Integer> areaIds = new HashSet<>();
+            stackVos.forEach(stackVo -> {
+                areaIds.add(stackVo.getAreaId());
+            });
+        //查询没有养护计划的区间
+        List<WareAreaVo> wareAreaVos = findAllWareArea(areaIds);
+        Set<Integer> floorIds = new HashSet<>();
+        wareAreaVos.forEach(wareAreaVo -> {
+            floorIds.add(wareAreaVo.getFloorId());
+        });
+        //查询没有养护计划的楼层
+        List<FloorVo> floorVos = findAllFloor(floorIds);
+        Set<Integer> buildingIds = new HashSet<>();
+        floorVos.forEach(floorVo -> {
+            buildingIds.add(floorVo.getBuildingId());
+        });
+        //查询没有养护计划的楼栋
+        List<BuildingVo> buildingVos = findAllBulid(buildingIds);
+        Set<Integer> warehouseIds = new HashSet<>();
+        buildingVos.forEach(buildingVo -> {
+            warehouseIds.add(buildingVo.getWarehouseId());
+        });
+        //查询没有养护计划的仓库
+        List<WarehouseVo> warehouseVos = warehouseDao.findAllWarehouses(warehouseIds);
+            //将垛位放到对应的区间去
+            wareAreaVos.stream().forEach(wareAreaVo ->{
+                stackVos.stream().collect(Collectors.groupingBy(stackVo -> stackVo.getAreaId())).forEach((key, value)->{
+                    if (wareAreaVo.getId().equals(key)){
+                        wareAreaVo.setStackVos(value);
+                    }
+                }); });
+            //将区间放到对应的楼层去
+            floorVos.stream().forEach(floorVo ->{
+                wareAreaVos.stream().collect(Collectors.groupingBy(wareAreaVo -> wareAreaVo.getFloorId())).forEach((key,value)->{
+                    if (floorVo.getId().equals(key)){
+                        floorVo.setWareAreaVos(value);
+                    }
+                }); });
+            //将楼层放到对应的楼栋去
+            buildingVos.stream().forEach(buildingVo ->{
+                floorVos.stream().collect(Collectors.groupingBy(floorVo -> floorVo.getBuildingId())).forEach((key,value)->{
+                    if (buildingVo.getId().equals(key)){
+                        buildingVo.setFloorVos(value);
+                    }
+                }); });
+            //将楼栋放到对应的仓库去
+            warehouseVos.stream().forEach(warehouseVo -> {
+                buildingVos.stream().collect(Collectors.groupingBy(buildingVo -> buildingVo.getWarehouseId())).forEach((key,value)->{
+                    if (warehouseVo.getId().equals(key)){
+                        warehouseVo.setBuildingVos(value);
+                    }
+                });});
         return warehouseVos;
     }
 

@@ -5,6 +5,7 @@ import com.rpzh.dto.*;
 import com.rpzh.vo.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 仓库管理
@@ -273,13 +274,15 @@ public interface WarehouseService {
      */
     String findWareAreaType(Integer areaId);
 
-    List<BuildingVo> findAllBulid();
+    List<BuildingVo> findAllBulid(Set<Integer> buildingIds);
 
-    List<FloorVo> findAllFloor();
+    List<FloorVo> findAllFloor(Set<Integer> floorIds);
 
-    List<WareAreaVo> findAllWareArea();
+    List<WareAreaVo> findAllWareArea(Set<Integer> areaIds);
 
     List<StackVo> findAllStack();
 
     List<WarehouseVo> locating();
+
+    List<WarehouseVo> locatingMaintain();
 }

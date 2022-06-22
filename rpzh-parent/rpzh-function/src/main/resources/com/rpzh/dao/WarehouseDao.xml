@@ -616,6 +616,33 @@
     from tb_floor
     where id = #{floorId}
   </select>
+  <select id="findAllWarehouses" resultType="com.rpzh.vo.WarehouseVo">
+    SELECT
+    `id` as id,
+    `name` as name,
+    `build_time` as buildTime,
+    `code` as code,
+    `use_volume` as useVolume,
+    `use_volume_unit` as useVolumeUnit,
+    `use_area` as useArea,
+    `use_area_unit` as useAreaUnit,
+    `is_automation` as isAutomation,
+    `is_statistics` as isStatistics,
+    `is_using` as isUsing,
+    `remark` as remark,
+    `created_time` as createdTime,
+    `created_user` as createdUser,
+    `last_updated_time` as lastUpdatedTime,
+    `last_updated_user` as lastUpdatedUser,
+    `pid_route` as pidRoute,
+    `ware_type` as wareType,
+    `site_name` as siteName
+    FROM tb_warehouse
+    where 1=1
+    <if test="warehouseIds != null"> and id in  <foreach collection="warehouseIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach></if>
+  </select>
     <select id="findAllBulid" resultType="com.rpzh.vo.BuildingVo">
     SELECT
       `id` as id,
@@ -636,6 +663,10 @@
       `building_type` as buildingType,
       `site_name` as siteName
     FROM `tb_building`
+    where 1=1
+      <if test="buildingIds != null"> and id in  <foreach collection="buildingIds" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach></if>
   </select>
     <select id="findAllFloor" resultType="com.rpzh.vo.FloorVo">
     SELECT
@@ -652,19 +683,27 @@
       `floor_name` as floorName,
       `site_name` as siteName
     FROM tb_floor
+    where 1=1
+      <if test="floorIds != null"> and id in  <foreach collection="floorIds" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach></if>
   </select>
     <select id="findAllWareArea" resultType="com.rpzh.vo.WareAreaVo">
     SELECT
-      `id` as id,
-      `area_no` as areaNo,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `floor_id` as floorId,
-      `pid_route` as pidRoute,
-      `area_name` as areaName,
-      `site_name` as siteName,
-      `remark` as remark
-    FROM `tb_ware_area`
+      id as id,
+      area_no as areaNo,
+      created_time as createdTime,
+      created_user as createdUser,
+      floor_id as floorId,
+      pid_route as pidRoute,
+      area_name as areaName,
+      site_name as siteName,
+      remark as remark
+    FROM tb_ware_area
+    where 1=1
+    <if test="areaIds != null"> and id in  <foreach collection="areaIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach></if>
   </select>
     <select id="findAllStack" resultType="com.rpzh.vo.StackVo">
     SELECT
@@ -681,6 +720,22 @@
   `stack_type` as stackType,
   `remark` as remark
     FROM `tb_stack`
+  </select>
+  <select id="findStackNotInMaintainPlan" resultType="com.rpzh.vo.StackVo">
+    SELECT
+      `id` as id,
+      `stack_no` as stackNo,
+      `name_cn` as nameCn,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `area_id` as areaId,
+      `pid_route` as pidRoute,
+      `site_name` as siteName,
+  `stack_type` as stackType,
+  `remark` as remark
+    FROM `tb_stack` where id not in (select stack_id from tb_maintain_plan where is_end = '0')
   </select>
   <select id = "findBuildingPrincipalName" resultType="com.rpzh.vo.BuildingVo">
     select

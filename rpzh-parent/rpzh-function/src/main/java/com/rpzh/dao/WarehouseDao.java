@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 仓库管理
@@ -357,15 +358,19 @@ public interface WarehouseDao {
 
     WarehouseVo findWarehousePrincipalName(@Param("warehouseId") Integer warehouseId);
 
-    List<BuildingVo> findAllBulid();
+    List<BuildingVo> findAllBulid(@Param("buildingIds") Set<Integer> buildingIds);
 
-    List<FloorVo> findAllFloor();
+    List<FloorVo> findAllFloor(@Param("floorIds") Set<Integer> floorIds);
 
-    List<WareAreaVo> findAllWareArea();
+    List<WareAreaVo> findAllWareArea(@Param("areaIds") Set<Integer> areaIds);
 
     List<StackVo> findAllStack();
 
     StackVo findPidRoute(@Param("stackId") Integer id);
 
-    List<Integer> findStackByAreId(@Param("areaId")Integer areaId);
+    List<Integer> findStackByAreId(@Param("areaId") Integer areaId);
+
+    List<StackVo> findStackNotInMaintainPlan();
+
+    List<WarehouseVo> findAllWarehouses(@Param("warehouseIds")Set<Integer> warehouseIds);
 }
