@@ -10,7 +10,6 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.pojo.PestData;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.PestBoardVo;
@@ -47,6 +46,7 @@ public class PestMonitoringController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pestBoardId", value = "虫情板Id", dataType = "String", required = true),
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String", required = true),
+            @ApiImplicitParam(name = "siteName", value = "位置名称", dataType = "String", required = true),
             @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer", required = true),
             @ApiImplicitParam(name = "principalId", value = "负责人Id", dataType = "Integer", required = true),
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String", required = true),
@@ -76,16 +76,12 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "colorTwo", value = "二级预警颜色",dataType = "String", required = true),
             @ApiImplicitParam(name = "colorThree", value = "三级预警颜色",dataType = "String", required = true),
             @ApiImplicitParam(name = "replacePeriod", value = "替换周期",dataType = "Integer", required = true),
-            @ApiImplicitParam(name = "siteRoutes", value = "位置路由集合（需要前端把原本的pidRoute中的，替换成|）",dataType = "String",allowMultiple = true),
-            @ApiImplicitParam(name = "siteIds", value = "位置id集合",dataType = "Integer",allowMultiple = true),
-            @ApiImplicitParam(name = "siteNames", value = "位置名称集合",dataType = "String",allowMultiple = true),
-            @ApiImplicitParam(name = "stackWarningValues", value = "垛位预警值集合（每个垛位的预警值用|拼接）",dataType = "String", allowMultiple = true),
-            @ApiImplicitParam(name = "delIds", value = "需要删除的特殊垛位的主键id集",dataType = "Integer", allowMultiple = true)
+            @ApiImplicitParam(name = "specialStack", value = "特殊垛位集合",dataType = "String")
     })
     @PostMapping("/updatePestRule")
     public Result updatePestRule(PestMonitoringRuleDto pestMonitoringRuleDto){
         pestMonitoringService.updatePestRule(pestMonitoringRuleDto);
-        return new Result(true, StatusCode.OK,"修改成功");
+        return new Result(true, StatusCode.OK,"保存成功");
     }
 
     @ApiOperation("查询虫情监控规则")
@@ -97,8 +93,15 @@ public class PestMonitoringController {
 
     @ApiOperation("虫情导入模板下载")
     @GetMapping("/downloadTemplate")
-    public void downloadTemplate(HttpServletResponse response) {
-        String downloadFilePath = "/template/pestBoard/pestBoard.xlsx";//被下载的文件在服务器中的路径,
+    @ApiImplicitParam(name = "siteType", value = "位置类型仓间04 垛内05", dataType = "String", required = true)
+    public void downloadStackTemplate(HttpServletResponse response,String siteType) {
+        String downloadFilePath = "";
+        if (NodeConstant.NODE_WARE_AREA.equals(siteType)) {
+            downloadFilePath = "/template/pestBoard/ware_pestBoard.xlsx";
+        }else {
+            downloadFilePath = "/template/pestBoard/stack_pestBoard.xlsx";
+        }
+        //被下载的文件在服务器中的路径,
         String fileName = "虫情导入模板";//被下载文件的名称
         InputStream inputStream = getClass().getResourceAsStream(downloadFilePath);
         ExcelUtils.outFile(inputStream, response, fileName, "xlsx");
@@ -147,17 +150,19 @@ public class PestMonitoringController {
     @ApiOperation("虫情点位信息查询")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String"),
-            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer"),
             @ApiImplicitParam(name = "principalId", value = "负责人id", dataType = "Integer"),
             @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer")
     })
-    @GetMapping("/findPestBoard")
+    @PostMapping("/findPestBoard")
     public Result<List<PestBoardVo>> findPestBoard(@ApiIgnore PestBoardDto pestBoardDto){
-        //分页
-        PageHelper.startPage(pestBoardDto.getPage(),pestBoardDto.getSize());
 
+        if (!ToolUtil.isEmpty(pestBoardDto.getPage())&&!ToolUtil.isEmpty(pestBoardDto.getSize())){
+            //分页
+            PageHelper.startPage(pestBoardDto.getPage(),pestBoardDto.getSize());
+        }
         List<PestBoardVo> pestBoard = pestMonitoringService.findPestBoard(pestBoardDto);
 
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(pestBoard));
@@ -172,7 +177,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer"),
             @ApiImplicitParam(name = "sortCondition", value = "排序规则 0 位置排序 1 预警排序", dataType = "Integer")
     })
-    @GetMapping("/findPestDataHistory")
+    @PostMapping("/findPestDataHistory")
     public Result<List<PestDataVo>>  findPestDataHistory(@ApiIgnore MonitorCondition monitorCondition){
         PageInfo<PestDataVo> pageInfo = pestMonitoringService.findPestDataHistory(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
@@ -181,8 +186,8 @@ public class PestMonitoringController {
 
     @ApiOperation("查询单个点位虫情数据")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String"),
-            @ApiImplicitParam(name = "beginTime", value = "开始时间", dataType = "String"),
+            @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String" ,required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String"),
             @ApiImplicitParam(name = "siteType", value = "位置类型 04仓间05垛位", dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", dataType = "String"),
             @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
@@ -190,28 +195,41 @@ public class PestMonitoringController {
     })
     @GetMapping("/findPestDataHistoryByOne")
     public Result<List<PestDataVo>> findPestDataHistoryByOne(@ApiIgnore PestDataDto pestDataDto){
-        PageHelper.startPage(pestDataDto.getPage(),pestDataDto.getSize());
+        if (!ToolUtil.isEmpty(pestDataDto.getPage())&&!ToolUtil.isEmpty(pestDataDto.getSize())){
+            //分页
+            PageHelper.startPage(pestDataDto.getPage(),pestDataDto.getSize());
+        }
         List<PestDataVo> pestDataVos = pestMonitoringService.findPestDataHistoryByOne(pestDataDto);
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(pestDataVos));
     }
 
-    @ApiOperation("添加虫情数据")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String"),
-            @ApiImplicitParam(name = "siteId", value = "位置标识", dataType = "String"),
-            @ApiImplicitParam(name = "beetleCount", value = "甲虫数量", dataType = "Integer"),
-            @ApiImplicitParam(name = "mealwormCount", value = "粉螟数量", dataType = "Integer"),
-            @ApiImplicitParam(name = "gatherSite", value = "采集位置", dataType = "String")
-    })
-    @PostMapping("/addPestHistory")
-    public Result addPestHistory(@ApiIgnore PestDataDto pestDataDto){
-        pestMonitoringService.addPestHistory(pestDataDto);
-        return new Result(true,StatusCode.OK,"添加成功");
-    }
+    //    @ApiOperation("添加虫情数据")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String"),
+//            @ApiImplicitParam(name = "siteId", value = "位置标识", dataType = "String"),
+//            @ApiImplicitParam(name = "beetleCount", value = "甲虫数量", dataType = "Integer"),
+//            @ApiImplicitParam(name = "mealwormCount", value = "粉螟数量", dataType = "Integer"),
+//            @ApiImplicitParam(name = "gatherSite", value = "采集位置", dataType = "String")
+//    })
+//    @PostMapping("/addPestHistory")
+//    public Result addPestHistory(@ApiIgnore PestDataDto pestDataDto){
+//        pestMonitoringService.addPestHistory(pestDataDto);
+//        return new Result(true,StatusCode.OK,"添加成功");
+//    }
     @ApiOperation("通过rfid查询虫情板数据")
     @GetMapping("/findPestBoardByRfid")
     @ApiImplicitParam(name = "rfid", value = "rfid", dataType = "String", required = true)
     public Result findPestBoardByRfid(String rfid){
         return pestMonitoringService.findPestBoardByRfid(rfid);
     }
+
+
+    @ApiOperation("查询虫情点位预警值")
+    @GetMapping("/findPestWarningValue")
+    @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String", required = true)
+    public Result<Map<String,Object>> findPestWarningValue(String pestBoardId){
+        Map<String,Object> map = pestMonitoringService.findPestWarningValue(pestBoardId);
+        return new Result(true,StatusCode.OK,"查询成功",map);
+    }
+
 }

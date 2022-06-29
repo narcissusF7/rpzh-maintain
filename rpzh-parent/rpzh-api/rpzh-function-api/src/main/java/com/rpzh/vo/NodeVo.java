@@ -126,4 +126,10 @@ public class NodeVo implements Serializable {
     @ApiModelProperty(notes = "物料代码")
     private String materialCode;
 
+    @ApiModelProperty(notes = "温度预警等级")
+    private Integer tempLevel;
+
+    @ApiModelProperty(notes = "湿度预警等级")
+    private Integer humidityLevel;
+
 }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.GMWSDao">
+
+<!--    <select id="findOxygenData" resultType="com.rpzh.vo.NodeDataVo">-->
+<!--        SELECT-->
+<!--            t.nodeId,-->
+<!--            any(t.stackId) stackId,-->
+<!--            any(t.oxygen) oxygen,-->
+<!--            any(t.gatherSite) gatherSite,-->
+<!--            any(t.transferTime) transferTime-->
+<!--        from-->
+<!--            (-->
+<!--            select-->
+<!--            node_id nodeId ,-->
+<!--            stack_id stackId ,-->
+<!--            oxygen oxygen,-->
+<!--            gather_site gatherSite ,-->
+<!--            transfer_time transferTime-->
+<!--            from-->
+<!--            tb_node_o2_history-->
+<!--            order by-->
+<!--            transfer_time-->
+<!--            ) t-->
+<!--        group by-->
+<!--            t.nodeId-->
+<!--    </select>-->
+    <select id="findNodeData" resultType="com.rpzh.vo.NodeDataVo">
+        SELECT
+            t.nodeId,
+            any(t.stackId) stackId,
+            <if test="tableName=='tb_node_env_history'">
+                any(t.humiture) humiture,
+                any(t.temp) temp,
+            </if>
+
+            <if test="tableName!='tb_node_env_history'">
+                any(t.${column}) ${column},
+            </if>
+
+            any(t.gatherSite) gatherSite,
+            any(t.transferTime) transferTime
+        from
+            (
+             select
+                 node_id nodeId ,
+                 stack_id stackId ,
+                <if test="tableName=='tb_node_env_history'">
+                    humiture humiture,
+                    temp temp,
+                </if>
+
+                <if test="tableName!='tb_node_env_history'">
+                    ${column} ${column},
+                </if>
+                 gather_site gatherSite ,
+                 transfer_time transferTime
+             from
+                 ${tableName}
+             order by
+                 transfer_time
+            ) t
+        group by
+            t.nodeId
+    </select>
+</mapper>

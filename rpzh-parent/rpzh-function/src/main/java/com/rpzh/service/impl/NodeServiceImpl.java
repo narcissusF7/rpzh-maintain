@@ -3,9 +3,11 @@ package com.rpzh.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
@@ -13,6 +15,9 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
+import com.rpzh.pojo.GeneralSetting;
+import com.rpzh.pojo.NodeData;
+import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeDataVo;
@@ -36,7 +41,8 @@ public class NodeServiceImpl implements NodeService {
     @Autowired
     private NodeDao nodeDao;
 
-
+    @Autowired
+    private MonitoringCenterService monitoringCenterService;
     /**
      * 添加节点
      *
@@ -98,10 +104,15 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public PageInfo<NodeVo> findAllNodeList(NodeDto nodeDto) {
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        //静态分页
-        PageHelper.startPage(page, size);
+        if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
+            int page = nodeDto.getPage();
+            int size = nodeDto.getSize();
+            //静态分页
+            PageHelper.startPage(page, size);
+        }
+        if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
+            nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
+        }
         List<NodeVo> nodeVoList = nodeDao.findAllNodeList(nodeDto);
         return new PageInfo<>(nodeVoList);
     }
@@ -135,7 +146,6 @@ public class NodeServiceImpl implements NodeService {
         //插入设备替换日志
         int insertFlag = nodeDao.insertReplaceNodeIdLog(nodeDto);
         if (insertFlag>0){
-            //设备替换,注意:后面要加修改历史数据的设备替换,此处需要添加feign调用,修改历史数据中的设备id
             return nodeDao.replaceNodeId(nodeDto);
         }
         return -1;
@@ -148,10 +158,12 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public PageInfo<NodeVo> findNodeReplaceLog(NodeDto nodeDto) {
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        //静态分页
-        PageHelper.startPage(page, size);
+        if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
+            int page = nodeDto.getPage();
+            int size = nodeDto.getSize();
+            //静态分页
+            PageHelper.startPage(page, size);
+        }
         List<NodeVo> nodeVoList = nodeDao.findNodeReplaceLog(nodeDto);
         return new PageInfo<>(nodeVoList);
     }
@@ -176,10 +188,12 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public PageInfo<NodeVo> findNoEnterStack(NodeDto nodeDto) {
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        //静态分页
-        PageHelper.startPage(page, size);
+        if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getPage())){
+            int page = nodeDto.getPage();
+            int size = nodeDto.getSize();
+            //静态分页
+            PageHelper.startPage(page, size);
+        }
         List<NodeVo> nodeVoList = nodeDao.findNoEnterStack(nodeDto);
         return new PageInfo<>(nodeVoList);
     }
@@ -336,14 +350,15 @@ public class NodeServiceImpl implements NodeService {
     public Integer findNodeStatus(Integer id) {
         return nodeDao.findNodeStatus(id);
     }
-
     @Override
     public Result flipStack(MaintainPlanDto maintainPlanDto) {
         List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
         nodeDtoList.forEach(nodeDtostr ->
-                    nodeDao.updateNode(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
+                nodeDao.updateNode(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
         return new Result(true,StatusCode.OK,"翻垛成功");
     }
+
+
 
     /**
      * 查询设备历史记录
@@ -353,6 +368,49 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<NodeDataVo> findNodeHistory(NodeDto nodeDto) {
         NodeTypeEnum nodeType = NodeTypeEnum.getNodeType(nodeDto.getNodeType());
-        return nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn());
+        if (!ToolUtil.isEmpty(nodeType)){
+            Map map = monitoringCenterService.putCacheWarningColor();
+            if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
+                nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
+            }
+            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn());
+            for (int i = 0; i < nodeDataVos.size(); i++) {
+                if (nodeDataVos.get(i).getAlertLevel()==1){
+                    nodeDataVos.get(i).setWarningColor(map.get("one").toString());
+                }else if (nodeDataVos.get(i).getAlertLevel()==2){
+                    nodeDataVos.get(i).setWarningColor(map.get("two").toString());
+                }else if (nodeDataVos.get(i).getAlertLevel()==3){
+                    nodeDataVos.get(i).setWarningColor(map.get("three").toString());
+                }else {
+                    nodeDataVos.get(i).setWarningColor("");
+                }
+            }
+            return nodeDataVos;
+        }
+        return null;
     }
+    /**
+     * 手动分页
+     * @param list 需要分页的数据
+     * @param pageNum 当前页
+     * @param pageSize 每页数量
+     * @return
+     */
+    @Override
+    public Page<NodeDataVo> manuallyPage(List<NodeDataVo> list, int pageNum, int pageSize) {
+        //创建一个page类
+        Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
+        //总数量
+        int total = list.size();
+        page.setTotal(total);
+        //起始下标
+        int startIndex = (pageNum - 1) * pageSize;
+        //终止下标
+        int endIndex = Math.min(startIndex + pageSize, total);
+        //截取数量
+        page.addAll(list.subList(startIndex, endIndex));
+
+        return page;
+    }
+
 }

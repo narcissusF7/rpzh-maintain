@@ -2,6 +2,8 @@ package com.rpzh.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class PestMonitoringRuleDto {
     private Integer[] weekPatrol;
@@ -12,9 +14,5 @@ public class PestMonitoringRuleDto {
     private String colorTwo;
     private String colorThree;
     private Integer replacePeriod;
-    private String[] siteRoutes;
-    private Integer[] siteIds;
-    private String[] siteNames;
-    private String[] stackWarningValues;
-    private String[] delIds;
+    private String specialStack;
 }

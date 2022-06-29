@@ -2,9 +2,13 @@ package com.rpzh.vo;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.entity.ToolUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @ApiModel(description = "设备数据返回类")
@@ -27,73 +31,73 @@ public class NodeDataVo {
     private String typeName;
     @Excel(
             name = "数据上传时间",
-            orderNum = "3"
+            orderNum = "9"
     )
     @ApiModelProperty(notes = "数据上传时间")
     private String transferTime;
     @Excel(
             name = "氧气浓度",
-            orderNum = "4",
+            orderNum = "3",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "氧气浓度")
     private Double oxygen;
     @Excel(
             name = "二氧化碳浓度",
-            orderNum = "4",
+            orderNum = "3",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "二氧化碳浓度")
     private Double concentrationCo2;
     @Excel(
             name = "温度",
-            orderNum = "4",
+            orderNum = "3",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "温度")
     private Double temp;
     @Excel(
             name = "水份含量",
-            orderNum = "4",
+            orderNum = "3",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "水份含量")
     private Double moist;
     @Excel(
             name = "磷化氢含量",
-            orderNum = "4",
+            orderNum = "3",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "磷化氢含量")
     private Double phosphine;
     @Excel(
             name = "湿度",
-            orderNum = "5",
+            orderNum = "4",
             isColumnHidden = true
     )
     @ApiModelProperty(notes = "湿度")
     private Double humiture;
     @Excel(
             name = "采集位置",
-            orderNum = "6"
+            orderNum = "8"
     )
     @ApiModelProperty(notes = "采集位置")
     private String gatherSite;
     @Excel(
             name = "坐标X",
-            orderNum = "7"
+            orderNum = "5"
     )
     @ApiModelProperty(notes = "坐标X")
     private String siteX;
     @Excel(
             name = "坐标Y",
-            orderNum = "8"
+            orderNum = "6"
     )
     @ApiModelProperty(notes = "坐标Y")
     private String siteY;
     @Excel(
             name = "坐标Z",
-            orderNum = "9"
+            orderNum = "7"
     )
     @ApiModelProperty(notes = "坐标Z")
     private String siteZ;
@@ -116,6 +120,22 @@ public class NodeDataVo {
     @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
     private String warningType;
 
+    @ApiModelProperty(notes = "预警类型名称")
+    private String warningName;
+
+    @ApiModelProperty(notes = "位置类型")
+    private String siteType;
+
+    @ApiModelProperty(notes = "温度预警等级")
+    private Integer tempLevel;
+    @ApiModelProperty(notes = "温度预警颜色")
+    private String tempColor;
+
+    @ApiModelProperty(notes = "湿度预警等级")
+    private Integer humidityLevel;
+    @ApiModelProperty(notes = "湿度预警颜色")
+    private String humidityColor;
+
 
     public void setType(String type){
         this.type = type;
@@ -133,20 +153,23 @@ public class NodeDataVo {
     }
 
     public Double getData() {
-        switch(this.type) {
-            case NodeConstant.CARBON_DIOXIDE_NODE_TYPE_VALUE:
-                return this.getConcentrationCo2();
-            case NodeConstant.HUMITURE_NODE_TYPE_VALUE:
-            case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
-                return this.getTemp();
-            case NodeConstant.WET_CORE_CHIP_NODE_TYPE_VALUE:
-                return this.getMoist();
-            case NodeConstant.PHOSPHINE_NODE_TYPE_VALUE:
-                return this.getPhosphine();
-            case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-            default:
-                return this.getOxygen();
+        if (!ToolUtil.isEmpty(this.type)){
+            switch(this.type) {
+                case NodeConstant.CARBON_DIOXIDE_NODE_TYPE_VALUE:
+                    return this.getConcentrationCo2();
+                case NodeConstant.HUMITURE_NODE_TYPE_VALUE:
+                case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
+                    return this.getTemp();
+                case NodeConstant.WET_CORE_CHIP_NODE_TYPE_VALUE:
+                    return this.getMoist();
+                case NodeConstant.PHOSPHINE_NODE_TYPE_VALUE:
+                    return this.getPhosphine();
+                case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
+                default:
+                    return this.getOxygen();
+            }
         }
+        return null;
     }
 
     public static String getColumn(String type) {
@@ -164,6 +187,40 @@ public class NodeDataVo {
             default:
                 return "oxygen";
         }
+    }
+
+    public void setWarningName(){
+        String str1 = "01,02,03";
+        String str2 = "04,05,06,07,08,09,10,11,12,13,14";
+        String warningTypeName ="-";
+        if (!ToolUtil.isEmpty(this.warningType)){
+            String[] split = this.warningType.split(",");
+
+            for (int i = 0; i <split.length ; i++) {
+                if (str2.contains(split[i])){
+                    warningTypeName+="预警-";
+                    break;
+                }
+            }
+
+            for (int i = 0; i <split.length ; i++) {
+                if (str1.contains(split[i])){
+                    warningTypeName+="故障";
+                    break;
+                }
+            }
+            if (warningTypeName.length()>1&&warningTypeName.length()>5){
+                this.warningName =warningTypeName.substring(1);
+            }else if (warningTypeName.length()>1){
+                this.warningName =warningTypeName.substring(1,3);
+            }else {
+                this.warningName ="";
+            }
+        }else {
+            this.warningType = "";
+            this.warningName = "";
+        }
+
     }
 }
 

@@ -29,21 +29,21 @@ public interface PestMonitoringDao {
 
     List<String> findSpecialSiteRoute(@Param("siteRoutes") List<String> asList);
 
-    Integer updateSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne") String valueOne, @Param("valueTwo") String valueTwo, @Param("valueThree") String valueThree, @Param("siteName") String siteName);
+    Integer insertSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne")String valueOne,@Param("valueTwo")String valueTwo,@Param("valueThree")String valueThree,@Param("siteName") String siteName);
 
-    Integer addSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne") String valueOne, @Param("valueTwo") String valueTwo, @Param("valueThree") String valueThree, @Param("siteName") String siteName);
+    Integer addSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne")String valueOne,@Param("valueTwo")String valueTwo,@Param("valueThree")String valueThree,@Param("siteName") String siteName);
 
-    Map<String, Integer> findWeekPatrol();
+    Map<String,Integer> findWeekPatrol();
 
     Map<String, Object> findPestMonitorValue();
 
-    List<Map<String, String>> findSpecialSite();
+    List<Map<String, Object>> findSpecialSite();
 
-    Integer delSpecialSite(@Param("ids") List<String> asList);
+    Integer delSpecialSite();
 
-    Integer exportPestData(@Param("pestDataList") List<PestData> pestDataList, @Param("siteType") String siteType);
+    Integer exportPestData(@Param("pestDataList") List<PestData> pestDataList,@Param("siteType") String siteType);
 
-    List<Map<String, String>> findByPrincipalName(@Param("principalName") String principalName);
+    List<Map<String ,String>> findByPrincipalName(@Param("principalName") String principalName);
 
     PestBoardVo findPestBoardByPestBoardId(@Param("pestBoardId") String pestBoardId);
 
@@ -59,7 +59,11 @@ public interface PestMonitoringDao {
 
     Result findPestBoardByRfid(@Param("rfid") String rfid);
 
+    Map<String, String> findPestWarningColor();
+
     PestMonitoringRuleVo findPestStackMonitor(@Param("pidRoute") String pidRoute);
 
     PestMonitoringRuleVo findPestMonitor();
+
+
 }

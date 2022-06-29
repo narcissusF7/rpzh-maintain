@@ -19,8 +19,8 @@
         <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">created_user_id,</if>
         <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">last_updated_user_id,</if>
         <if test="pestBoardDto.remark!='' and pestBoardDto.remark!=null">remark,</if>
-            created_time,
-            last_updated_time
+        created_time,
+        last_updated_time
         )
         VALUE
         (
@@ -59,13 +59,13 @@
     </update>
     <update id="updateWeekPatrol">
         update tb_pest_patrol set
-          monday   = #{map.x1},
-          tuesday  = #{map.x2},
-          wednesday= #{map.x3},
-          thursday = #{map.x4},
-          friday   = #{map.x5},
-          saturday = #{map.x6},
-          sunday   = #{map.x7}
+                                  monday   = #{map.x1},
+                                  tuesday  = #{map.x2},
+                                  wednesday= #{map.x3},
+                                  thursday = #{map.x4},
+                                  friday   = #{map.x5},
+                                  saturday = #{map.x6},
+                                  sunday   = #{map.x7}
     </update>
     <delete id="deletePestBoard">
         delete from tb_pest_board where id in
@@ -74,15 +74,12 @@
         </foreach>
     </delete>
     <delete id="delSpecialSite">
-        delete from tb_pest_stack_monitor where id in
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
+        truncate tb_pest_stack_monitor
     </delete>
     <select id="findSpecialSiteRoute" resultType="java.lang.String">
-        select stack_id from tb_pest_stack_monitor where stack_id in
+        select site_route from tb_pest_stack_monitor where site_route in
         <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
-            #{siteRoutes}
+            #{siteRoute}
         </foreach>
     </select>
     <select id="findWeekPatrol" resultType="java.util.Map">
@@ -99,10 +96,11 @@
     </select>
     <select id="findSpecialSite" resultType="java.util.Map">
         select  id ,
-                site_route siteRoute,
-                prewarning_value_one   valueOne,
-                prewarning_value_two   valueTwo,
-                prewarning_value_three valueThree
+                site_route pidRoute,
+                site_name siteName,
+                prewarning_value_one   little,
+                prewarning_value_two   middle,
+                prewarning_value_three big
         from tb_pest_stack_monitor
     </select>
     <select id="findByPrincipalName" resultType="java.util.Map">
@@ -112,27 +110,27 @@
         select pest_board_id pestBoardId, site_route siteRoute  from tb_pest_board where pest_board_id =#{pestBoardId}
     </select>
     <select id="findPestBoard" resultType="com.rpzh.vo.PestBoardVo">
-      SELECT
-        	id  as id,
-        	pest_board_id  as pestBoardId,
-        	board_type  as boardType,
-        	principal_id  as principalId,
-        	principal_name  as principalName,
-        	site_id  as siteId,
-        	site_type  as siteType,
-        	site_name  as siteName,
-        	site_route  as siteRoute,
-        	site_x  as siteX,
-        	site_y  as siteY,
-        	site_z  as siteZ,
-        	created_user  as createdUser,
-        	created_time  as createdTime,
-        	last_updated_time  as lastUpdatedTime,
-        	last_updated_user  as lastUpdatedUser,
-        	last_updated_user_id  as lastUpdatedUserId,
-        	remark  as remark
+        SELECT
+        id  as id,
+        pest_board_id  as pestBoardId,
+        board_type  as boardType,
+        principal_id  as principalId,
+        principal_name  as principalName,
+        site_id  as siteId,
+        site_type  as siteType,
+        site_name  as siteName,
+        site_route  as siteRoute,
+        site_x  as siteX,
+        site_y  as siteY,
+        site_z  as siteZ,
+        created_user  as createdUser,
+        created_time  as createdTime,
+        last_updated_time  as lastUpdatedTime,
+        last_updated_user  as lastUpdatedUser,
+        last_updated_user_id  as lastUpdatedUserId,
+        remark  as remark
         FROM
-        	tb_pest_board
+        tb_pest_board
         <where>
             <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">
                 and pest_board_id like concat('%', #{pestBoardDto.pestBoardId}, '%')
@@ -150,7 +148,7 @@
         select pest_board_id from tb_pest_board
         <where>
             <if test="monitorCondition.pidRoute!='' and monitorCondition.pidRoute!=null">
-                and site_route like concat('',#{monitorCondition.pidRoute}, '%');
+                and site_route like concat('',#{monitorCondition.pidRoute}, '%')
             </if>
             <if test="monitorCondition.siteType!='' and monitorCondition.siteType!=null">
                 and site_type = #{monitorCondition.siteType}
@@ -158,9 +156,9 @@
         </where>
         order by site_route,site_x,site_y,site_z
     </select>
-    <update id="updateSpecialSiteRoute">
-        update tb_pest_stack_monitor set prewarning_value_one = #{valueOne} , prewarning_value_two = #{valueTwo},prewarning_value_three = #{valueThree},site_name = #{siteName} where site_route = #{siteRoute}
-    </update>
+    <insert id="insertSpecialSiteRoute">
+        insert into tb_pest_stack_monitor (prewarning_value_one ,prewarning_value_two,prewarning_value_three,site_name,site_route)values (#{valueOne} ,#{valueTwo}, #{valueThree}, #{siteName}, #{siteRoute})
+    </insert>
 
     <insert id="addSpecialSiteRoute">
         insert into tb_pest_stack_monitor (site_route,prewarning_value_one,prewarning_value_two,prewarning_value_three,site_name) values (#{siteRoute},#{valueOne},#{valueTwo},#{valueThree},#{siteName})
@@ -173,8 +171,8 @@
         </if>
         )
         VALUES
-        <foreach collection="pestDataList" item="pestData" separator=",">
-            (#{pestData.pestBoardId},#{pestData.gatherSite},#{pestData.gatherTime},#{pestData.beetleCount},#{pestData.alertLevel}
+        <foreach collection="pestDataList" item="pestData" index="index" separator=",">
+            ( #{pestData.pestBoardId},#{pestData.gatherSite},#{pestData.gatherTime},#{pestData.beetleCount},#{pestData.alertLevel}
             <if test="siteType!='04'">
                 ,#{pestData.mealwormCount}
             </if>
@@ -200,8 +198,8 @@
             mealworm_count mealwormCount
         </if>
         alert_level alertLevel from tb_pest_data_history where pest_board_id = #{pestDataDto.pestBoardId}
-        <if test="pestDataDto.beginTime!='' and pestDataDto.beginTime!=null">
-            and gather_time >= #{pestDataDto.beginTime}
+        <if test="pestDataDto.startTime!='' and pestDataDto.startTime!=null">
+            and gather_time >= #{pestDataDto.startTime}
         </if>
         <if test="pestDataDto.endTime!='' and pestDataDto.endTime!=null">
             and gather_time  &lt;= #{pestDataDto.endTime}
@@ -213,33 +211,41 @@
     <select id="findPestBoardByRfid" resultType="com.rpzh.entity.Result">
         select
             tboard.id  as id,
-        	tboard.pest_board_id  as pestBoardId,
-        	tboard.board_type  as boardType,
-        	tboard.principal_id  as principalId,
-        	tboard.principal_name  as principalName,
-        	tboard.site_id  as siteId,
-        	tboard.site_type  as siteType,
-        	tboard.site_name  as siteName,
-        	tboard.site_route  as siteRoute,
-        	tboard.site_x  as siteX,
-        	tboard.site_y  as siteY,
-        	tboard.site_z  as siteZ,
-        	tboard.created_user  as createdUser,
-        	tboard.created_time  as createdTime,
-        	tboard.last_updated_time  as lastUpdatedTime,
-        	tboard.last_updated_user  as lastUpdatedUser,
-        	tboard.last_updated_user_id  as lastUpdatedUserId,
-        	tboard.remark  as remark
+            tboard.pest_board_id  as pestBoardId,
+            tboard.board_type  as boardType,
+            tboard.principal_id  as principalId,
+            tboard.principal_name  as principalName,
+            tboard.site_id  as siteId,
+            tboard.site_type  as siteType,
+            tboard.site_name  as siteName,
+            tboard.site_route  as siteRoute,
+            tboard.site_x  as siteX,
+            tboard.site_y  as siteY,
+            tboard.site_z  as siteZ,
+            tboard.created_user  as createdUser,
+            tboard.created_time  as createdTime,
+            tboard.last_updated_time  as lastUpdatedTime,
+            tboard.last_updated_user  as lastUpdatedUser,
+            tboard.last_updated_user_id  as lastUpdatedUserId,
+            tboard.remark  as remark
         FROM
-        	tb_pest_board tboard,tb_rfid_relationship trfid
+            tb_pest_board tboard,tb_rfid_relationship trfid
         where
-        tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
+            tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
+    </select>
+    <select id="findPestWarningColor" resultType="java.util.Map">
+        select prewarning_value_one valueOne,
+               prewarning_color_one colorOne,
+               prewarning_value_two valueTwo,
+               prewarning_color_two colorTwo,
+               prewarning_value_three valueThree,
+               prewarning_color_three colorThree from tb_pest_monitor limit 1;
     </select>
 
     <select id="findPestStackMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">
         select prewarning_value_one as valueOne,
-            prewarning_value_two as valueTwo,
-            prewarning_value_three as  valueThree
+               prewarning_value_two as valueTwo,
+               prewarning_value_three as  valueThree
         from tb_pest_stack_monitor where site_route = #{pidRoute}
     </select>
     <select id="findPestMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">

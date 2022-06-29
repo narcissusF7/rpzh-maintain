@@ -12,40 +12,42 @@ import lombok.Data;
 @Data
 @ApiModel(description = "虫情点位返回类")
 public class PestBoardVo {
-    @ApiModelProperty("主键id")
+    @ApiModelProperty(notes = "主键id")
     private String id;
-    @ApiModelProperty("虫情点位id")
+    @ApiModelProperty(notes = "虫情点位id")
     private String pestBoardId;
     @ApiModelProperty("位置路由")
     private String siteRoute;
-    @ApiModelProperty("虫情板类型")
+    @ApiModelProperty(notes = "虫情板类型")
     private String boardType;
-    @ApiModelProperty("负责人id")
+    @ApiModelProperty(notes = "负责人id")
     private String principalId;
-    @ApiModelProperty("负责人名称")
+    @ApiModelProperty(notes = "负责人名称")
     private String principalName;
-    @ApiModelProperty("位置id")
+    @ApiModelProperty(notes = "位置id")
     private String siteId;
-    @ApiModelProperty("位置类型")
+    @ApiModelProperty(notes = "位置类型")
     private String siteType;
-    @ApiModelProperty("位置名称")
+    @ApiModelProperty(notes = "位置名称")
     private String siteName;
-    @ApiModelProperty("坐标X")
+    @ApiModelProperty(notes = "坐标X")
     private String siteX;
-    @ApiModelProperty("坐标Y")
+    @ApiModelProperty(notes = "坐标Y")
     private String siteY;
-    @ApiModelProperty("坐标Z")
+    @ApiModelProperty(notes = "坐标Z")
     private String siteZ;
-    @ApiModelProperty("创建人")
+    @ApiModelProperty(notes = "创建人")
     private String createdUser;
-    @ApiModelProperty("创建时间")
+    @ApiModelProperty(notes = "创建时间")
     private String createdTime;
-    @ApiModelProperty("最后更新时间")
+    @ApiModelProperty(notes = "最后更新时间")
     private String lastUpdatedTime;
-    @ApiModelProperty("最后更新人")
+    @ApiModelProperty(notes = "最后更新人")
     private String lastUpdatedUser;
-    @ApiModelProperty("最后更新人id")
+    @ApiModelProperty(notes = "最后更新人id")
     private String lastUpdatedUserId;
-    @ApiModelProperty("备注")
+    @ApiModelProperty(notes = "备注")
     private String remark;
+    @ApiModelProperty(notes = "虫情预警颜色")
+    private String pestWarningColor;
 }

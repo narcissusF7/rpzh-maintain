@@ -144,6 +144,7 @@ public class DataHandler {
             warningType= warningType +","+WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN;
             //判断数据库中该设备是否存在未处理的低电量预警
             nodeMalfunction(parseData, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData.getVoltage());
+
         }
         //判断信号强度
         if (parseData.getSignalStrength() < signalStrength) {
@@ -216,19 +217,24 @@ public class DataHandler {
                 //温度数据
                 data = parseData.getData().get(i);
                 //判断当前数据所属等级
-                int level = decideValue(data, list);
+                int tempLevel = decideValue(data, list);
 
                 //温度处理
-                earlyWarningHandle(nodeVo, level, parseData, data, "temp");
-
+                earlyWarningHandle(nodeVo, tempLevel, parseData, data, "temp");
+                //设置温度预警等级
+                nodeVo.setTempLevel(tempLevel);
                 //湿度数据
                 data = parseData.getData().get(i + 3);
 
                 //湿度数据等级
-                level = decideValue(data, list.subList(4, 8));
+                int humidityLevel = decideValue(data, list.subList(4, 8));
 
                 //湿度处理
-                earlyWarningHandle(nodeVo, level, parseData, data, "humidity");
+                earlyWarningHandle(nodeVo, humidityLevel, parseData, data, "humidity");
+                //设置湿度预警等
+                nodeVo.setHumidityLevel(humidityLevel);
+                //设置该设备预警等级
+                nodeVo.setAlertLevel(tempLevel>humidityLevel?tempLevel:humidityLevel);
 
                 //如果是其他设备
             } else {
@@ -240,7 +246,9 @@ public class DataHandler {
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);
-            nodeData.setWarningType(warningType.substring(1));
+            if (!ToolUtil.isEmpty(warningType)){
+                nodeData.setWarningType(warningType.substring(1));
+            }
             //向数据库插入当前数据
             Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
 
@@ -396,7 +404,7 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setId(areaId);
 
-         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
+        level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
 
         return level;
     }

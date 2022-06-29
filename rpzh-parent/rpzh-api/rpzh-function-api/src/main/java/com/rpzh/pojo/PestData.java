@@ -12,6 +12,7 @@ public class PestData {
     private  Integer beetleCount;
     private  Integer mealwormCount;
     private  Integer alertLevel;
+    private  Integer mealwormLevel;
 
     public PestData() {
     }
@@ -23,6 +24,7 @@ public class PestData {
         this.beetleCount = beetleCount;
         this.mealwormCount = mealwormCount;
         this.alertLevel = alertLevel;
+
     }
 
     public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount,Integer alertLevel) {
@@ -33,7 +35,7 @@ public class PestData {
         this.alertLevel = alertLevel;
     }
 
-    public PestData(Integer id, String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount ,Integer alertLevel) {
+    public PestData(Integer id, String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount ,Integer alertLevel,Integer mealwormLevel) {
         this.id = id;
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
@@ -41,5 +43,6 @@ public class PestData {
         this.beetleCount = beetleCount;
         this.mealwormCount = mealwormCount;
         this.alertLevel = alertLevel;
+        this.mealwormLevel = mealwormLevel;
     }
 }

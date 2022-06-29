@@ -50,9 +50,9 @@ public class PestBoardDto {
     //备注
     private String remark;
 
-    private Integer page =1;
+    private Integer page;
 
-    private Integer size =10;
+    private Integer size;
 
     private String rfid;
 }

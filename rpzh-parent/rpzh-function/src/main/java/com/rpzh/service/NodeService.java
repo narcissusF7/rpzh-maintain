@@ -1,5 +1,6 @@
 package com.rpzh.service;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
@@ -137,4 +138,6 @@ public interface NodeService {
     Integer findNodeStatus(Integer id);
 
     Result flipStack(MaintainPlanDto maintainPlanDto);
+
+    Page<NodeDataVo> manuallyPage(List<NodeDataVo> nodeDataVos, int page, int size);
 }

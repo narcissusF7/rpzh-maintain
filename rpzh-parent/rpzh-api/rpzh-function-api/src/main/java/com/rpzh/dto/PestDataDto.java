@@ -7,7 +7,7 @@ public class PestDataDto {
     private String pestBoardId;
     private Integer page =1;
     private Integer size =10;
-    private String beginTime;
+    private String startTime;
     private String endTime;
     private String siteType;
     private Integer beetleCount;

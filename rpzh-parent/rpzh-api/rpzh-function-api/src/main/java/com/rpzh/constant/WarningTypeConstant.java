@@ -20,7 +20,7 @@ public class WarningTypeConstant {
     public static String WARE_HUMIDITY_OVERRUN_WARNING ="11";
     public static String CORE_TEMP_OVERRUN_WARNING ="12";
     public static String CORE_TEMP_OVERRUN_STACK_WARNING ="13";
-    public static String WARE_MEALWORM_OVERRUN_WARNING ="13";
+    public static String WARE_MEALWORM_OVERRUN_WARNING ="14";
 
     public static String getWarningType(String siteType , String nodeType , String evnType){
         //非温湿度设备

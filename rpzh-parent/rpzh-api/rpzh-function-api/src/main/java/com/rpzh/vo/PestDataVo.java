@@ -28,4 +28,6 @@ public class PestDataVo {
     private Integer beetleCount;
     @ApiModelProperty("粉螟数量")
     private Integer mealwormCount;
+    @ApiModelProperty("预警颜色")
+    private String warningColor;
 }

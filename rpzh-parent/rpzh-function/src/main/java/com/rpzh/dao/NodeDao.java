@@ -14,6 +14,7 @@ import org.springframework.security.core.parameters.P;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 节点管理
@@ -175,4 +176,6 @@ public interface NodeDao {
 
     @DS("clickhouse")
     List<NodeData> findNodeData(@Param("nodeId") String nodeId,@Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
+    List<Map<String,String>> findEnterStack();
 }

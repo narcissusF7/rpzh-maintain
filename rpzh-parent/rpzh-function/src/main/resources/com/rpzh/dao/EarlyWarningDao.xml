@@ -3,7 +3,7 @@
 <mapper namespace="com.rpzh.dao.EarlyWarningDao">
 
     <select id="findUndoEarlyWarningByNodeId" resultType="com.rpzh.vo.EarlyWarningVo">
-        select id , warning_grade as warningGrade from tb_early_warning where node_id =#{nodeId} and is_affirm = 2
+        select id , warning_grade as warningGrade  , warning_type warningType from tb_early_warning where node_id =#{nodeId} and is_affirm = 2
         <if test="warningType!='' and warningType!=null">
             and warning_type =#{warningType}
         </if>

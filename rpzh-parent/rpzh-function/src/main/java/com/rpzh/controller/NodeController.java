@@ -56,12 +56,6 @@ public class NodeController {
             value = "设备类型,默认:01",
             required = true,
             dataType = "String"
-    ), @ApiImplicitParam(
-            name = "siteType",
-            value = "采集位置类型,04:仓间,05非仓间  默认05",
-            required = true,
-            dataType = "String",
-            defaultValue = "05"
     )})
     public Result addNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
@@ -140,7 +134,6 @@ public class NodeController {
     )})
     @PostMapping("/updateNode")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {
-        //TODO 需要传个siteId 然后拼接到nodeDto.siteRoute中
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
             return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
@@ -199,7 +192,7 @@ public class NodeController {
             dataType = "Integer"
     )})
     @PostMapping("/findNode")
-    public Result<PageInfo<NodeVo>> findNode(@ApiIgnore NodeDto nodeDto) {
+    public Result<NodeVo> findNode(@ApiIgnore NodeDto nodeDto) {
         PageInfo<NodeVo> pageInfo = nodeService.findAllNodeList(nodeDto);
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
@@ -279,7 +272,7 @@ public class NodeController {
             dataType = "Integer"
     )})
     @GetMapping({"/findNodeReplaceLog"})
-    public Result<PageInfo<NodeVo>> findNodeReplaceLog(@ApiIgnore NodeDto nodeDto) {
+    public Result<NodeVo> findNodeReplaceLog(@ApiIgnore NodeDto nodeDto) {
         Integer id = nodeDto.getId();
         if (ToolUtil.isEmpty(id)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
@@ -313,7 +306,7 @@ public class NodeController {
             dataType = "Integer"
     )})
     @GetMapping({"/findNoEnterStack"})
-    public Result<PageInfo<NodeVo>> findNoEnterStack(@ApiIgnore NodeDto nodeDto) {
+    public Result<NodeVo> findNoEnterStack(@ApiIgnore NodeDto nodeDto) {
         PageInfo<NodeVo> pageInfo = nodeService.findNoEnterStack(nodeDto);
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
@@ -321,7 +314,7 @@ public class NodeController {
     @ApiOperation("设备入垛")
     @ApiImplicitParam(
             name = "data",
-            value = "JSON字符串,可以包含多个对象 每个对象包含id（设备主键id 必传）,xyz（根据情况填写）,stackId（垛位id 垛内设备必传）,caseNo（箱号）,siteType（采集位置类型 04 仓间设备 05非仓间设备 必传），level （位置等级 必传），pid_route",
+            value = "JSON字符串,可以包含多个对象 每个对象包含id（设备主键id 必传）,xyz（根据情况填写）,stackId（垛位id 垛内设备必传）,caseNo（箱号）,siteType（采集位置类型 04 仓间设备 05非仓间设备 必传），pid_route(必传)",
             dataType = "String"
     )
     @PostMapping("/enterStack")
@@ -336,17 +329,36 @@ public class NodeController {
             //设置主键id
             nodeDto.setId(Integer.parseInt(map.get("id").toString()));
             //如果是垛内设备
-            if (Integer.parseInt(map.get("level").toString())==5) {
+            Object pidRoute = map.get("pidRoute");
+            if (ToolUtil.isEmpty(pidRoute)){
+                return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的入垛位置为空");
+            }
+            String[] split = pidRoute.toString().split(",");
+
+            if (split.length==5) {
                 //设置设备所在垛位的id
+                if (ToolUtil.isEmpty(map.get("stackId"))){
+                    return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的位置id为空");
+                }
                 nodeDto.setStackId(Integer.parseInt(map.get("stackId").toString()));
                 //设置采集位置类型
+                if (ToolUtil.isEmpty(map.get("stackId"))){
+                    return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的位置id为空");
+                }
                 nodeDto.setSiteType(NodeConstant.NODE_STACK);
-                //设置X坐标
-                nodeDto.setSiteX(map.get("x").toString());
-                //设置Y坐标
-                nodeDto.setSiteY(map.get("y").toString());
-                //设置Z坐标
-                nodeDto.setSiteZ(map.get("z").toString());
+
+                if (!ToolUtil.isEmpty(map.get("x"))){
+                    //设置X坐标
+                    nodeDto.setSiteX(map.get("x").toString());
+                }
+                if (!ToolUtil.isEmpty(map.get("y"))){
+                    //设置Y坐标
+                    nodeDto.setSiteX(map.get("y").toString());
+                }
+                if (!ToolUtil.isEmpty(map.get("z"))){
+                    //设置Z坐标
+                    nodeDto.setSiteZ(map.get("z").toString());
+                }
                 //设置采集位置
                 nodeDto.setGatherSite(map.get("stack").toString());
                 //设置垛位名称
@@ -360,7 +372,7 @@ public class NodeController {
                 }
 
                 //如果是仓间设备
-            } else if (Integer.parseInt(map.get("level").toString())==4) {
+            } else if (split.length==4) {
                 //设置位置路由
                 nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[04:"+map.get("stackId")+"]");
                 //设置采集位置
@@ -454,10 +466,11 @@ public class NodeController {
     )})
     @PostMapping("/findVagueNode")
     public Result<List<NodeVo>> findVagueNode(@ApiIgnore NodeDto nodeDto) {
-
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        PageHelper.startPage(page, size);
+        if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
+            int page = nodeDto.getPage();
+            int size = nodeDto.getSize();
+            PageHelper.startPage(page, size);
+        }
         if (ToolUtil.isEmpty(nodeDto.getNodeId())) {
             return new Result<>(false, StatusCode.ERROR, "请输入节点id");
         }
@@ -467,13 +480,13 @@ public class NodeController {
     }
 
     @ApiOperation(
-            value = "根据id查询设备类型"
+            value = "根据设备id查询设备类型"
     )
     @ApiImplicitParams({@ApiImplicitParam(
-            name = "id",
-            value = "id",
+            name = "nodeId",
+            value = "设备id",
             required = true,
-            dataType = "Integer"
+            dataType = "String"
     )})
     @PostMapping("/findNodeType")
     public Result<String> findNodeType(@ApiIgnore NodeDto nodeDto) {

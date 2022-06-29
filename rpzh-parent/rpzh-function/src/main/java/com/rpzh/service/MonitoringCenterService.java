@@ -21,11 +21,13 @@ public interface MonitoringCenterService {
 
     Map<String, String> findWarningThreshold();
 
-    Map<String,Double> findAlarmValue(NodeData nodeData);
+    Map<String,String> findAlarmValue(NodeData nodeData);
 
     List<WeatherDataVo> findWeatherData(MonitorCondition monitorCondition);
 
-    Map<String, HashMap<String, Double>>findWeatherDataByDay(MonitorCondition monitorCondition);
+    List<HashMap<String, String>>findWeatherDataByDay(MonitorCondition monitorCondition);
 
     WeatherDataVo findNowWeather();
+
+    Map putCacheWarningColor();
 }

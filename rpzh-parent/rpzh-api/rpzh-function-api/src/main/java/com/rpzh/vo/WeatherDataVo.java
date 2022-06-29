@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @ApiModel(description = "天气返回类")
-public class WeatherDataVo extends NodeData {
+public class WeatherDataVo extends NodeDataVo {
     @ApiModelProperty(notes = "天气名称")
     private String weatherName;
     @ApiModelProperty(notes = "温度")

@@ -29,13 +29,22 @@ public class NodeData{
     private String siteZ;
     private String materialCode;
     private String warningType;
+    private Integer tempLevel;
+    private Integer humidityLevel;
 
 
 
     public NodeData() {
     }
 
-    public NodeData(ParseData parseData, NodeVo nodeVo,int count) {
+    public NodeData(String type, Integer maintainStageId, String pidRoute, String siteType) {
+        this.type = type;
+        this.maintainStageId = maintainStageId;
+        this.pidRoute = pidRoute;
+        this.siteType = siteType;
+    }
+
+    public NodeData(ParseData parseData, NodeVo nodeVo, int count) {
         this.id = nodeVo.getId();
         this.nodeId = parseData.getNodeId();
         this.type = parseData.getNodeType();
@@ -63,6 +72,8 @@ public class NodeData{
             case NodeConstant.HUMITURE_NODE_TYPE_VALUE:
                 this.temp = parseData.getData().get(count);
                 this.humiture = parseData.getData().get(count+3);
+                this.tempLevel = nodeVo.getTempLevel();
+                this.humidityLevel = nodeVo.getHumidityLevel();
                 break;
             case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
                 this.temp = parseData.getData().get(0);

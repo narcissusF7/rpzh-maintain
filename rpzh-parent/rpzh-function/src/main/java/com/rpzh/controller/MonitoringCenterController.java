@@ -1,6 +1,7 @@
 package com.rpzh.controller;
 
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
@@ -24,10 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -90,7 +88,7 @@ public class MonitoringCenterController {
             value = "每页数量",
             dataType = "Integer"
     )})
-    @GetMapping({"/findMonitoringData"})
+    @PostMapping({"/findMonitoringData"})
     public Result<NodeDataVo> findMonitoringData(@ApiIgnore MonitorCondition monitorCondition) {
         PageInfo<NodeDataVo> pageInfo = monitoringCenterService.findMonitoringData(monitorCondition);
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
@@ -139,9 +137,9 @@ public class MonitoringCenterController {
             dataType = "String",
             required = true
     )})
-    @GetMapping("/findAlarmValue")
-    public Result<Map<String,Double>> findAlarmValue(@ApiIgnore NodeData nodeData){
-        Map<String,Double> map = monitoringCenterService.findAlarmValue(nodeData);
+    @PostMapping("/findAlarmValue")
+    public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData){
+        Map<String,String> map = monitoringCenterService.findAlarmValue(nodeData);
         return new Result<>(true,StatusCode.OK,"查询成功",map);
     }
 
@@ -172,6 +170,7 @@ public class MonitoringCenterController {
     public Result<List<WeatherDataVo>> findWeatherData(@ApiIgnore MonitorCondition monitorCondition){
         PageHelper.startPage(monitorCondition.getPage(),monitorCondition.getSize());
         List<WeatherDataVo> weatherDataVos = monitoringCenterService.findWeatherData(monitorCondition);
+
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(weatherDataVos));
     }
 
@@ -188,8 +187,8 @@ public class MonitoringCenterController {
             dataType = "String"
     )})
     @GetMapping("/findWeatherDataByDay")
-    public Result<Map<String, HashMap<String, Double>>> findWeatherDataByDay(@ApiIgnore MonitorCondition monitorCondition){
-        Map<String, HashMap<String, Double>> weatherDataVos = monitoringCenterService.findWeatherDataByDay(monitorCondition);
+    public Result<List<HashMap<String, Double>>> findWeatherDataByDay(@ApiIgnore MonitorCondition monitorCondition){
+        List<HashMap<String, String>> weatherDataVos = monitoringCenterService.findWeatherDataByDay(monitorCondition);
         return new Result<>(true,StatusCode.OK,"查询成功",weatherDataVos);
     }
     @ApiOperation(
@@ -222,16 +221,31 @@ public class MonitoringCenterController {
             name = "size",
             value = "每页数量",
             dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "startTime",
+            value = "开始时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "endTime",
+            value = "结束时间",
+            dataType = "String"
     )})
     @GetMapping({"/findNodeHistory"})
     public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
-        int page = nodeDto.getPage();
-        int size = nodeDto.getSize();
-        PageHelper.startPage(page, size);
+
+
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
+            int page = nodeDto.getPage();
+            int size = nodeDto.getSize();
+            Page<NodeDataVo> nodeDataPage =  nodeService.manuallyPage(nodeDataVos,page,size);
+            return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataPage));
+        }
+        if (ToolUtil.isEmpty(nodeDataVos)){
+            return new Result<>(true, StatusCode.OK, "查询成功",null);
+        }
         return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataVos));
     }
-
 
     @ApiOperation(
             value = "查询设备历史数据(日数据)"
@@ -251,32 +265,40 @@ public class MonitoringCenterController {
             value = "数据类型(温湿度湿度数据 传4 其他随意)",
             dataType = "Integer",
             required = true
+    ), @ApiImplicitParam(
+            name = "startTime",
+            value = "开始时间",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "endTime",
+            value = "结束时间",
+            dataType = "String"
     )})
     @GetMapping({"/findNodeHistoryGraph"})
-    public Result<Map<String, HashMap<String, Double>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
+    public Result<Map<String, HashMap<String, String>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
-        Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
-                item.getTransferTime().split(" ")[0])));
-        Map<String, HashMap<String, Double>> historyGraphData = new HashMap();
-        if (nodeDto.getDataType() == NodeConstant.HUMITURE_NUMBER) {
-            collect.forEach((k, value) -> {
-                HashMap<String, Double> map = new HashMap();
-                map.put("max", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get());
-                map.put("min", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get());
-                map.put("avg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble());
-                historyGraphData.put(k, map);
+        if (!ToolUtil.isEmpty(nodeDataVos)){
+            Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
+                    item.getTransferTime().split(" ")[0])));
+            List<HashMap<String, String>> historyGraphData = new ArrayList<>();
+            TreeMap<String, List<NodeDataVo>> treeMap = new TreeMap<>(collect);
+            treeMap.forEach((k, value) -> {
+                HashMap<String, String> map = new HashMap();
+                map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get().toString());
+                map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get().toString());
+                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble()+"");
+                map.put("date",k);
+                if (!ToolUtil.isEmpty(nodeDto.getNodeType())&&NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
+                    map.put("humitureMax", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get().toString());
+                    map.put("humitureMin", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get().toString());
+                    map.put("humitureAvg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble()+"");
+                    map.put("humitureDate",k);
+                }
+                historyGraphData.add(map);
             });
-        } else {
-            collect.forEach((k, value) -> {
-                HashMap<String, Double> map = new HashMap();
-                map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get());
-                map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get());
-                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble());
-                historyGraphData.put(k, map);
-            });
+            return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
         }
-
-        return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
+        return new Result<>(true, StatusCode.OK, "", null);
     }
 
     @ApiOperation(
@@ -292,6 +314,14 @@ public class MonitoringCenterController {
             value = "设备类型  01氧气 03温湿度 04 包芯氧气",
             dataType = "String",
             required = true
+    ),@ApiImplicitParam(
+            name = "startTime",
+            value = "开始时间",
+            dataType = "String"
+    ),@ApiImplicitParam(
+            name = "endTime",
+            value = "结束时间",
+            dataType = "String"
     )})
     @GetMapping({"/exportNodeHistory"})
     public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
@@ -299,7 +329,7 @@ public class MonitoringCenterController {
         EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
         List<String> columns = new ArrayList<>();
         //把要导出的字段添加到集合中
-        if (ToolUtil.isEmpty(nodeDto.getNodeType())) {
+        if (!ToolUtil.isEmpty(nodeDto.getNodeType())) {
             columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
             if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
                 columns.add("humiture");
