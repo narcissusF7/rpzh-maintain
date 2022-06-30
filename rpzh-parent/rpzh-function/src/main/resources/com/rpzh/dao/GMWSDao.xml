@@ -25,10 +25,13 @@
 <!--        group by-->
 <!--            t.nodeId-->
 <!--    </select>-->
-    <select id="findNodeData" resultType="com.rpzh.vo.NodeDataVo">
+    <select id="findNodeData" resultType="com.rpzh.vo.GWMSNodeDataVo">
         SELECT
             t.nodeId,
             any(t.stackId) stackId,
+            any(t.stackId) stackId,
+            any(t.type) nodeType,
+            any(t.pidRoute) pidRoute,
             <if test="tableName=='tb_node_env_history'">
                 any(t.humiture) humiture,
                 any(t.temp) temp,
@@ -45,6 +48,8 @@
              select
                  node_id nodeId ,
                  stack_id stackId ,
+                 type type,
+                 pid_route pidRoute,
                 <if test="tableName=='tb_node_env_history'">
                     humiture humiture,
                     temp temp,

@@ -1,6 +1,7 @@
 package com.rpzh.service;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.rpzh.vo.GWMSNodeDataVo;
 import com.rpzh.vo.NodeDataVo;
 
 import java.util.List;
@@ -11,5 +12,5 @@ import java.util.List;
  * @Description: 功能
  */
 public interface GMWSService {
-    List<NodeDataVo> findMaintainData();
+    List<GWMSNodeDataVo> findMaintainData();
 }

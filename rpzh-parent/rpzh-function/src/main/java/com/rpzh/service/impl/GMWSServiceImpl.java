@@ -5,6 +5,7 @@ import com.rpzh.dao.GMWSDao;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.GMWSService;
+import com.rpzh.vo.GWMSNodeDataVo;
 import com.rpzh.vo.NodeDataVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class GMWSServiceImpl implements GMWSService {
     NodeDao nodeDao;
 
     @Override
-    public List<NodeDataVo> findMaintainData() {
+    public List<GWMSNodeDataVo> findMaintainData() {
 
         //查询所有的入垛设备
         List<Map<String,String>> nodeIds =  nodeDao.findEnterStack();
@@ -44,16 +45,16 @@ public class GMWSServiceImpl implements GMWSService {
         NodeTypeEnum coreChipTempType = NodeTypeEnum.getNodeType(NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE);
 
         //所有氧气设备的最新数据
-        List<NodeDataVo> oxygenDataVos =  gmwsDao.findNodeData(oxygenType.getTableName(),oxygenType.getTableColumn());
+        List<GWMSNodeDataVo> oxygenDataVos =  gmwsDao.findNodeData(oxygenType.getTableName(),oxygenType.getTableColumn());
 
         //所有温湿度设备的最新数据
-        List<NodeDataVo> evnDataVos =  gmwsDao.findNodeData(evnType.getTableName(),evnType.getTableColumn());
+        List<GWMSNodeDataVo> evnDataVos =  gmwsDao.findNodeData(evnType.getTableName(),evnType.getTableColumn());
 
         //所有包芯温度设备的最新数据
-        List<NodeDataVo> coreChipTempDataVos =  gmwsDao.findNodeData(coreChipTempType.getTableName(),coreChipTempType.getTableColumn());
+        List<GWMSNodeDataVo> coreChipTempDataVos =  gmwsDao.findNodeData(coreChipTempType.getTableName(),coreChipTempType.getTableColumn());
 
 
-        List<NodeDataVo> nodeDataVos = new ArrayList<>();
+        List<GWMSNodeDataVo> nodeDataVos = new ArrayList<>();
 
         //将在垛氧气设备的数据存放到nodedataVos中
         nodeDataVos.addAll(oxygenDataVos.stream().filter(nodeDataVo -> oxygenSet.contains(nodeDataVo.getNodeId())).collect(Collectors.toList()));

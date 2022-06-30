@@ -458,6 +458,10 @@
         order by pidRoute
     </select>
     <select id="findEnterStack" resultType="java.util.Map">
-        select node_id nodeId, node_type nodeType from tb_node where status = 2;
+        select node_id nodeId, node_type nodeType from tb_node where status = 1;
+    </select>
+    <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
+        select * from
+            (select ${tableColumn},transfer_time as transferTime from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
     </select>
 </mapper>
