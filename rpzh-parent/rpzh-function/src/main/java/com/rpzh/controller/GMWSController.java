@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-@Controller("/maintain/gwms")
+@RequestMapping("/maintain/gwms")
 @RestController
 @CrossOrigin
 @Api(value = "gwms控制类", tags = "gwms控制类", description = "gwms控制类")
