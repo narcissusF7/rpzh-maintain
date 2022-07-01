@@ -53,14 +53,18 @@ public class NodeController {
             dataType = "String"
     ), @ApiImplicitParam(
             name = "nodeType",
-            value = "设备类型,默认:01",
+            value = "设备类型",
             required = true,
             dataType = "String"
     )})
     public Result addNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
-            return new Result<>(false, StatusCode.ERROR, "节点Id不能为空");
+            return new Result<>(false, StatusCode.ERROR, "设备Id不能为空");
+        }
+
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())) {
+            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
         }
         //判断设备id是否存在
         int nodeCount = nodeService.findNodeCountById(nodeId);
@@ -522,6 +526,16 @@ public class NodeController {
 
     })
     public Result flipStack(MaintainPlanDto maintainPlanDto) {
+        if (ToolUtil.isEmpty(maintainPlanDto.getId())){
+            return new Result(false,StatusCode.ERROR,"养护计划id不能为空");
+        }
+        if (ToolUtil.isEmpty(maintainPlanDto.getStackId())){
+            return new Result(false,StatusCode.ERROR,"垛位id不能为空");
+        }
+        if (ToolUtil.isEmpty(maintainPlanDto.getNodeDtoList())){
+            return new Result(false,StatusCode.ERROR,"该养护计划下的所有垛位不能为空");
+        }
+
         return nodeService.flipStack(maintainPlanDto);
     }
 

@@ -55,13 +55,36 @@ public class PestMonitoringController {
     })
     @PostMapping("/addPestBoard")
     public Result addPestBoard(@ApiIgnore PestBoardDto pestBoardDto){
-
+        if (ToolUtil.isEmpty(pestBoardDto.getPestBoardId())) {
+            return new Result<>(false, StatusCode.ERROR, "虫情板Id不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getSiteRoute())) {
+            return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getSiteName())) {
+            return new Result<>(false, StatusCode.ERROR, "位置名称不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getSiteId())) {
+            return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getPrincipalId())) {
+            return new Result<>(false, StatusCode.ERROR, "负责人id不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getPrincipalName())) {
+            return new Result<>(false, StatusCode.ERROR, "负责人姓名不能为空");
+        }
+        if (ToolUtil.isEmpty(pestBoardDto.getRfid())) {
+            return new Result<>(false, StatusCode.ERROR, "rfid不能为空");
+        }
         return pestMonitoringService.addPestBoard(pestBoardDto);
     }
     @ApiOperation("删除虫情板")
     @ApiImplicitParam(name = "ids", value = "id集", dataType = "Integer", required = true,allowMultiple = true)
     @PostMapping("/deletePestBoard")
     public Result deletePestBoard(Integer [] ids){
+        if (ToolUtil.isEmpty(ids)) {
+            return new Result<>(false, StatusCode.ERROR, "id集不能为空");
+        }
         pestMonitoringService.deletePestBoard(ids);
         return new Result(true, StatusCode.OK,"删除成功");
     }
@@ -80,6 +103,31 @@ public class PestMonitoringController {
     })
     @PostMapping("/updatePestRule")
     public Result updatePestRule(PestMonitoringRuleDto pestMonitoringRuleDto){
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getWeekPatrol())) {
+            return new Result<>(false, StatusCode.ERROR, "巡查时间不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getValueOne())) {
+            return new Result<>(false, StatusCode.ERROR, "一级预警值不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getValueTwo())) {
+            return new Result<>(false, StatusCode.ERROR, "二级预警值不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getValueThree())) {
+            return new Result<>(false, StatusCode.ERROR, "三级预警值不能为空");
+        }
+
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getColorOne())) {
+            return new Result<>(false, StatusCode.ERROR, "一级预警颜色不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getColorTwo())) {
+            return new Result<>(false, StatusCode.ERROR, "二级预警颜色不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getColorThree())) {
+            return new Result<>(false, StatusCode.ERROR, "三级预警颜色不能为空");
+        }
+        if (ToolUtil.isEmpty(pestMonitoringRuleDto.getReplacePeriod())) {
+            return new Result<>(false, StatusCode.ERROR, "替换周期不能为空");
+        }
         pestMonitoringService.updatePestRule(pestMonitoringRuleDto);
         return new Result(true, StatusCode.OK,"保存成功");
     }
@@ -94,7 +142,10 @@ public class PestMonitoringController {
     @ApiOperation("虫情导入模板下载")
     @GetMapping("/downloadTemplate")
     @ApiImplicitParam(name = "siteType", value = "位置类型仓间04 垛内05", dataType = "String", required = true)
-    public void downloadStackTemplate(HttpServletResponse response,String siteType) {
+    public Result downloadStackTemplate(HttpServletResponse response,String siteType) {
+        if (ToolUtil.isEmpty(siteType)) {
+            return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
+        }
         String downloadFilePath = "";
         if (NodeConstant.NODE_WARE_AREA.equals(siteType)) {
             downloadFilePath = "/template/pestBoard/ware_pestBoard.xlsx";
@@ -105,6 +156,7 @@ public class PestMonitoringController {
         String fileName = "虫情导入模板";//被下载文件的名称
         InputStream inputStream = getClass().getResourceAsStream(downloadFilePath);
         ExcelUtils.outFile(inputStream, response, fileName, "xlsx");
+        return new Result<>(true, StatusCode.OK, "下载成功");
     }
 
     @ApiOperation("虫情数据导入")
@@ -195,6 +247,9 @@ public class PestMonitoringController {
     })
     @GetMapping("/findPestDataHistoryByOne")
     public Result<List<PestDataVo>> findPestDataHistoryByOne(@ApiIgnore PestDataDto pestDataDto){
+        if (ToolUtil.isEmpty(pestDataDto.getPestBoardId())){
+            return new Result(false,StatusCode.ERROR,"虫情点位id不能为空");
+        }
         if (!ToolUtil.isEmpty(pestDataDto.getPage())&&!ToolUtil.isEmpty(pestDataDto.getSize())){
             //分页
             PageHelper.startPage(pestDataDto.getPage(),pestDataDto.getSize());
@@ -220,6 +275,9 @@ public class PestMonitoringController {
     @GetMapping("/findPestBoardByRfid")
     @ApiImplicitParam(name = "rfid", value = "rfid", dataType = "String", required = true)
     public Result findPestBoardByRfid(String rfid){
+        if (ToolUtil.isEmpty(rfid)){
+            return new Result(false,StatusCode.ERROR,"rfid不能为空");
+        }
         return pestMonitoringService.findPestBoardByRfid(rfid);
     }
 
@@ -228,6 +286,9 @@ public class PestMonitoringController {
     @GetMapping("/findPestWarningValue")
     @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String", required = true)
     public Result<Map<String,Object>> findPestWarningValue(String pestBoardId){
+        if (ToolUtil.isEmpty(pestBoardId)){
+            return new Result(false,StatusCode.ERROR,"虫情点位id不能为空");
+        }
         Map<String,Object> map = pestMonitoringService.findPestWarningValue(pestBoardId);
         return new Result(true,StatusCode.OK,"查询成功",map);
     }

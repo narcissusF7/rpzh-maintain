@@ -90,6 +90,12 @@ public class MonitoringCenterController {
     )})
     @PostMapping({"/findMonitoringData"})
     public Result<NodeDataVo> findMonitoringData(@ApiIgnore MonitorCondition monitorCondition) {
+        if (ToolUtil.isEmpty(monitorCondition.getSiteType())){
+            return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
+        }
+        if (ToolUtil.isEmpty(monitorCondition.getNodeTypes())){
+            return new Result<>(false, StatusCode.ERROR, "设备类型数组不能为空");
+        }
         PageInfo<NodeDataVo> pageInfo = monitoringCenterService.findMonitoringData(monitorCondition);
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
@@ -139,6 +145,18 @@ public class MonitoringCenterController {
     )})
     @PostMapping("/findAlarmValue")
     public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData){
+        if (ToolUtil.isEmpty(nodeData.getMaintainStageId())){
+            return new Result<>(false, StatusCode.ERROR, "养护阶段id不能为空");
+        }
+        if (ToolUtil.isEmpty(nodeData.getType())){
+            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
+        }
+        if (ToolUtil.isEmpty(nodeData.getSiteType())){
+            return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
+        }
+        if (ToolUtil.isEmpty(nodeData.getPidRoute())){
+            return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
+        }
         Map<String,String> map = monitoringCenterService.findAlarmValue(nodeData);
         return new Result<>(true,StatusCode.OK,"查询成功",map);
     }
@@ -232,8 +250,13 @@ public class MonitoringCenterController {
     )})
     @GetMapping({"/findNodeHistory"})
     public Result<List<NodeDataVo>> findNodeHistory(@ApiIgnore NodeDto nodeDto) {
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
+            return new Result<>(false, StatusCode.ERROR, "设备id不能为空");
+        }
 
-
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())){
+            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
+        }
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
         if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
             int page = nodeDto.getPage();
@@ -276,6 +299,19 @@ public class MonitoringCenterController {
     )})
     @GetMapping({"/findNodeHistoryGraph"})
     public Result<Map<String, HashMap<String, String>>> findNodeHistoryGraph(@ApiIgnore NodeDto nodeDto) {
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
+            return new Result<>(false, StatusCode.ERROR, "设备id不能为空");
+        }
+
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())){
+            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
+        }
+
+        if (ToolUtil.isEmpty(nodeDto.getDataType())){
+            return new Result<>(false, StatusCode.ERROR, "数据类型不能为空");
+        }
+
+
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
         if (!ToolUtil.isEmpty(nodeDataVos)){
             Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
@@ -324,7 +360,15 @@ public class MonitoringCenterController {
             dataType = "String"
     )})
     @GetMapping({"/exportNodeHistory"})
-    public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
+    public Result exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())){
+            return new Result<>(false, StatusCode.ERROR, "设备id不能为空");
+        }
+
+        if (ToolUtil.isEmpty(nodeDto.getNodeType())){
+            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
+        }
+
         List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
         EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
         List<String> columns = new ArrayList<>();
@@ -349,6 +393,8 @@ public class MonitoringCenterController {
         });
         String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
         EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
+
+        return new Result(true,StatusCode.OK,"查询成功");
     }
 }
 
