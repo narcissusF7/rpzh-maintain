@@ -22,6 +22,10 @@ public class PestDataVo {
     private String gatherSite;
     @ApiModelProperty("预警等级")
     private Integer alertLevel;
+    @ApiModelProperty("甲虫预警等级")
+    private Integer beetleLevel;
+    @ApiModelProperty("粉螟预警等级")
+    private Integer mealwormLevel;
     @ApiModelProperty("采集时间")
     private String gatherTime;
     @ApiModelProperty("甲虫数量")
@@ -30,4 +34,8 @@ public class PestDataVo {
     private Integer mealwormCount;
     @ApiModelProperty("预警颜色")
     private String warningColor;
+    @ApiModelProperty("甲虫预警颜色")
+    private String beetleColor;
+    @ApiModelProperty("粉螟预警颜色")
+    private String mealwormColor;
 }

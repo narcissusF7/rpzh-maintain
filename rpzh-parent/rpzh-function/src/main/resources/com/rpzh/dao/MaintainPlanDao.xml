@@ -502,4 +502,17 @@
     <select id="findPrincipalId" resultType="java.lang.String">
         select principal_ids from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'
     </select>
+    <select id="findUsableStack" resultType="java.util.Map">
+        SELECT
+            t_plan.stack_id,
+            t_stage.created_time beginTime,
+            t_stage.aftercare_date_end endTime
+        FROM
+            tb_maintain_plan_stage t_stage,
+            tb_maintain_plan t_plan
+        WHERE
+            t_stage.maintain_plan_id = t_plan.id
+          AND phases = '充氮杀虫阶段'
+          and is_end = 0
+    </select>
 </mapper>

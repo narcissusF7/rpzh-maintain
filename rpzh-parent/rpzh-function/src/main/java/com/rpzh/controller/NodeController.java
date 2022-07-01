@@ -394,8 +394,8 @@ public class NodeController {
     @PostMapping({"/unbindStack"})
     public Result unbindStack(@ApiIgnore NodeDto nodeDto) {
         Integer[] ids = nodeDto.getIds();
-        if (ids.length<=0) {
-            return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
+        if (ToolUtil.isEmpty(ids)) {
+            return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
         }
         int updateFlag = nodeService.unbindStack(nodeDto);
         return new Result<>(true, StatusCode.OK, "解垛成功");

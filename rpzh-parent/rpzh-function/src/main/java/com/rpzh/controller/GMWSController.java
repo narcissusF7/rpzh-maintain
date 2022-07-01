@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+
 @RequestMapping("/maintain/gwms")
 @RestController
 @CrossOrigin
@@ -30,5 +32,15 @@ public class GMWSController {
     public Result<GWMSNodeDataVo> findMaintainData(){
         List<GWMSNodeDataVo> nodeDataVos = gmwsService.findMaintainData();
         return new Result<>(true, StatusCode.OK,"查询成功",nodeDataVos);
+    }
+
+    /**
+     * 查询可用的烟叶
+     * @return
+     */
+    @GetMapping("/findUsableTobacco")
+    public Result findUsableTobacco(){
+        List<Map<String,String>> list = gmwsService.findUsableTobacco();
+        return null;
     }
 }

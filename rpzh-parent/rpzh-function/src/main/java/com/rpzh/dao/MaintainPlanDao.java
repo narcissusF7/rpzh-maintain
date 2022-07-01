@@ -9,6 +9,7 @@ import com.rpzh.vo.MaintainPlanVo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface MaintainPlanDao {
@@ -91,4 +92,6 @@ public interface MaintainPlanDao {
     String findPrincipalId(@Param("stackId") Integer stackId);
 
     MaintainPlanVo findMaintainPlanByStack(@Param("stackId") Integer stackId);
+
+    Map<String,String> findUsableStack();
 }

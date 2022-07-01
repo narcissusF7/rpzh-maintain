@@ -2,6 +2,7 @@ package com.rpzh.service.impl;
 
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.GMWSDao;
+import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.GMWSService;
@@ -24,6 +25,9 @@ public class GMWSServiceImpl implements GMWSService {
 
     @Autowired
     NodeDao nodeDao;
+
+    @Autowired
+    MaintainPlanDao maintainPlanDao;
 
     @Override
     public List<GWMSNodeDataVo> findMaintainData() {
@@ -66,6 +70,14 @@ public class GMWSServiceImpl implements GMWSService {
         nodeDataVos.addAll(coreChipTempDataVos.stream().filter(nodeDataVo -> coreChipTempSet.contains(nodeDataVo.getNodeId())).collect(Collectors.toList()));
 
         return nodeDataVos;
+    }
+
+    @Override
+    public List<Map<String, String>> findUsableTobacco() {
+        //查询尚未结束的养护计划且该计划存在过杀虫阶段及该计划所在的垛位
+        Map<String,String>  map = maintainPlanDao.findUsableStack();
+
+        return null;
     }
 
     /**

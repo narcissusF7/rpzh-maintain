@@ -44,4 +44,5 @@ public interface PestMonitoringService {
     Result findPestBoardByRfid(String rfid);
 
     Map<String, Object> findPestWarningValue(String pestBoardId);
+
 }

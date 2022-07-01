@@ -5,6 +5,7 @@ import com.rpzh.vo.GWMSNodeDataVo;
 import com.rpzh.vo.NodeDataVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: ljj
@@ -13,4 +14,6 @@ import java.util.List;
  */
 public interface GMWSService {
     List<GWMSNodeDataVo> findMaintainData();
+
+    List<Map<String, String>> findUsableTobacco();
 }
