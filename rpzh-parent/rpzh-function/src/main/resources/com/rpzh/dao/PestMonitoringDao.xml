@@ -96,7 +96,7 @@
     </select>
     <select id="findSpecialSite" resultType="java.util.Map">
         select  id ,
-                site_route pidRoute,
+                site_route siteRoute,
                 site_name siteName,
                 prewarning_value_one   little,
                 prewarning_value_two   middle,
