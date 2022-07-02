@@ -562,7 +562,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             siteRoutes = new ArrayList<>();
             specialSites.forEach(map -> {
                 //添加特殊位置位置路由
-                siteRoutes.add(map.get("siteRoute").toString());
+                siteRoutes.add(map.get("pidRoute").toString());
 
                 //放到缓存中
                 StringBuffer sb = new StringBuffer();
