@@ -6,14 +6,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
-import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.rpzh.entity.ToolUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -87,93 +79,6 @@ public class EasyPoiUtil<T> {
         if (workbook != null) {
             downLoadExcel(fileName, response, workbook);
         }
-    }
-
-    /**
-     * 设置单元格样式
-     */
-    private static void setBorderStyle(HSSFCellStyle cellStyle, BorderStyle border) {
-        cellStyle.setBorderBottom(border); // 下边框
-        cellStyle.setBorderLeft(border);// 左边框
-        cellStyle.setBorderTop(border);// 上边框
-        cellStyle.setBorderRight(border);// 右边框
-    }
-
-    /**
-     * 设置字体样式
-     */
-    private static HSSFFont setFontStyle(HSSFWorkbook workbook, String name, short height) {
-        HSSFFont font = workbook.createFont();
-        font.setFontHeightInPoints(height);
-        font.setFontName(name);
-        return font;
-    }
-
-    /**
-     * 创建excel并填入数据
-     */
-    public static HSSFWorkbook expExcel(String sheetName, List<String> head, List<String> fileds, JSONArray body) {
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet(sheetName);
-
-        HSSFRow row = sheet.createRow(0);
-        HSSFCell cell = null;
-
-        HSSFCellStyle cellStyle = workbook.createCellStyle();
-        setBorderStyle(cellStyle, BorderStyle.THIN);
-        cellStyle.setFont(setFontStyle(workbook, "黑体", (short) 14));
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-
-        for (int i = 0; i < head.size(); i++) {
-            cell = row.createCell(i);
-            cell.setCellValue(head.get(i));
-            cell.setCellStyle(cellStyle);
-        }
-
-        HSSFCellStyle cellStyle2 = workbook.createCellStyle();
-        setBorderStyle(cellStyle2, BorderStyle.THIN);
-        cellStyle2.setFont(setFontStyle(workbook, "宋体", (short) 12));
-        cellStyle2.setAlignment(HorizontalAlignment.CENTER);
-        for (int i = 0, isize = body.size(); i < isize; i++) {
-            row = sheet.createRow(i + 1);
-            JSONObject exportData = body.getJSONObject(i);
-
-            for (int j = 0, jsize = fileds.size(); j < jsize; j++) {
-                cell = row.createCell(j);
-                String cellVal = "";
-                if (fileds.get(j).indexOf(".") > 0) {
-                    String[] kes = fileds.get(j).split("\\.");
-                    JSONObject childData = new JSONObject();
-                    for (int k = 0; k < kes.length; k++) {
-                        if (null == childData) {
-                            cellVal = "";
-                            continue;
-                        }
-                        if ((k + 1) == kes.length) {
-                            if (childData.get(kes[k]) instanceof Date) {
-                                cellVal = DateUtil.format(childData.getDate(kes[k]), "yyyy-MM-dd HH:mm:ss");
-                            } else {
-                                cellVal = childData.getString(kes[k]);
-                            }
-                        } else {
-                            childData = exportData.getJSONObject(kes[k]);
-                        }
-                    }
-                } else {
-                    if (exportData.get(fileds.get(j)) instanceof Date) {
-                        cellVal = DateUtil.format((Date) exportData.get(fileds.get(j)), "yyyy-MM-dd HH:mm:ss");
-                    } else {
-                        cellVal = ToolUtil.toStr(exportData.get(fileds.get(j)));
-                    }
-                }
-                cell.setCellValue(cellVal);
-                cell.setCellStyle(cellStyle2);
-            }
-        }
-        for (int i = 0, isize = head.size(); i < isize; i++) {
-            sheet.autoSizeColumn(i);
-        }
-        return workbook;
     }
 
     /**
