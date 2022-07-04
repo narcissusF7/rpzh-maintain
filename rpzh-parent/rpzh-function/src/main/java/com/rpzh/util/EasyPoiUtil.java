@@ -197,5 +197,4 @@ public class EasyPoiUtil<T> {
         Map memberValues = (Map) excelField.get(invocationHandler);
         memberValues.put("isColumnHidden", target);
     }
-
 }
