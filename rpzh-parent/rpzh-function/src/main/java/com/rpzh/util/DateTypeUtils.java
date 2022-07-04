@@ -33,16 +33,9 @@ public class DateTypeUtils {
                 }
                 break;
             case 2:
-                int l = Integer.parseInt((end.getTime() - start.getTime()) / (1000 * 3600 * 24 * 7) + "");
-                long k =(end.getTime() - start.getTime()) % (1000 * 3600 * 24 * 7);
-                SimpleDateFormat dateFm = new SimpleDateFormat("EEEE");
-                String endFormat = dateFm.format(end);
-                Integer endWeek = get(endFormat);
-                String startFormat = dateFm.format(start);
-                Integer startWeek = get(startFormat);
-                if(endWeek<=startWeek || k!=0){
-                    l = l + 1 ;
-                }
+                startCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+                endCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+                int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR) + 1;
                 for (int i=1;i<=l;i++){
                     WarningOrDealVo warningOrDealVo=new WarningOrDealVo();
                     warningOrDealVo.setDayType(i+"");
@@ -110,16 +103,9 @@ public class DateTypeUtils {
                 }
                 break;
             case 2:
-                int l = Integer.parseInt((end.getTime() - start.getTime()) / (1000 * 3600 * 24 * 7) + "");
-                long k =(end.getTime() - start.getTime()) % (1000 * 3600 * 24 * 7);
-                SimpleDateFormat dateFm = new SimpleDateFormat("EEEE");
-                String endFormat = dateFm.format(end);
-                Integer endWeek = get(endFormat);
-                String startFormat = dateFm.format(start);
-                Integer startWeek = get(startFormat);
-                if(endWeek<=startWeek || k!=0){
-                    l = l + 1 ;
-                }
+                startCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+                endCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+                int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR) + 1;
                 for (int i=1;i<=l;i++){
                     WarningOrDealVo warningOrDealVo=new WarningOrDealVo();
                     warningOrDealVo.setDayType(i+"");
@@ -185,17 +171,4 @@ public class DateTypeUtils {
         return warningOrDealVos;
     }
 
-    public static Integer get(String format){
-        int k = 0;
-        switch (format){
-            case "星期一": k = 1; break;
-            case "星期二": k = 2; break;
-            case "星期三": k = 3; break;
-            case "星期四": k = 4; break;
-            case "星期五": k = 5; break;
-            case "星期六": k = 6; break;
-            case "星期日": k = 7; break;
-        }
-        return k;
-    }
 }

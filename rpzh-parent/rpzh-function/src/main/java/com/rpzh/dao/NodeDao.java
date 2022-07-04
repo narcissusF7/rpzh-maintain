@@ -11,13 +11,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 节点管理
+ *
  * @Author liubc
  * @create 2022/3/3 10:58
  * @Description: good good study,day day up
@@ -27,6 +25,7 @@ public interface NodeDao {
 
     /**
      * 添加节点
+     *
      * @param nodeDto
      * @return
      */
@@ -34,22 +33,25 @@ public interface NodeDao {
 
     /**
      * 查询设备id
+     *
      * @param nodeId
      * @return
      */
-    String findNodeID(@Param("nodeId") String nodeId,@Param("id") Integer id);
+    String findNodeID(@Param("nodeId") String nodeId, @Param("id") Integer id);
 
     /**
      * 更新设备信息
+     *
      * @param nodeDto
      * @return
      */
     int updateNode(@Param("nodeDto") NodeDto nodeDto);
 
-    int updateNode(@Param("nodeDto") Map<String,String> nodeDto);
+    int updateNode(@Param("nodeDto") Map<String, String> nodeDto);
 
     /**
      * 删除节点
+     *
      * @param ids
      * @return
      */
@@ -57,6 +59,7 @@ public interface NodeDao {
 
     /**
      * 查询节点列表
+     *
      * @param nodeDto
      * @return
      */
@@ -64,6 +67,7 @@ public interface NodeDao {
 
     /**
      * 根据设备id查询设备数量
+     *
      * @param nodeId
      * @return
      */
@@ -71,6 +75,7 @@ public interface NodeDao {
 
     /**
      * 替换设备id
+     *
      * @param nodeDto
      * @return
      */
@@ -78,6 +83,7 @@ public interface NodeDao {
 
     /**
      * 设备替换日志插入
+     *
      * @param nodeDto
      * @return
      */
@@ -85,6 +91,7 @@ public interface NodeDao {
 
     /**
      * 设备替换日志查询
+     *
      * @param nodeDto
      * @return
      */
@@ -92,20 +99,21 @@ public interface NodeDao {
 
     /**
      * 设备解垛
+     *
      * @param ids
      * @return
      */
     int unbindStack(@Param("ids") Integer[] ids);
 
     /**
-     *查询未入垛
+     * 查询未入垛
+     *
      * @param nodeDto
      * @return
      */
     List<NodeVo> findNoEnterStack(@Param("nodeDto") NodeDto nodeDto);
 
     /**
-     *
      * @param nodeDto
      * @return
      */
@@ -113,6 +121,7 @@ public interface NodeDao {
 
     /**
      * 判断设备是否存在
+     *
      * @param nodeId
      * @return
      */
@@ -120,34 +129,38 @@ public interface NodeDao {
 
     /**
      * 批量导入成功
+     *
      * @param nodeVoList
      * @return
      */
-    int exportNode(@Param("nodeVoList")List<NodeVo> nodeVoList);
+    int exportNode(@Param("nodeVoList") List<NodeVo> nodeVoList);
 
     /**
      * 查询设备类型
+     *
      * @param nodeId
      * @return
      */
-    String findNodeType(@Param("nodeId")String nodeId);
+    String findNodeType(@Param("nodeId") String nodeId);
 
     /**
      * 模糊查询设备id
+     *
      * @param nodeDto
      * @return
      */
-    List<NodeVo> findVagueNode(@Param("nodeDto")NodeDto nodeDto);
+    List<NodeVo> findVagueNode(@Param("nodeDto") NodeDto nodeDto);
 
     /**
      * 测试方法
+     *
      * @param nodeId
      * @param nodeType
      * @param createTime
      * @return
      */
-    List<NodeVo> testFindNode(@Param("nodeId")String nodeId, @Param("nodeType")String nodeType,
-                              @Param("createTime")String createTime,@Param("startTime") String startTime,
+    List<NodeVo> testFindNode(@Param("nodeId") String nodeId, @Param("nodeType") String nodeType,
+                              @Param("createTime") String createTime, @Param("startTime") String startTime,
                               @Param("endTime") String endTime);
 
     List<NodeVo> findNodeByStackId(Integer stackID);
@@ -165,17 +178,28 @@ public interface NodeDao {
     NodeVo findByNodeId(@Param("nodeId") String nodeId);
 
     @DS("clickhouse")
-    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData,@Param("tableName") String tableName);
+    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData, @Param("tableName") String tableName);
 
 
     Integer findNodeStatus(@Param("id") Integer id);
 
-    List<NodeVo> findNodeIdBySiteType(@Param("siteType") String siteType,@Param("stackId")Integer stackId,@Param("pidRoute")String pidRoute);
+    List<NodeVo> findNodeIdBySiteType(@Param("siteType") String siteType, @Param("stackId") Integer stackId, @Param("pidRoute") String pidRoute);
 
     List<NodeVo> findHumitureDevice(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     @DS("clickhouse")
-    List<NodeData> findNodeData(@Param("nodeId") String nodeId,@Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+    List<NodeData> findNodeData(@Param("nodeId") String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
+    @DS("clickhouse")
+    List<NodeData> findData(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoute") String pidRoute, @Param("materialCode") String materialCode);
+
+    @DS("clickhouse")
+    List<NodeData> findDataList(@Param("column") String column, @Param("gatherType") String gatherType, @Param("tableName") String tableName, @Param("startTime") Date startTime,
+                                @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("pidRoutes") List<String> pidRoutes);
+
+    @DS("clickhouse")
+    List<NodeData> findDataListByEnv(@Param("gatherType") String gatherType, @Param("startTime") Date startTime,
+                                     @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("coreIds") List<String> coreIds, @Param("pidRoutes") List<String> pidRoutes);
 
     List<Map<String,String>> findEnterStack();
 }

@@ -48,15 +48,15 @@ public class MaintainPlanVo {
     private Integer maintainDays;
 
     @ApiModelProperty(notes = "调养日期")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date aftercareDateStart;
 
     @ApiModelProperty(notes = "调养结束日期")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date aftercareDateEnd;
 
     @ApiModelProperty(notes = "降氧完成时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date oxygenReductionTime;
 
     @ApiModelProperty(notes = "负责人")
@@ -67,7 +67,7 @@ public class MaintainPlanVo {
     private List<String> principalIds;
 
     @ApiModelProperty(notes = "到期提醒时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expireTime;
 
     @ApiModelProperty(notes = "养护数量")

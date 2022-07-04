@@ -42,6 +42,14 @@ public class MaintainCountVo {
 
     private String pidRoute;
 
+    private String nameCn;
+
     @ApiModelProperty(notes = "养护数量集合")
-    private List<MaintainCountVo> maintainCountVos;
+    private List<MaintainCountVo> children;
+    private String id;
+    private Integer areaId;
+    private Integer floorId;
+    private Integer buildingId;
+    private Integer warehouseId;
+    private Integer stackId;
 }

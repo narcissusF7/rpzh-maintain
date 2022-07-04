@@ -46,5 +46,7 @@ public interface AlarmSettingTemplateDao {
 
     int insertLogAlarmSetting(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
 
-    List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto")LogAlarmSettingDto logAlarmSettingDto);
+    List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
+
+    List<String> findAlarmSettingTemplateList();
 }

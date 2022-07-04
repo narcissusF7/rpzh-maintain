@@ -2,6 +2,7 @@ package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.*;
+import com.rpzh.entity.Result;
 import com.rpzh.vo.*;
 
 import java.util.List;
@@ -284,5 +285,5 @@ public interface WarehouseService {
 
     List<WarehouseVo> locating();
 
-    List<WarehouseVo> locatingMaintain();
+    Result locatingMaintain();
 }

@@ -33,6 +33,8 @@ public interface MaintainPlanService {
      */
     PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto);
 
+    List<String> findAlarmSettingTemplateList();
+
     /**
      * 删除养护计划
      * @param stageIds 养护计划id

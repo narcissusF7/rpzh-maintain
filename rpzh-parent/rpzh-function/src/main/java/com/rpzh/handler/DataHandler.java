@@ -171,6 +171,7 @@ public class DataHandler {
                 MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
                 nodeVo.setMaintainPlanId(maintainPlanVo.getId());
                 nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
                 //设置该预警id
                 nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
             }

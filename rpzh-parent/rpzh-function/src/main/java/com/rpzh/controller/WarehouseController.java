@@ -460,11 +460,11 @@ public class WarehouseController {
     }
 
     /**
-     * 多级目录  树状结构
+     * 没有养护计划 多级目录  树状结构
      * @return success or failure
      */
-    @GetMapping("/locatingMaintain")
+    @PostMapping("/locatingMaintain")
     public Result<T> locatingMaintain(){
-        return new Result<>(true, StatusCode.OK, "查询目录成功", warehouseService.locatingMaintain());
+        return warehouseService.locatingMaintain();
     }
 }

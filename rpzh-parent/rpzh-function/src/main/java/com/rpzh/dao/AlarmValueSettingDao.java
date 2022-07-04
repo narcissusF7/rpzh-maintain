@@ -17,7 +17,7 @@ public interface AlarmValueSettingDao {
 
     Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findMaxId(@Param("earlyWarningRuleName") String earlyWarningRuleName);
+    Integer findIdByEarlyWarningRuleName(@Param("earlyWarningRuleName") String earlyWarningRuleName);
 
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 

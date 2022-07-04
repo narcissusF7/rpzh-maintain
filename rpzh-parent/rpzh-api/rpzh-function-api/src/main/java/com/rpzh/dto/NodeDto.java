@@ -19,6 +19,10 @@ public class NodeDto {
     private static final long serialVersionUID = 1L;
     private Integer id;
     private String nodeId;
+    private Integer flag=0;
+    private String materialCode;
+    //对比的类型:1:设备   2:位置
+    private String contrastType;
     private List<String> nodeIds;
     private Integer stackId;
     private String stack;

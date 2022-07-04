@@ -114,8 +114,8 @@
         #{alarmValueSettingDto.createdTime}
         )
     </insert>
-    <select id="findMaxId" resultType="java.lang.Integer">
-        select max(Id) from tb_alarm_value_setting where early_warning_rule_name = #{earlyWarningRuleName}
+    <select id="findIdByEarlyWarningRuleName" resultType="java.lang.Integer">
+        select id from tb_alarm_value_setting where early_warning_rule_name = #{earlyWarningRuleName} order by id desc limit 1
     </select>
     <delete id="deleteIds">
         delete from tb_alarm_value_setting where

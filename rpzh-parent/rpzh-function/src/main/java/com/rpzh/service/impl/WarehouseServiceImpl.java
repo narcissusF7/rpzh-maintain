@@ -5,14 +5,21 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.*;
+import com.rpzh.entity.Result;
+import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
+import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
+import com.sun.org.apache.regexp.internal.RE;
+import org.apache.poi.ss.formula.functions.T;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -653,9 +660,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public List<WarehouseVo> locatingMaintain() {
+    public Result locatingMaintain() {
             //查询没有养护计划的垛位
             List<StackVo> stackVos = warehouseDao.findStackNotInMaintainPlan();
+            if(stackVos.size()==0){
+                return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
+            }
             Set<Integer> areaIds = new HashSet<>();
             stackVos.forEach(stackVo -> {
                 areaIds.add(stackVo.getAreaId());
@@ -708,7 +718,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                         warehouseVo.setBuildingVos(value);
                     }
                 });});
-        return warehouseVos;
+        return new Result(true, StatusCode.OK, "垛位都有新建养护计划",warehouseVos);
     }
 
 

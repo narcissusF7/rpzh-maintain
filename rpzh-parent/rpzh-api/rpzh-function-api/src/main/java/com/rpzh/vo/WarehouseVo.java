@@ -43,6 +43,10 @@ public class WarehouseVo implements Serializable {
     @ApiModelProperty(notes = "负责人")
     private String principalName;
 
+    //负责人
+    @ApiModelProperty(notes = "负责人id")
+    private Integer principalId;
+
     //仓库编码
     @ApiModelProperty(notes = "仓库编码")
     private String code;

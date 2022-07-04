@@ -26,6 +26,11 @@ public class MaintainPlanDto {
      * 垛位id
      */
     private Integer stackId;
+    private List<Integer> siteIds;
+    private Integer areaId;
+    private Integer floorId;
+    private Integer buildingId;
+    private Integer warehouseId;
     /**
      * 开始时间
      */
@@ -97,7 +102,7 @@ public class MaintainPlanDto {
     /**
      * 养护数量
      */
-    private Double maintainCount;
+    private Double maintainCount=0d;
 
     /**
      * 预警设置表id

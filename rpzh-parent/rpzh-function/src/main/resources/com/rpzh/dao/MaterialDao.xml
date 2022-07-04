@@ -19,9 +19,13 @@
     <update id="updateMaterialStatus">
         update tb_material set is_end = '1' where stack_id = #{stackId}
     </update>
-    <select id="findCount" resultType="java.lang.Double">
-    select
-    sum(stock_box) as maintainCount
-    from tb_material where stack_id = #{stackId} and material_code = #{materialCode} and is_end = '0'
+    <select id="findCount" resultType="com.rpzh.vo.MaterialVo">
+    SELECT
+material_code as materialCode,
+    SUM(stock_box) AS maintainCount
+    FROM tb_material WHERE stack_id = #{stackId} AND
+    material_code IN <foreach collection="materialCodes" item="materialCode" open="(" separator="," close=")">
+        #{materialCode}
+    </foreach> AND is_end = '0' GROUP BY material_code
 </select>
 </mapper>

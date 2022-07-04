@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class MaterialController {
         }
         MaterialVo materialVo = materialService.findMaterialInfo(stackId);
         if(!ToolUtil.isEmpty(materialVo)) {
-            return new Result(true, StatusCode.OK, "查询物料代码成功!", materialVo);
+            return new Result(true, StatusCode.OK, "查询物料信息成功!", materialVo);
         }
         return new Result(false, StatusCode.ERROR, "该垛位暂无物料信息,请重新选择垛位!");
     }
@@ -62,9 +64,9 @@ public class MaterialController {
             @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "String")
+            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true, dataType = "List")
     })
-    public Result findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto){
+    public Result findAlarmValueSetting(@ApiIgnore AlarmValueSettingDto alarmValueSettingDto){
         if(ToolUtil.isEmpty(alarmValueSettingDto.getMaterialCodes()) || ToolUtil.isEmpty(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "物料代码不能为空!");
         }

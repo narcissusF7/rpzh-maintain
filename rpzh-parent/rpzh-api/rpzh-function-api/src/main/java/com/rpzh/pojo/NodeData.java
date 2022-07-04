@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class NodeData{
     private Integer id;
-    private String nodeId;
+    private String nodeId="";
     private String type;
     private Integer frequency;
     private Double voltage;
@@ -22,6 +22,7 @@ public class NodeData{
     private String transferTime;
     private String gatherSite;
     private String pidRoute;
+    private String siteName;
     private String siteType;
     private Integer alertLevel;
     private String siteX;
@@ -31,7 +32,8 @@ public class NodeData{
     private String warningType;
     private Integer tempLevel;
     private Integer humidityLevel;
-
+    private String nodeName;
+    private Double count=0d;
 
 
     public NodeData() {

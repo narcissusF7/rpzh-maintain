@@ -1,30 +1,40 @@
 package com.rpzh.controller;
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.rabbitmq.client.Return;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.StringUtils;
+import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.MaintainCountVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import com.rpzh.vo.MaintainPlanVo;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -60,6 +70,13 @@ public class MaintainPlanController {
     public Result<AlarmValueSettingVo> findAlarmSettingTemplate(String earlyWarningRuleName){
         AlarmValueSettingVo alarmSettingTemplate = maintainPlanService.findAlarmSettingTemplate(earlyWarningRuleName);
         return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplate);
+    }
+
+    @PostMapping("/findAlarmSettingTemplateList")
+    @ApiOperation(value = "查询所有的预警规则名称")
+    public Result findAlarmSettingTemplateList(){
+        List<String> alarmSettingTemplateNames = maintainPlanService.findAlarmSettingTemplateList();
+        return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplateNames);
     }
     /**
      * 插入一条养护计划
@@ -103,7 +120,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
-            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境",required = true,dataType ="double")
     })
     public Result insertMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto){
         // 烟叶代码是否为null
@@ -153,7 +170,8 @@ public class MaintainPlanController {
     @ApiOperation(value = "分页查询养护计划")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "Integer"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
@@ -299,7 +317,7 @@ public class MaintainPlanController {
         phases.add("养护阶段");
         phases.add("充氮杀虫阶段");
         phases.add("磷化铝杀虫阶段");
-        if(maintenceStyle.equals("机械调控")) {
+        if(maintenceStyle.equals("机械调控方式")) {
             phases.add("充氮保质阶段");
         }
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
@@ -386,7 +404,8 @@ public class MaintainPlanController {
     @ApiOperation(value = "养护到期汇总列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
@@ -405,11 +424,12 @@ public class MaintainPlanController {
      * @param maintainPlanDto
      * @return
      */
-    @GetMapping(value = "/findMaintainMonthEndReport")
+    @PostMapping(value = "/findMaintainMonthEndReport")
     @ApiOperation(value = "月底养护报表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
@@ -430,7 +450,8 @@ public class MaintainPlanController {
     @PostMapping(value = "/findMaintainHistoryCollect")
     @ApiOperation(value = "历史汇总单")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "stackName", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "垛位名称", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
@@ -477,4 +498,77 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",map);
     }
 
+    @Resource
+    private RedisTemplate redisTemplate;
+    @PostMapping("/export")
+    public void export(HttpServletResponse response,@RequestParam("ids") List<String> ids) {
+        if(ToolUtil.isEmpty(ids)){
+            return;
+        }
+        String username = TokenDecode.getUserInfo().get("username");
+        String maintainCountInfos = redisTemplate.opsForValue().get("code_" + username).toString();
+        List<MaintainCountVo> maintainCountVos= JSONArray.parseArray(maintainCountInfos,MaintainCountVo.class);
+        List<MaintainCountVo> maintainCountOnes = new ArrayList<>();
+        maintainCountVos.forEach(maintainCountVo -> {
+            if(ids.contains(maintainCountVo.getId())){
+                for (MaintainCountVo maintainCount : maintainCountVo.getChildren()) {
+                    maintainCountOnes.add(maintainCount);
+                }
+                maintainCountVo.setChildren(null);
+                maintainCountOnes.add(maintainCountVo);
+            }
+        });
+        int size = maintainCountOnes.size();
+        for (int i = 0; i < size; i++) {
+            if(ToolUtil.isNotEmpty(maintainCountOnes.get(i).getChildren())){
+                for (MaintainCountVo maintainCount : maintainCountOnes.get(i).getChildren()) {
+                    maintainCountOnes.add(maintainCount);
+                    size++;
+                }
+                maintainCountOnes.get(i).setChildren(null);
+            }
+        }
+        Collections.sort(maintainCountOnes, new Comparator<MaintainCountVo>(){
+            public int compare(MaintainCountVo o1, MaintainCountVo o2) {
+
+                if( Integer.parseInt(o2.getMaterialCode())<Integer.parseInt(o1.getMaterialCode()))
+                    return 1;
+                else if(Integer.parseInt(o2.getMaterialCode())==Integer.parseInt(o1.getMaterialCode())){
+                    if(o1.getStackName().compareTo(o2.getStackName()) > 0)
+                        return 1;
+                    else
+                        return -1;
+                }
+                else
+                    return -1;
+            }
+        });
+        //数据集合,这是导出的数据
+        List<Map<String, Object>> data = new ArrayList<>();
+        if(maintainCountVos.size()==0){
+            return;
+        }else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for (MaintainCountVo maintainCountVo : maintainCountOnes) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("code", maintainCountVo.getMaterialCode());
+                map.put("count", maintainCountVo.getMaintainCount());
+                map.put("siteName", maintainCountVo.getStackName());
+                map.put("createTime", sdf.format(maintainCountVo.getCreatedTime()));
+                map.put("maintenceStyle", maintainCountVo.getMaintenceStyle());
+                map.put("phases", maintainCountVo.getPhases());
+                data.add(map);
+            }
+            //这个是字段解释
+            List<String> head = Lists.newArrayList("物料代码", "位置", "养护方式", "养护阶段", "制定时间", "养护数量");
+            //这个要跟map里面的key一致
+            List<String> fileds = Lists.newArrayList("code", "siteName", "maintenceStyle", "phases", "createTime", "count");
+            //此处时间用于保证导出时文件名的唯一
+            String dateNow = DateUtil.format(new Date(), "yyyyMMddHHmmss");
+            //这个是导出时的文件名字
+            String fileName = "养护数量导出数据" + dateNow;
+            HSSFWorkbook wb = ExcelUtils.expExcel(fileName, head, fileds, JSONArray.parseArray(JSONObject.toJSONString(data)));
+            ExcelUtils.outFile(wb, response, fileName);
+        }
+    }
 }

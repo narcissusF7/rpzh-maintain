@@ -1,5 +1,6 @@
 package com.rpzh.dao;
 
+import com.rpzh.vo.MaterialVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,5 +22,5 @@ public interface MaterialDao {
 
     int updateMaterialStatus(@Param("stackId") Integer stackId);
 
-    Double findCount(@Param("stackId") Integer stackId,@Param("materialCode")String materialCode);
+    List<MaterialVo> findCount(@Param("stackId") Integer stackId, @Param("materialCodes")List<String> materialCodes);
 }

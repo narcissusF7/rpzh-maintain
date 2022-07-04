@@ -9,6 +9,7 @@ import com.rpzh.vo.MaintainPlanVo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 
 @Mapper
@@ -30,9 +31,9 @@ public interface MaintainPlanDao {
 
     Integer insertMaintainStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    Integer findMaxStageId(@Param("id") Integer id);
+    Integer findStageIdById(@Param("id") Integer id);
 
-    Integer findMaxPlanId(@Param("stackId") Integer stackId);
+    Integer findIdByStackId(@Param("stackId") Integer stackId);
 
     int updateMaintainPlanStageId(@Param("stageId") Integer stageId, @Param("id") Integer id);
 
@@ -72,26 +73,33 @@ public interface MaintainPlanDao {
 
     List<Integer> findId(@Param("ids") List<Integer> ids);
 
-    int insertMaintainCount(@Param("materialCode") String materialCode, @Param("maintainCount") Double maintainCount, @Param("maintainPlanId") Integer maintainPlanId, @Param("pidRoute") String pidRoute,
-                            @Param("maintenceStyle") String maintenceStyle, @Param("phases") String phases, @Param("createdTime") Date createdTime);
+    int insertMaintainCount(@Param("maintainPlanDtos") List<MaintainPlanDto> maintainPlanDtos);
 
     int deleteMaintainCount(@Param("id") Integer id);
 
-    List<MaintainCountVo> findMaintainCountBySiteName(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+    List<MaintainCountVo> findMaintainCountBySiteName(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("tableColumn") String tableColumn);
 
     List<MaintainCountVo> findFirst(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
 
-    List<MaintainCountVo> findChild(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
-
-    List<MaintainCountVo> findFirstMaterialCode(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
-
-    Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+    Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("tableColumn") String tableColumn);
 
     List<String> findPhases(@Param("stackId") Integer stackId, @Param("maintenceStyle") String maintenceStyle);
 
     String findPrincipalId(@Param("stackId") Integer stackId);
 
     MaintainPlanVo findMaintainPlanByStack(@Param("stackId") Integer stackId);
+
+    int updateMaintainCount(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    List<MaintainCountVo> findTwo(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+
+    List<MaintainCountVo> findThree(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+
+    List<MaintainCountVo> findFour(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+
+    List<MaintainCountVo> findFive(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+
+    List<MaintainCountVo> findSite(@Param("materialCode")String materialCode);
 
     Map<String,String> findUsableStack();
 }

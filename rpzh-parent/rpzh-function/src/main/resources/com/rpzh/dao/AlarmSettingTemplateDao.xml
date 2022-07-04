@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.AlarmSettingTemplateDao">
+    <select id="findAlarmSettingTemplateList" resultType="java.lang.String">
+        select
+        early_warning_rule_name
+        from tb_alarm_setting_template
+    </select>
     <select id="findAlarmSettingTemplate" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select
         stack_oxygen_upper_one as stackOxygenUpperOne,
@@ -26,7 +31,7 @@
         early_warning_rule_name as earlyWarningRuleName
         from tb_alarm_setting_template
         where 1=1
-        <if test="earlyWarningRuleName != null and earlyWarningRuleName != ''">and early_warning_rule_name like concat('%', #{earlyWarningRuleName} , '%')</if>
+        <if test="earlyWarningRuleName != null and earlyWarningRuleName != ''">and early_warning_rule_name like concat('%', #{earlyWarningRuleName} , '%')</if> limit 1
     </select>
     <select id="findAlarmSettingTemplateTable" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select
