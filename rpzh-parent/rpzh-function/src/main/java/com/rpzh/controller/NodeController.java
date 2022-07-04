@@ -357,7 +357,7 @@ public class NodeController {
                 }
                 if (!ToolUtil.isEmpty(map.get("y"))){
                     //设置Y坐标
-                    nodeDto.setSiteX(map.get("y").toString());
+                    nodeDto.setSiteY(map.get("y").toString());
                 }
                 if (!ToolUtil.isEmpty(map.get("z"))){
                     //设置Z坐标
@@ -383,6 +383,11 @@ public class NodeController {
                 nodeDto.setGatherSite(map.get("stack").toString());
                 //设置采集位置类型
                 nodeDto.setSiteType(NodeConstant.NODE_WARE_AREA);
+
+                if (!ToolUtil.isEmpty(map.get("x"))){
+                    //设置X坐标
+                    nodeDto.setSiteX(map.get("x").toString());
+                }
             }
             nodeService.enterStack(nodeDto);
         }

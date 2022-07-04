@@ -18,7 +18,7 @@ public class PestData {
     public PestData() {
     }
 
-    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount, Integer mealwormCount,Integer alertLevel,Integer beetleLevel) {
+    public PestData(String pestBoardId, String gatherSite, String gatherTime ,Integer alertLevel, Integer beetleCount,Integer beetleLevel, Integer mealwormCount,Integer mealwormLevel) {
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
@@ -26,6 +26,7 @@ public class PestData {
         this.mealwormCount = mealwormCount;
         this.alertLevel = alertLevel;
         this.beetleLevel = beetleLevel;
+        this.mealwormLevel = mealwormLevel;
 
     }
 

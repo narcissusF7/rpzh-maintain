@@ -278,7 +278,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 if (NodeConstant.NODE_STACK.equals(siteType)) {
                     pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level);
                 } else {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount, level,levelMap.get("mealwormLevel"),levelMap.get("beetleLevel"));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"));
                 }
             }
             //将当前行数据存到list中
@@ -325,7 +325,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 stackList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0));
             } else {
                 //仓间
-                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0));
+                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0,0));
             }
         }
         //执行数据库操作
@@ -566,8 +566,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
                 //放到缓存中
                 StringBuffer sb = new StringBuffer();
-                sb.append(map.get("valueOne")).append("|").append("valueTwo").append("|").append("valueThree");
-                redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, map.get("siteRoute"), sb.toString());
+                sb.append(map.get("little")).append("|").append(map.get("middle")).append("|").append(map.get("big"));
+                redisTemplate.opsForHash().put(SPECIAL_SITE_ROUTE, map.get("pidRoute"), sb.toString());
             });
         } else {
             siteRoutes = new ArrayList<>(((Map) o).keySet());
@@ -596,36 +596,36 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
         //该数据预警等级
         int level = 0;
+
+        String[] split;
         //如果s为空 代表非特殊位置
         if ("".equals(s)) {
             putValueToCache();
             //获取缓存中的通用虫情预警设置
             String values = (String) redisTemplate.opsForValue().get(GENERAL_PEST_WARNING_VALUE);
             //分割后获取每个预警等级阈值
-            String[] split = values.split("\\|");
-            //求出对应的预警等级
-            level = decideValue(beetleCount, split);
-            //判断预警
-            level = decideEarlyWarning(pestBoardVo, level, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING);
-            map.put("beetleLevel",level);
-
+            split = values.split("\\|");
         } else {
             //获取特殊位置的预警阈值
             String values = (String) redisTemplate.opsForHash().get(SPECIAL_SITE_ROUTE, s);
             //截取
-            String[] split = values.split("\\|");
-            //求出对应的预警等级
-            Integer beetleLevel = decideValue(beetleCount, split);
-            //通过甲虫预警等级和数据库该虫情
-            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
-            map.put("beetleLevel",level);
-            if (!ToolUtil.isEmpty(mealwormCount)) {
-                //仓间粉螟
-                int mealwormLevel = decideValue(mealwormCount, split);
-                map.put("mealwormLevel",level);
-                mealwormLevel = decideEarlyWarning(pestBoardVo, mealwormLevel, mealwormCount, WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING);
-                    map.put("level",Math.max(level,mealwormLevel));
-            }
+            split = values.split("\\|");
+
+        }
+        //求出对应的预警等级
+        Integer beetleLevel = decideValue(beetleCount, split);
+        //通过甲虫预警等级和数据库该虫情
+        level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
+        map.put("beetleLevel",level);
+        if (!ToolUtil.isEmpty(mealwormCount)) {
+            //仓间粉螟
+            int mealwormLevel = decideValue(mealwormCount, split);
+            mealwormLevel = decideEarlyWarning(pestBoardVo, mealwormLevel, mealwormCount, WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING);
+            map.put("mealwormLevel",mealwormLevel);
+
+            map.put("level",Math.max(level,mealwormLevel));
+        }else {
+            map.put("level",level);
         }
         return map;
     }
