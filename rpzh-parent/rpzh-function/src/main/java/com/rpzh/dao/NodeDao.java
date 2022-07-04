@@ -201,5 +201,9 @@ public interface NodeDao {
     List<NodeData> findDataListByEnv(@Param("gatherType") String gatherType, @Param("startTime") Date startTime,
                                      @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("coreIds") List<String> coreIds, @Param("pidRoutes") List<String> pidRoutes);
 
-    List<Map<String,String>> findEnterStack();
+    List<Map<String, String>> findEnterStack();
+
+    @DS("clickhouse")
+    List<NodeData> findOxygenList(@Param("column") String column, @Param("gatherType") String gatherType, @Param("tableName") String tableName, @Param("startTime") Date startTime,
+                                  @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("pidRoutes") List<String> pidRoutes);
 }

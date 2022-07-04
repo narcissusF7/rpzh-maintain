@@ -1,6 +1,8 @@
 package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.DataContrastDto;
@@ -234,14 +236,16 @@ public class DataContrastServiceImpl implements DataContrastService {
         int year = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int month = year * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
         long day = ((endTime.getTime() - startTime.getTime()) / (1000*3600*24));
-        Map<String,Double> timeMap = new HashMap<>();
+        List<DataContrastVo> days = new ArrayList<>();
+
         switch (gatherType){
             case "1":
                 gatherType = "formatDateTime(transfer_time,'%m月%d日')";
                 simpleDateFormat = new SimpleDateFormat("MM月dd日");
                 for (long i = 0;i<=day;i++){
                     String format = simpleDateFormat.format(new Date(startTime.getTime() + i * 1000 * 60 * 60 * 24));
-                    timeMap.put(format,0d);
+                    DataContrastVo dataContrastVo = new DataContrastVo(format);
+                    days.add(dataContrastVo);
                 }
                 break;
             case "2":
@@ -250,7 +254,8 @@ public class DataContrastServiceImpl implements DataContrastService {
                 endCalendar.setFirstDayOfWeek(Calendar.MONDAY);
                 int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR) + 1;
                 for (int i = 1;i<=l;i++){
-                    timeMap.put(i+"",0d);
+                    DataContrastVo dataContrastVo = new DataContrastVo(i+"");
+                    days.add(dataContrastVo);
                 }
                 break;
             case "3":
@@ -258,7 +263,8 @@ public class DataContrastServiceImpl implements DataContrastService {
                 simpleDateFormat = new SimpleDateFormat("yyyy年MM月");
                 for (long i = 0;i<=month;i++){
                     String format = simpleDateFormat.format(startCalendar.getTime());
-                    timeMap.put(format,0d);
+                    DataContrastVo dataContrastVo = new DataContrastVo(format);
+                    days.add(dataContrastVo);
                     startCalendar.add(Calendar.MONTH,1);
                 }
                 break;
@@ -267,59 +273,59 @@ public class DataContrastServiceImpl implements DataContrastService {
                 simpleDateFormat = new SimpleDateFormat("yyyy年");
                 for (long i = 0;i<=year;i++){
                     String format = simpleDateFormat.format(startCalendar.getTime());
-                    timeMap.put(format,0d);
+                    DataContrastVo dataContrastVo = new DataContrastVo(format);
+                    days.add(dataContrastVo);
                     startCalendar.add(Calendar.YEAR,1);
                 }
                 break;
         }
-        List<String> pidRoutes=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isEmpty(nodeData.getNodeId())).map(NodeData::getPidRoute).distinct().collect(Collectors.toList());
+        String username = TokenDecode.getUserInfo().get("username");
+        redisTemplate.opsForValue().set(username+"_days",JSON.toJSONString(days));
+        //获取所选的位置设备所有的位置路由
+        List<String> pidRoutes=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isEmpty(nodeData.getNodeId())).map(NodeData::getPidRoute).collect(Collectors.toList());
         long count = nodeDataDtos.stream().map(NodeData::getType).distinct().count();
-        //所选设备中包含包芯温度和环境温度
         List<NodeData> dataListByEnv = new ArrayList<>();
-        Map<String,Map<String,Double>> map = new TreeMap<>();
         List<DataVo> dataVos = new ArrayList<>();
+        //所选设备中包含包芯温度和环境温度
         if(count!=1){
             List<String> core=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("02")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
             List<String> env=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("03")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
             dataListByEnv = nodeDao.findDataListByEnv(gatherType, startTime, endTime, env,core, pidRoutes);
-            dataListByEnv.forEach(data->{
-                /*DataContrastVo dataContrastVo = new DataContrastVo();
-                dataContrastVo.setGatherTime(data.getTransferTime());
-                dataContrastVo.setNode(data.getTemp());*/
-                String key = data.getNodeId()  + "-" + data.getPidRoute();
-                String s = keyInfo.get(key);
-                if(ToolUtil.isEmpty(map.get(s))){
-                    /*List<DataContrastVo> dataContrastVos= new ArrayList<>();
-                    dataContrastVos.add(dataContrastVo);*/
-                    Map<String,Double> t = new TreeMap<>();
-                    t.put(data.getTransferTime(),data.getTemp());
-                    map.put(s,t);
-                }else{
-                    Map<String, Double> one = map.get(s);
-                    one.put(data.getTransferTime(),data.getTemp());
-                }
-            });
         }
+        //所选设备中只包含一种设备
+        if(count==1){
+            List<String> node=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isNotEmpty(nodeData.getNodeId())).map(NodeData::getNodeId).distinct().collect(Collectors.toList());
+            String type = nodeDataDtos.get(0).getType();
+            if("01".equals(type)){
+                dataListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", startTime, endTime, node, pidRoutes);
+            }else if("02".equals(type)){
+                dataListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", startTime, endTime, node, pidRoutes);
+            }else if("03".equals(type)){
+                dataListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+            }else{
+                dataListByEnv = nodeDao.findOxygenList("humiture",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+            }
+        }
+        List<String> nodeNames = new ArrayList<>();
+        dataListByEnv.forEach(data->{
+            DataContrastVo dataContrastVo = new DataContrastVo(data.getTransferTime());
+            String nodeName = keyInfo.get(data.getNodeId()  + "-" + data.getPidRoute());
+            if(!nodeNames.contains(nodeName)){
+                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_days").toString(), DataContrastVo.class);
+                int i = dayData.indexOf(dataContrastVo);
+                dataContrastVo.setNode(data.getTemp());
+                dayData.set(i,dataContrastVo);
+                DataVo dataVo = new DataVo(nodeName,dayData);
+                dataVos.add(dataVo);
+                nodeNames.add(nodeName);
+            }else{
+                int i = nodeNames.indexOf(nodeName);
+                List<DataContrastVo> dataContrastVos = dataVos.get(i).getDataContrastVos();
+                int index = dataContrastVos.indexOf(dataContrastVo);
+                dataContrastVos.get(index).setNode(data.getTemp());
+            }
+        });
         //下周优化
-        for(Map.Entry entry : map.entrySet()){
-            DataVo dataVo = new DataVo();
-            dataVo.setNodeName(entry.getKey().toString());
-            Map<String,Double> mapValue = (Map<String,Double>)entry.getValue();
-            for(Map.Entry timeMapData : timeMap.entrySet()){
-                if(ToolUtil.isEmpty(mapValue.get(timeMapData.getKey().toString()))){
-                    mapValue.put(timeMapData.getKey().toString(),0d);
-                }
-            }
-            List<DataContrastVo> dataContrastVos = new ArrayList<>();
-            for(Map.Entry k : timeMap.entrySet()){
-                DataContrastVo dataContrastVo = new DataContrastVo();
-                dataContrastVo.setGatherTime(k.getKey().toString());
-                dataContrastVo.setNode(Double.parseDouble(k.getValue().toString()));
-                dataContrastVos.add(dataContrastVo);
-            }
-            dataVo.setDataContrastVos(dataContrastVos);
-            dataVos.add(dataVo);
-        }
         return new Result<>(true, StatusCode.OK, "数据对比成功!",dataVos);
     }
 }

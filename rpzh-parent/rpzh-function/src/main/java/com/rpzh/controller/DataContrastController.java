@@ -51,7 +51,7 @@ public class DataContrastController {
     @PostMapping("/getNodeDataList")
     @ApiOperation(value = "数据对比")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "nodeDatas", value = "选择设备,NodeData包含nodeId、type、pidRoute、nodeName、siteName", required = true, dataType = "List<NodeData>"),
+            @ApiImplicitParam(name = "nodeDataInfos", value = "选择设备,json字符串,NodeData包含nodeId、type、pidRoute、nodeName、siteName", required = true, dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "采集的开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "采集的结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "beginTime", value = "对比的开始时间", required = false, dataType = "String"),

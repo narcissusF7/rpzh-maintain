@@ -15,4 +15,9 @@ public class DataVo {
     private String nodeName;
 
     private List<DataContrastVo> dataContrastVos;
+
+    public DataVo(String nodeName,List<DataContrastVo> dataContrastVos){
+        this.nodeName = nodeName;
+        this.dataContrastVos = dataContrastVos;
+    }
 }
