@@ -7,14 +7,21 @@ package com.rpzh.service;
  * @Description: good good study,day day up
  */
 public interface FileService {
-
     /**
-     * 更新图片路径
+     * 上传图片
      * @param path
      * @param group
      * @param fileName
      * @param id
      * @return
      */
-    int updateFilePictureUrl(String path, String group, String fileName, String id);
+    int insertFilePictureUrl(String path, String group, String fileName, String id);
+
+    /**
+     * 删除数据库中的地址
+     * @param groupName
+     * @param fileName
+     * @return
+     */
+    int deletePic(String groupName, String fileName);
 }

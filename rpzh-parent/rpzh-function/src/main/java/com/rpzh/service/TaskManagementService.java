@@ -4,6 +4,8 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.vo.TaskVo;
 
+import java.util.List;
+
 /**
  * @Author liubc
  * @create 2022-05-30 11:33
@@ -74,4 +76,40 @@ public interface TaskManagementService {
      * @return
      */
     int taskEvaluate(TaskDto taskDto);
+
+    /**
+     * 根据任务id查询任务图片
+     * @param id
+     * @return
+     */
+    List<TaskVo> findPicMes(String id);
+
+    /**
+     * 虫情监控任务处理
+     * @param pestData
+     * @param dealResult
+     * @return
+     */
+    int pestTaskDeal(String pestData, String dealResult,String id);
+
+    /**
+     * 一键虫情上报
+     * @param siteRoute
+     * @return
+     */
+    int oneButtonPestReport(String siteRoute,String taskAddress);
+
+    /**
+     * 根据位置路径,查询所有的设备,进行移垛处理
+     * @param siteRoute
+     * @return
+     */
+    List<TaskVo> findAllNodeByStack(String siteRoute);
+
+    /**
+     * 移垛处理
+     * @param taskDto
+     * @return
+     */
+    int moveStackDeal(TaskDto taskDto);
 }

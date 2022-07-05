@@ -76,7 +76,7 @@ public class FileController {
         String group = uploads[0];
         //图片文件名
         String fileName = uploads[1];
-        int updateFlag = fileService.updateFilePictureUrl(path,group,fileName,id);
+        int insertFlag = fileService.insertFilePictureUrl(path,group,fileName,id);
         return new Result(true, StatusCode.OK, "文件上传成功");
     }
 
@@ -96,7 +96,10 @@ public class FileController {
         if (ToolUtil.isEmpty(groupName) || ToolUtil.isEmpty(fileName)){
             return new Result(false, StatusCode.ERROR, "组名和文件名不能为空");
         }
+        //删除服务器中的图片
         int i = FileUtil.deleteFile(groupName, fileName);
+        //删除数据库中的路径
+        int delFlag = fileService.deletePic(groupName,fileName);
         return new Result(true, StatusCode.OK, "删除成功", i);
     }
 

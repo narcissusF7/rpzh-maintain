@@ -28,8 +28,14 @@ public class TaskDto {
     //位置路径
     private String siteRoute;
 
+    //位置名称
+    private String siteName;
+
     //当前位置id
     private String siteId;
+
+    //移垛数据
+    private String siteDate;
 
     //任务位置路径
     private String taskSiteRoute;
@@ -73,7 +79,7 @@ public class TaskDto {
     //负责人
     private String principal;
 
-    //任务状态
+    //任务状态,0:未完成,1:完成,2:逾期(mq代码控制)
     private String status;
 
     //创建人

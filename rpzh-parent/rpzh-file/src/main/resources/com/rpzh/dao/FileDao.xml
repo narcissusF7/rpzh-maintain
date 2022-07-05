@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.FileDao">
-<update id="updateFilePictureUrl">
-UPDATE tb_task
-    <set>
-         <if test="path != null and path != ''">picture_url = #{path},</if>
-         <if test="group != null and group != ''">picture_group = #{group},</if>
-         picture_filename = #{fileName}
-     </set>
-    WHERE id = #{id}
-</update>
+<insert id="insertFilePictureUrl">
+INSERT INTO tb_task_pic
+( `task_id`, `picture_url`, `picture_group`, `picture_filename` )
+VALUES
+(#{id}, #{path}, #{group}, #{fileName} );
+</insert>
+<delete id="deletePic">
+ DELETE
+ FROM tb_task_pic
+ WHERE picture_group = #{groupName} and picture_filename = #{fileName}
+</delete>
 </mapper>

@@ -2,6 +2,7 @@ package com.rpzh.service.impl;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.TaskManagementDao;
@@ -9,7 +10,9 @@ import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
+import com.rpzh.service.PestMonitoringService;
 import com.rpzh.service.TaskManagementService;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.StackVo;
 import com.rpzh.vo.TaskVo;
@@ -22,8 +25,10 @@ import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.sql.SQLOutput;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,7 @@ import java.util.UUID;
 
 /**
  * 任务管理中心
+ *
  * @Author liubc
  * @create 2022-05-30 11:33
  * @Description: good good study,day day up
@@ -48,6 +54,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private PestMonitoringService pestMonitoringService;
 
     /**
      * 新建任务
@@ -73,24 +81,24 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteRoute = taskDto.getSiteRoute();
         //获取当前位置id
         String siteId = taskDto.getSiteId();
-        if (siteRoute.contains("04")){
+        if (siteRoute.contains("04")) {
             //如果包含04,拼接05加位置id [00:0],[01:1],[02:1],[03:1],[04:1],[05:2]
             String siteRouteC = siteRoute + ",[05:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        }else if (siteRoute.contains("03")){
+        } else if (siteRoute.contains("03")) {
             String siteRouteC = siteRoute + ",[04:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        }else if (siteRoute.contains("02")){
+        } else if (siteRoute.contains("02")) {
             String siteRouteC = siteRoute + ",[03:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        }else if (siteRoute.contains("01")){
+        } else if (siteRoute.contains("01")) {
             String siteRouteC = siteRoute + ",[02:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        }else {
+        } else {
             String siteRouteC = siteRoute + ",[01:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
@@ -116,13 +124,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                 return message;
             }
         });*/
-        log.info("新建任务发送消息成功:"+uuid+":结束时间:"+endTime+":相差时间为:"+betweenMsStr);
+        log.info("新建任务发送消息成功:" + uuid + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
     }
 
     /**
      * 查询任务列表
+     *
      * @param taskDto
      * @return
      */
@@ -146,7 +155,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     public int mqUpdateStatus(String msg) {
         //只有未完成的任务才能逾期
         String taskStatus = "0";
-        int mqUpdateFlag = taskManagementDao.mqUpdateStatus(msg,taskStatus);
+        int mqUpdateFlag = taskManagementDao.mqUpdateStatus(msg, taskStatus);
         return mqUpdateFlag;
     }
 
@@ -181,20 +190,21 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      * @return
      */
     @Override
-    public TaskVo findTaskDetailBySiteId(Integer stackId,Integer areaId,String type) {
+    public TaskVo findTaskDetailBySiteId(Integer stackId, Integer areaId, String type) {
         String siteRoute = "";
-        if(ToolUtil.isNotEmpty(stackId)){
+        if (ToolUtil.isNotEmpty(stackId)) {
             siteRoute = warehouseDao.findStackById(stackId).getPidRoute() + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]";
         }
-        if(ToolUtil.isNotEmpty(areaId)) {
+        if (ToolUtil.isNotEmpty(areaId)) {
             siteRoute = warehouseDao.findWareArea(areaId).getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + areaId + "]";
         }
-        TaskVo taskVo = taskManagementDao.findTaskDetailBySiteId(siteRoute,type);
+        TaskVo taskVo = taskManagementDao.findTaskDetailBySiteId(siteRoute, type);
         return taskVo;
     }
 
     /**
      * 工作任务查询任务列表
+     *
      * @param taskDto
      * @return
      */
@@ -226,14 +236,22 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String nowTime = DateUtil.dateNew(new Date()).toString();
         //设置完成时间
         taskDto.setFinishTime(nowTime);
-        //设置任务状态为完成
-        taskDto.setStatus("1");
+        //获取处理结果
+        String dealResult = taskDto.getDealResult();
+        //如果处理结果为空,状态为处理中
+        if (ToolUtil.isEmpty(dealResult)) {
+            taskDto.setStatus("3");
+        } else {
+            //设置任务状态为完成
+            taskDto.setStatus("1");
+        }
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;
     }
 
     /**
      * 任务评价
+     *
      * @param taskDto
      * @return
      */
@@ -252,4 +270,120 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int updateFlag = taskManagementDao.taskEvaluate(taskDto);
         return updateFlag;
     }
+
+    /**
+     * 根据任务id查询任务图片
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<TaskVo> findPicMes(String id) {
+        List<TaskVo> list = taskManagementDao.findPicMes(id);
+        return list;
+    }
+
+    /**
+     * 虫情监控任务处理
+     *
+     * @param pestData
+     * @param dealResult
+     * @return
+     */
+    @Override
+    @Transactional
+    public int pestTaskDeal(String pestData, String dealResult, String id) {
+        String status = null;
+        if (ToolUtil.isEmpty(dealResult)) {
+            //处理结果为空,状态是处理中
+            status = "3";
+        } else {
+            //不为空,状态为完成
+            status = "1";
+        }
+        //修改任务状态
+        int updateFlag = taskManagementDao.updateTaskStatus(id, status, dealResult);
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //解析虫情数据
+        try {
+            List<Map> list = JSONObject.parseObject(pestData, List.class);
+            for (Map map : list) {
+                //虫情板id
+                String pestBoardId = map.get("pestBoardId") + "";
+                //获取采集位置
+                String gatherSite = map.get("gatherSite") + "";
+                //获取甲虫数量
+                int beetle = Integer.parseInt(map.get("beetle") + "");
+                //获取粉虫数量
+                int mealworm = Integer.parseInt(map.get("mealworm") + "");
+                //虫情预警等级
+                //pestMonitoringService.decideLevel(pestBoardId,beetle,mealworm);
+                int insertPest = taskManagementDao.insertPest(pestBoardId, gatherSite, beetle, mealworm, nowTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("虫情数据格式错误");
+        }
+        return updateFlag;
+    }
+
+    /**
+     * 一键虫情上报
+     *
+     * @param siteRoute
+     * @return
+     */
+    @Override
+    public int oneButtonPestReport(String siteRoute, String taskAddress) {
+        //获取路径下所有的虫情板
+        List<String> pestBoardList = taskManagementDao.findPestBoard(siteRoute);
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        for (String pestBoard : pestBoardList) {
+            int insertPest = taskManagementDao.oneButtonPestReport(pestBoard,taskAddress,nowTime);
+        }
+        return 0;
+    }
+
+    /**
+     * 根据位置路径,查询所有的设备,进行移垛处理
+     *
+     * @param siteRoute
+     * @return
+     */
+    @Override
+    public List<TaskVo> findAllNodeByStack(String siteRoute) {
+        List<TaskVo> taskVoList = taskManagementDao.findAllNodeByStack(siteRoute);
+        return taskVoList;
+    }
+
+    /**
+     * 移垛处理
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public int moveStackDeal(TaskDto taskDto) {
+        //获取移垛路径,传入的是父路径,需要拼接当前路径
+        String siteRoute = taskDto.getSiteRoute();
+        //获取移垛垛位名称
+        String siteName = taskDto.getSiteName();
+        //获取目标地址id
+        String siteId = taskDto.getSiteId();
+        //拼接获取当前地址
+        siteRoute = SiteRouteUtil.route(siteRoute, siteId);
+        //获取移垛数据
+        String siteDate = taskDto.getSiteDate();
+        List<Map> list = JSONObject.parseObject(siteDate, List.class);
+        for (Map map : list) {
+            String nodeId = map.get("nodeId").toString();
+            int x = Integer.parseInt(map.get("x").toString());
+            int y = Integer.parseInt(map.get("y").toString());
+            int z = Integer.parseInt(map.get("z").toString());
+        }
+        return 0;
+    }
+
 }

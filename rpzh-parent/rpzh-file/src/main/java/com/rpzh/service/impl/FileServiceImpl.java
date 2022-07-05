@@ -18,19 +18,31 @@ public class FileServiceImpl implements FileService {
     @Autowired
     private FileDao fileDao;
 
-
     /**
-     * 更新图片路径
+     * 上传图片
      *
-     * @param path
-     * @param group
-     * @param fileName
-     * @param id
+     * @param path 图片路径
+     * @param group 图片组名
+     * @param fileName 文件名
+     * @param id 任务主键id
      * @return
      */
     @Override
-    public int updateFilePictureUrl(String path, String group, String fileName, String id) {
-        int updateFlag = fileDao.updateFilePictureUrl(path,group,fileName,id);
-        return updateFlag;
+    public int insertFilePictureUrl(String path, String group, String fileName, String id) {
+        int insertFlag = fileDao.insertFilePictureUrl(path,group,fileName,id);
+        return insertFlag;
+    }
+
+    /**
+     * 删除数据库中的地址
+     *
+     * @param groupName
+     * @param fileName
+     * @return
+     */
+    @Override
+    public int deletePic(String groupName, String fileName) {
+        int delFlag = fileDao.deletePic(groupName,fileName);
+        return delFlag;
     }
 }

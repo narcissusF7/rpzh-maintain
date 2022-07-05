@@ -7,6 +7,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.vo.TaskVo;
+import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
+import sun.net.www.protocol.http.HttpURLConnection;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 养护任务中心
@@ -94,8 +101,9 @@ public class TaskManagementController {
      */
     @ApiOperation(value = "发布任务菜单查询任务列表", tags = "任务管理中心")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
-                    "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
+                    "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
+                    "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String"),
             @ApiImplicitParam(name = "taskNum", value = "任务编号", required = false,dataType = "String"),
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
@@ -150,15 +158,15 @@ public class TaskManagementController {
     }
 
     /**
-     * 根据位置id和任务类型查询任务详情
+     * 根据位置id和任务类型查询任务详情,搜索垛位的任务类型
      * @param
      * @return
      */
-    @ApiOperation(value = "根据位置id和任务类型查询任务详情", tags = "预警类型")
+    @ApiOperation(value = "根据位置id和任务类型查询任务详情", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "stackId", value = "垛位id",required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "areaId", value = "仓间id",required = true,dataType = "Integer"),
-            @ApiImplicitParam(name = "type", value = "预警类型",required = true,dataType = "String")
+            @ApiImplicitParam(name = "type", value = "任务类型",required = true,dataType = "String")
     })
     @PostMapping("/findTaskDetailBySiteId")
     public Result<TaskVo> findTaskDetailBySiteId(Integer stackId,Integer areaId,String type){
@@ -179,8 +187,9 @@ public class TaskManagementController {
      */
     @ApiOperation(value = "工作任务菜单查询任务任务列表", tags = "任务管理中心")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查," +
-                    "04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
+                    "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
+                    "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String"),
             @ApiImplicitParam(name = "taskNum", value = "任务编号", required = false,dataType = "String"),
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
@@ -192,7 +201,7 @@ public class TaskManagementController {
     @PostMapping("/findTaskByUser")
     public Result<PageInfo<TaskVo>> findTaskByUser(@ApiIgnore TaskDto taskDto){
         PageInfo<TaskVo> pageInfo = taskManagementService.findTaskByUser(taskDto);
-        return new Result<>(true,StatusCode.ERROR,"查询成功",pageInfo);
+        return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
     }
 
 
@@ -218,6 +227,99 @@ public class TaskManagementController {
     }
 
     /**
+     * 虫情巡查任务处理
+     * @param pestData 虫情数据
+     * @param dealResult 处理结果
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单虫情巡查任务处理", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "pestData", value = "虫情数据案例:pestBoardId:虫情板,gatherSite采集位置,beetle:甲虫,mealworm:粉虫:[{\"pestBoardId\":\"123FAA1111111111\",\"gatherSite\":\"宁波仓库1楼二仓间\",\"beetle\":12,\"mealworm\":18},{ \"pestBoardId\":\"1231AA\", \"gatherSite\":\"宁波仓库1楼二仓间\",\"beetle\":11, \"mealworm\":38 }]", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String")
+    })
+    @PostMapping("/pestTaskDeal")
+    public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id){
+        if (ToolUtil.isEmpty(pestData)){
+            return new Result(false, StatusCode.ERROR, "请输入虫情数据");
+        }
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "请选择一个任务");
+        }
+        int insertFlag = taskManagementService.pestTaskDeal(pestData,dealResult,id);
+        return new Result(true, StatusCode.OK, "处理成功");
+    }
+
+    /**
+     * 一键虫情上报
+     * @param siteRoute
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单虫情巡查任务中一键虫情上报", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "siteRoute", value = "任务地址路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "taskAddress", value = "任务地址名称", required = true,dataType = "String")
+    })
+    @PostMapping("/oneButtonPestReport")
+    public Result oneButtonPestReport(@ApiIgnore String siteRoute,@ApiIgnore String taskAddress){
+        if (ToolUtil.isEmpty(siteRoute)){
+            return new Result(false, StatusCode.ERROR, "位置路径不能为空");
+        }
+        if (ToolUtil.isEmpty(taskAddress)){
+            return new Result(false, StatusCode.ERROR, "任务地址名称不能为空");
+        }
+        int insertFlag = taskManagementService.oneButtonPestReport(siteRoute,taskAddress);
+        return new Result(true,StatusCode.OK,"一键上报成功");
+    }
+
+
+    /**
+     * 移垛任务处理
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单移垛任务处理", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径,移垛之后的位置路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteName", value = "任务目标地址名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = true,dataType = "integer"),
+            @ApiImplicitParam(name = "siteDate", value = "移垛数据,", required = true,dataType = "String")
+    })
+    @PostMapping("/moveStackDeal")
+    public Result moveStackDeal(@ApiIgnore TaskDto taskDto){
+        if (ToolUtil.isEmpty(taskDto.getSiteRoute())){
+            return new Result(false, StatusCode.ERROR, "目标地址路径不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteName())){
+            return new Result(false, StatusCode.ERROR, "目标地址名称不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteId())){
+            return new Result(false, StatusCode.ERROR, "目标地址id不能为空");
+        }
+        int updateFlag = taskManagementService.moveStackDeal(taskDto);
+        return new Result(true,StatusCode.OK,"移垛成功");
+    }
+
+    /**
+     * 工作任务菜单移垛任务处理查询当前垛位下所有的设备
+     * @param siteRoute
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单移垛任务处理查询当前垛位下所有的设备", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "siteRoute", value = "任务地址路径", required = true,dataType = "String")
+    })
+    @PostMapping("/findAllNodeByStack")
+    public Result<TaskVo> findAllNodeByStack(@ApiIgnore String siteRoute){
+        if (ToolUtil.isEmpty(siteRoute)){
+            return new Result(false, StatusCode.ERROR, "任务地址路径不能为空");
+        }
+        List<TaskVo> taskVoList = taskManagementService.findAllNodeByStack(siteRoute);
+        return new Result<TaskVo>(true,StatusCode.OK,"查询成功",taskVoList);
+    }
+
+
+    /**
      * 任务评价
      * @param taskDto
      * @return
@@ -236,6 +338,23 @@ public class TaskManagementController {
         return new Result(true, StatusCode.OK, "评价成功");
     }
 
+    /**
+     * 根据任务主键Id查询任务图片路径信息
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "根据任务主键Id查询任务图片路径信息", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String")
+    })
+    @PostMapping("/findPicUrlByTaskId")
+    public Result<TaskVo> findPicUrlByTaskId(@ApiIgnore TaskDto taskDto){
+        if (ToolUtil.isEmpty(taskDto.getId())){
+            return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
+        }
+        List<TaskVo> list = taskManagementService.findPicMes(taskDto.getId());
+        return new Result<TaskVo>(true, StatusCode.OK, "查询成功",list);
+    }
 
     /**
      * 任务进度统计

@@ -11,15 +11,21 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface FileDao {
-
-
     /**
-     * 更新图片路径
+     * 上传图片
      * @param path
      * @param group
      * @param fileName
-     * @param taskNum
+     * @param id
      * @return
      */
-    int updateFilePictureUrl(@Param("path") String path,@Param("group") String group,@Param("fileName") String fileName,@Param("id") String id);
+    int insertFilePictureUrl(@Param("path") String path,@Param("group") String group,@Param("fileName") String fileName,@Param("id") String id);
+
+    /**
+     * 删除数据库中的路径
+     * @param groupName
+     * @param fileName
+     * @return
+     */
+    int deletePic(@Param("groupName")String groupName,@Param("fileName")String fileName);
 }

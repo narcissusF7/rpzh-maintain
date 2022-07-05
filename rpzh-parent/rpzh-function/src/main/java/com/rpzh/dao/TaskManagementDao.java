@@ -82,4 +82,54 @@ public interface TaskManagementDao {
      * @return
      */
     TaskVo findTaskDetailBySiteId(@Param("siteRoute") String siteRoute, @Param("type") String type);
+
+    /**
+     * 查询任务图片
+     * @param id
+     * @return
+     */
+    List<TaskVo> findPicMes(@Param("id") String id);
+
+    /**
+     * 修改任务状态
+     * @param id
+     * @param status
+     * @return
+     */
+    int updateTaskStatus(@Param("id")String id,@Param("status")String status,@Param("dealResult") String dealResult);
+
+    /**
+     * 虫情数据插入虫情板
+     * @param pestBoardId
+     * @param gatherSite
+     * @param beetle
+     * @param mealworm
+     * @param nowTime
+     * @return
+     */
+    int insertPest(@Param("pestBoardId")String pestBoardId, @Param("gatherSite")String gatherSite, @Param("beetle")int beetle,
+                   @Param("mealworm") int mealworm, @Param("nowTime") String nowTime);
+
+    /**
+     * 查询所有的虫情板
+     * @param siteRoute
+     * @return
+     */
+    List<String> findPestBoard(@Param("siteRoute")String siteRoute);
+
+    /**
+     * 一键上报虫情
+     * @param pestBoard
+     * @param taskAddress
+     * @param nowTime
+     * @return
+     */
+    int oneButtonPestReport(@Param("pestBoard")String pestBoard, @Param("taskAddress")String taskAddress, @Param("nowTime")String nowTime);
+
+    /**
+     * 查询垛位下所有的设备
+     * @param siteRoute
+     * @return
+     */
+    List<TaskVo> findAllNodeByStack(@Param("siteRoute") String siteRoute);
 }
