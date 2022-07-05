@@ -265,13 +265,12 @@
         inner join
         (select id,site_name from tb_stack <where>
         <if test="maintainPlanDto.pidRoute!=null and maintainPlanDto.pidRoute!=''">and pid_route like concat('%',#{maintainPlanDto.pidRoute},'%')</if>
-        <if test="maintainPlanDto.stackId!=null and maintainPlanDto.stackId!=''">and id = #{maintainPlanDto.stackId}</if>
     </where>
         ) t3 on t3.id = t1.stack_id
         where t1.is_end = '1'
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
-        <if test="maintainPlanDto.changeStatus != null and maintainPlanDto.changeStatus != ''"> and t2.is_change=#{maintainPlanDto.changeStatus}</if>
+        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t2.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
         ORDER BY t2.maintain_plan_id
     </select>
     <update id="endMaintainPlan">

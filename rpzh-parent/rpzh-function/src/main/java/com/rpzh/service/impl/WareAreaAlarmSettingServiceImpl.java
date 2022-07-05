@@ -41,7 +41,7 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
 
     @Override
     public void insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        String siteType = "0" + wareAreaAlarmSettingDto.getLevel();
+        String siteType = "0" + wareAreaAlarmSettingDto.getPidRoute().split(",").length;
         wareAreaAlarmSettingDto.setSiteType(siteType);
         Date date = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
@@ -94,7 +94,8 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
 
     @Override
     public void updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        wareAreaAlarmSettingDto.setSiteType("0"+wareAreaAlarmSettingDto.getLevel());
+        String siteType = "0" + wareAreaAlarmSettingDto.getPidRoute().split(",").length;
+        wareAreaAlarmSettingDto.setSiteType(siteType);
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         wareAreaAlarmSettingDto.setUpdateUser(updateUser);

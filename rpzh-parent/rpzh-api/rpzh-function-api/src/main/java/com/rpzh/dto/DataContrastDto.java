@@ -12,27 +12,25 @@ import java.util.List;
 /**
  * @Author: zyq
  * @Date: 2022/06/30/10:14
- * @Description: 功能
+ * @Description: 数据对比前端传参
  */
 @Data
 public class DataContrastDto {
-    //private List<NodeData> nodeDatas = new ArrayList<>();
+    //所选设备集合  json字符串
     private String nodeDatas;
-    //采集的开始时间、结束时间
-/*
-    @DateTimeFormat来控制入参，@JsonFormat来控制出参
-*/
-
+    //采集的开始时间
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startTime;
+    //采集的结束时间
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
-    //对比的开始时间、结束时间
+    //对比的开始时间
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginTime;
+    //对比的结束时间
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date finishTime;

@@ -13,55 +13,54 @@ import java.util.Date;
 @Data
 public class WareAreaAlarmSettingDto {
 
-    /**
-     * 仓间氧气
-     */
-    private Double warehouseOxygenUpperOne;
-    private Double warehouseOxygenUpperTwo;
-    private Double warehouseOxygenUpperThree;
-    private Double warehouseOxygenLower;
-
-    /**
-     * 仓间温度
-     */
-    private Double warehouseTempUpperOne;
-    private Double warehouseTempUpperTwo;
-    private Double warehouseTempUpperThree;
-    private Double warehouseTempLower;
-
-    /**
-     * 垛内水分
-     */
+    //仓间水分上限一级
     private Double warehouseMoistureUpperOne;
+    //仓间水分上限二级
     private Double warehouseMoistureUpperTwo;
+    //仓间水分上限三级
     private Double warehouseMoistureUpperThree;
+    //仓间水分下限
     private Double warehouseMoistureLower;
-
+    //仓间温度上限一级
+    private Double warehouseTempUpperOne;
+    //仓间温度上限二级
+    private Double warehouseTempUpperTwo;
+    //仓间温度上限三级
+    private Double warehouseTempUpperThree;
+    //仓间氧气上限一级
+    private Double warehouseOxygenUpperOne;
+    //仓间氧气上限二级
+    private Double warehouseOxygenUpperTwo;
+    //仓间氧气上限三级
+    private Double warehouseOxygenUpperThree;
+    //仓间氧气下限
+    private Double warehouseOxygenLower;
+    //位置类型 01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位
     private String siteType;
-    private Integer level;
+    //位置id
     private Integer stackId;
+    //位置路由
     private String pidRoute;
-
-    /**
-     * 制定时间
-     */
+    //制定时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdTime;
-    /**
-     * 更新时间
-     */
+    //更新时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedTime;
+    //创建人
     private String createUser;
+    //更新人
     private String updateUser;
-
+    //仓间数值设置表id
     private Integer id;
+    //位置名称
     private String siteName;
-
     private Integer size=10;
     private Integer page=1;
+    //开始时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String startTime;
+    //结束时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String endTime;
 

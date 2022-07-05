@@ -5,16 +5,9 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * <p>
- *
- * </p>
- *
  * @author liujj
  * @since 2022-04-29
  */

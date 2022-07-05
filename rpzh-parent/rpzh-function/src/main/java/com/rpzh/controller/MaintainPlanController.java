@@ -454,6 +454,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false, dataType = "String"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
             @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
     })

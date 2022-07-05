@@ -47,7 +47,6 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "level", value = "位置等级",required = true,dataType ="Integer"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由",required = true,dataType ="String"),
             @ApiImplicitParam(name = "stackId", value = "位置id",required = true,dataType ="Integer")
     })
@@ -106,7 +105,6 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "level", value = "位置等级",required = true,dataType ="Integer"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由",required = true,dataType ="String"),
             @ApiImplicitParam(name = "stackId", value = "位置id",required = true,dataType ="Integer")
     })

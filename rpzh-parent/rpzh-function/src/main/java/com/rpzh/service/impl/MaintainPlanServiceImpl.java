@@ -572,6 +572,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
+        maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0"+maintainPlanDto.getPidRoute().split(",").length+":"+maintainPlanDto.getStackId()+"]");
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         String pidRoute = maintainPlanDto.getPidRoute();
         if(StringUtil.isNotEmpty(pidRoute)) {
