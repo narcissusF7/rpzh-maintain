@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 public class SettingColorAndDayDto {
-
     private String colorOne;
 
     private String colorTwo;
