@@ -237,7 +237,6 @@ public class DataContrastServiceImpl implements DataContrastService {
         int month = year * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
         long day = ((endTime.getTime() - startTime.getTime()) / (1000*3600*24));
         List<DataContrastVo> days = new ArrayList<>();
-
         switch (gatherType){
             case "1":
                 gatherType = "formatDateTime(transfer_time,'%m月%d日')";

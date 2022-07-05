@@ -14,7 +14,7 @@ public class NodeData{
     //主键id
     private Integer id;
     //设备id
-    private String nodeId;
+    private String nodeId = "";
     //设备类型
     private String type;
     //频率
@@ -56,9 +56,11 @@ public class NodeData{
     private Integer tempLevel;
     //湿度预警等级
     private Integer humidityLevel;
-
-
-
+    //位置名称
+    private String siteName;
+    //数据对比时所选的曲线名称
+    private String nodeName;
+    private Double count=0d;
 
     public NodeData() {
     }
