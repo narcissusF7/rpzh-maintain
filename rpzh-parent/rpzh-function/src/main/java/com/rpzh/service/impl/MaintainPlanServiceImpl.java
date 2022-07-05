@@ -624,6 +624,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                     maintainPlanDao.updateMaintainCount(maintainPlanDto);
                     //修改垛位信息
                     nodeDtos.forEach((nodeDto) -> {
+                        nodeDto.setSiteId(stackId);
                         nodeDto.setStackId(stackId);
                         nodeDto.setSiteRoute(siteRoute);
                         nodeDto.setGatherSite(siteName);
