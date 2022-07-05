@@ -6,6 +6,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.TaskManagementService;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.TaskVo;
 import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
@@ -258,16 +259,22 @@ public class TaskManagementController {
     @ApiOperation(value = "工作任务菜单虫情巡查任务中一键虫情上报", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteRoute", value = "任务地址路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务地址id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "taskAddress", value = "任务地址名称", required = true,dataType = "String")
     })
     @PostMapping("/oneButtonPestReport")
-    public Result oneButtonPestReport(@ApiIgnore String siteRoute,@ApiIgnore String taskAddress){
+    public Result oneButtonPestReport(@ApiIgnore String siteRoute,@ApiIgnore String taskAddress,@ApiIgnore String id){
         if (ToolUtil.isEmpty(siteRoute)){
             return new Result(false, StatusCode.ERROR, "位置路径不能为空");
         }
         if (ToolUtil.isEmpty(taskAddress)){
             return new Result(false, StatusCode.ERROR, "任务地址名称不能为空");
         }
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "当前位置id不能为空");
+        }
+        //拼接id
+        siteRoute = SiteRouteUtil.route(siteRoute, id);
         int insertFlag = taskManagementService.oneButtonPestReport(siteRoute,taskAddress);
         return new Result(true,StatusCode.OK,"一键上报成功");
     }
