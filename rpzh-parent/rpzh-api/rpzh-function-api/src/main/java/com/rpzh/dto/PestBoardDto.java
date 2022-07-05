@@ -1,7 +1,11 @@
 package com.rpzh.dto;
 
 import lombok.Data;
-
+/**
+ * @Author: ljj
+ * @Date: 2022/05/18/15:30
+ * @Description: 虫情点位传参
+ */
 @Data
 public class PestBoardDto {
 
