@@ -144,6 +144,7 @@
         SET `status` = '0',
         `stack`  = '--',
         stack_id =null ,
+        site_id =null ,
         `site_x` = '-',
         `site_y` = '-',
         `site_z` = '-',

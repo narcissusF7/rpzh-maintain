@@ -345,6 +345,7 @@ public class NodeController {
                     return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的位置id为空");
                 }
                 nodeDto.setStackId(Integer.parseInt(map.get("stackId").toString()));
+                nodeDto.setSiteId(Integer.parseInt(map.get("stackId").toString()));
                 //设置采集位置类型
                 if (ToolUtil.isEmpty(map.get("stackId"))){
                     return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的位置id为空");

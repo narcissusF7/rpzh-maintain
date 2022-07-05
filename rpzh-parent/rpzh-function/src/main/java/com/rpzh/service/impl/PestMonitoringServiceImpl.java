@@ -666,10 +666,15 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         list.forEach(pestDataVo -> {
             //设置预警颜色
             pestDataVo.setWarningColor(getPestWarningColor(pestDataVo.getAlertLevel(),pestMonitorValue));
-            //甲虫预警颜色
-            pestDataVo.setBeetleColor(getPestWarningColor(pestDataVo.getBeetleLevel(),pestMonitorValue));
+
+
 
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)){
+                Map<String, Integer> map = decideLevel(pestDataVo.getPestBoardId(), pestDataVo.getBeetleCount(), pestDataVo.getMealwormCount());
+                pestDataVo.setBeetleLevel(map.get("beetleLevel"));
+                //甲虫预警颜色
+                pestDataVo.setBeetleColor(getPestWarningColor(pestDataVo.getBeetleLevel(),pestMonitorValue));
+                pestDataVo.setMealwormLevel(map.get("mealwormLevel"));
                 //粉螟预警颜色
                 pestDataVo.setMealwormColor(getPestWarningColor(pestDataVo.getMealwormLevel(),pestMonitorValue));
             }

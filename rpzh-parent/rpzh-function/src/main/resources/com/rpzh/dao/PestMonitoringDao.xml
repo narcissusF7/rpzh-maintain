@@ -195,7 +195,7 @@
     <select id="findPestDataHistoryByOne" resultType="com.rpzh.vo.PestDataVo">
         select pest_board_id pestBoardId,gather_site gatherSite , gather_time gatherTime ,beetle_count beetleCount,
         <if test="pestDataDto.siteType=='04'">
-            mealworm_count mealwormCount
+            mealworm_count mealwormCount,
         </if>
         alert_level alertLevel from tb_pest_data_history where pest_board_id = #{pestDataDto.pestBoardId}
         <if test="pestDataDto.startTime!='' and pestDataDto.startTime!=null">
