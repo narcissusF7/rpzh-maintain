@@ -374,14 +374,22 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteId = taskDto.getSiteId();
         //拼接获取当前地址
         siteRoute = SiteRouteUtil.route(siteRoute, siteId);
+        //含有05,说明是垛位
+        String stackId = "";
+        if (siteRoute.contains("05")){
+            stackId = siteId;
+        }
         //获取移垛数据
         String siteDate = taskDto.getSiteDate();
         List<Map> list = JSONObject.parseObject(siteDate, List.class);
         for (Map map : list) {
+            //设备id
             String nodeId = map.get("nodeId").toString();
+            //设备坐标
             int x = Integer.parseInt(map.get("x").toString());
             int y = Integer.parseInt(map.get("y").toString());
             int z = Integer.parseInt(map.get("z").toString());
+            int updateFlag = taskManagementDao.updateNodeAddress(nodeId,x,y,z,siteRoute,siteId,siteName,stackId);
         }
         return 0;
     }

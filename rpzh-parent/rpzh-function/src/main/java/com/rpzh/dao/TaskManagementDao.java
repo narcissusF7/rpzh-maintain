@@ -132,4 +132,19 @@ public interface TaskManagementDao {
      * @return
      */
     List<TaskVo> findAllNodeByStack(@Param("siteRoute") String siteRoute);
+
+    /**
+     * 任务中心移垛任务处理
+     * @param nodeId
+     * @param x
+     * @param y
+     * @param z
+     * @param siteRoute
+     * @param siteId
+     * @param siteName
+     * @return
+     */
+    int updateNodeAddress(@Param("nodeId")String nodeId,@Param("x") int x, @Param("y")int y,
+                          @Param("z")int z, @Param("siteRoute")String siteRoute,
+                          @Param("siteId")String siteId,@Param("siteName") String siteName,@Param("stackId") String stackId);
 }

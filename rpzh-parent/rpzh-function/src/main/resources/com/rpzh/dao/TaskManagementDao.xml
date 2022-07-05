@@ -205,4 +205,19 @@
   FROM tb_node
   WHERE site_route = #{siteRoute}
 </select>
+<update id="updateNodeAddress">
+  UPDATE tb_node
+  SET
+  `gather_site` = #{siteName},
+  `stack` = #{siteName},
+  `site_id` = #{siteId},
+  <if test="x != null and x != ''">  `site_x` = #{x},</if>
+  <if test="y != null and y != ''"> `site_y` = #{y},</if>
+  <if test="z != null and z != ''">`site_z` = #{z},</if>
+  <if test="siteRoute != null and siteRoute != ''">`site_route` = #{siteRoute},</if>
+  <if test="stackId != null and stackId != ''">`stack_id` = #{stackId},</if>
+  last_updated_time = sysdate()
+  WHERE
+	node_id = #{nodeId}
+</update>
 </mapper>

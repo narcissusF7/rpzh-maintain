@@ -283,7 +283,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径,移垛之后的位置路径", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteName", value = "任务目标地址名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = true,dataType = "integer"),
-            @ApiImplicitParam(name = "siteDate", value = "移垛数据,", required = true,dataType = "String")
+            @ApiImplicitParam(name = "siteDate", value = "移垛数据:[{\"nodeId\":\"88FFDFD29\",\"x\":15,\"y\":112,\"z\":132},{\"nodeId\":\"88FFDFD30\", \"x\":11, \"y\":122, \"z\":132}]", required = true,dataType = "String")
     })
     @PostMapping("/moveStackDeal")
     public Result moveStackDeal(@ApiIgnore TaskDto taskDto){

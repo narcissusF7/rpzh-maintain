@@ -22,6 +22,8 @@ import java.util.List;
 @ApiModel(description = "仓库返回类")
 public class WarehouseVo implements Serializable {
 
+    private static final long serialVersionUID = 4211792115506119363L;
+
     //主键ID
     @ApiModelProperty(notes = "主键id")
     private Integer id;
