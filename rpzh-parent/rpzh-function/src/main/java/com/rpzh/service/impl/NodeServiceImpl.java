@@ -22,6 +22,7 @@ import com.rpzh.service.NodeService;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -388,29 +389,6 @@ public class NodeServiceImpl implements NodeService {
             return nodeDataVos;
         }
         return null;
-    }
-    /**
-     * 手动分页
-     * @param list 需要分页的数据
-     * @param pageNum 当前页
-     * @param pageSize 每页数量
-     * @return
-     */
-    @Override
-    public Page<NodeDataVo> manuallyPage(List<NodeDataVo> list, int pageNum, int pageSize) {
-        //创建一个page类
-        Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
-        //总数量
-        int total = list.size();
-        page.setTotal(total);
-        //起始下标
-        int startIndex = (pageNum - 1) * pageSize;
-        //终止下标
-        int endIndex = Math.min(startIndex + pageSize, total);
-        //截取数量
-        page.addAll(list.subList(startIndex, endIndex));
-
-        return page;
     }
 
 }

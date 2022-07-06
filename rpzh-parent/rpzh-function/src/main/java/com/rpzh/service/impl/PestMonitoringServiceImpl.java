@@ -21,6 +21,7 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.PestData;
 import com.rpzh.service.PestMonitoringService;
+import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.EarlyWarningVo;
@@ -500,32 +501,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //设置预警颜色
         setPestWarningColor(collect,monitorCondition.getSiteType());
         //手动分页
-        Page<PestDataVo> page = manuallyPage(collect, monitorCondition.getPage(), monitorCondition.getSize());
+        Page<PestDataVo> page = ManuallyPageUtil.manuallyPage(collect, monitorCondition.getPage(), monitorCondition.getSize());
         return new PageInfo<>(page);
-    }
-
-    /**
-     * 手动分页
-     *
-     * @param list     需要分页的数据
-     * @param pageNum  当前页
-     * @param pageSize 每页数量
-     * @return
-     */
-    public Page<PestDataVo> manuallyPage(List<PestDataVo> list, Integer pageNum, Integer pageSize) {
-        //创建一个page类
-        Page<PestDataVo> page = new Page<>(pageNum, pageSize);
-        //总数量
-        int total = list.size();
-        page.setTotal(total);
-        //起始下标
-        int startIndex = (pageNum - 1) * pageSize;
-        //终止下标
-        int endIndex = Math.min(startIndex + pageSize, total);
-        //截取数量
-        page.addAll(list.subList(startIndex, endIndex));
-
-        return page;
     }
 
     /**

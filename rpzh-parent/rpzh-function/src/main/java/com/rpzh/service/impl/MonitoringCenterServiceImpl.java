@@ -15,6 +15,7 @@ import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
+import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.*;
 
@@ -138,7 +139,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             list.add(findNowWeather());
         }
         list.addAll(collect);
-        Page<NodeDataVo> page = manuallyPage(list, pageNum, pageSize);
+        Page<NodeDataVo> page = ManuallyPageUtil.manuallyPage(list, pageNum, pageSize);
         return new PageInfo<>(page);
     }
 
@@ -325,22 +326,6 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             historyGraphData.add(map);
         });
         return historyGraphData;
-    }
-
-    public Page<NodeDataVo> manuallyPage(List<NodeDataVo> list ,Integer pageNum , Integer pageSize){
-        //创建一个page类
-        Page<NodeDataVo> page = new Page<>(pageNum, pageSize);
-        //总数量
-        int total = list.size();
-        page.setTotal(total);
-        //起始下标
-        int startIndex = (pageNum - 1) * pageSize;
-        //终止下标
-        int endIndex = Math.min(startIndex + pageSize, total);
-        //截取数量
-        page.addAll(list.subList(startIndex, endIndex));
-
-        return page;
     }
 
     /**

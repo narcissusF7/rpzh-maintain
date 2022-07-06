@@ -138,6 +138,4 @@ public interface NodeService {
     Integer findNodeStatus(Integer id);
 
     Result flipStack(MaintainPlanDto maintainPlanDto);
-
-    Page<NodeDataVo> manuallyPage(List<NodeDataVo> nodeDataVos, int page, int size);
 }

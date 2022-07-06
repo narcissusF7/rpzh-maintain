@@ -14,6 +14,7 @@ import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.EasyPoiUtil;
+import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.NodeDataVo;
@@ -261,7 +262,7 @@ public class MonitoringCenterController {
         if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
             int page = nodeDto.getPage();
             int size = nodeDto.getSize();
-            Page<NodeDataVo> nodeDataPage =  nodeService.manuallyPage(nodeDataVos,page,size);
+            Page<NodeDataVo> nodeDataPage = ManuallyPageUtil.manuallyPage(nodeDataVos, page, size);
             return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataPage));
         }
         if (ToolUtil.isEmpty(nodeDataVos)){
