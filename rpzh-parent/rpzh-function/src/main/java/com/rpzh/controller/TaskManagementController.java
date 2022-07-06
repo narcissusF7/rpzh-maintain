@@ -9,6 +9,7 @@ import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.TaskVo;
 import com.sun.org.apache.regexp.internal.RE;
+import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -289,6 +290,8 @@ public class TaskManagementController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径,移垛之后的位置路径", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteName", value = "任务目标地址名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = true,dataType = "integer"),
             @ApiImplicitParam(name = "siteDate", value = "移垛数据:[{\"nodeId\":\"88FFDFD29\",\"x\":15,\"y\":112,\"z\":132},{\"nodeId\":\"88FFDFD30\", \"x\":11, \"y\":122, \"z\":132}]", required = true,dataType = "String")
     })
@@ -303,16 +306,45 @@ public class TaskManagementController {
         if (ToolUtil.isEmpty(taskDto.getSiteId())){
             return new Result(false, StatusCode.ERROR, "目标地址id不能为空");
         }
+        if (ToolUtil.isEmpty(taskDto.getId())){
+            return new Result(false, StatusCode.ERROR, "任务id不能为空");
+        }
         int updateFlag = taskManagementService.moveStackDeal(taskDto);
         return new Result(true,StatusCode.OK,"移垛成功");
     }
 
+
     /**
-     * 工作任务菜单移垛任务处理查询当前垛位下所有的设备
+     * 翻垛任务处理
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "工作任务菜单翻垛任务处理", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteDate", value = "翻垛数据", required = true,dataType = "String")
+    })
+    @PostMapping("/flipStackDeal")
+    public Result flipStackDeal(@ApiIgnore TaskDto taskDto){
+        if (ToolUtil.isEmpty(taskDto.getId())){
+            return new Result(false, StatusCode.ERROR, "任务id不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteDate())){
+            return new Result(false, StatusCode.ERROR, "翻垛数据不能为空");
+        }
+        int updateFlag = taskManagementService.flipStackDeal(taskDto);
+        return new Result(true, StatusCode.OK, "翻垛成功");
+    }
+
+
+
+    /**
+     * 工作任务菜单移垛和翻垛任务处理查询当前垛位下所有的设备
      * @param siteRoute
      * @return
      */
-    @ApiOperation(value = "工作任务菜单移垛任务处理查询当前垛位下所有的设备", tags = "任务管理中心")
+    @ApiOperation(value = "工作任务菜单移垛和翻垛任务处理查询当前垛位下所有的设备", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteRoute", value = "任务地址路径", required = true,dataType = "String")
     })

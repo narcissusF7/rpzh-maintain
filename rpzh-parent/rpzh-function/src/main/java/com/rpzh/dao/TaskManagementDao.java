@@ -147,4 +147,14 @@ public interface TaskManagementDao {
     int updateNodeAddress(@Param("nodeId")String nodeId,@Param("x") int x, @Param("y")int y,
                           @Param("z")int z, @Param("siteRoute")String siteRoute,
                           @Param("siteId")String siteId,@Param("siteName") String siteName,@Param("stackId") String stackId);
+
+    /**
+     * 翻垛后,修改设备位置
+     * @param nodeId
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    int updateNodeXYZ(@Param("nodeId")String nodeId, @Param("x")String x, @Param("y")String y, @Param("z")String z);
 }

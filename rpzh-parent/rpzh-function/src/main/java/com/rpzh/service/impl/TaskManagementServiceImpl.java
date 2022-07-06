@@ -365,7 +365,18 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      * @return
      */
     @Override
+    @Transactional
     public int moveStackDeal(TaskDto taskDto) {
+        //获取处理结果
+        String dealResult = taskDto.getDealResult();
+        if (ToolUtil.isEmpty(dealResult)){
+            //没有处理结果,任务状态为处理中
+            taskDto.setStatus("3");
+        }else {
+            //有处理效果,任务状态为完成
+            taskDto.setStatus("1");
+        }
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(),taskDto.getStatus(),taskDto.getDealResult());
         //获取移垛路径,传入的是父路径,需要拼接当前路径
         String siteRoute = taskDto.getSiteRoute();
         //获取移垛垛位名称
@@ -381,17 +392,59 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         }
         //获取移垛数据
         String siteDate = taskDto.getSiteDate();
-        List<Map> list = JSONObject.parseObject(siteDate, List.class);
-        for (Map map : list) {
-            //设备id
-            String nodeId = map.get("nodeId").toString();
-            //设备坐标
-            int x = Integer.parseInt(map.get("x").toString());
-            int y = Integer.parseInt(map.get("y").toString());
-            int z = Integer.parseInt(map.get("z").toString());
-            int updateFlag = taskManagementDao.updateNodeAddress(nodeId,x,y,z,siteRoute,siteId,siteName,stackId);
+        try {
+            List<Map> list = JSONObject.parseObject(siteDate, List.class);
+            for (Map map : list) {
+                //设备id
+                String nodeId = map.get("nodeId").toString();
+                //设备坐标
+                int x = Integer.parseInt(map.get("x").toString());
+                int y = Integer.parseInt(map.get("y").toString());
+                int z = Integer.parseInt(map.get("z").toString());
+                int updateFlag = taskManagementDao.updateNodeAddress(nodeId,x,y,z,siteRoute,siteId,siteName,stackId);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            throw new RuntimeException("数据输入错误");
         }
-        return 0;
+        return updateStatus;
+    }
+
+    /**
+     * 翻垛任务处理
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    @Transactional
+    public int flipStackDeal(TaskDto taskDto) {
+        //获取处理结果
+        String dealResult = taskDto.getDealResult();
+        if (ToolUtil.isEmpty(dealResult)){
+            //没有处理结果,任务状态为处理中
+            taskDto.setStatus("3");
+        }else {
+            //有处理效果,任务状态为完成
+            taskDto.setStatus("1");
+        }
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(),taskDto.getStatus(),taskDto.getDealResult());
+        //获取翻垛数据
+        String siteDate = taskDto.getSiteDate();
+        try {
+            List<Map> list = JSONObject.parseObject(siteDate, List.class);
+            for (Map map : list) {
+                String nodeId = map.get("nodeId").toString();
+                String x = map.get("x").toString();
+                String y = map.get("y").toString();
+                String z = map.get("z").toString();
+                int updateFlag = taskManagementDao.updateNodeXYZ(nodeId,x,y,z);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("数据输入错误");
+        }
+        return updateStatus;
     }
 
 }

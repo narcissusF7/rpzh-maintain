@@ -112,4 +112,11 @@ public interface TaskManagementService {
      * @return
      */
     int moveStackDeal(TaskDto taskDto);
+
+    /**
+     * 翻垛任务处理
+     * @param taskDto
+     * @return
+     */
+    int flipStackDeal(TaskDto taskDto);
 }

@@ -220,4 +220,13 @@
   WHERE
 	node_id = #{nodeId}
 </update>
+<update id="updateNodeXYZ">
+  UPDATE tb_node
+  SET
+  site_x = #{x},
+  site_y = #{y},
+  site_z = #{z}
+  WHERE
+  node_id =  #{nodeId}
+</update>
 </mapper>
