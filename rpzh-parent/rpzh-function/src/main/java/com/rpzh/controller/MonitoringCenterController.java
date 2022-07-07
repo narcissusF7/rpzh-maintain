@@ -389,13 +389,12 @@ public class MonitoringCenterController {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             });
         });
         String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
         EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
 
-        return new Result(true,StatusCode.OK,"查询成功");
+        return new Result(true,StatusCode.OK,"导出成功");
     }
 }
 

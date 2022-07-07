@@ -376,19 +376,28 @@ public class NodeServiceImpl implements NodeService {
             }
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn());
             for (int i = 0; i < nodeDataVos.size(); i++) {
-                if (nodeDataVos.get(i).getAlertLevel()==1){
-                    nodeDataVos.get(i).setWarningColor(map.get("one").toString());
-                }else if (nodeDataVos.get(i).getAlertLevel()==2){
-                    nodeDataVos.get(i).setWarningColor(map.get("two").toString());
-                }else if (nodeDataVos.get(i).getAlertLevel()==3){
-                    nodeDataVos.get(i).setWarningColor(map.get("three").toString());
-                }else {
-                    nodeDataVos.get(i).setWarningColor("");
-                }
+                setWarningColor(nodeDataVos.get(i),map);
             }
+
             return nodeDataVos;
         }
         return null;
     }
 
+    /**
+     * 设置预警颜色
+     * @param nodeDataVo
+     * @param map
+     */
+    public static void setWarningColor(NodeDataVo nodeDataVo,Map map){
+            if (nodeDataVo.getAlertLevel()==1){
+                nodeDataVo.setWarningColor(map.get("one").toString());
+            }else if (nodeDataVo.getAlertLevel()==2){
+                nodeDataVo.setWarningColor(map.get("two").toString());
+            }else if (nodeDataVo.getAlertLevel()==3){
+                nodeDataVo.setWarningColor(map.get("three").toString());
+            }else {
+                nodeDataVo.setWarningColor("");
+        }
+    }
 }

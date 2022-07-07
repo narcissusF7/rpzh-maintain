@@ -362,6 +362,9 @@
     <update id="updateTime">
         update tb_send_time set first_time = #{firstTime},second_time =#{secondTime}
     </update>
+    <update id="updateWarningType">
+        update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} ORDER BY id DESC LIMIT 1
+    </update>
     <select id="findStack" resultType="java.lang.Integer">
         SELECT stack_id from tb_early_warning where is_affirm = '2' and stack_id is not null group by stack_id order by stack_id
     </select>

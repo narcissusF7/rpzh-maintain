@@ -81,4 +81,6 @@ public interface EarlyWarningDao {
     List<EarlyWarningVo> findSendAreaByWarningThree(@Param("areaId") Integer areaId);
 
     String findMaxTime(@Param("nodeId")String nodeId);
+
+    Integer updateWarningType(@Param("nodeId")String nodeId, @Param("warningType")String warningType);
 }

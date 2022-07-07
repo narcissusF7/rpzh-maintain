@@ -1,6 +1,7 @@
 package com.rpzh.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
@@ -62,6 +63,7 @@ public class DataHandler {
     public static String MAINTAIN = "MAINTAIN_";
     public static String ALERT_NUM = "ALERT_NUM_";
     public static String MAINTAIN_CACHE_NODE = "MAINTAIN_CACHE_NODE_";
+    public static String FAULT = "FAULT_";
 
     /**
      * 设备推送数据处理
@@ -138,26 +140,6 @@ public class DataHandler {
      * @param parseData
      */
     public void handlerData(ParseData parseData) {
-        warningType = "";
-        //判断电量
-        if (parseData.getVoltage() < voltage) {
-            warningType= warningType +","+WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN;
-            //判断数据库中该设备是否存在未处理的低电量预警
-            nodeMalfunction(parseData, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData.getVoltage());
-
-        }
-        //判断信号强度
-        if (parseData.getSignalStrength() < signalStrength) {
-            warningType= warningType +","+WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN;
-            nodeMalfunction(parseData, WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN, parseData.getSignalStrength().doubleValue());
-        }
-        //判断丢包个数
-        if (parseData.getPacketLossNum() > 0) {
-            warningType= warningType +","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN;
-            nodeMalfunction(parseData, WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN, parseData.getPacketLossNum().doubleValue());
-        }
-
-
         //通过设备id找到对应的设备
         Object o = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
 
@@ -165,7 +147,6 @@ public class DataHandler {
 
         if (ToolUtil.isEmpty(o)){
             nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
-
             if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
                 //查询对应的养护计划 养护计划阶段
                 MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
@@ -179,6 +160,31 @@ public class DataHandler {
         }else {
             nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
         }
+        //如果设备处于是解垛状态  数据不做任何处理
+        if (nodeVo.getStatus().equals("0")){
+            return;
+        }
+
+
+        warningType = "";
+        //判断电量
+        decideFault(parseData.getVoltage(),voltage,WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN,parseData);
+
+        //判断缓存中是否存在该设备的预警 且预警包含电量预警
+//        if (parseData.getVoltage() < voltage) {
+//            warningType= warningType +","+WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN;
+//            //判断数据库中该设备是否存在未处理的低电量预警
+//            nodeMalfunction(parseData, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData.getVoltage());
+//        }
+        //判断信号强度
+        decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
+
+        //判断丢包个数  丢包预警在监控那边判断
+//        if (parseData.getPacketLossNum() > 0) {
+//            warningType= warningType +","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN;
+//            nodeMalfunction(parseData, WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN, parseData.getPacketLossNum().doubleValue());
+//        }
+
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
@@ -300,7 +306,7 @@ public class DataHandler {
     public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn,Integer alarmId){
 
         for (int i = hashKeys.size()-1; i >=0 ; i--) {
-            //            //判断缓存是否存在
+            //判断缓存是否存在
             Boolean hasKey = redisTemplate.opsForHash().hasKey(MAINTAIN + hashKeys.get(i), alarmColumn);
             if (hasKey) {
                 return MAINTAIN + hashKeys.get(i);
@@ -348,9 +354,23 @@ public class DataHandler {
         //查询该设备在预警记录表中该类型的预警记录是否存在
         Integer count = earlyWarningDao.findUndoCount(parseData.getNodeId(), warningType);
         if (count < 1) {
-            //不存在就新增一条数据
-            EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1);
-            earlyWarningDao.insertWarning(earlyWarning);
+            //获取缓存中该设备该预警类型的次数
+            Object o = redisTemplate.opsForHash().get(FAULT + warningType, parseData.getNodeId());
+            if (!ToolUtil.isEmpty(o)){
+                //如果缓存中存在次数
+                if ((Integer) o ==2){
+                    //达到3次新增一条数据
+                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1);
+                    earlyWarningDao.insertWarning(earlyWarning);
+                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
+                }else {
+                    //否则次数加1
+                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),(Integer) o+1);
+                }
+            }else {
+                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),1);
+            }
+
         }
     }
 
@@ -627,5 +647,34 @@ public class DataHandler {
             }
         }
         return level;
+    }
+
+    /**
+     * 故障预警信息处理
+     * @param v1 传入值
+     * @param v2 预警阈值  如果是丢包统计v1和v2代表的意思相反
+     * @param type 类型
+     * @param parseData
+     */
+    public void decideFault(Double v1,Double v2,String type,ParseData parseData){
+        if (v1 < v2) {
+            warningType= warningType +","+type;
+            //判断数据库中该设备是否存在未处理的预警
+            nodeMalfunction(parseData, type, v1);
+
+        }else{
+            //获取缓存的该设备数据
+            Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN + parseData.getNodeId());
+            if (!ToolUtil.isEmpty(cacheNodeData)){
+                //转成NodeDataVo
+                NodeDataVo nodeDataVo = JSONObject.parseObject(cacheNodeData + "", NodeDataVo.class);
+                //获取预警类ing
+                String warningType = nodeDataVo.getWarningType();
+                //如果包含当前校验的类型
+                if (warningType.contains(type)){
+                    earlyWarningDao.updateWarningType(parseData.getNodeId(),type);
+                }
+            }
+        }
     }
 }
