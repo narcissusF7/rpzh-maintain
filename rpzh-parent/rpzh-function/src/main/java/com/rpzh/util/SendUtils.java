@@ -5,8 +5,6 @@ import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.feign.UserFeign;
-import com.rpzh.service.impl.SpringUtils;
-import com.rpzh.util.StringUtils;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;

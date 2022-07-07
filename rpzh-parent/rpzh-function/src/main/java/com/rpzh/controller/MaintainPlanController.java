@@ -503,6 +503,10 @@ public class MaintainPlanController {
     @Resource
     private RedisTemplate redisTemplate;
     @PostMapping("/export")
+    @ApiOperation(value = "导出养护数量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "列表中的id", required = false, dataType = "List")
+    })
     public void export(HttpServletResponse response,@RequestParam("ids") List<String> ids) {
         if(ToolUtil.isEmpty(ids)){
             return;

@@ -47,18 +47,21 @@ public class WareAreaAlarmSettingVo {
     private String moistureList;
     @ApiModelProperty(notes = "仓间水分上限集合")
     private String warehouseMoistureLower;
-
+    @ApiModelProperty(notes = "位置类型")
     private String siteType;
-    private Integer level;
+    @ApiModelProperty(notes = "位置id")
     private Integer stackId;
+    @ApiModelProperty(notes = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位")
     private String siteName;
     /**
      * 更新时间
      */
+    @ApiModelProperty(notes = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedTime;
+    @ApiModelProperty(notes = "创建人")
     private String createUser;
-
+    @ApiModelProperty(notes = "仓间数值设置表id")
     private Integer id;
 
 }

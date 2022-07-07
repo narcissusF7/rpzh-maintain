@@ -44,9 +44,10 @@ public class MaterialController {
             @ApiImplicitParam(name = "stackId", value = "垛位Id", required = true, dataType = "Integer")
     })
     public Result findMaterialInfo(Integer stackId){
-        if(stackId == null){
+        if(ToolUtil.isEmpty(stackId)){
             return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
         }
+        //查询该垛位是否新建养护计划
         Integer stackIdCount = maintainPlanService.isExistStackId(stackId);
         if(stackIdCount>0){
             return new Result(false, StatusCode.EXISTERROR, "该垛位已存在养护计划!");

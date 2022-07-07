@@ -32,6 +32,7 @@ public class EarlyWarningController {
     @Resource
     private EarlyWarningService earlyWarningService;
 
+    //解决前端传时间参数时出现的问题
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
