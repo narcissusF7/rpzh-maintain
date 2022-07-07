@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @Author: zyq
  * @Date: 2022/06/07/11:30
- * @Description: 功能
+ * @Description: 预警模板前端传参
  */
 @Data
 public class AlarmSettingTemplateDto {

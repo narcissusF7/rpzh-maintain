@@ -11,10 +11,10 @@ import java.util.Date;
 /**
  * @Author: zyq
  * @Date: 2022/05/19/14:03
- * @Description: EarlyWarningVoEarlyWarningVo返回
+ * @Description: 返回
  */
 @Data
-@ApiModel(description = "预警返回数据")
+@ApiModel(description = "预警信息返回")
 public class EarlyWarningVo {
     @ApiModelProperty(notes ="主键id")
     private Integer id;
@@ -26,8 +26,11 @@ public class EarlyWarningVo {
     private Double upperThree;
     @ApiModelProperty(notes = "下限")
     private Double lower;
+    @ApiModelProperty(notes = "x坐标")
     private String siteX;
+    @ApiModelProperty(notes = "y坐标")
     private String siteY;
+    @ApiModelProperty(notes = "z坐标")
     private String siteZ;
     @ApiModelProperty(notes = "预警等级,1:一级预警,2:二级预警,3:三级预警")
     private Integer warningGrade;

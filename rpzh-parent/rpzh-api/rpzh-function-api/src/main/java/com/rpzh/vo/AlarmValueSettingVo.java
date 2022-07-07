@@ -9,12 +9,11 @@ import java.util.Date;
 
 /**
  * @author zyq
- * 预警信息设置
+ * 预警规则数据返回
  */
 @Data
-@ApiModel(description = "预警数值返回数据")
+@ApiModel(description = "预警规则数据返回")
 public class AlarmValueSettingVo {
-
     @ApiModelProperty(notes = "垛内氧气上限一级")
     public Double stackOxygenUpperOne;
     @ApiModelProperty(notes = "垛内氧气上限二级")
@@ -23,7 +22,6 @@ public class AlarmValueSettingVo {
     private Double stackOxygenUpperThree;
     @ApiModelProperty(notes = "垛内氧气下限")
     private Double stackOxygenLower;
-
     @ApiModelProperty(notes = "仓间氧气上限一级")
     private Double warehouseOxygenUpperOne;
     @ApiModelProperty(notes = "仓间氧气上限二级")
@@ -32,7 +30,6 @@ public class AlarmValueSettingVo {
     private Double warehouseOxygenUpperThree;
     @ApiModelProperty(notes = "仓间氧气下限")
     private Double warehouseOxygenLower;
-
     @ApiModelProperty(notes = "包芯温度上限一级")
     private Double tempCoreChipUpperOne;
     @ApiModelProperty(notes = "包芯温度上限二级")
@@ -41,7 +38,6 @@ public class AlarmValueSettingVo {
     private Double tempCoreChipUpperThree;
     @ApiModelProperty(notes = "包芯温度下限")
     private Double tempCoreChipLower;
-
     @ApiModelProperty(notes = "垛内温度上限一级")
     private Double stackTempUpperOne;
     @ApiModelProperty(notes = "垛内温度上限二级")
@@ -50,7 +46,6 @@ public class AlarmValueSettingVo {
     private Double stackTempUpperThree;
     @ApiModelProperty(notes = "垛内温度下限")
     private Double stackTempLower;
-
     @ApiModelProperty(notes = "垛内水分上限一级")
     private Double stackMoistureUpperOne;
     @ApiModelProperty(notes = "垛内水分上限二级")
@@ -59,7 +54,6 @@ public class AlarmValueSettingVo {
     private Double stackMoistureUpperThree;
     @ApiModelProperty(notes = "垛内水分下限")
     private Double stackMoistureLower;
-
     @ApiModelProperty(notes = "仓间温度上限一级")
     private Double warehouseTempUpperOne;
     @ApiModelProperty(notes = "仓间温度上限二级")
@@ -68,7 +62,6 @@ public class AlarmValueSettingVo {
     private Double warehouseTempUpperThree;
     @ApiModelProperty(notes = "仓间温度下限")
     private Double warehouseTempLower;
-
     @ApiModelProperty(notes = "仓间水分上限一级")
     private Double warehouseMoistureUpperOne;
     @ApiModelProperty(notes = "仓间水分上限二级")
@@ -77,7 +70,6 @@ public class AlarmValueSettingVo {
     private Double warehouseMoistureUpperThree;
     @ApiModelProperty(notes = "仓间水分下限")
     private Double warehouseMoistureLower;
-
     @ApiModelProperty(notes = "平均包芯高于环境一级")
     private Double coreTempHighEnvTempOne;
     @ApiModelProperty(notes = "平均包芯高于环境二级")
@@ -86,23 +78,18 @@ public class AlarmValueSettingVo {
     private Double coreTempHighEnvTempThree;
     @ApiModelProperty(notes = "平均包芯低于环境")
     private Double coreTempLowEnvTemp;
-
     @ApiModelProperty(notes = "预警设置表id")
     private Integer alarmValueSettingId;
-
     @ApiModelProperty(notes = "预警规则名称")
     private String earlyWarningRuleName;
-
+    @ApiModelProperty(notes = "物料代码集合")
     private String materialCodes;
+    @ApiModelProperty(notes = "养护方式")
     private String maintenceStyle;
-
-
     @ApiModelProperty(notes = "预警设置id")
     private Integer id;
     @ApiModelProperty(notes = "制定人")
     private String createUser;
-    @ApiModelProperty(notes = "状态(0:停用,1:启用)")
-    private String status;
     @ApiModelProperty(notes = "最后更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedTime;

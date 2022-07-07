@@ -1,5 +1,7 @@
 package com.rpzh.vo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -10,21 +12,22 @@ import java.util.Date;
  * @Description: 预警模板操作日志
  */
 @Data
+@ApiModel(description = "预警模板操作日志")
 public class LogAlarmSettingVo {
-    //预警模板操作日志id
+    @ApiModelProperty(notes ="预警模板操作日志id")
     private Integer id;
-    //操作人员
+    @ApiModelProperty(notes ="操作人员")
     private String logUserName;
-    //操作类型:添加,修改
+    @ApiModelProperty(notes ="操作类型:添加,修改")
     private String logType;
-    //操作主机ip
+    @ApiModelProperty(notes ="操作主机ip")
     private String logIp;
-    //操作时间
+    @ApiModelProperty(notes ="操作时间")
     private Date logDate;
-    //预警规则名称
+    @ApiModelProperty(notes ="预警规则名称")
     private String earlyWarningRuleName;
-    //养护阶段
+    @ApiModelProperty(notes ="养护阶段")
     private String phases;
-    //仓间预警id
+    @ApiModelProperty(notes ="仓间预警id")
     private Integer alarmValueSettingId;
 }
