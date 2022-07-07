@@ -5,6 +5,7 @@ import com.rpzh.dto.TaskDto;
 import com.rpzh.vo.TaskVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author liubc
@@ -119,4 +120,11 @@ public interface TaskManagementService {
      * @return
      */
     int flipStackDeal(TaskDto taskDto);
+
+    /**
+     * 任务进度统计
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskScheduleCount(TaskDto taskDto);
 }

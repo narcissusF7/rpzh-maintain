@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -29,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.SQLOutput;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 任务管理中心
@@ -341,7 +342,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //当前时间
         String nowTime = DateUtil.dateNew(new Date()).toString();
         for (String pestBoard : pestBoardList) {
-            int insertPest = taskManagementDao.oneButtonPestReport(pestBoard,taskAddress,nowTime);
+            int insertPest = taskManagementDao.oneButtonPestReport(pestBoard, taskAddress, nowTime);
         }
         return 0;
     }
@@ -369,14 +370,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     public int moveStackDeal(TaskDto taskDto) {
         //获取处理结果
         String dealResult = taskDto.getDealResult();
-        if (ToolUtil.isEmpty(dealResult)){
+        if (ToolUtil.isEmpty(dealResult)) {
             //没有处理结果,任务状态为处理中
             taskDto.setStatus("3");
-        }else {
+        } else {
             //有处理效果,任务状态为完成
             taskDto.setStatus("1");
         }
-        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(),taskDto.getStatus(),taskDto.getDealResult());
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult());
         //获取移垛路径,传入的是父路径,需要拼接当前路径
         String siteRoute = taskDto.getSiteRoute();
         //获取移垛垛位名称
@@ -387,7 +388,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         siteRoute = SiteRouteUtil.route(siteRoute, siteId);
         //含有05,说明是垛位
         String stackId = "";
-        if (siteRoute.contains("05")){
+        if (siteRoute.contains("05")) {
             stackId = siteId;
         }
         //获取移垛数据
@@ -401,7 +402,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                 int x = Integer.parseInt(map.get("x").toString());
                 int y = Integer.parseInt(map.get("y").toString());
                 int z = Integer.parseInt(map.get("z").toString());
-                int updateFlag = taskManagementDao.updateNodeAddress(nodeId,x,y,z,siteRoute,siteId,siteName,stackId);
+                int updateFlag = taskManagementDao.updateNodeAddress(nodeId, x, y, z, siteRoute, siteId, siteName, stackId);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -421,14 +422,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     public int flipStackDeal(TaskDto taskDto) {
         //获取处理结果
         String dealResult = taskDto.getDealResult();
-        if (ToolUtil.isEmpty(dealResult)){
+        if (ToolUtil.isEmpty(dealResult)) {
             //没有处理结果,任务状态为处理中
             taskDto.setStatus("3");
-        }else {
+        } else {
             //有处理效果,任务状态为完成
             taskDto.setStatus("1");
         }
-        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(),taskDto.getStatus(),taskDto.getDealResult());
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult());
         //获取翻垛数据
         String siteDate = taskDto.getSiteDate();
         try {
@@ -438,7 +439,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                 String x = map.get("x").toString();
                 String y = map.get("y").toString();
                 String z = map.get("z").toString();
-                int updateFlag = taskManagementDao.updateNodeXYZ(nodeId,x,y,z);
+                int updateFlag = taskManagementDao.updateNodeXYZ(nodeId, x, y, z);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -447,4 +448,190 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         return updateStatus;
     }
 
+    /**
+     * 任务进度统计
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public List<Map> taskScheduleCount(TaskDto taskDto) {
+        //获取开始时间
+        String startTime = taskDto.getStartTime();
+        //获取结束时间
+        String endTime = taskDto.getEndTime();
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //如果开始时间和结束时间都为空,日期向前推一周
+        if (ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)) {
+            startTime = DateUtil.lastWeek().toString();
+            endTime = nowTime;
+        }
+        //如果开始时间不为空,结束时间为空,结束时间向后推一周
+        if (ToolUtil.isNotEmpty(startTime) && ToolUtil.isEmpty(endTime)) {
+            Date date = DateUtil.parse(startTime);
+            endTime = DateUtil.offsetDay(date, 7).toString();
+        }
+        //如果开始时间为空,结束时间不为空,开始时间为向前推一周
+        if (ToolUtil.isEmpty(startTime) && ToolUtil.isNotEmpty(endTime)) {
+            Date date = DateUtil.parse(endTime);
+            startTime = DateUtil.offsetDay(date, -7).toString();
+        }
+        //获取统计方式,Y:年统计,M:月统计,D:日统计
+        String deteType = taskDto.getDeteType();
+        if ("D".equals(deteType)) {
+            //按照日统计,获取开始时间结束时间所有的日期
+            List<String> betweenDays = getBetweenDays(startTime, endTime);
+            //对获取日期排序
+            List<String> dayList = betweenDays.stream().sorted(String::compareTo).collect(Collectors.toList());
+            taskDto.setDays(betweenDays);
+            //按照日统计数据,数据总量,包含完成和未完成的任务,所有的任务
+            List<Map> taskVoList = taskManagementDao.taskScheduleDayCount(taskDto);
+            for (Map map : taskVoList) {
+                //获取日期
+                String day = map.get("day").toString();
+                //获取任务总数
+                int sum = Integer.parseInt(map.get("sum").toString());
+                if (sum == 0){
+                    map.put("finish",0);
+                    map.put("noFinish",0);
+                }else {
+                    //查询完成的任务数量
+                    int count = taskManagementDao.findTaskFinish(taskDto.getType(),day);
+                    map.put("finish",count);
+                    map.put("noFinish",sum-count);
+                }
+            }
+            //获取每一个日期,判断是否存在,不存在的日期数量为0
+            for (String day : dayList) {
+                boolean flag = false;
+                for (Map map : taskVoList) {
+                    //判断日期是否存在
+                    String day1 = map.get("day").toString();
+                    if (day.equals(day1)){
+                        flag = true;
+                        break;
+                    }
+                }
+                //如果日期不存在,补充日期数据,任务为0
+                if (!flag){
+                    Map map = new HashMap();
+                    map.put("day",day);
+                    map.put("sum",0);
+                    map.put("finish",0);
+                    map.put("noFinish",0);
+                    taskVoList.add(map);
+                }
+            }
+            List<Map> taskList = taskVoList.stream().sorted((m1, m2) -> m1.get("day").toString().compareTo(m2.get("day").toString())).collect(Collectors.toList());
+            return taskList;
+        } else if ("M".equals(deteType)) {
+            //按照月统计,获取开始时间结束时间所有的月份
+            List<String> monthBetweenDate = getMonthBetweenDate(startTime, endTime);
+        } else if ("Y".equals(deteType)) {
+            //按照年统计
+            List<String> yearBetweenDate = getYearBetweenDate(startTime, endTime);
+        }
+        return null;
+    }
+
+    /**
+     * 获取两个日期之间的所有日期 (年月日)
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return
+     */
+    public List<String> getBetweenDays(String startTime, String endTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        // 声明保存日期集合
+        List<String> list = new ArrayList<String>();
+        try {
+            // 转化成日期类型
+            Date startDate = sdf.parse(startTime);
+            Date endDate = sdf.parse(endTime);
+            //用Calendar 进行日期比较判断
+            Calendar calendar = Calendar.getInstance();
+            while (startDate.getTime() <= endDate.getTime()) {
+                // 把日期添加到集合
+                list.add(sdf.format(startDate));
+                // 设置日期
+                calendar.setTime(startDate);
+                //把日期增加一天
+                calendar.add(Calendar.DATE, 1);
+                // 获取增加后的日期
+                startDate = calendar.getTime();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * 获取两个日期之间的所有月份 (年月)
+     *
+     * @param startTime
+     * @param endTime
+     * @return：YYYY-MM
+     */
+    public List<String> getMonthBetweenDate(String startTime, String endTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        // 声明保存日期集合
+        List<String> list = new ArrayList<String>();
+        try {
+            // 转化成日期类型
+            Date startDate = sdf.parse(startTime);
+            Date endDate = sdf.parse(endTime);
+
+            //用Calendar 进行日期比较判断
+            Calendar calendar = Calendar.getInstance();
+            while (startDate.getTime() <= endDate.getTime()) {
+                // 把日期添加到集合
+                list.add(sdf.format(startDate));
+                // 设置日期
+                calendar.setTime(startDate);
+                //把日期增加一天
+                calendar.add(Calendar.MONTH, 1);
+                // 获取增加后的日期
+                startDate = calendar.getTime();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * 获取两个日期之间的所有年
+     * @param startTime
+     * @param endTime
+     * @return：YYYY
+     */
+    public List<String> getYearBetweenDate(String startTime, String endTime){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        // 声明保存日期集合
+        List<String> list = new ArrayList<String>();
+        try {
+            // 转化成日期类型
+            Date startDate = sdf.parse(startTime);
+            Date endDate = sdf.parse(endTime);
+
+            //用Calendar 进行日期比较判断
+            Calendar calendar = Calendar.getInstance();
+            while (startDate.getTime()<=endDate.getTime()){
+                // 把日期添加到集合
+                list.add(sdf.format(startDate));
+                // 设置日期
+                calendar.setTime(startDate);
+                //把日期增加一天
+                calendar.add(Calendar.YEAR, 1);
+                // 获取增加后的日期
+                startDate=calendar.getTime();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

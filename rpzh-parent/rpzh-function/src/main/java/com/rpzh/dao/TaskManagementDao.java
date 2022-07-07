@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务中心
@@ -157,4 +158,19 @@ public interface TaskManagementDao {
      * @return
      */
     int updateNodeXYZ(@Param("nodeId")String nodeId, @Param("x")String x, @Param("y")String y, @Param("z")String z);
+
+    /**
+     * 按照天统计
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskScheduleDayCount(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 查询完成任务的数量
+     * @param type
+     * @param day
+     * @return
+     */
+    int findTaskFinish(@Param("type")String type, @Param("day")String day);
 }

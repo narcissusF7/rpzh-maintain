@@ -1,7 +1,8 @@
 package com.rpzh.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 任务中心管理前端传参
@@ -21,6 +22,9 @@ public class TaskDto {
 
     //任务类型
     private String type;
+
+    //统计类型,Y:年统计,M:月统计,D:日统计
+    private String deteType;
 
     //任务地点
     private String taskAddress;
@@ -51,6 +55,9 @@ public class TaskDto {
 
     //发起时间
     private String createdTime;
+
+    //开始时间
+    private String startTime;
 
     //结束时间
     private String endTime;
@@ -90,5 +97,8 @@ public class TaskDto {
 
     //分页每页显示
     private int size;
+
+    //日期数据
+    List<String> days;
 
 }

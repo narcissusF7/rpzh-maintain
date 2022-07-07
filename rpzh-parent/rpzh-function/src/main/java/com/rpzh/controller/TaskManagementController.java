@@ -400,11 +400,26 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "工作任务菜单查看详情任务评价", tags = "任务管理中心")
+    @ApiOperation(value = "发布任务菜单任务进度统计", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deteType", value = "统计类型:Y:年统计,M:月统计,D:日统计", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
+                    "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
+                    "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String")
+    })
     @PostMapping("/taskScheduleCount")
     public Result<TaskVo> taskScheduleCount(@ApiIgnore TaskDto taskDto){
-
-        return null;
+        String deteType = taskDto.getDeteType();
+        if (ToolUtil.isEmpty(deteType)){
+            return new Result<TaskVo>(false, StatusCode.ERROR, "统计类型不能为空");
+        }
+        if (!("D".equals(deteType)) && !("M".equals(deteType)) && !("Y".equals(deteType))){
+            return new Result<TaskVo>(false, StatusCode.ERROR, "日期类型错误");
+        }
+        List<Map> taskVoList = taskManagementService.taskScheduleCount(taskDto);
+        return new Result<TaskVo>(true,StatusCode.OK,"查询任务统计成功",taskVoList);
     }
 
 }
