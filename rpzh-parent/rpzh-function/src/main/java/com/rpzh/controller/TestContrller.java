@@ -204,7 +204,7 @@ public class TestContrller{
 
     @GetMapping("/updateCron")
     public String updateCron(String firstTime,String secondTime) throws SchedulerException {
-        if(ToolUtil.isEmpty(firstTime) || ToolUtil.isEmpty(secondTime)) {
+        /*if(ToolUtil.isEmpty(firstTime) || ToolUtil.isEmpty(secondTime)) {
             return null;
         }
         earlyWarningDao.insertTime(firstTime,secondTime);
@@ -236,7 +236,7 @@ public class TestContrller{
                 .build();
         scheduler.scheduleJob(jobDetail,trigger);
         scheduler.start();
-        log.debug(cron);
+        log.debug(cron);*/
         return "ok";
     }
 

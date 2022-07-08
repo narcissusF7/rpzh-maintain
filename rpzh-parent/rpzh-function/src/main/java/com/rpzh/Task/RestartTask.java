@@ -1,5 +1,6 @@
 package com.rpzh.Task;
 
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.util.SendUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +31,14 @@ public class RestartTask implements SchedulingConfigurer {
 
         @Override
         public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-            taskRegistrar.addTriggerTask(() -> {
+            /*taskRegistrar.addTriggerTask(() -> {
                 try {
                     //1、调度器(Schedular)，从工厂中获取调度实例（默认：实例化new StdSchedulerFactory();)
                     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                     List<String> jobGroupNames = scheduler.getJobGroupNames();
                     if(!jobGroupNames.contains("group1")){
-                        String cron = redisTemplate.opsForValue().get("firstTime").toString();
+                        Object firstTime = redisTemplate.opsForValue().get("firstTime")
+                        String cron = firstTime.toString();
                         JobDetail jobDetail= JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
                                 .withIdentity("job1","group1") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
                                 .build();
@@ -59,8 +61,8 @@ public class RestartTask implements SchedulingConfigurer {
                     e.printStackTrace();
                 }
             }, triggerContext -> {
-                /*return new CronTrigger("0 0 0/2 * * ?").nextExecutionTime(triggerContext);*/
+                *//*return new CronTrigger("0 0 0/2 * * ?").nextExecutionTime(triggerContext);*//*
                 return new CronTrigger("0/24 * * * * ?").nextExecutionTime(triggerContext);
-            });
+            });*/
         }
 }
