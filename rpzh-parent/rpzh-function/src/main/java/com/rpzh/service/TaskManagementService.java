@@ -127,4 +127,11 @@ public interface TaskManagementService {
      * @return
      */
     List<Map> taskScheduleCount(TaskDto taskDto);
+
+    /**
+     * 任务量趋势统计
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskCountTrend(TaskDto taskDto);
 }

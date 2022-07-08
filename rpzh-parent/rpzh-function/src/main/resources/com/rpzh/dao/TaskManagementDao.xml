@@ -251,4 +251,48 @@ and status = '1'
   AND type = #{type}
 </if>
 </select>
+<select id="taskScheduleMonthCount" resultType="java.util.Map">
+SELECT count(1) as sum,DATE_FORMAT( create_time, '%Y-%m' ) AS day
+FROM tb_task
+WHERE DATE_FORMAT( create_time, '%Y-%m' ) in
+<foreach collection="taskDto.days" item="day" open="(" separator="," close=")">
+ #{day}
+</foreach>
+<if test="taskDto.type != null and taskDto.type != ''">
+  AND type = #{taskDto.type}
+</if>
+GROUP BY day
+ORDER BY day
+</select>
+<select id="findTaskMonthFinish" resultType="int">
+SELECT count(1)
+FROM tb_task
+WHERE DATE_FORMAT( create_time, '%Y-%m' ) = #{day}
+and status = '1'
+<if test="type != null and type != ''">
+  AND type = #{type}
+</if>
+</select>
+<select id="taskScheduleYearCount" resultType="java.util.Map">
+SELECT count(1) as sum,DATE_FORMAT( create_time, '%Y' ) AS day
+FROM tb_task
+WHERE DATE_FORMAT( create_time, '%Y' ) in
+<foreach collection="taskDto.days" item="day" open="(" separator="," close=")">
+ #{day}
+</foreach>
+<if test="taskDto.type != null and taskDto.type != ''">
+  AND type = #{taskDto.type}
+</if>
+GROUP BY day
+ORDER BY day
+</select>
+<select id="findTaskYearFinish" resultType="int">
+SELECT count(1)
+FROM tb_task
+WHERE DATE_FORMAT( create_time, '%Y' ) = #{day}
+and status = '1'
+<if test="type != null and type != ''">
+  AND type = #{type}
+</if>
+</select>
 </mapper>

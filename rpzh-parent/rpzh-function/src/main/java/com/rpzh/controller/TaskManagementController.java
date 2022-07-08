@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -421,5 +422,33 @@ public class TaskManagementController {
         List<Map> taskVoList = taskManagementService.taskScheduleCount(taskDto);
         return new Result<TaskVo>(true,StatusCode.OK,"查询任务统计成功",taskVoList);
     }
+
+    /**
+     * 发布任务菜单任务统计任务量趋势统计
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "发布任务菜单任务统计任务量趋势统计", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+    })
+    @PostMapping("/taskCountTrend")
+    public Result<TaskVo> taskCountTrend(@ApiIgnore TaskDto taskDto){
+        List<Map> taskList = taskManagementService.taskCountTrend(taskDto);
+        return new Result<>(true,StatusCode.OK,"查询成功",taskList);
+    }
+
+    /**
+     * 发布任务菜单按照类型统计数量
+     * @param taskDto
+     * @return
+     */
+    @PostMapping("/testCountByType")
+    public Result testCountByType(@ApiIgnore TaskDto taskDto){
+        return null;
+    }
+
+
 
 }

@@ -173,4 +173,34 @@ public interface TaskManagementDao {
      * @return
      */
     int findTaskFinish(@Param("type")String type, @Param("day")String day);
+
+    /**
+     * 按照月统计
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskScheduleMonthCount(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 查询完成任务的数量,按照月统计
+     * @param type
+     * @param day
+     * @return
+     */
+    int findTaskMonthFinish(@Param("type")String type, @Param("day")String day);
+
+    /**
+     * 按照年统计
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskScheduleYearCount(@Param("taskDto") TaskDto taskDto);
+
+    /**
+     * 查询完成的数量
+     * @param type
+     * @param day
+     * @return
+     */
+    int findTaskYearFinish(@Param("type")String type, @Param("day")String day);
 }
