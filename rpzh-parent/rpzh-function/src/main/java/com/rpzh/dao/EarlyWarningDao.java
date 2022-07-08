@@ -62,10 +62,6 @@ public interface EarlyWarningDao {
 
     Integer misreport(@Param("id") Integer id);
 
-    Map<String,String> findTime();
-
-    int insertTime(@Param("firstTime") String firstTime, @Param("secondTime") String secondTime);
-
     List<EarlyWarningVo> findSendStack(@Param("stackId") Integer stackId);
 
     List<Integer> findStack();

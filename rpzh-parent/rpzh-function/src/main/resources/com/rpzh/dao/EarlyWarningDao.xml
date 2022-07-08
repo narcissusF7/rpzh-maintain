@@ -352,13 +352,6 @@
     <delete id="misreport">
         delete from tb_early_warning where id = #{id}
     </delete>
-
-    <select id="findTime" resultType="java.util.Map">
-        select first_time AS firstTime,second_time AS secondTime from tb_send_time
-    </select>
-    <insert id="insertTime">
-        insert into tb_send_time(first_time,second_time) values(#{firstTime},#{secondTime})
-    </insert>
     <update id="updateWarningType">
         update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} ORDER BY id DESC LIMIT 1
     </update>

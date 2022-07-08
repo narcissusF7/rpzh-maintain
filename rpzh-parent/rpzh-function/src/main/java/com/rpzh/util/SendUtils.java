@@ -8,8 +8,8 @@ import com.rpzh.feign.UserFeign;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Slf4j
@@ -20,9 +20,37 @@ public class SendUtils implements Job {
     WarehouseDao warehouseDao = SpringUtils.getBean(WarehouseDao.class);
     MaintainPlanDao maintainPlanDao = SpringUtils.getBean(MaintainPlanDao.class);
     EarlyWarningDao earlyWarningDao = SpringUtils.getBean(EarlyWarningDao.class);
-
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        //TODO   换成修改的标记flag
+        if(maintainPlanDao.findStageId(11,1)>4){
+            log.info("111111");
+            Scheduler scheduler = null;
+            try {
+                scheduler = StdSchedulerFactory.getDefaultScheduler();
+                scheduler.deleteJob(new JobKey("job1", "group1"));
+                scheduler.deleteJob(new JobKey("job2", "group2"));
+                JobDetail jobDetail = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
+                        .withIdentity("job1", "group1") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
+                        .build();
+                //TODO   将cron改成从数据库中查询
+                CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * ?"))
+                        .build();
+                scheduler.scheduleJob(jobDetail, trigger);
+                scheduler.start();
+                JobDetail jobDetail1 = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
+                        .withIdentity("job2", "group2") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
+                        .build();
+                //TODO   将cron改成从数据库中查询
+                CronTrigger trigger1 = TriggerBuilder.newTrigger().withIdentity("trigger2", "group2").withSchedule(CronScheduleBuilder.cronSchedule("0 0 7 * * ?"))
+                        .build();
+                scheduler.scheduleJob(jobDetail1, trigger1);
+                scheduler.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
         List<Integer> stack = earlyWarningDao.findStack();
         for (Integer stackId : stack) {
             List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findSendStack(stackId);

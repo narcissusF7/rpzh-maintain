@@ -4,8 +4,6 @@ package com.rpzh.controller;
 import com.rpzh.dto.DataContrastDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
-import com.rpzh.entity.StatusCode;
-import com.rpzh.pojo.NodeData;
 import com.rpzh.service.DataContrastService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,10 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-
 import javax.annotation.Resource;
-import java.util.List;
-
 
 /**
  * @Author: zyq
@@ -56,8 +51,7 @@ public class DataContrastController {
             @ApiImplicitParam(name = "endTime", value = "采集的结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "beginTime", value = "对比的开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "finishTime", value = "对比的结束时间", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "gatherType", value = "采集的时间类型 1:天  2:周  3:月  4:年    默认月", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "contrastType", value = "对比的时间类型 1:天  2:周  3:月  4:年    默认天", required = false, dataType = "String")
+            @ApiImplicitParam(name = "gatherType", value = "采集的时间类型 1:天  2:周  3:月  4:年    默认月", required = false, dataType = "String")
     })
     public Result getNodeDateList(@ApiIgnore DataContrastDto dataContrastDto){
         return dataContrastService.getNodeDateList(dataContrastDto);

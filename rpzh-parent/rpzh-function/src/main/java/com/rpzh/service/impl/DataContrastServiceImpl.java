@@ -2,7 +2,6 @@ package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.DataContrastDto;
@@ -12,21 +11,15 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.DataContrastService;
-import com.rpzh.util.DateTypeUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.DataContrastVo;
 import com.rpzh.vo.DataVo;
 import com.rpzh.vo.MaintainCountVo;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import tk.mybatis.mapper.util.StringUtil;
-
 import javax.annotation.Resource;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,6 +30,7 @@ import java.util.stream.Collectors;
  * @Description: 功能
  */
 @Service
+@Slf4j
 public class DataContrastServiceImpl implements DataContrastService {
     public static String MAINTAIN ="MAINTAIN_NODE_TYPE_";
     @Resource
@@ -195,9 +189,8 @@ public class DataContrastServiceImpl implements DataContrastService {
 
     @Override
     public Result getNodeDateList(DataContrastDto dataContrastDto) {
+        //TODO   优化
         String nodeDataInfos = dataContrastDto.getNodeDatas();
-        Date startTime = dataContrastDto.getStartTime();
-        Date endTime = dataContrastDto.getEndTime();
         List<NodeData> nodeDataDtos = JSON.parseArray(nodeDataInfos, NodeData.class);
         if(nodeDataDtos.size()>64){
             return new Result(false, StatusCode.ERROR, "所选设备超过64个!");
@@ -212,10 +205,10 @@ public class DataContrastServiceImpl implements DataContrastService {
         });
         //采集的开始时间、结束时间startTime endTime
         //对比的开始时间、结束时beginTime finishTime
-        if(ToolUtil.isNotEmpty(endTime)){
-            dataContrastDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
+        if(ToolUtil.isNotEmpty(dataContrastDto.getEndTime())){
+            dataContrastDto.setEndTime(new Date(dataContrastDto.getEndTime().getTime() + 24 * 60 * 60 * 1000 - 1));
         }
-        if(ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)){
+        if(ToolUtil.isEmpty(dataContrastDto.getStartTime()) && ToolUtil.isEmpty(dataContrastDto.getEndTime())){
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.MONTH, 0);
             calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
@@ -226,17 +219,36 @@ public class DataContrastServiceImpl implements DataContrastService {
             calendar.add(Calendar.MONTH, 1);
             dataContrastDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
         }
+        Date startTime = dataContrastDto.getStartTime();
+        Date endTime = dataContrastDto.getEndTime();
+        //对比的开始时间
+        Date beginTime = dataContrastDto.getBeginTime();
+        Date finishTime = dataContrastDto.getFinishTime();
         String gatherType= dataContrastDto.getGatherType();
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.setTime(startTime);
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.setTime(endTime);
-        //采集的时间类型 1:天  2:周  3:月  4:年  默认月
         SimpleDateFormat simpleDateFormat;
         int year = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
         int month = year * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
         long day = ((endTime.getTime() - startTime.getTime()) / (1000*3600*24));
+        Calendar beginCalendar = Calendar.getInstance();
+        Calendar finishCalendar = Calendar.getInstance();
+        int yearContrast = 0;
+        int monthContrast = 0;
+        long  dayContrast = 0;
+        int flag=0;
+        if(ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)){
+            beginCalendar.setTime(beginTime);
+            finishCalendar.setTime(finishTime);
+            yearContrast = finishCalendar.get(Calendar.YEAR) - beginCalendar.get(Calendar.YEAR);
+            monthContrast = year * 12 + finishCalendar.get(Calendar.MONTH) - beginCalendar.get(Calendar.MONTH);
+            dayContrast = ((finishTime.getTime() - beginTime.getTime()) / (1000*3600*24));
+            flag=1;
+        }
         List<DataContrastVo> days = new ArrayList<>();
+        List<DataContrastVo> daysContrast = new ArrayList<>();
         switch (gatherType){
             case "1":
                 gatherType = "formatDateTime(transfer_time,'%m月%d日')";
@@ -246,15 +258,36 @@ public class DataContrastServiceImpl implements DataContrastService {
                     DataContrastVo dataContrastVo = new DataContrastVo(format);
                     days.add(dataContrastVo);
                 }
+                if(flag==1){
+                    for (long i = 0;i<=dayContrast;i++){
+                        String format = simpleDateFormat.format(new Date(beginTime.getTime() + i * 1000 * 60 * 60 * 24));
+                        DataContrastVo dataContrastVo = new DataContrastVo(format);
+                        daysContrast.add(dataContrastVo);
+                    }
+                }
                 break;
             case "2":
-                gatherType = "(toYearWeek(transfer_time) - toYearWeek(toDateTime(#{startTime}))+1)";
-                startCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-                endCalendar.setFirstDayOfWeek(Calendar.MONDAY);
-                int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR) + 1;
-                for (int i = 1;i<=l;i++){
-                    DataContrastVo dataContrastVo = new DataContrastVo(i+"");
+                gatherType = "toMonday(transfer_time)";
+                simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                startCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+                endCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+                int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR);
+                for (int i = 0;i<=l;i++){
+                    String format = simpleDateFormat.format(startCalendar.getTime());
+                    DataContrastVo dataContrastVo = new DataContrastVo(format);
                     days.add(dataContrastVo);
+                    startCalendar.add(Calendar.DATE,7);
+                }
+                if(flag==1){
+                    beginCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+                    finishCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+                    int k = finishCalendar.get(Calendar.WEEK_OF_YEAR) - beginCalendar.get(Calendar.WEEK_OF_YEAR);
+                    for (int i = 0;i<=k;i++){
+                        String format = simpleDateFormat.format(beginCalendar.getTime());
+                        DataContrastVo dataContrastVo = new DataContrastVo(format);
+                        daysContrast.add(dataContrastVo);
+                        beginCalendar.add(Calendar.DATE,7);
+                    }
                 }
                 break;
             case "3":
@@ -266,6 +299,14 @@ public class DataContrastServiceImpl implements DataContrastService {
                     days.add(dataContrastVo);
                     startCalendar.add(Calendar.MONTH,1);
                 }
+                if(flag==1){
+                    for (long i = 0;i<=monthContrast;i++){
+                        String format = simpleDateFormat.format(beginCalendar.getTime());
+                        DataContrastVo dataContrastVo = new DataContrastVo(format);
+                        daysContrast.add(dataContrastVo);
+                        beginCalendar.add(Calendar.MONTH,1);
+                    }
+                }
                 break;
             case "4":
                 gatherType = "formatDateTime(transfer_time,'%Y年')";
@@ -276,41 +317,68 @@ public class DataContrastServiceImpl implements DataContrastService {
                     days.add(dataContrastVo);
                     startCalendar.add(Calendar.YEAR,1);
                 }
+                if(flag==1){
+                    for (long i = 0;i<=yearContrast;i++){
+                        String format = simpleDateFormat.format(beginCalendar.getTime());
+                        DataContrastVo dataContrastVo = new DataContrastVo(format);
+                        daysContrast.add(dataContrastVo);
+                        beginCalendar.add(Calendar.YEAR,1);
+                    }
+                }
                 break;
         }
+        log.info("days{}",days);
+        log.info("daysContrast{}",daysContrast);
         String username = TokenDecode.getUserInfo().get("username");
         redisTemplate.opsForValue().set(username+"_days",JSON.toJSONString(days));
+        redisTemplate.opsForValue().set(username+"_daysContrast",JSON.toJSONString(daysContrast));
         //获取所选的位置设备所有的位置路由
         List<String> pidRoutes=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isEmpty(nodeData.getNodeId())).map(NodeData::getPidRoute).collect(Collectors.toList());
         long count = nodeDataDtos.stream().map(NodeData::getType).distinct().count();
-        List<NodeData> dataListByEnv = new ArrayList<>();
+        List<NodeData> gatherListByEnv = new ArrayList<>();
+        List<NodeData> contrastListByEnv = new ArrayList<>();
         List<DataVo> dataVos = new ArrayList<>();
         //所选设备中包含包芯温度和环境温度
         if(count!=1){
             List<String> core=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("02")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
             List<String> env=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("03")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-            dataListByEnv = nodeDao.findDataListByEnv(gatherType, startTime, endTime, env,core, pidRoutes);
+            gatherListByEnv = nodeDao.findDataListByEnv(gatherType, startTime, endTime, env,core, pidRoutes);
+            if(flag==1) {
+                contrastListByEnv = nodeDao.findDataListByEnv(gatherType, beginTime, finishTime, env, core, pidRoutes);
+            }
         }
         //所选设备中只包含一种设备
         if(count==1){
             List<String> node=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isNotEmpty(nodeData.getNodeId())).map(NodeData::getNodeId).distinct().collect(Collectors.toList());
             String type = nodeDataDtos.get(0).getType();
             if("01".equals(type)){
-                dataListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", startTime, endTime, node, pidRoutes);
+                gatherListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", startTime, endTime, node, pidRoutes);
+                if(flag==1) {
+                    contrastListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", beginTime, finishTime,node, pidRoutes);
+                }
             }else if("02".equals(type)){
-                dataListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", startTime, endTime, node, pidRoutes);
+                gatherListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", startTime, endTime, node, pidRoutes);
+                if(flag==1) {
+                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
+                }
             }else if("03".equals(type)){
-                dataListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+                gatherListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+                if(flag==1) {
+                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
+                }
             }else{
-                dataListByEnv = nodeDao.findOxygenList("humiture",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+                gatherListByEnv = nodeDao.findOxygenList("humiture",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
+                if(flag==1) {
+                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
+                }
             }
         }
         List<String> nodeNames = new ArrayList<>();
-        dataListByEnv.forEach(data->{
+        contrastListByEnv.forEach(data->{
             DataContrastVo dataContrastVo = new DataContrastVo(data.getTransferTime());
             String nodeName = keyInfo.get(data.getNodeId()  + "-" + data.getPidRoute());
             if(!nodeNames.contains(nodeName)){
-                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_days").toString(), DataContrastVo.class);
+                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_daysContrast").toString(), DataContrastVo.class);
                 int i = dayData.indexOf(dataContrastVo);
                 dataContrastVo.setNode(data.getTemp());
                 dayData.set(i,dataContrastVo);
@@ -324,7 +392,29 @@ public class DataContrastServiceImpl implements DataContrastService {
                 dataContrastVos.get(index).setNode(data.getTemp());
             }
         });
-        //下周优化
-        return new Result<>(true, StatusCode.OK, "数据对比成功!",dataVos);
+        Map<String,List<DataVo>> k = new HashMap<>();
+        k.put("contrastListByEnv",dataVos);
+        List<DataVo> dataVos1 = new ArrayList<>();
+        List<String> nodeNames1 = new ArrayList<>();
+        gatherListByEnv.forEach(data->{
+            DataContrastVo dataContrastVo = new DataContrastVo(data.getTransferTime());
+            String nodeName = keyInfo.get(data.getNodeId()  + "-" + data.getPidRoute());
+            if(!nodeNames1.contains(nodeName)){
+                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_days").toString(), DataContrastVo.class);
+                int i = dayData.indexOf(dataContrastVo);
+                dataContrastVo.setNode(data.getTemp());
+                dayData.set(i,dataContrastVo);
+                DataVo dataVo = new DataVo(nodeName,dayData);
+                dataVos1.add(dataVo);
+                nodeNames1.add(nodeName);
+            }else{
+                int i = nodeNames1.indexOf(nodeName);
+                List<DataContrastVo> dataContrastVos = dataVos1.get(i).getDataContrastVos();
+                int index = dataContrastVos.indexOf(dataContrastVo);
+                dataContrastVos.get(index).setNode(data.getTemp());
+            }
+        });
+        k.put("gatherListByEnv",dataVos1);
+        return new Result<>(true, StatusCode.OK, "数据对比成功!",k);
     }
 }

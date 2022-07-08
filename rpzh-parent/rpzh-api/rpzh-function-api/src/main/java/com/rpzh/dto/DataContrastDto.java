@@ -1,13 +1,9 @@
 package com.rpzh.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.rpzh.pojo.NodeData;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @Author: zyq
@@ -36,6 +32,4 @@ public class DataContrastDto {
     private Date finishTime;
     //采集的时间类型 1:天  2:周  3:月  4:年  默认月
     private String gatherType = "3";
-    //对比的时间类型 1:天  2:周  3:月  4:年  默认天
-    private String contrastType = "1";
 }

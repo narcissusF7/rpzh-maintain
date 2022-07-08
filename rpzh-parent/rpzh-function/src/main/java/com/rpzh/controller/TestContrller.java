@@ -2,12 +2,9 @@ package com.rpzh.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import com.rpzh.util.SendUtils;
-import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
-import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
@@ -17,15 +14,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -193,51 +184,6 @@ public class TestContrller{
 
         JSONObject.parseObject(map,Map.class);
         return new Result<>(true, StatusCode.OK, "测试方法4");
-    }
-
-    @Resource
-    private EarlyWarningDao earlyWarningDao;
-    @Resource
-    private RedisTemplate redisTemplate;
-
-
-
-    @GetMapping("/updateCron")
-    public String updateCron(String firstTime,String secondTime) throws SchedulerException {
-        /*if(ToolUtil.isEmpty(firstTime) || ToolUtil.isEmpty(secondTime)) {
-            return null;
-        }
-        earlyWarningDao.insertTime(firstTime,secondTime);
-        //1、调度器(Schedular)，从工厂中获取调度实例（默认：实例化new StdSchedulerFactory();)
-        Scheduler scheduler= null;
-        String[] times = firstTime.split(":");
-        String cron =Integer.parseInt(times[2]) + " " + Integer.parseInt(times[1]) + " " + Integer.parseInt(times[0]) + " * * ?";
-        redisTemplate.opsForValue().set("firstTime",cron);
-        log.debug(cron);
-        scheduler = StdSchedulerFactory.getDefaultScheduler();
-        List<JobKey> keys = new ArrayList<>();
-        keys.add(new JobKey("job1","group1"));
-        keys.add(new JobKey("job2","group2"));
-        scheduler.deleteJobs(keys);
-        //2、任务实例（JobDetail）
-        JobDetail jobDetail= JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
-                .withIdentity("job1","group1") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
-                .build();
-        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "group1").withSchedule(CronScheduleBuilder.cronSchedule(cron))
-                .build();
-        scheduler.scheduleJob(jobDetail,trigger);
-        String[] time1 = secondTime.split(":");
-        cron =Integer.parseInt(time1[2]) + " " + Integer.parseInt(time1[1]) + " " + Integer.parseInt(time1[0]) + " * * ?";
-        redisTemplate.opsForValue().set("secondTime",cron);
-        jobDetail= JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
-                .withIdentity("job2","group2") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
-                .build();
-        trigger = TriggerBuilder.newTrigger().withIdentity("trigger2", "group2").withSchedule(CronScheduleBuilder.cronSchedule(cron))
-                .build();
-        scheduler.scheduleJob(jobDetail,trigger);
-        scheduler.start();
-        log.debug(cron);*/
-        return "ok";
     }
 
 }

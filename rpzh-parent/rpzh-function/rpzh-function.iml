@@ -24,6 +24,7 @@
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2." level="project" />
     <orderEntry type="library" name="Maven: com.maxmind.geoip2:geoip2:2.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.maxmind.db:maxmind-db:1.2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains:annotations:16.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery:2.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.cloud:spring-cloud-alibaba-commons:2.2.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.nacos:nacos-client:1.4.1" level="project" />
