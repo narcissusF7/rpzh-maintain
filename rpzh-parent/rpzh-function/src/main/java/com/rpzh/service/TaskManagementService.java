@@ -134,4 +134,11 @@ public interface TaskManagementService {
      * @return
      */
     List<Map> taskCountTrend(TaskDto taskDto);
+
+    /**
+     * 查询各种类型的任务数量
+     * @param taskDto
+     * @return
+     */
+    Map testCountByType(TaskDto taskDto);
 }

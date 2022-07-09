@@ -444,9 +444,15 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
+    @ApiOperation(value = "发布任务菜单任务统计任务类型数量", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+    })
     @PostMapping("/testCountByType")
     public Result testCountByType(@ApiIgnore TaskDto taskDto){
-        return null;
+        Map typeCount = taskManagementService.testCountByType(taskDto);
+        return new Result(true,StatusCode.OK,"查询成功",typeCount);
     }
 
 

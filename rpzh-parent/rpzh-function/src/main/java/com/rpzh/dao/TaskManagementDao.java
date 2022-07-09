@@ -203,4 +203,132 @@ public interface TaskManagementDao {
      * @return
      */
     int findTaskYearFinish(@Param("type")String type, @Param("day")String day);
+
+    /**
+     * 查询虫情巡查任务数量,默认一周
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findPestCount(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 查询翻垛数量
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findRollStack(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 查询移垛数量
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findMoveStack(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     *垛内甲虫预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 仓间甲虫预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findHouseBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 氧气预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findO2(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 仓间氧气预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findHouseO2(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 垛内温度预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findStackTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 仓间温度预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findHouseTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 垛内湿度预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findStackMoist(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 仓间湿度预警
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findHouseMoist(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 包芯温度
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findCoreTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 平均包芯高于环境预警任务
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findMoreAveTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 仓间粉螟预警任务
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findHouseMealworm(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 检查任务
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findCheck(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 其他任务
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int findOther(@Param("startTime")String startTime, @Param("endTime")String endTime);
 }

@@ -295,4 +295,84 @@ and status = '1'
   AND type = #{type}
 </if>
 </select>
+<select id="findPestCount" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '01'
+</select>
+<select id="findRollStack" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '02'
+</select>
+<select id="findMoveStack" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '03'
+</select>
+<select id="findBeetle" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '04'
+</select>
+<select id="findHouseBeetle" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '05'
+</select>
+<select id="findO2" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '06'
+</select>
+<select id="findHouseO2" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '07'
+</select>
+<select id="findStackTemp" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '08'
+</select>
+<select id="findHouseTemp" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '09'
+</select>
+<select id="findStackMoist" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '10'
+</select>
+<select id="findHouseMoist" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '11'
+</select>
+<select id="findCoreTemp" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '12'
+</select>
+<select id="findMoreAveTemp" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '13'
+</select>
+<select id="findHouseMealworm" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '14'
+</select>
+<select id="findCheck" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '15'
+</select>
+<select id="findOther" resultType="int">
+SELECT count(*) FROM tb_task
+WHERE create_time BETWEEN #{startTime} AND #{endTime}
+AND type = '16'
+</select>
 </mapper>
