@@ -1,6 +1,7 @@
 package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.*;
 import com.rpzh.dao.*;
 import com.rpzh.dto.EarlyWarningDto;
@@ -11,11 +12,13 @@ import com.rpzh.service.EarlyWarningService;
 import com.rpzh.util.*;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: zyq
@@ -83,121 +86,146 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     public Result findWarningCount(EarlyWarningDto earlyWarningDto) {
         String pidRoute = earlyWarningDto.getPidRoute();
         Integer siteId = earlyWarningDto.getSiteId();
-        Date endTime = earlyWarningDto.getEndTime();
-        //结束时间不为空
-        if(ToolUtil.isNotEmpty(endTime)){
-            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
+        Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
+        //设置开始时间
+        earlyWarningDto.setBeginTime(time.get("startTime"));
+        //设置结束时间
+        earlyWarningDto.setFinishTime(time.get("endTime"));
+        Integer dayType = earlyWarningDto.getDayType();
+        if(dayType==0){
+            return new Result(false, StatusCode.ERROR, "日期类型不能为空");
         }
-        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
-        if(ToolUtil.isEmpty(earlyWarningDto.getStartTime()) && ToolUtil.isEmpty(earlyWarningDto.getEndTime())){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            earlyWarningDto.setStartTime(new Date(calendar.getTime().getTime()));
-            calendar.add(Calendar.MONTH, 1);
-            earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
-        }
-        //根据位置路由和位置id设置仓间id和垛位id
-        if(StringUtils.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            List<Integer> stackIds = new ArrayList<>();
-            switch (length) {
-                case 4:
-                    stackIds = warehouseDao.findStackByAreId(siteId);
-                    earlyWarningDto.setAreaId(siteId);
-                    if (ToolUtil.isEmpty(stackIds)) {
-                        stackIds.add(0);
-                    }
-                    earlyWarningDto.setStackIds(stackIds);
-                    break;
-                case 5:
-                    stackIds.add(siteId);
-                    earlyWarningDto.setStackIds(stackIds);
-                    break;
-                default:
-                    break;
-            }
+        //根据位置路由和位置id拼接完整的位置路由
+        if(StringUtils.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(siteId)) {
+            earlyWarningDto.setPidRoute(SiteRouteUtil.route(pidRoute,siteId+""));
         }
         //查询预警总数量
         Integer sum = earlyWarningDao.findSum(earlyWarningDto);
-        earlyWarningDto.setCount(sum);
-        //报警类型所占的百分比
-        List<WarningOrDealVo> count = earlyWarningDao.findCountByWarningType(earlyWarningDto);
-        if(count.size()>0) {
-            for (int i = 1; i <= 3; i++) {
-                if (!count.get(i-1).getWarningType().equals("0" + i)) {
-                    WarningOrDealVo warningOrDealVo = new WarningOrDealVo();
-                    warningOrDealVo.setWarningType("0" + i);
-                    warningOrDealVo.setPercentage(0d);
-                    count.add(i - 1, warningOrDealVo);
-                }
-            }
-            WarningOrDealVo warningOrDealVo = count.get(0);
-            warningOrDealVo.setPercentage(count.get(0).getPercentage() + count.get(1).getPercentage() + count.get(2).getPercentage());
-            count.remove(2);
-            count.remove(1);
-            if(warningOrDealVo.getPercentage()==0d){
-                count.remove(0);
-            }
+        //报警类型统计 各种类型所占比例
+        List<Map> warningTypeCount = earlyWarningDao.findWarningTypeCount(earlyWarningDto);
+        if("03".equals(warningTypeCount.get(0).get("warningType"))){
+            warningTypeCount.get(0).put("warningType","01");
         }
-        //已处理和未处理所占的比率
-        List<WarningOrDealVo> dealCount = earlyWarningDao.findCountByDeal(earlyWarningDto);
-        //查询各种报警类型的数量
-        List<WarningOrDealVo> countInfo =getMonthCountInfo(earlyWarningDto);
-        Integer dayType = earlyWarningDto.getDayType();
-        //报警处理率统计
-        List<WarningOrDealVo> isDealCount = earlyWarningDao.findCountByIsDeal(earlyWarningDto);
-        List<Date> listTime = new ArrayList<>();
-        listTime.add(earlyWarningDto.getStartTime());
-        listTime.add(endTime);
-        if(isDealCount.size()>0) {
-            Map<String, WarningOrDealVo> listDate = DateTypeUtils.getIsDealCountList(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime(), dayType);
-            for (WarningOrDealVo warningOrDealVo : isDealCount) {
-                listDate.put(warningOrDealVo.getDayType()+warningOrDealVo.getDeal(), warningOrDealVo);
+        if("02".equals(warningTypeCount.get(0).get("warningType"))){
+            if("03".equals(warningTypeCount.get(1).get("warningType"))){
+                Integer sumOne = Integer.parseInt(warningTypeCount.get(0).get("sum").toString());
+                Integer sumTwo = Integer.parseInt(warningTypeCount.get(1).get("sum").toString());
+                warningTypeCount.get(0).put("sum", sumOne+sumTwo);
+                warningTypeCount.remove(1);
             }
-            isDealCount = new ArrayList<>();
-            for (Map.Entry<String, WarningOrDealVo> map : listDate.entrySet()) {
-                isDealCount.add(map.getValue());
-            }
+            warningTypeCount.get(0).put("warningType","01");
         }
-        Collections.sort(isDealCount, new Comparator<WarningOrDealVo>(){
-            public int compare(WarningOrDealVo o1, WarningOrDealVo o2) {
-
-                if( Integer.parseInt(o2.getDayType())<Integer.parseInt(o1.getDayType()))
-                    return 1;
-                else if(Integer.parseInt(o2.getDayType())==Integer.parseInt(o1.getDayType())){
-                    if(o1.getDeal()>(o2.getDeal()) )
-                        return 1;
-                    else
-                        return -1;
-                }
-                else
-                    return -1;
+        if("01".equals(warningTypeCount.get(0).get("warningType")) && ("02".equals(warningTypeCount.get(1).get("warningType")) || "03".equals(warningTypeCount.get(1).get("warningType")))){
+            Integer sumOne = Integer.parseInt(warningTypeCount.get(0).get("sum").toString());
+            Integer sumTwo = Integer.parseInt(warningTypeCount.get(1).get("sum").toString());
+            if("03".equals(warningTypeCount.get(2).get("warningType"))){
+                Integer sumThree = Integer.parseInt(warningTypeCount.get(2).get("sum").toString());
+                warningTypeCount.get(0).put("sum", sumOne+sumTwo+sumThree);
+                warningTypeCount.remove(2);
+            }
+            warningTypeCount.get(0).put("sum",sumOne+sumTwo);
+            warningTypeCount.remove(1);
+        }
+        String countJson = JSON.toJSONString(warningTypeCount);
+        //报警类型统计 各种类型所占总数
+        List<Map> warningTypeNumber =  JSON.parseArray(countJson,Map.class);
+        List<String> warningTypes = Arrays.asList("01,04,05,06,07,08,09,10,11,12,13,14".split(","));
+        List<String> types = new ArrayList<>();
+        for (int i = 0; i < warningTypeCount.size(); i++) {
+            Map map = warningTypeCount.get(i);
+            map.put("sum",Math.round(Double.parseDouble(map.get("sum").toString())/sum*100)+"%");
+            types.add(map.get("warningType").toString());
+        }
+        warningTypes.forEach(warningType -> {
+            if(!types.contains(warningType)){
+                Map map = new HashMap();
+                map.put("warningType",warningType);
+                map.put("sum",0);
+                warningTypeNumber.add(map);
             }
         });
-        earlyWarningDto.setStartTime(listTime.get(0));
-        earlyWarningDto.setEndTime(listTime.get(1));
-        //报警数量统计
-        List<WarningOrDealVo> dayCount = earlyWarningDao.findCountByDay(earlyWarningDto);
-        if(dayCount.size()>0) {
-            Map<String, WarningOrDealVo> listDate = DateTypeUtils.getDayCountList(listTime.get(0),listTime.get(1), dayType);
-            for (WarningOrDealVo warningOrDealVo : dayCount) {
-                listDate.put(warningOrDealVo.getDayType(), warningOrDealVo);
-            }
-            dayCount = new ArrayList<>();
-            for (Map.Entry<String, WarningOrDealVo> map : listDate.entrySet()) {
-                dayCount.add(map.getValue());
+        warningTypeNumber.sort((v1, v2) -> v1.get("warningType").toString().compareTo(v2.get("warningType").toString()));
+        List<Map> isDeal = earlyWarningDao.findIsDeal(earlyWarningDto,sum);
+        for (int i = 0; i < 3; i++) {
+            if((i+"").equals(isDeal.get(0).get("deal").toString())){
+                Map map = new HashMap();
+                map.put("deal",i);
+                map.put("sum",0);
+                map.put("ratio",0+"");
             }
         }
+        List<Map> warningCount = new ArrayList<>();
+        List<Map> isDealCount = new ArrayList<>();
+        List<String> betweenDays = new ArrayList<>();
+        String dateType="";
+        //获取统计方式,1:日统计,2:周统计,3:月统计,4:年统计
+        if(dayType==1){
+            //日统计
+            betweenDays = GetBetweenDayUtils.getBetweenDays(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());//对获取日期排序
+            dateType = "DATE_FORMAT(warning_time,'%Y-%m-%d' )";
+        }else if(dayType==2){
+            //周统计
+            betweenDays = GetBetweenDayUtils.getBetweenWeek(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
+            dateType = "DATE_FORMAT(DATE_SUB(warning_time,INTERVAL DATE_FORMAT(warning_time,'%w')-1 DAY),'%Y-%m-%d' )";
+        }else if(dayType==3){
+            //月统计
+            betweenDays = GetBetweenDayUtils.getMonthBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
+            dateType = "DATE_FORMAT(warning_time, '%Y-%m')";
+        }else if(dayType==4){
+            //年统计
+            betweenDays = GetBetweenDayUtils.getYearBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
+            dateType = "DATE_FORMAT(warning_time, '%Y')";
+        }
+        //报警数量统计
+        warningCount = earlyWarningDao.findWarningCountByDay(earlyWarningDto,dateType);
+        for (int i = 0; i < warningCount.size(); i++) {
+            Map map = warningCount.get(i);
+            String date = map.get("day").toString();
+            Integer noDeal = earlyWarningDao.findNoDealCountByDay(date, earlyWarningDto,dateType);
+            if(ToolUtil.isEmpty(noDeal)){
+                noDeal  = 0;
+            }
+            map.put("noDeal",noDeal);
+            Integer deal = earlyWarningDao.findDealCountByDay(date, earlyWarningDto,dateType);
+            if(ToolUtil.isEmpty(deal)){
+                deal  = 0;
+            }
+            map.put("deal",deal);
+            map.put("processing",Integer.parseInt(map.get("sum").toString())-noDeal-deal);
+            map.put("treatmentRate",Math.round(Double.parseDouble(deal.toString())/Double.parseDouble(map.get("sum").toString())*100)+"%");
+        }
+        List<String> day = warningCount.stream().map((Map timeMap) -> timeMap.get("day").toString()).collect(Collectors.toList());
+        List<Map> addWarningCount = new ArrayList<>();
+        betweenDays.forEach(betweenDay -> {
+            if(!day.contains(betweenDay)){
+                Map<String,String> map = new HashMap<>();
+                map.put("day",betweenDay);
+                map.put("sum",0+"");
+                map.put("deal",0+"");
+                map.put("noDeal",0+"");
+                map.put("processing",0+"");
+                map.put("treatmentRate",0+"");
+                addWarningCount.add(map);
+            }
+        });
+        warningCount.addAll(addWarningCount);
+        warningCount.sort((v1, v2) -> v1.get("day").toString().compareTo(v2.get("day").toString()));
+        String isDealJson = JSON.toJSONString(warningCount);
+        //报警类型统计 各种类型所占总数
+        isDealCount =  JSON.parseArray(isDealJson,Map.class);
+
+        for (Map map : warningCount) {
+            map.remove("deal");
+            map.remove("noDeal");
+            map.remove("processing");
+            map.remove("treatmentRate");
+        }
         Map<String,Object> map = new HashMap<>();
-        map.put("count",sum);
-        map.put("count_type",count);
-        map.put("countInfo",countInfo);
-        map.put("dealCount",dealCount);
-        map.put("dayCount",dayCount);
+        map.put("sum",sum);
+        map.put("warningTypeCount",warningTypeCount);
+        map.put("warningCount",warningCount);
+        map.put("warningTypeNumber",warningTypeNumber);
+        map.put("dayCount",isDeal);
         map.put("isDealCount",isDealCount);
         return new Result(true, StatusCode.OK, "查询报警统计成功",map);
     }
@@ -572,28 +600,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return new Result<>(true, StatusCode.OK, "查询成功,无预警信息", map);
     }
 
-    public List<WarningOrDealVo> getMonthCountInfo(EarlyWarningDto earlyWarningDto){
-        List<WarningOrDealVo> countInfo =earlyWarningDao.findCountByMonth(earlyWarningDto);
-        List<String> type = new ArrayList<>();
-        countInfo.forEach((countVo) ->{type.add(countVo.getWarningType());});
-        for (int i = 1; i < 15;i++) {
-            String flag= "0" + i;
-            if(i>=10){
-                flag= "" + i;
-            }
-            if (!type.contains(flag)) {
-                WarningOrDealVo warningOrDealVo = new WarningOrDealVo();
-                warningOrDealVo.setWarningType(flag);
-                warningOrDealVo.setCount(0);
-                countInfo.add(warningOrDealVo);
-            }
-        }
-        countInfo.sort((v1, v2) -> v1.getWarningType().compareTo(v2.getWarningType()));
-        countInfo.get(0).setCount(countInfo.get(0).getCount()+countInfo.get(1).getCount()+countInfo.get(2).getCount());
-        countInfo.remove(2);
-        countInfo.remove(1);
-        return countInfo;
-    }
     @Override
     public Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto) {
         Date endTime = earlyWarningDto.getEndTime();

@@ -360,7 +360,8 @@ public class DataHandler {
                 //如果缓存中存在次数
                 if ((Integer) o ==2){
                     //达到3次新增一条数据
-                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1);
+                    String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
+                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,siteRoute);
                     earlyWarningDao.insertWarning(earlyWarning);
                     redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
                 }else {
@@ -478,7 +479,8 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
-
+        String siteRoute = nodeDao.findByNodeId(nodeVo.getNodeId()).getSiteRoute();
+        earlyWarning.setSiteRoute(siteRoute);
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
             //如果当前的等级更高
@@ -632,6 +634,8 @@ public class DataHandler {
                 }
                 earlyWarning.setWarningType(type);
                 warningType = warningType +","+type;
+                String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
+                earlyWarning.setSiteRoute(siteRoute);
                 //设置设备id
                 earlyWarning.setNodeId(parseData.getNodeId());
                 //设置设备类型

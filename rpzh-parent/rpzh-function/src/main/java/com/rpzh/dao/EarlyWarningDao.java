@@ -18,11 +18,7 @@ public interface EarlyWarningDao {
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
-    EarlyWarningVo findUndoStackEarlyWarning(@Param("stackId") Integer stackId);
-
     List<String> findWarningThreshold(@Param("settingKey") String settingKey);
-
-    List<EarlyWarningVo> findUndoEarlyWarning();
 
     Integer insertWarning(@Param("earlyWarning") EarlyWarning earlyWarning);
 
@@ -36,17 +32,7 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findHistoryWarningData(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<WarningOrDealVo> findCountByMonth(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
     Integer findSum(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<WarningOrDealVo> findCountByWarningType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<WarningOrDealVo> findCountByDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<WarningOrDealVo> findCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<WarningOrDealVo> findCountByIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<EarlyWarningVo> findEarlyWarningByStackType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
@@ -74,7 +60,16 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findSendAreaByWarningThree(@Param("areaId") Integer areaId);
 
-    String findMaxTime(@Param("nodeId")String nodeId);
+    String findMaxTime(@Param("nodeId") String nodeId);
 
-    Integer updateWarningType(@Param("nodeId")String nodeId, @Param("warningType")String warningType);
+    Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
+
+    List<Map> findWarningCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
+
+    List<Map> findWarningTypeCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<Map> findIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("count") Integer count);
+
+    Integer findNoDealCountByDay(@Param("date")String date,@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
+    Integer findDealCountByDay(@Param("date")String date,@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
 }

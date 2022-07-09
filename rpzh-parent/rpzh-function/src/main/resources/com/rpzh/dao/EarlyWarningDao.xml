@@ -9,17 +9,9 @@
         </if>
         limit 1;
     </select>
-
-    <select id="findUndoStackEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
-        select id , warning_grade as warningGrade from tb_early_warning where node_id =#{stackId} and is_affirm = 2 and node_id is null;
-    </select>
     <select id="findWarningThreshold" resultType="java.lang.String">
         select setting_value from tb_general_setting where setting_key = #{settingKey} order by id
     </select>
-    <select id="findUndoEarlyWarning" resultType="com.rpzh.vo.EarlyWarningVo">
-        select node_id,warning_grade from tb_general_setting where is_affirm = 0 order by warning_grade desc;
-    </select>
-
     <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
         select
         warning_type as warningType,
@@ -143,6 +135,7 @@
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade,</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">stack_id,</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">area_id,</if>
+        <if test="earlyWarning.siteRoute != '' and earlyWarning.siteRoute != null">site_route,</if>
         is_affirm
         ) values (
         <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">#{earlyWarning.warningType},</if>
@@ -163,6 +156,7 @@
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
+        <if test="earlyWarning.siteRoute != '' and earlyWarning.siteRoute != null">#{earlyWarning.siteRoute},</if>
         2
         )
     </insert>
@@ -254,69 +248,74 @@
         ORDER BY t4.stack_id
         ) t3
     </select>
-    <select id="findCountByMonth" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT
-        warning_type AS warningType,
-        COUNT(warning_type) AS count
-        FROM tb_early_warning WHERE 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
-        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-         GROUP BY warning_type
-    </select>
+
     <select id="findSum" resultType="java.lang.Integer">
-        SELECT COUNT(t.id) FROM
-        (select id from tb_early_warning where 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
+        SELECT COUNT(id) FROM tb_early_warning where 1=1
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t
+        <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
+        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= #{earlyWarningDto.finishTime}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
     </select>
-    <select id="findCountByWarningType" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT t.warning_type as warningType,round(COUNT(t.id)/#{earlyWarningDto.count},2) as percentage FROM
-        (select id,warning_type from tb_early_warning where 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
+    <select id="findWarningCountByDay" resultType="java.util.Map">
+        SELECT count(1) as sum,${dateType} AS day
+        FROM tb_early_warning
+        WHERE 1=1
+        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
+        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= #{earlyWarningDto.finishTime}</if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t group by t.warning_type
+        <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        GROUP BY day
+        ORDER BY day
     </select>
-    <select id="findCountByDeal" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT t.is_affirm as deal,round(COUNT(t.id)/#{earlyWarningDto.count},2) as percentage FROM
-        (select id,is_affirm from tb_early_warning where 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
+    <select id="findNoDealCountByDay" resultType="java.lang.Integer">
+        SELECT count(1) as sum
+        FROM tb_early_warning
+        WHERE is_affirm = '2' and ${dateType} = #{date}
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t group by t.is_affirm
+        <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        GROUP BY ${dateType}
     </select>
-    <select id="findCountByDay" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT
-        (CASE #{earlyWarningDto.dayType}
-        WHEN '1' THEN DATE_FORMAT(t.warning_time,'%m%d')
-        WHEN '2' THEN DATE_FORMAT(t.warning_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
-        WHEN '3' THEN DATE_FORMAT(t.warning_time,'%Y%m')
-        WHEN '4' THEN DATE_FORMAT(t.warning_time,'%Y') END) as dayType,
-        COUNT(id) as count FROM
-        (select id,warning_time from tb_early_warning where 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
+    <select id="findDealCountByDay" resultType="java.lang.Integer">
+        SELECT count(1) as sum
+        FROM tb_early_warning
+        WHERE is_affirm = '0' and ${dateType} = #{date}
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t group by
-        dayType
+        <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        GROUP BY ${dateType}
+    </select>
+    <select id="findWarningTypeCount" resultType="java.util.Map">
+    SELECT count(1) as sum,warning_type AS warningType
+    FROM tb_early_warning
+    WHERE 1=1
+    <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
+    <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= #{earlyWarningDto.finishTime}</if>
+    <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
+    <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
+    <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+    <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+    GROUP BY warning_type
+    ORDER BY warning_type
+</select>
+    <select id="findIsDeal" resultType="java.util.Map">
+        SELECT count(1) as sum,concat(round(COUNT(1)/#{count}* 100,2),'%') as ratio,is_affirm AS deal
+        FROM tb_early_warning
+        WHERE 1=1
+        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
+        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= #{earlyWarningDto.finishTime}</if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.principalId != null and earlyWarningDto.principalId != ''">and principal_Id = #{earlyWarningDto.principalId}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        GROUP BY is_affirm
+        order by is_affirm
     </select>
     <select id="findById" resultType="com.rpzh.vo.EarlyWarningVo">
         select
@@ -327,26 +326,6 @@
         warning_val_three as warningValThree,
         warning_time_three as warningTimeThree
         from  tb_early_warning where id =#{id}
-    </select>
-    <select id="findCountByIsDeal" resultType="com.rpzh.vo.WarningOrDealVo">
-        SELECT
-        t.is_affirm as deal,
-        (CASE #{earlyWarningDto.dayType}
-        WHEN '1' THEN DATE_FORMAT(t.warning_time,'%m%d')
-        WHEN '2' THEN DATE_FORMAT(t.warning_time,'%Y%u') - DATE_FORMAT(#{earlyWarningDto.startTime},'%Y%u') + 1
-        WHEN '3' THEN DATE_FORMAT(t.warning_time,'%Y%m')
-        WHEN '4' THEN DATE_FORMAT(t.warning_time,'%Y') END) AS dayType,
-        COUNT(id) AS count FROM
-        (select id,warning_time,is_affirm from tb_early_warning where 1=1
-        <if test="earlyWarningDto.siteId != null and earlyWarningDto.siteId != ''">and (area_id = #{earlyWarningDto.areaId} or stack_id
-            in <foreach collection="earlyWarningDto.stackIds" item="id" open="(" separator="," close=")">#{id}</foreach>)</if>
-        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal_name = #{earlyWarningDto.principalName}</if>
-        <if test="earlyWarningDto.startTime != null">and warning_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        ) t
-        GROUP BY
-        dayType,t.is_affirm ORDER BY dayType
     </select>
 
     <delete id="misreport">

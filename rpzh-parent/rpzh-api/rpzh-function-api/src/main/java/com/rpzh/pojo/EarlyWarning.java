@@ -46,6 +46,7 @@ public class EarlyWarning {
     private Integer stackId;
     //仓间id
     private Integer areaId;
+    private String siteRoute;
 
     public EarlyWarning(){
 
@@ -73,12 +74,13 @@ public class EarlyWarning {
         this.areaId = areaId;
     }
 
-    public EarlyWarning(String warningType, String nodeId, String nodeType, Double warningValOne, Integer warningGrade) {
+    public EarlyWarning(String warningType, String nodeId, String nodeType, Double warningValOne, Integer warningGrade,String siteRoute) {
         this.warningType = warningType;
         this.nodeId = nodeId;
         this.nodeType = nodeType;
         this.warningValOne = warningValOne;
         this.warningGrade = warningGrade;
+        this.siteRoute = siteRoute;
     }
     public EarlyWarning(String warningType, String nodeId, String nodeType, Integer warningGrade) {
         this.warningType = warningType;

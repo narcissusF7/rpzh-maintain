@@ -16,6 +16,9 @@ public class EarlyWarningDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //日期数据
+    List<String> days;
+
     private Integer earlyWarningId;
 
     private String warningType;
@@ -42,6 +45,9 @@ public class EarlyWarningDto implements Serializable {
 
     private Integer principalId;
 
+    private String beginTime;
+    private String finishTime;
+
     private String principalName;
 
     private String warningGrade;
@@ -62,8 +68,8 @@ public class EarlyWarningDto implements Serializable {
 
     private Integer count;
 
-    // 时间类型,1:日,2:周,3:月,4:年   默认为月
-    private Integer dayType = 3;
+    // 时间类型,1:日,2:周,3:月,4:年
+    private Integer dayType=0;
 
     //分页开始页面
     private int page=1;
