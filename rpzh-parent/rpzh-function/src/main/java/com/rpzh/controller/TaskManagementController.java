@@ -23,10 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 import sun.net.www.protocol.http.HttpURLConnection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * 养护任务中心
@@ -449,12 +447,67 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
     })
-    @PostMapping("/testCountByType")
-    public Result testCountByType(@ApiIgnore TaskDto taskDto){
-        Map typeCount = taskManagementService.testCountByType(taskDto);
+    @PostMapping("/taskCountByType")
+    public Result taskCountByType(@ApiIgnore TaskDto taskDto){
+        Map typeCount = taskManagementService.taskCountByType(taskDto);
         return new Result(true,StatusCode.OK,"查询成功",typeCount);
     }
 
+
+    /**
+     * 任务类型占比
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "发布任务菜单任务统计任务类型占比", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+    })
+    @PostMapping("/taskTypePercent")
+    public Result taskTypePercent(@ApiIgnore TaskDto taskDto){
+        Map typeCount = taskManagementService.taskCountByType(taskDto);
+        //获取所有的和,所有的任务和
+        int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
+        DecimalFormat df = new DecimalFormat("######0.00");
+        Map<String,String> map = new HashMap<>();
+        //获取百分比
+        double percent01 = Double.parseDouble(typeCount.get("01").toString())/sum;
+        double percent02 = Double.parseDouble(typeCount.get("02").toString())/sum;
+        double percent03 = Double.parseDouble(typeCount.get("03").toString())/sum;
+        double percent04 = Double.parseDouble(typeCount.get("04").toString())/sum;
+        double percent05 = Double.parseDouble(typeCount.get("05").toString())/sum;
+        double percent06 = Double.parseDouble(typeCount.get("06").toString())/sum;
+        double percent07 = Double.parseDouble(typeCount.get("07").toString())/sum;
+        double percent08 = Double.parseDouble(typeCount.get("08").toString())/sum;
+        double percent09 = Double.parseDouble(typeCount.get("09").toString())/sum;
+        double percent10 = Double.parseDouble(typeCount.get("10").toString())/sum;
+        double percent11 = Double.parseDouble(typeCount.get("11").toString())/sum;
+        double percent12 = Double.parseDouble(typeCount.get("12").toString())/sum;
+        double percent13 = Double.parseDouble(typeCount.get("13").toString())/sum;
+        double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
+        double percent15 = Double.parseDouble(typeCount.get("15").toString())/sum;
+        double percent16 = Double.parseDouble(typeCount.get("16").toString())/sum;
+
+        //虫情巡查
+        map.put("01",df.format(percent01));
+        map.put("02",df.format(percent02));
+        map.put("03",df.format(percent03));
+        map.put("04",df.format(percent04));
+        map.put("05",df.format(percent05));
+        map.put("06",df.format(percent06));
+        map.put("07",df.format(percent07));
+        map.put("08",df.format(percent08));
+        map.put("09",df.format(percent09));
+        map.put("10",df.format(percent10));
+        map.put("11",df.format(percent11));
+        map.put("12",df.format(percent12));
+        map.put("13",df.format(percent13));
+        map.put("14",df.format(percent14));
+        map.put("15",df.format(percent15));
+        map.put("16",df.format(percent16));
+        return new Result(true,StatusCode.OK,"查询成功",map);
+    }
 
 
 }

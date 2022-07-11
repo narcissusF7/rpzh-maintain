@@ -1,11 +1,13 @@
 package com.rpzh;
 
+import com.sun.media.sound.SoftTuning;
+
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Author liubc
@@ -14,10 +16,10 @@ import java.util.List;
  */
 public class Demo02 {
     public static void main(String[] args) {
-        String startStr = "2021-02-26 00:00:00";
-        String endStr = "2029-02-09 00:00:00";
-        List<String> list = getYearBetweenDate(startStr, endStr);
-        System.out.println(list);
+        double a = 0.14285714285714285;
+        DecimalFormat df = new DecimalFormat("######0.00");
+        String format = df.format(a);
+        System.out.println(format);
     }
     /**
      * 获取两个日期之间的所有年

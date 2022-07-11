@@ -686,7 +686,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      * @return
      */
     @Override
-    public Map testCountByType(TaskDto taskDto) {
+    public Map taskCountByType(TaskDto taskDto) {
         //获取开始时间
         String startTime = taskDto.getStartTime();
         //获取结束时间

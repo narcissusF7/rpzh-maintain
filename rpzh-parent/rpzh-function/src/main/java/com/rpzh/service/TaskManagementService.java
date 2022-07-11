@@ -140,5 +140,5 @@ public interface TaskManagementService {
      * @param taskDto
      * @return
      */
-    Map testCountByType(TaskDto taskDto);
+    Map taskCountByType(TaskDto taskDto);
 }
