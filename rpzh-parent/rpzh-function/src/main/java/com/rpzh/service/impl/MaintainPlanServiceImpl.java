@@ -203,7 +203,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<Integer> stageIds = maintainPlanDao.findId(ids);
         for (Integer stageId : stageIds) {
             if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + stageId))){
-                redisTemplate.opsForHash().delete(MAINTAIN + stageId);
+                redisTemplate.delete(MAINTAIN + stageId);
             }
         }
         for (Integer id : ids) {
@@ -455,7 +455,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String updateUser = TokenDecode.getUserInfo().get("username");
         Integer maintainPlanId = maintainPlanDto.getId();
         maintainPlanDao.deleteMaintainCount(maintainPlanId);
-        maintainPlanDao.deleteMaintainCount(maintainPlanId);
         materialDao.updateMaterialStatus(maintainPlanDto.getStackId());
         Integer result =  maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId);
         return result;
@@ -520,6 +519,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId) {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
+        maintainPlanVos.forEach(maintainPlan->{
+            List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
+            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+            maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+        });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id,stackId);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         return maintainPlanVo;
@@ -572,7 +576,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
-        maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0"+maintainPlanDto.getPidRoute().split(",").length+":"+maintainPlanDto.getStackId()+"]");
+        if(ToolUtil.isNotEmpty(maintainPlanDto.getPidRoute())) {
+            maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0" + maintainPlanDto.getPidRoute().split(",").length + ":" + maintainPlanDto.getStackId() + "]");
+        }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         String pidRoute = maintainPlanDto.getPidRoute();
         if(StringUtil.isNotEmpty(pidRoute)) {
@@ -640,12 +646,17 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Map<String,Object> findMaintainCountReport(MaintainCountDto maintainCountDto) {
-        String username = TokenDecode.getUserInfo().get("username");
         Double sum = 0d;
         //00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位',
         String pidRoute = maintainCountDto.getPidRoute();
         Integer stackId = maintainCountDto.getStackId();
         String materialCode = maintainCountDto.getMaterialCode();
+        String maintenceStyle = maintainCountDto.getMaintenceStyle();
+        String phases = maintainCountDto.getPhases();
+        String key = "not";
+        if(StringUtil.isNotEmpty(materialCode) || StringUtil.isNotEmpty(maintenceStyle) || StringUtil.isNotEmpty(phases) || StringUtil.isNotEmpty(pidRoute)){
+            key = maintenceStyle + phases + pidRoute + materialCode;
+        }
         List<MaintainCountVo> maintainCountVos = new ArrayList<MaintainCountVo>();
         Map<String,Object> map = new HashMap<>();
         //位置不为空
@@ -666,8 +677,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainCountVos.forEach(maintainCountVo -> {
                 maintainCountVo.setChildren(new ArrayList<>());
             });
-            redisTemplate.opsForValue().set("code_"+username,JSON.toJSONString(maintainCountVos));
+            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountVos));
             map.put("sum",sum);
+            map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
@@ -679,14 +691,21 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainCountVos.forEach(maintainCountVo -> {
                 maintainCountVo.setChildren(new ArrayList<>());
             });
-            redisTemplate.opsForValue().set("code_"+username,JSON.toJSONString(maintainCountVos));
+            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountVos));
             map.put("sum",sum);
+            map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
         //物料代码不为空而位置为空
         if(ToolUtil.isEmpty(pidRoute) && ToolUtil.isEmpty(stackId) && ToolUtil.isNotEmpty(materialCode)){
             sum = maintainPlanDao.findCount(maintainCountDto,"");
+            if(ToolUtil.isEmpty(sum)){
+                maintainCountVos = new ArrayList<>();
+                map.put("sum",0);
+                map.put("list",new PageInfo(maintainCountVos));
+                return map;
+            }
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
             maintainCountVos = maintainPlanDao.findFirst(maintainCountDto);
             List<MaintainCountVo> maintainCountOnes = new PageInfo<MaintainCountVo>(maintainCountVos).getList();
@@ -702,40 +721,44 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             Set<Integer> stackIds = new HashSet<>();
             maintainCountFours.forEach(maintainCountFour -> { stackIds.add(maintainCountFour.getStackId()); });
             List<MaintainCountVo> maintainCountFives = maintainPlanDao.findFive(maintainCountDto,stackIds);
-            maintainCountFours.stream().forEach(maintainCountVo ->{
+            maintainCountFives.forEach(maintainCountVo -> {
                 maintainCountVo.setId("05"+maintainCountVo.getId());
-                maintainCountFives.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getAreaId()+maintainCountFive.getMaterialCode())).forEach((key, value)->{
-                    if ((maintainCountVo.getAreaId()+maintainCountVo.getMaterialCode()).equals(key)){
+            });
+            maintainCountFours.stream().forEach(maintainCountVo ->{
+                maintainCountVo.setId("04"+maintainCountVo.getId());
+                maintainCountFives.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getAreaId()+maintainCountFive.getMaterialCode())).forEach((keys, value)->{
+                    if ((maintainCountVo.getAreaId()+maintainCountVo.getMaterialCode()).equals(keys)){
                         maintainCountVo.setChildren(value);
                     }
                 });
             });
             maintainCountThrees.stream().forEach(maintainCountVo ->{
-                maintainCountVo.setId("04"+maintainCountVo.getId());
-                maintainCountFours.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getFloorId()+maintainCountFive.getMaterialCode())).forEach((key, value)->{
-                    if ((maintainCountVo.getFloorId()+maintainCountVo.getMaterialCode()).equals(key)){
+                maintainCountVo.setId("03"+maintainCountVo.getId());
+                maintainCountFours.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getFloorId()+maintainCountFive.getMaterialCode())).forEach((keys, value)->{
+                    if ((maintainCountVo.getFloorId()+maintainCountVo.getMaterialCode()).equals(keys)){
                         maintainCountVo.setChildren(value);
                     }
                 });
             });
             maintainCountTwos.stream().forEach(maintainCountVo ->{
-                maintainCountVo.setId("03"+maintainCountVo.getId());
-                maintainCountThrees.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getBuildingId()+maintainCountFive.getMaterialCode())).forEach((key, value)->{
-                    if ((maintainCountVo.getBuildingId()+maintainCountVo.getMaterialCode()).equals(key)){
+                maintainCountVo.setId("02"+maintainCountVo.getId());
+                maintainCountThrees.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getBuildingId()+maintainCountFive.getMaterialCode())).forEach((keys, value)->{
+                    if ((maintainCountVo.getBuildingId()+maintainCountVo.getMaterialCode()).equals(keys)){
                         maintainCountVo.setChildren(value);
                     }
                 });
             });
             maintainCountOnes.stream().forEach(maintainCountVo ->{
-                maintainCountVo.setId("02"+maintainCountVo.getId());
-                maintainCountTwos.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getWarehouseId()+maintainCountFive.getMaterialCode())).forEach((key, value)->{
-                    if ((maintainCountVo.getWarehouseId()+maintainCountVo.getMaterialCode()).equals(key)){
+                maintainCountVo.setId("01"+maintainCountVo.getId());
+                maintainCountTwos.stream().collect(Collectors.groupingBy(maintainCountFive -> maintainCountFive.getWarehouseId()+maintainCountFive.getMaterialCode())).forEach((keys, value)->{
+                    if ((maintainCountVo.getWarehouseId()+maintainCountVo.getMaterialCode()).equals(keys)){
                         maintainCountVo.setChildren(value);
                     }
                 });
             });
-            redisTemplate.opsForValue().set("code_"+username,JSON.toJSONString(maintainCountVos));
+            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountOnes));
             map.put("sum",sum);
+            map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountOnes));
             return map;
         }

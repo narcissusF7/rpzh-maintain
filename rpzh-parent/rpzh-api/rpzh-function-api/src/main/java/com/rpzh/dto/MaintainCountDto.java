@@ -2,6 +2,8 @@ package com.rpzh.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author zyq
  * @description 养护数量前端传参
@@ -24,4 +26,5 @@ public class MaintainCountDto {
     private Integer size = 10;
     //位置id
     private Integer stackId;
+    private List<String> ids;
 }

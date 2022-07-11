@@ -270,7 +270,7 @@
         where t1.is_end = '1'
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
-        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t2.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
+        <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
         ORDER BY t2.maintain_plan_id
     </select>
     <update id="endMaintainPlan">
@@ -297,7 +297,7 @@
         t1.maintence_style as maintenceStyle,
         t2.phases as phases
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
-        left join (select id,site_name from tb_stack where id = #{stackId}) t3 on t3.id = t1.stack_id
+        left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
         where t1.id = #{id}
     </select>
     <select id="findDetails" resultType="com.rpzh.vo.MaintainPlanVo">
@@ -405,8 +405,8 @@
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and t.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
-        <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+        <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
         GROUP BY t.material_code,t.warehouse_id,stackName order by t.material_code,t.warehouse_id
     </select>
     <select id="findTwo" resultType="com.rpzh.vo.MaintainCountVo">
@@ -420,8 +420,8 @@
     <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and t.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
     <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
     <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
-    <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
-    <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+    <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+    <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
     GROUP BY t.material_code,t.warehouse_id,t.buliding_id,stackName order by t.material_code,t.warehouse_id,t.buliding_id
     </select>
     <select id="findThree" resultType="com.rpzh.vo.MaintainCountVo">
@@ -435,8 +435,8 @@
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and t.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
-        <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+        <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,stackName order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id
     </select>
     <select id="findFour" resultType="com.rpzh.vo.MaintainCountVo">
@@ -450,8 +450,8 @@
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and t.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
-        <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+        <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,stackName order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id
     </select>
     <select id="findFive" resultType="com.rpzh.vo.MaintainCountVo">
@@ -468,8 +468,8 @@
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and t.material_code like concat('%',#{maintainCountDto.materialCode},'%')</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t.phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime!=null"> and t.created_time >= #{maintainCountDto.startTime}</if>
-        <if test="maintainCountDto.endTime!=null"> and t.created_time &lt;= #{maintainCountDto.endTime}</if>
+        <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
+        <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id,stackName order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id
     </select>
     <select id="findPhases" resultType="java.lang.String">

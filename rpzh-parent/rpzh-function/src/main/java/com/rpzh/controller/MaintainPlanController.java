@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.Lists;
 import com.rabbitmq.client.Return;
 import com.rpzh.dto.AlarmValueSettingDto;
@@ -502,18 +503,35 @@ public class MaintainPlanController {
 
     @Resource
     private RedisTemplate redisTemplate;
-    @PostMapping("/export")
+    @GetMapping("/export")
     @ApiOperation(value = "导出养护数量")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids", value = "列表中的id", required = false, dataType = "List")
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "ids", value = "列表中的id", required = true, dataType = "List")
     })
-    public void export(HttpServletResponse response,@RequestParam("ids") List<String> ids) {
+    public void export(HttpServletResponse response,MaintainCountDto maintainCountDto) {
+        List<String> ids = maintainCountDto.getIds();
         if(ToolUtil.isEmpty(ids)){
             return;
         }
-        String username = TokenDecode.getUserInfo().get("username");
-        String maintainCountInfos = redisTemplate.opsForValue().get("code_" + username).toString();
-        List<MaintainCountVo> maintainCountVos= JSONArray.parseArray(maintainCountInfos,MaintainCountVo.class);
+        String materialCode = maintainCountDto.getMaterialCode();
+        String maintenceStyle = maintainCountDto.getMaintenceStyle();
+        String phases = maintainCountDto.getPhases();
+        String pidRoute = maintainCountDto.getPidRoute();
+        String key = "not";
+        if(StringUtil.isNotEmpty(materialCode) || StringUtil.isNotEmpty(maintenceStyle) || StringUtil.isNotEmpty(phases) || StringUtil.isNotEmpty(pidRoute)){
+            key = maintenceStyle + phases + pidRoute + materialCode;
+        }
+        String maintainCountInfos = redisTemplate.opsForValue().get(key).toString();
+        List<MaintainCountVo> maintainCountVos = new ArrayList<>();
+        if(StringUtil.isNotEmpty(maintainCountInfos)){
+            maintainCountVos= JSONArray.parseArray(maintainCountInfos,MaintainCountVo.class);
+        }else{
+            maintainCountVos = JSONArray.parseArray(maintainPlanService.findMaintainCountReport(maintainCountDto).get("export").toString(),MaintainCountVo.class);
+        }
         List<MaintainCountVo> maintainCountOnes = new ArrayList<>();
         maintainCountVos.forEach(maintainCountVo -> {
             if(ids.contains(maintainCountVo.getId())){
