@@ -239,6 +239,12 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) in
 <if test="taskDto.type != null and taskDto.type != ''">
   AND type = #{taskDto.type}
 </if>
+<if test="taskDto.taskSiteRoute != null and taskDto.taskSiteRoute != ''">
+  AND site_route like concat(#{taskDto.taskSiteRoute}, '%')
+</if>
+<if test="taskDto.principal != null and taskDto.principal != ''">
+  AND principal = #{taskDto.principal}
+</if>
 GROUP BY day
 ORDER BY day
 </select>
@@ -249,6 +255,12 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day}
 and status = '1'
 <if test="type != null and type != ''">
   AND type = #{type}
+</if>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
 </if>
 </select>
 <select id="taskScheduleMonthCount" resultType="java.util.Map">
@@ -261,6 +273,12 @@ WHERE DATE_FORMAT( create_time, '%Y-%m' ) in
 <if test="taskDto.type != null and taskDto.type != ''">
   AND type = #{taskDto.type}
 </if>
+<if test="taskDto.taskSiteRoute != null and taskDto.taskSiteRoute != ''">
+  AND site_route like concat(#{taskDto.taskSiteRoute}, '%')
+</if>
+<if test="taskDto.principal != null and taskDto.principal != ''">
+  AND principal = #{taskDto.principal}
+</if>
 GROUP BY day
 ORDER BY day
 </select>
@@ -271,6 +289,12 @@ WHERE DATE_FORMAT( create_time, '%Y-%m' ) = #{day}
 and status = '1'
 <if test="type != null and type != ''">
   AND type = #{type}
+</if>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
 </if>
 </select>
 <select id="taskScheduleYearCount" resultType="java.util.Map">
@@ -283,6 +307,12 @@ WHERE DATE_FORMAT( create_time, '%Y' ) in
 <if test="taskDto.type != null and taskDto.type != ''">
   AND type = #{taskDto.type}
 </if>
+<if test="taskDto.taskSiteRoute != null and taskDto.taskSiteRoute != ''">
+  AND site_route like concat(#{taskDto.taskSiteRoute}, '%')
+</if>
+<if test="taskDto.principal != null and taskDto.principal != ''">
+  AND principal = #{taskDto.principal}
+</if>
 GROUP BY day
 ORDER BY day
 </select>
@@ -294,86 +324,220 @@ and status = '1'
 <if test="type != null and type != ''">
   AND type = #{type}
 </if>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
 </select>
 <select id="findPestCount" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '01'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findRollStack" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '02'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findMoveStack" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '03'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findBeetle" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '04'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findHouseBeetle" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '05'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findO2" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '06'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findHouseO2" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '07'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findStackTemp" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '08'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findHouseTemp" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '09'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findStackMoist" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '10'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findHouseMoist" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '11'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findCoreTemp" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '12'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findMoreAveTemp" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '13'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findHouseMealworm" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '14'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findCheck" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '15'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="findOther" resultType="int">
 SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '16'
+<where>
+<if test="siteRoute != null and siteRoute != ''">
+  AND site_route like concat(#{siteRoute}, '%')
+</if>
+<if test="principal != null and principal != ''">
+  AND principal = #{principal}
+</if>
+</where>
 </select>
 <select id="taskAvlFinishTime" resultType="java.util.Map">
 SELECT create_time as createTime,finish_time as finishTime

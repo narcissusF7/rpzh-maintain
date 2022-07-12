@@ -172,7 +172,7 @@ public interface TaskManagementDao {
      * @param day
      * @return
      */
-    int findTaskFinish(@Param("type")String type, @Param("day")String day);
+    int findTaskFinish(@Param("type")String type, @Param("day")String day,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 按照月统计
@@ -187,7 +187,7 @@ public interface TaskManagementDao {
      * @param day
      * @return
      */
-    int findTaskMonthFinish(@Param("type")String type, @Param("day")String day);
+    int findTaskMonthFinish(@Param("type")String type, @Param("day")String day,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 按照年统计
@@ -202,7 +202,7 @@ public interface TaskManagementDao {
      * @param day
      * @return
      */
-    int findTaskYearFinish(@Param("type")String type, @Param("day")String day);
+    int findTaskYearFinish(@Param("type")String type, @Param("day")String day,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 查询虫情巡查任务数量,默认一周
@@ -210,7 +210,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findPestCount(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findPestCount(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 查询翻垛数量
@@ -218,7 +218,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findRollStack(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findRollStack(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 查询移垛数量
@@ -226,7 +226,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findMoveStack(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findMoveStack(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      *垛内甲虫预警
@@ -234,7 +234,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 仓间甲虫预警
@@ -242,7 +242,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findHouseBeetle(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 氧气预警
@@ -250,7 +250,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findO2(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findO2(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 仓间氧气预警
@@ -258,7 +258,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseO2(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findHouseO2(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 垛内温度预警
@@ -266,7 +266,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findStackTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findStackTemp(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 仓间温度预警
@@ -274,7 +274,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findHouseTemp(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 垛内湿度预警
@@ -282,7 +282,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findStackMoist(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findStackMoist(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 仓间湿度预警
@@ -290,7 +290,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseMoist(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findHouseMoist(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 包芯温度
@@ -298,7 +298,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findCoreTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findCoreTemp(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 平均包芯高于环境预警任务
@@ -306,7 +306,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findMoreAveTemp(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findMoreAveTemp(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 仓间粉螟预警任务
@@ -314,7 +314,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseMealworm(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findHouseMealworm(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 检查任务
@@ -322,7 +322,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findCheck(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findCheck(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 其他任务
@@ -330,7 +330,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findOther(@Param("startTime")String startTime, @Param("endTime")String endTime);
+    int findOther(@Param("startTime")String startTime, @Param("endTime")String endTime,@Param("siteRoute")String siteRoute,@Param("principal")String principal);
 
     /**
      * 查询任务平均完成时间

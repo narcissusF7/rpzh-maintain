@@ -458,6 +458,15 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      */
     @Override
     public List<Map> taskScheduleCount(TaskDto taskDto) {
+        //获取任务路径
+        String siteRoute = taskDto.getSiteRoute();
+        //获取当前任务id
+        String siteId = taskDto.getSiteId();
+        if (ToolUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteId)){
+            //当前位置路径
+            String route = SiteRouteUtil.route(siteRoute, siteId);
+            taskDto.setTaskSiteRoute(route);
+        }
         //获取开始时间
         String startTime = taskDto.getStartTime();
         //获取结束时间
@@ -499,7 +508,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                     map.put("noFinish", 0);
                 } else {
                     //查询完成的任务数量
-                    int count = taskManagementDao.findTaskFinish(taskDto.getType(), day);
+                    int count = taskManagementDao.findTaskFinish(taskDto.getType(), day,taskDto.getTaskSiteRoute(),taskDto.getPrincipal());
                     map.put("finish", count);
                     map.put("noFinish", sum - count);
                 }
@@ -545,7 +554,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                     map.put("noFinish", 0);
                 } else {
                     //查询完成的任务数量
-                    int count = taskManagementDao.findTaskMonthFinish(taskDto.getType(), day);
+                    int count = taskManagementDao.findTaskMonthFinish(taskDto.getType(), day,taskDto.getTaskSiteRoute(),taskDto.getPrincipal());
                     map.put("finish", count);
                     map.put("noFinish", sum - count);
                 }
@@ -591,7 +600,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                     map.put("noFinish", 0);
                 } else {
                     //查询完成的任务数量
-                    int count = taskManagementDao.findTaskYearFinish(taskDto.getType(), day);
+                    int count = taskManagementDao.findTaskYearFinish(taskDto.getType(), day,taskDto.getTaskSiteRoute(),taskDto.getPrincipal());
                     map.put("finish", count);
                     map.put("noFinish", sum - count);
                 }
@@ -631,6 +640,15 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      */
     @Override
     public List<Map> taskCountTrend(TaskDto taskDto) {
+        //获取任务路径
+        String siteRoute = taskDto.getSiteRoute();
+        //获取当前任务id
+        String siteId = taskDto.getSiteId();
+        if (ToolUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteId)){
+            //当前位置路径
+            String route = SiteRouteUtil.route(siteRoute, siteId);
+            taskDto.setTaskSiteRoute(route);
+        }
         //获取开始时间
         String startTime = taskDto.getStartTime();
         //获取结束时间
@@ -690,6 +708,15 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      */
     @Override
     public Map taskCountByType(TaskDto taskDto) {
+        //获取任务路径
+        String siteRoute = taskDto.getSiteRoute();
+        //获取当前任务id
+        String siteId = taskDto.getSiteId();
+        if (ToolUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteId)){
+            //当前位置路径
+            String route = SiteRouteUtil.route(siteRoute, siteId);
+            taskDto.setTaskSiteRoute(route);
+        }
         //获取开始时间
         String startTime = taskDto.getStartTime();
         //获取结束时间
@@ -713,52 +740,52 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         }
         Map mapAll = new HashMap();
         //查询虫情监控任务01:虫情巡查任务
-        int type01 = taskManagementDao.findPestCount(startTime, endTime);
+        int type01 = taskManagementDao.findPestCount(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("01", type01);
         //查询02:翻垛任务数量
-        int type02 = taskManagementDao.findRollStack(startTime, endTime);
+        int type02 = taskManagementDao.findRollStack(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("02", type02);
         //查询03:移垛任务
-        int type03 = taskManagementDao.findMoveStack(startTime, endTime);
+        int type03 = taskManagementDao.findMoveStack(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("03", type03);
         //查询04:垛内甲虫预警任务
-        int type04 = taskManagementDao.findBeetle(startTime, endTime);
+        int type04 = taskManagementDao.findBeetle(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("04", type04);
         //查询05:仓间甲虫预警任务
-        int type05 = taskManagementDao.findHouseBeetle(startTime, endTime);
+        int type05 = taskManagementDao.findHouseBeetle(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("05", type05);
         //查询06:垛内氧气预警任务
-        int type06 = taskManagementDao.findO2(startTime, endTime);
+        int type06 = taskManagementDao.findO2(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("06", type06);
         //查询07:仓间氧气预警任务
-        int type07 = taskManagementDao.findHouseO2(startTime, endTime);
+        int type07 = taskManagementDao.findHouseO2(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("07", type07);
         //查询08:垛内温度预警任务
-        int type08 = taskManagementDao.findStackTemp(startTime, endTime);
+        int type08 = taskManagementDao.findStackTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("08", type08);
         //查询09:仓间温度预警任务
-        int type09 = taskManagementDao.findHouseTemp(startTime, endTime);
+        int type09 = taskManagementDao.findHouseTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("09", type09);
         //查询10:垛内湿度预警任务
-        int type10 = taskManagementDao.findStackMoist(startTime, endTime);
+        int type10 = taskManagementDao.findStackMoist(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("10", type10);
         //查询11:仓间湿度预警任务
-        int type11 = taskManagementDao.findHouseMoist(startTime, endTime);
+        int type11 = taskManagementDao.findHouseMoist(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("11", type11);
         //查询12:包芯温度预警任务
-        int type12 = taskManagementDao.findCoreTemp(startTime, endTime);
+        int type12 = taskManagementDao.findCoreTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("12", type12);
         //查询13:平均包芯高于环境预警任务
-        int type13 = taskManagementDao.findMoreAveTemp(startTime, endTime);
+        int type13 = taskManagementDao.findMoreAveTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("13", type13);
         //查询14:仓间粉螟预警任务
-        int type14 = taskManagementDao.findHouseMealworm(startTime, endTime);
+        int type14 = taskManagementDao.findHouseMealworm(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("14", type14);
         //查询15:仓库检查任务
-        int type15 = taskManagementDao.findCheck(startTime, endTime);
+        int type15 = taskManagementDao.findCheck(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("15", type15);
         //查询16其他任务
-        int type16 = taskManagementDao.findOther(startTime, endTime);
+        int type16 = taskManagementDao.findOther(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("16", type16);
         return mapAll;
     }

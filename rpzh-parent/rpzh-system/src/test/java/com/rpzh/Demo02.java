@@ -19,10 +19,21 @@ import java.util.stream.Stream;
  */
 public class Demo02 {
     public static void main(String[] args) {
-        long a = 1000;
-        long b = 11;
-        double c = a/(double)b/60;
-        System.out.println(c);
+        double sum = 19.9+17.6+17.8+13
+                     +240+120+300+120
+                     +20+30+30+8
+                     +16+28+28+40
+                     +52+31+44+38
+                     +13+19+15+30
+                     +20+16+30+30
+                     +34+38+30+31
+                     +31+20+30+16
+                     +8+12+17+8
+                     +6+15+10+15
+                     +15+16+12+12
+                     +11+17+14;
+        System.out.println(sum);
+
     }
     /**
      * 获取两个日期之间的所有年

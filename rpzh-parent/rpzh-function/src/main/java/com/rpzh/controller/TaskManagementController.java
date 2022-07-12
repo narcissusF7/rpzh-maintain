@@ -405,6 +405,9 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "deteType", value = "统计类型:Y:年统计,M:月统计,D:日统计", required = true,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String"),
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
                     "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
                     "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String")
@@ -430,7 +433,10 @@ public class TaskManagementController {
     @ApiOperation(value = "发布任务菜单任务统计任务量趋势统计", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskCountTrend")
     public Result<TaskVo> taskCountTrend(@ApiIgnore TaskDto taskDto){
@@ -446,7 +452,10 @@ public class TaskManagementController {
     @ApiOperation(value = "发布任务菜单任务统计任务类型数量", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskCountByType")
     public Result taskCountByType(@ApiIgnore TaskDto taskDto){
@@ -463,7 +472,10 @@ public class TaskManagementController {
     @ApiOperation(value = "发布任务菜单任务统计任务类型占比", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String")
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskTypePercent")
     public Result taskTypePercent(@ApiIgnore TaskDto taskDto){
@@ -521,7 +533,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
-            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskAvlFinishTime")
     public Result taskAvlFinishTime(@ApiIgnore TaskDto taskDto){
