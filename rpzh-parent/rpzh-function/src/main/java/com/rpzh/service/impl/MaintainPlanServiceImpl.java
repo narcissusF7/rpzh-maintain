@@ -131,9 +131,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
+    public AlarmValueSettingVo findAlarmSettingTemplateByPhases(String materialCode, String maintenceStyle, String phases) {
+        String[] codes = materialCode.split(",");
+        for (String code : codes) {
+            AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(code, maintenceStyle, phases);
+            if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
+                return alarmValueSettingVo;
+            }
+        }
+        return new AlarmValueSettingVo();
+    }
+
+    @Override
     public List<String> findAlarmSettingTemplateList(){
         return alarmSettingTemplateDao.findAlarmSettingTemplateList();
     }
+
     @Override
     public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName) {
         //根据预警规则名称获取预警模板数值
@@ -223,7 +236,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
         List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
         maintainPlanVo.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
-        maintainPlanVo.setPrincipalIds(principalIds);
+        maintainPlanVo.setPrincipalIds(principalId);
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
             maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
@@ -288,7 +301,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo beforeUpdateMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-        maintainPlanVo.setPrincipalIds(principalIds);
+        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+        maintainPlanVo.setPrincipalIds(principalId);
         maintainPlanVo.setPrincipalId(null);
         Integer stackId = maintainPlanVo.getStackId();
         maintainPlanVo.setMaintainCount(materialDao.getMaintainCount(stackId));
@@ -310,17 +324,18 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
         List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-        maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId).getData().toString()));
-        maintainPlanVo.setPrincipalIds(principalIds);
+        Integer stackId = maintainPlanVo.getStackId();
         MaintainPlanVo maintainPlanVo1 = new MaintainPlanVo();
         String pidRoute = warehouseDao.findPidRoute(maintainPlanVo.getStackId()).getPidRoute();
+        maintainPlanVo1.setPersonId(principalId.get(0));
         maintainPlanVo1.setAlarmValueSettingId(maintainPlanVo.getAlarmValueSettingId());
         maintainPlanVo1.setStackId(maintainPlanVo.getStackId());
         maintainPlanVo1.setPidRoute(pidRoute);
-        maintainPlanVo1.setMaterialCode(maintainPlanVo.getMaterialCode());
-        maintainPlanVo1.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
+        maintainPlanVo1.setMaterialCodes(materialDao.findMaterialCode(stackId));
+        maintainPlanVo1.setMaterialCode(StringUtils.join(maintainPlanVo1.getMaterialCodes(),","));
+        maintainPlanVo1.setMaintainCount(materialDao.getMaintainCount(stackId));
         maintainPlanVo1.setStackName(maintainPlanVo.getStackName());
-        maintainPlanVo1.setPrincipalIds(Arrays.asList(maintainPlanVo.getPrincipalId().split(",")));
+        maintainPlanVo1.setPrincipalIds(principalId);
         maintainPlanVo1.setMaintenceStyle(maintainPlanVo.getMaintenceStyle());
         return maintainPlanVo1;
     }
@@ -414,10 +429,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setUpdatedTime(nowDate);
         Date date = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
         maintainPlanDto.setAftercareDateEnd(date);
-        Integer r = maintainPlanDao.updateMaintainPlan(maintainPlanDto);
-        System.out.println(r);
-        Integer k = maintainPlanDao.updateMaintainPlanStage(maintainPlanDto);
-        System.out.println(k);
+        maintainPlanDao.updateMaintainPlan(maintainPlanDto);
+        maintainPlanDao.updateMaintainPlanStage(maintainPlanDto);
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute();

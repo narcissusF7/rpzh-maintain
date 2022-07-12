@@ -242,16 +242,16 @@
                prewarning_color_three colorThree from tb_pest_monitor limit 1;
     </select>
 
-    <select id="findPestStackMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">
-        select prewarning_value_one as valueOne,
-               prewarning_value_two as valueTwo,
-               prewarning_value_three as  valueThree
+    <select id="findPestStackMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
+        select prewarning_value_one as upperOne,
+               prewarning_value_two as upperTwo,
+               prewarning_value_three as  upperThree
         from tb_pest_stack_monitor where site_route = #{pidRoute}
     </select>
-    <select id="findPestMonitor" resultType="com.rpzh.vo.PestMonitoringRuleVo">
-        select prewarning_value_one as valueOne,
-               prewarning_value_two as valueTwo,
-               prewarning_value_three as  valueThree
+    <select id="findPestMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
+        select prewarning_value_one as upperOne,
+               prewarning_value_two as upperTwo,
+               prewarning_value_three as  upperThree
         from tb_pest_monitor
     </select>
 </mapper>

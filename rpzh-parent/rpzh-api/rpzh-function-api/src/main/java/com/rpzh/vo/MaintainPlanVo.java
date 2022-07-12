@@ -64,7 +64,9 @@ public class MaintainPlanVo {
     @ApiModelProperty(notes = "负责人id")
     private String principalId;
     @ApiModelProperty(notes = "负责人ids集合")
-    private List<String> principalIds;
+    private List<Integer> principalIds;
+    @ApiModelProperty(notes = "垛位负责人id")
+    private Integer personId;
 
     @ApiModelProperty(notes = "到期提醒时间")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")

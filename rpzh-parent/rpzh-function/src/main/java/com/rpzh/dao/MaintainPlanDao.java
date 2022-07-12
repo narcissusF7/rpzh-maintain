@@ -99,7 +99,9 @@ public interface MaintainPlanDao {
 
     List<MaintainCountVo> findFive(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
 
-    List<MaintainCountVo> findSite(@Param("materialCode")String materialCode);
+    List<MaintainCountVo> findSite(@Param("materialCode") String materialCode);
 
-    Map<String,String> findUsableStack();
+    Map<String, String> findUsableStack();
+
+    String findMaintainMaxIdByStackId(@Param("stackId") Integer stackId);
 }

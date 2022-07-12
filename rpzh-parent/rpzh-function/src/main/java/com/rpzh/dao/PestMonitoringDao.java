@@ -6,6 +6,7 @@ import com.rpzh.dto.PestMonitoringRuleDto;
 import com.rpzh.entity.Result;
 import com.rpzh.pojo.PestData;
 import com.rpzh.util.MonitorCondition;
+import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.PestBoardVo;
 import com.rpzh.vo.PestDataVo;
 import com.rpzh.vo.PestMonitoringRuleVo;
@@ -61,9 +62,9 @@ public interface PestMonitoringDao {
 
     Map<String, String> findPestWarningColor();
 
-    PestMonitoringRuleVo findPestStackMonitor(@Param("pidRoute") String pidRoute);
+    EarlyWarningVo findPestStackMonitor(@Param("pidRoute") String pidRoute);
 
-    PestMonitoringRuleVo findPestMonitor();
+    EarlyWarningVo findPestMonitor();
 
 
 }

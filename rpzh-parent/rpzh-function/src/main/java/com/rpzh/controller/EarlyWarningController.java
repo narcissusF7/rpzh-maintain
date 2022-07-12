@@ -96,8 +96,8 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "nodeType", value = "设备类型 01:无线氧气传感器,03:无线温湿度传感器,04:无线包芯温度传感器)", dataType = "String",required = true),
             @ApiImplicitParam(name = "warningType", value = "预警类型)", dataType = "String",required = true),
             @ApiImplicitParam(name = "nodeId", value = "设备Id", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "String",required = false),
-            @ApiImplicitParam(name = "areaId", value = "仓间id", dataType = "String",required = false)
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String",required = true),
+            @ApiImplicitParam(name = "stackId", value = "位置id", dataType = "Integer",required = true)
     })
     public Result findNodeData(@ApiIgnore EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findNodeData(earlyWarningDto);

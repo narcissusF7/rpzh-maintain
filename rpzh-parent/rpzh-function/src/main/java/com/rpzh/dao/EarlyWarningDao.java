@@ -5,16 +5,14 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Mapper
 public interface EarlyWarningDao {
     List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<EarlyWarningVo> findEarlyWarningByNode(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<EarlyWarningVo> findEarlyWarningByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
@@ -34,15 +32,7 @@ public interface EarlyWarningDao {
 
     Integer findSum(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<EarlyWarningVo> findEarlyWarningByStackType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<EarlyWarningVo> findEarlyWarningByAreaType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<EarlyWarningVo> findWarningDataByNode(@Param("affirm") String affirm, @Param("stackId") Integer stackId, @Param("areaId") Integer areaId, @Param("type") List<String> type);
-
-    List<EarlyWarningVo> findWarningDataByStack(@Param("affirm") String affirm, @Param("stackId") Integer stackId, @Param("warningType") String warningType);
-
-    List<EarlyWarningVo> findWarningDataByArea(@Param("affirm") String affirm, @Param("areaId") Integer areaId, @Param("warningType") String warningType);
+    List<EarlyWarningVo> findEarlyWarningByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findById(@Param("id") Integer id);
 
@@ -64,12 +54,26 @@ public interface EarlyWarningDao {
 
     Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
-    List<Map> findWarningCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
+    List<Map> findWarningCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
 
     List<Map> findWarningTypeCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<Map> findIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("count") Integer count);
 
-    Integer findNoDealCountByDay(@Param("date")String date,@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
-    Integer findDealCountByDay(@Param("date")String date,@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,@Param("dateType")String dateType);
+    Integer findNoDealCountByDay(@Param("date") String date, @Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
+
+    Integer findDealCountByDay(@Param("date") String date, @Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
+
+    List<WarningCountVo> findEarlyWarningCountByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<WarningCountVo> findEarlyWarningCountByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    String findNewTime(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
+                       @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
+
+    List<EarlyWarningVo> findWarningDataWarningTypeIsOne(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
+                                                         @Param("siteRoute") String siteRoute);
+
+    List<EarlyWarningVo> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
+                                                            @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 }

@@ -33,8 +33,6 @@ public class EarlyWarningDto implements Serializable {
 
     private LocalDateTime warningTime;
 
-    private String time;
-
     private String siteName;
 
     private Date startTime;

@@ -25,7 +25,7 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes ="上限三级")
     private Double upperThree;
     @ApiModelProperty(notes = "下限")
-    private Double lower;
+    private Double lower=0d;
     @ApiModelProperty(notes = "x坐标")
     private String siteX;
     @ApiModelProperty(notes = "y坐标")
@@ -77,4 +77,5 @@ public class EarlyWarningVo {
     private String dealSuggestion;
     @ApiModelProperty(notes = "仓间id")
     private Integer areaId;
+    private String siteRoute;
 }

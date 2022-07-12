@@ -2,6 +2,7 @@ package com.rpzh.dao;
 
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.MaintainPlanVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,5 +28,7 @@ public interface AlarmValueSettingDao {
 
     int changeStatus(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    MaintainPlanVo findByMaintainStackId(@Param("stackId")Integer stackId);
+    MaintainPlanVo findByMaintainStackId(@Param("stackId") Integer stackId);
+
+    EarlyWarningVo findAlarmValueSettingByStackId(@Param("column")String column, @Param("stackId") Integer stackId);
 }

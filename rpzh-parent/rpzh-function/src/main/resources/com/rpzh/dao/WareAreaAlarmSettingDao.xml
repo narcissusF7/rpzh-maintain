@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.WareAreaAlarmSettingDao">
-
+    <select id="findAlarmValueSettingByStackId" resultType="com.rpzh.vo.EarlyWarningVo">
+       select ${column}
+       from tb_ware_area_alarm_setting
+       where pid_route = #{pidRoute}
+    </select>
     <select id="findBySite" resultType="com.rpzh.vo.AlarmValueSettingVo">
         SELECT
         id as id,

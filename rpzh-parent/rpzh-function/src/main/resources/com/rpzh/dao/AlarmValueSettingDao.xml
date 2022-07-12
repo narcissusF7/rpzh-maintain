@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.AlarmValueSettingDao">
+    <select id="findAlarmValueSettingByStackId" resultType="com.rpzh.vo.EarlyWarningVo">
+       select ${column}
+       from tb_alarm_value_setting t1
+       inner join tb_maintain_plan_stage t2 on t1.id=t2.alarm_value_setting_id
+       inner join tb_maintain_plan t3 on t2.id = t3.stage_id and t3.stack_id = #{stackId} and t3.is_end ='0'
+    </select>
     <select id="findAlarmValueSettingById" resultType="com.rpzh.vo.AlarmValueSettingVo">
        select
         id as alarmValueSettingId,

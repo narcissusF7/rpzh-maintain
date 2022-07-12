@@ -595,4 +595,10 @@ public class MaintainPlanController {
             ExcelUtils.outFile(wb, response, fileName);
         }
     }
+
+    @PostMapping(value = "findAlarmSettingTemplateByPhases")
+    public Result findAlarmSettingTemplateByPhases(String materialCode, String maintenceStyle, String phases){
+        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmSettingTemplateByPhases(materialCode, maintenceStyle, phases);
+        return new Result(true, StatusCode.OK, "查询成功",alarmValueSettingVo);
+    }
 }

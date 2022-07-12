@@ -40,7 +40,6 @@
     <select id="findMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">
         SELECT
             t1.id as id,
-            t1.material_code AS materialCode,
             t3.site_name as stackName,
             t1.stack_id as stackId,
             t1.maintence_style as maintenceStyle,
@@ -361,6 +360,9 @@
     </update>
     <select id="findStackCountByStackId" resultType="java.lang.Integer">
         select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
+    </select>
+    <select id="findMaintainMaxIdByStackId" resultType="java.lang.String">
+        select material_code from tb_maintain_plan where id in (select max(id) from tb_maintain_plan where stack_id = #{stackId})
     </select>
     <select id="findMaintainStackId" resultType="com.rpzh.vo.MaintainPlanVo">
         SELECT
