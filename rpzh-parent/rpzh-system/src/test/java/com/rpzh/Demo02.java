@@ -1,6 +1,9 @@
 package com.rpzh;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.sun.media.sound.SoftTuning;
+import sun.rmi.runtime.Log;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -16,10 +19,10 @@ import java.util.stream.Stream;
  */
 public class Demo02 {
     public static void main(String[] args) {
-        double a = 0.14285714285714285;
-        DecimalFormat df = new DecimalFormat("######0.00");
-        String format = df.format(a);
-        System.out.println(format);
+        long a = 1000;
+        long b = 11;
+        double c = a/(double)b/60;
+        System.out.println(c);
     }
     /**
      * 获取两个日期之间的所有年

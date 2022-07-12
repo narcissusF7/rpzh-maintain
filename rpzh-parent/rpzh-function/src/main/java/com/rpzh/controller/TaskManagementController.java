@@ -31,6 +31,7 @@ import java.util.*;
  * @Author liubc
  * @create 2022-05-30 11:31
  * @Description: good good study,day day up
+ * http://192.168.3.5:9001/api/maintain/warehouse/locating
  */
 @RestController
 @RequestMapping("/maintain/taskmanager")
@@ -469,6 +470,7 @@ public class TaskManagementController {
         Map typeCount = taskManagementService.taskCountByType(taskDto);
         //获取所有的和,所有的任务和
         int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
+        //保留两位小数
         DecimalFormat df = new DecimalFormat("######0.00");
         Map<String,String> map = new HashMap<>();
         //获取百分比
@@ -488,7 +490,6 @@ public class TaskManagementController {
         double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
         double percent15 = Double.parseDouble(typeCount.get("15").toString())/sum;
         double percent16 = Double.parseDouble(typeCount.get("16").toString())/sum;
-
         //虫情巡查
         map.put("01",df.format(percent01));
         map.put("02",df.format(percent02));
@@ -508,6 +509,26 @@ public class TaskManagementController {
         map.put("16",df.format(percent16));
         return new Result(true,StatusCode.OK,"查询成功",map);
     }
+
+    /**
+     * 任务平均完成时间
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "发布任务菜单任务统计任务平均完成时间", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer"),
+            @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String"),
+    })
+    @PostMapping("/taskAvlFinishTime")
+    public Result taskAvlFinishTime(@ApiIgnore TaskDto taskDto){
+        List<Map> mapList = taskManagementService.taskAvlFinishTime(taskDto);
+        return new Result(true,StatusCode.OK,"查询成功",mapList);
+    }
+
 
 
 }

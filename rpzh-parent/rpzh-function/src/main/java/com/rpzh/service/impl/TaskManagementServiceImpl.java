@@ -14,6 +14,7 @@ import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.SiteRouteUtil;
+import com.rpzh.util.TimeUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.StackVo;
 import com.rpzh.vo.TaskVo;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.SQLOutput;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -682,6 +684,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
     /**
      * 查询各种类型的任务数量
+     *
      * @param taskDto
      * @return
      */
@@ -710,58 +713,139 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         }
         Map mapAll = new HashMap();
         //查询虫情监控任务01:虫情巡查任务
-        int type01 = taskManagementDao.findPestCount(startTime,endTime);
-        mapAll.put("01",type01);
+        int type01 = taskManagementDao.findPestCount(startTime, endTime);
+        mapAll.put("01", type01);
         //查询02:翻垛任务数量
-        int type02 = taskManagementDao.findRollStack(startTime,endTime);
-        mapAll.put("02",type02);
+        int type02 = taskManagementDao.findRollStack(startTime, endTime);
+        mapAll.put("02", type02);
         //查询03:移垛任务
-        int type03 = taskManagementDao.findMoveStack(startTime,endTime);
-        mapAll.put("03",type03);
+        int type03 = taskManagementDao.findMoveStack(startTime, endTime);
+        mapAll.put("03", type03);
         //查询04:垛内甲虫预警任务
-        int type04 = taskManagementDao.findBeetle(startTime,endTime);
-        mapAll.put("04",type04);
+        int type04 = taskManagementDao.findBeetle(startTime, endTime);
+        mapAll.put("04", type04);
         //查询05:仓间甲虫预警任务
-        int type05 = taskManagementDao.findHouseBeetle(startTime,endTime);
-        mapAll.put("05",type05);
+        int type05 = taskManagementDao.findHouseBeetle(startTime, endTime);
+        mapAll.put("05", type05);
         //查询06:垛内氧气预警任务
-        int type06 = taskManagementDao.findO2(startTime,endTime);
-        mapAll.put("06",type06);
+        int type06 = taskManagementDao.findO2(startTime, endTime);
+        mapAll.put("06", type06);
         //查询07:仓间氧气预警任务
-        int type07 = taskManagementDao.findHouseO2(startTime,endTime);
-        mapAll.put("07",type07);
+        int type07 = taskManagementDao.findHouseO2(startTime, endTime);
+        mapAll.put("07", type07);
         //查询08:垛内温度预警任务
-        int type08 = taskManagementDao.findStackTemp(startTime,endTime);
-        mapAll.put("08",type08);
+        int type08 = taskManagementDao.findStackTemp(startTime, endTime);
+        mapAll.put("08", type08);
         //查询09:仓间温度预警任务
-        int type09 = taskManagementDao.findHouseTemp(startTime,endTime);
-        mapAll.put("09",type09);
+        int type09 = taskManagementDao.findHouseTemp(startTime, endTime);
+        mapAll.put("09", type09);
         //查询10:垛内湿度预警任务
-        int type10 = taskManagementDao.findStackMoist(startTime,endTime);
-        mapAll.put("10",type10);
+        int type10 = taskManagementDao.findStackMoist(startTime, endTime);
+        mapAll.put("10", type10);
         //查询11:仓间湿度预警任务
-        int type11 = taskManagementDao.findHouseMoist(startTime,endTime);
-        mapAll.put("11",type11);
+        int type11 = taskManagementDao.findHouseMoist(startTime, endTime);
+        mapAll.put("11", type11);
         //查询12:包芯温度预警任务
-        int type12 = taskManagementDao.findCoreTemp(startTime,endTime);
-        mapAll.put("12",type12);
+        int type12 = taskManagementDao.findCoreTemp(startTime, endTime);
+        mapAll.put("12", type12);
         //查询13:平均包芯高于环境预警任务
-        int type13 = taskManagementDao.findMoreAveTemp(startTime,endTime);
-        mapAll.put("13",type13);
+        int type13 = taskManagementDao.findMoreAveTemp(startTime, endTime);
+        mapAll.put("13", type13);
         //查询14:仓间粉螟预警任务
-        int type14 = taskManagementDao.findHouseMealworm(startTime,endTime);
-        mapAll.put("14",type14);
+        int type14 = taskManagementDao.findHouseMealworm(startTime, endTime);
+        mapAll.put("14", type14);
         //查询15:仓库检查任务
-        int type15 = taskManagementDao.findCheck(startTime,endTime);
-        mapAll.put("15",type15);
+        int type15 = taskManagementDao.findCheck(startTime, endTime);
+        mapAll.put("15", type15);
         //查询16其他任务
-        int type16 = taskManagementDao.findOther(startTime,endTime);
-        mapAll.put("16",type16);
+        int type16 = taskManagementDao.findOther(startTime, endTime);
+        mapAll.put("16", type16);
         return mapAll;
     }
 
     /**
+     * 任务平均完成时间
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public List<Map> taskAvlFinishTime(TaskDto taskDto) {
+        //获取开始时间
+        String startTime = taskDto.getStartTime();
+        //获取结束时间
+        String endTime = taskDto.getEndTime();
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        //如果开始时间和结束时间都为空,日期向前推一周
+        if (ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)) {
+            startTime = DateUtil.lastWeek().toString();
+            endTime = nowTime;
+        }
+        //如果开始时间不为空,结束时间为空,结束时间向后推一周
+        if (ToolUtil.isNotEmpty(startTime) && ToolUtil.isEmpty(endTime)) {
+            Date date = DateUtil.parse(startTime);
+            endTime = DateUtil.offsetDay(date, 7).toString();
+        }
+        //如果开始时间为空,结束时间不为空,开始时间为向前推一周
+        if (ToolUtil.isEmpty(startTime) && ToolUtil.isNotEmpty(endTime)) {
+            Date date = DateUtil.parse(endTime);
+            startTime = DateUtil.offsetDay(date, -7).toString();
+        }
+        //开始时间结束时间所有的时间,yyyy-MM-dd
+        List<String> days = getBetweenDays(startTime, endTime);
+        //获取仓库负责人
+        String principal = taskDto.getPrincipal();
+        //获取位置路径,传入的父路径,需要拼接当前位置id
+        String siteRoute = taskDto.getSiteRoute();
+        //获取当前地址id
+        String siteId = taskDto.getSiteId();
+        String route = "";
+        if (ToolUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteId)) {
+            //拼接获取当前路径
+            route = SiteRouteUtil.route(siteRoute, siteId);
+        }
+        //返回数据
+        List<Map> mapList = new ArrayList<>();
+        for (String day : days) {
+            //查询当天所有的任务时间,任务创建时间,完成时间
+            List<Map> timeList = taskManagementDao.taskAvlFinishTime(day, principal, route);
+            //如果今天没有完成的任务,时间是0
+            if (ToolUtil.isEmpty(timeList)) {
+                Map map = new HashMap();
+                map.put("day", day);
+                map.put("time", 0);
+                mapList.add(map);
+            } else {
+                //完成任务的总时间
+                long sum = 0;
+                //完成任务的数量
+                long size = timeList.size();
+                for (Map map : timeList) {
+                    //任务开始时间
+                    String createTime = map.get("createTime").toString();
+                    //任务完成时间
+                    String finishTime = map.get("finishTime").toString();
+                    //完成所用的时间,分钟
+                    long minute = TimeUtils.betweenMinute(createTime, finishTime);
+                    sum = sum + minute;
+                }
+                //获取平均完成时间,小时
+                double avlTime = sum/(double)size/60;
+                //保留两位小数
+                DecimalFormat df = new DecimalFormat("######0.00");
+                Map map = new HashMap();
+                map.put("day", day);
+                map.put("time", df.format(avlTime));
+                mapList.add(map);
+            }
+        }
+        return mapList;
+    }
+
+    /**
      * 获取两个日期之间的所有日期 (年月日)
+     *
      * @param startTime 开始时间
      * @param endTime   结束时间
      * @return

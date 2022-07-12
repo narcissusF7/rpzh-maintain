@@ -331,4 +331,13 @@ public interface TaskManagementDao {
      * @return
      */
     int findOther(@Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    /**
+     * 查询任务平均完成时间
+     * @param day
+     * @param principal
+     * @param route
+     * @return
+     */
+    List<Map> taskAvlFinishTime(@Param("day")String day, @Param("principal")String principal, @Param("route")String route);
 }

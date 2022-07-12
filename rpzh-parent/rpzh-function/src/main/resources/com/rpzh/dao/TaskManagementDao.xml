@@ -375,4 +375,15 @@ SELECT count(*) FROM tb_task
 WHERE create_time BETWEEN #{startTime} AND #{endTime}
 AND type = '16'
 </select>
+<select id="taskAvlFinishTime" resultType="java.util.Map">
+SELECT create_time as createTime,finish_time as finishTime
+FROM tb_task
+WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
+<if test="principal != null and principal != ''">
+   and principal = #{principal}
+</if>
+<if test="route != null and route != ''">
+  and site_route like concat(#{route}, '%')
+</if>
+</select>
 </mapper>

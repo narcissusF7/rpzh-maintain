@@ -141,4 +141,11 @@ public interface TaskManagementService {
      * @return
      */
     Map taskCountByType(TaskDto taskDto);
+
+    /**
+     * 任务平均完成时间
+     * @param taskDto
+     * @return
+     */
+    List<Map> taskAvlFinishTime(TaskDto taskDto);
 }
