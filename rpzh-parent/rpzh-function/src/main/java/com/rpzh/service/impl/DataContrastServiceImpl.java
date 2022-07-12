@@ -11,6 +11,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.DataContrastService;
+import com.rpzh.util.GetBetweenDayUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.DataContrastVo;
 import com.rpzh.vo.DataVo;
@@ -205,20 +206,9 @@ public class DataContrastServiceImpl implements DataContrastService {
         });
         //采集的开始时间、结束时间startTime endTime
         //对比的开始时间、结束时beginTime finishTime
-        if(ToolUtil.isNotEmpty(dataContrastDto.getEndTime())){
-            dataContrastDto.setEndTime(new Date(dataContrastDto.getEndTime().getTime() + 24 * 60 * 60 * 1000 - 1));
-        }
-        if(ToolUtil.isEmpty(dataContrastDto.getStartTime()) && ToolUtil.isEmpty(dataContrastDto.getEndTime())){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            dataContrastDto.setStartTime(calendar.getTime());
-            calendar.add(Calendar.MONTH, 1);
-            dataContrastDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
-        }
+        Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
+        dataContrastDto.setStartTime(setTime.get("startTime"));
+        dataContrastDto.setEndTime(setTime.get("endTime"));
         Date startTime = dataContrastDto.getStartTime();
         Date endTime = dataContrastDto.getEndTime();
         //对比的开始时间

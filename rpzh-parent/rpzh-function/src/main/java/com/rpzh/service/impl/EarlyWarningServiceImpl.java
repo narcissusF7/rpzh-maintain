@@ -391,23 +391,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     //预警信息
     @Override
     public Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto) {
-        Date endTime = earlyWarningDto.getEndTime();
-        //结束时间不为空
-        if(ToolUtil.isNotEmpty(endTime)){
-            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
-        }
-        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
-        if(ToolUtil.isEmpty(earlyWarningDto.getStartTime()) && ToolUtil.isEmpty(earlyWarningDto.getEndTime())){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            earlyWarningDto.setStartTime(calendar.getTime());
-            calendar.add(Calendar.MONTH, 1);
-            earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
-        }
+        Map<String, Date> month = GetBetweenDayUtils.getMonth(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime());
+        earlyWarningDto.setStartTime(month.get("startTime"));
+        earlyWarningDto.setEndTime(month.get("endTime"));
         String warningType = earlyWarningDto.getWarningType();
         List<WarningCountVo> warningCount = new ArrayList<>();
         if(ToolUtil.isNotEmpty(warningType)){
@@ -457,23 +443,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
 
     @Override
     public Result findEarlyWarningByWarningType(EarlyWarningDto earlyWarningDto) {
-        Date endTime = earlyWarningDto.getEndTime();
-        //结束时间不为空
-        if(ToolUtil.isNotEmpty(endTime)){
-            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1));
-        }
-        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
-        if(ToolUtil.isEmpty(earlyWarningDto.getStartTime()) && ToolUtil.isEmpty(earlyWarningDto.getEndTime())){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            earlyWarningDto.setStartTime(calendar.getTime());
-            calendar.add(Calendar.MONTH, 1);
-            earlyWarningDto.setEndTime(new Date(calendar.getTime().getTime() - 1000));
-        }
+        Map<String, Date> month = GetBetweenDayUtils.getMonth(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime());
+        earlyWarningDto.setStartTime(month.get("startTime"));
+        earlyWarningDto.setEndTime(month.get("endTime"));
         Map<String, Object> map = getData(earlyWarningDto);
         return new Result<>(true, StatusCode.OK, "查询成功",map);
     }
