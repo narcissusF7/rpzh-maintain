@@ -14,9 +14,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +37,13 @@ import java.util.Map;
 @Slf4j
 public class TestContrller{
 
+
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    //mq主题
+    @Value("${rocketmq.topic}")
+    private String topic;
 
     @Autowired
     private NodeService nodeService;
@@ -53,6 +65,24 @@ public class TestContrller{
         PageInfo<NodeVo> pageInfo = nodeService.findAllNodeList(nodeDto);
         return new Result(true, StatusCode.OK, "发送成功",pageInfo);
     }
+
+
+    /**
+     * rocketmq发送数据
+     * @return
+     */
+    @RequestMapping("/rocketmq")
+    public String test(){
+        Map map = new HashMap();
+        map.put("type", "养护短信类型数据");
+        map.put("data", "发送养护短信内容数据");
+        map.put("phone", "131898292929");
+        //系统标识,标识是哪个系统发送的消息,养护系统发送
+        rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
+        return "发送成功";
+    }
+
+
 
     /**
      * 参考这个方法
