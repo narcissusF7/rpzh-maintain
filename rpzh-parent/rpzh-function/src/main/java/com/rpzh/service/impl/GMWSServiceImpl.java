@@ -4,6 +4,7 @@ import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.GMWSDao;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.entity.DateToStrUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.GMWSService;
 import com.rpzh.vo.GWMSNodeDataVo;
@@ -11,10 +12,9 @@ import com.rpzh.vo.NodeDataVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,10 +74,46 @@ public class GMWSServiceImpl implements GMWSService {
 
     @Override
     public List<Map<String, String>> findUsableTobacco() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         //查询尚未结束的养护计划且该计划存在过杀虫阶段及该计划所在的垛位
-        Map<String,String>  map = maintainPlanDao.findUsableStack();
+        List<Map<String,String>>  list = maintainPlanDao.findUsableStack();
+        list.stream().filter(map->{
+            Calendar c = Calendar.getInstance();
+            int month = c.get(Calendar.MONTH) + 1;
+            //如果5月份以前
+            if (month<=5){
+                c.setTime(new Date());
+                c.add(Calendar.YEAR, -1);
+                //判断12个月内是否杀虫过
+                Date date = c.getTime();
+                try {
+                    if (date.before(format.parse(map.get("begingTime")))){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                Calendar currCal=Calendar.getInstance();
+                //获取今年第一天
+                c.set(Calendar.YEAR,currCal.get(Calendar.YEAR));
+                Date date = c.getTime();
+                try {
+                    if (date.before(format.parse(map.get("begingTime")))){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            return false;
+        });
 
-        return null;
+        return list;
     }
 
     /**

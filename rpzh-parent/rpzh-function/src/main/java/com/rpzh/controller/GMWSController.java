@@ -39,8 +39,8 @@ public class GMWSController {
      * @return
      */
     @GetMapping("/findUsableTobacco")
-    public Result findUsableTobacco(){
+    public Result<List<Map<String,String>>> findUsableTobacco(){
         List<Map<String,String>> list = gmwsService.findUsableTobacco();
-        return null;
+        return new Result<>(true, StatusCode.OK,"查询成功",list);
     }
 }

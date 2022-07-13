@@ -101,7 +101,7 @@ public interface MaintainPlanDao {
 
     List<MaintainCountVo> findSite(@Param("materialCode") String materialCode);
 
-    Map<String, String> findUsableStack();
+    List<Map<String, String>> findUsableStack();
 
     String findMaintainMaxIdByStackId(@Param("stackId") Integer stackId);
 }

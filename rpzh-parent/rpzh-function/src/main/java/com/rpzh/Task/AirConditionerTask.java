@@ -22,11 +22,11 @@ public class AirConditionerTask {
     DataHandler dataHandler;
 
     //TODO 需要接口地址
-    private static String weatherUrl = "";
-//    @Scheduled(cron="${time.cron}")
+    private static String airConditionUrl = "";
+    //    @Scheduled(cron="${time.cron}")
     void handleAirConditionerData() {
 
-        String s = PortDataUtils.GetPortData(weatherUrl);
+        String s = PortDataUtils.GetPortData(airConditionUrl);
         JSONObject dataOfJson = JSONObject.parseObject(s);
         //数据整理成parseData
         String siteRoute="";

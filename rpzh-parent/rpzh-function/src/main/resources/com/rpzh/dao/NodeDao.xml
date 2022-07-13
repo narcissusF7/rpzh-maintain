@@ -34,7 +34,7 @@
         FROM tb_node
         WHERE node_id = #{nodeId}
           and id != #{id}
-        limit 1
+            limit 1
     </select>
 
     <update id="updateNode">
@@ -441,7 +441,7 @@
     <select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">
         SELECT
         node_id AS nodeId,
-        site_route pidRoute
+        site_route siteRoute
         FROM
         tb_node
         WHERE
@@ -510,5 +510,18 @@
         transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
         group by pid_route,transferTime
         ) a group by pidRoute,transferTime
+    </select>
+    <select id="findAirConditioner" resultType="com.rpzh.vo.NodeVo">
+        SELECT
+        air_conditioning_no AS nodeId,
+        site_route siteRoute
+        FROM
+        tb_node
+        <where>
+            <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
+                site_route like concat ('%',#{monitorCondition.pidRoute},'%')
+            </if>
+        </where>
+        order by pidRoute
     </select>
 </mapper>

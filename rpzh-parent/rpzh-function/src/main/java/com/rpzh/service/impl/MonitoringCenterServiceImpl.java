@@ -80,8 +80,12 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         //判断是否包含仓间的温湿度设备
         if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())&& Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)){
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
-            //查询 温湿度设备包括空调
+            //查询 温湿度设备
             nodeVos = nodeDao.findHumitureDevice(monitorCondition);
+            //查询空调设备
+            nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
+            //再排序
+            nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
         }else{
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
             nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
@@ -248,13 +252,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                     //TODO 如果需要根据丢包个数判断设备是否故障 需要在这边添加判断条件
                     //根据频率求出丢包个数
                     if (intervalTime/(nodeData.getFrequency()*1000)>0){
-                       if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
-                           nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
-                       }else {
-                           if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
-                               nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
-                           }
-                       }
+                        if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
+                            nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
+                        }else {
+                            if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
+                                nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
+                            }
+                        }
                     }
 
                 } catch (ParseException e) {

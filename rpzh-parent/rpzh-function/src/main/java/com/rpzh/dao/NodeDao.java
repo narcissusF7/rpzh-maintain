@@ -206,4 +206,6 @@ public interface NodeDao {
     @DS("clickhouse")
     List<NodeData> findOxygenList(@Param("column") String column, @Param("gatherType") String gatherType, @Param("tableName") String tableName, @Param("startTime") Date startTime,
                                   @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("pidRoutes") List<String> pidRoutes);
+
+    List<NodeVo> findAirConditioner(MonitorCondition monitorCondition);
 }
