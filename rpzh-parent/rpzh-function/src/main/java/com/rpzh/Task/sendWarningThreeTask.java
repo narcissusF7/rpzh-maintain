@@ -5,6 +5,7 @@ package com.rpzh.Task;
  * @Date: 2022/06/16/16:27
  * @Description: 三级每两个小时推送一次至任务结束
  */
+import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.WarehouseDao;
@@ -85,10 +86,12 @@ public class sendWarningThreeTask{
             }
             log.info(info);
             String principalId = maintainPlanDao.findPrincipalId(stackId);
-            String number = userFeign.findPhoneNumberById(principalId).getData().toString();
-            /*MessageVo messageVo = SendMessageUtil.sendSms(number, "每天第一个固定时间点推送短信", info);
-            //当为0的时候发送成功
-            log.info(messageVo.getResult());*/
+            if(StringUtil.isNotEmpty(principalId)) {
+                String number = userFeign.findPhoneNumberById(principalId).getData().toString();
+                /*MessageVo messageVo = SendMessageUtil.sendSms(number, "每天第一个固定时间点推送短信", info);
+                //当为0的时候发送成功
+                log.info(messageVo.getResult());*/
+            }
         }
         List<Integer> area = earlyWarningDao.findArea();
         for (Integer areaId : area) {
