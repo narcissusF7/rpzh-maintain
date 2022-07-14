@@ -196,6 +196,9 @@ public class DataContrastServiceImpl implements DataContrastService {
         if(nodeDataDtos.size()>64){
             return new Result(false, StatusCode.ERROR, "所选设备超过64个!");
         }
+        Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
+        dataContrastDto.setStartTime(setTime.get("startTime"));
+        dataContrastDto.setEndTime(setTime.get("endTime"));
         Map<String,String> keyInfo = new HashMap<>();
         nodeDataDtos.forEach(dtos -> {
             String nodeId = dtos.getNodeId();
@@ -206,9 +209,6 @@ public class DataContrastServiceImpl implements DataContrastService {
         });
         //采集的开始时间、结束时间startTime endTime
         //对比的开始时间、结束时beginTime finishTime
-        Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
-        dataContrastDto.setStartTime(setTime.get("startTime"));
-        dataContrastDto.setEndTime(setTime.get("endTime"));
         Date startTime = dataContrastDto.getStartTime();
         Date endTime = dataContrastDto.getEndTime();
         //对比的开始时间
