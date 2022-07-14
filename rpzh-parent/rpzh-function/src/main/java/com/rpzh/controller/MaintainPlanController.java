@@ -401,6 +401,21 @@ public class MaintainPlanController {
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
     }
 
+    /**
+     * 历史汇总单中的详情
+     * @param maintainPlanDto
+     * @return
+     */
+    @PostMapping("/findEndMaintainPlanDetails")
+    @ApiOperation(value = "历史汇总单中的详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
+    })
+    public Result<MaintainPlanVo> findEndMaintainPlanDetails(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        MaintainPlanVo maintainPlanVo = maintainPlanService.findEndMaintainPlanDetails(maintainPlanDto.getId());
+        return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
+    }
+
     @PostMapping("/findExpireCollectTable")
     @ApiOperation(value = "养护到期汇总列表")
     @ApiImplicitParams({

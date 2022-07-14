@@ -26,11 +26,9 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findTroubleNode();
 
-    List<EarlyWarningVo> findHistoryWarningInfo(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
     List<EarlyWarningVo> findHistoryWarningData(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    Integer findSum(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<Integer> findIds(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<EarlyWarningVo> findEarlyWarningByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
@@ -54,15 +52,15 @@ public interface EarlyWarningDao {
 
     Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
-    List<Map> findWarningCountByDay(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
+    List<Map> findWarningCountByDay(@Param("ids") List<Integer> ids, @Param("dateType") String dateType);
 
-    List<Map> findWarningTypeCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<Map> findWarningTypeCount(@Param("ids") List<Integer> ids);
 
-    List<Map> findIsDeal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("count") Integer count);
+    List<Map> findIsDeal(@Param("ids") List<Integer> ids, @Param("count") Integer count);
 
-    Integer findNoDealCountByDay(@Param("date") String date, @Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
+    Integer findNoDealCountByDay(@Param("date") String date, @Param("ids") List<Integer> ids, @Param("dateType") String dateType);
 
-    Integer findDealCountByDay(@Param("date") String date, @Param("earlyWarningDto") EarlyWarningDto earlyWarningDto, @Param("dateType") String dateType);
+    Integer findDealCountByDay(@Param("date") String date, @Param("ids") List<Integer> ids, @Param("dateType") String dateType);
 
     List<WarningCountVo> findEarlyWarningCountByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
@@ -76,4 +74,7 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
                                                             @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
+
+    int updateTackId(@Param("affirm") String affirm, @Param("warningType") String warningType,
+                     @Param("siteRoute") String siteRout, @Param("id") Integer id, @Param("principal") String principal);
 }

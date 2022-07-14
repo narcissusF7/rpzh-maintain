@@ -469,7 +469,19 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer maintainPlanId = maintainPlanDto.getId();
         maintainPlanDao.deleteMaintainCount(maintainPlanId);
         materialDao.updateMaterialStatus(maintainPlanDto.getStackId());
-        Integer result =  maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId);
+        Date createdTime = maintainPlanDao.findCreatedTime(maintainPlanId);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(createdTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Calendar nowCalendar = Calendar.getInstance();
+        nowCalendar.setTime(new Date());
+        nowCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        nowCalendar.set(Calendar.MINUTE, 0);
+        nowCalendar.set(Calendar.SECOND, 0);
+        long maintainDays = (nowCalendar.getTime().getTime() - calendar.getTime().getTime())/(1000 * 24 * 60 * 60);
+        Integer result =  maintainPlanDao.endMaintainPlan(updateUser,updateTime,maintainPlanId,maintainDays);
         return result;
     }
 
@@ -537,8 +549,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
             maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
         });
-        MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id,stackId);
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
+        return maintainPlanVo;
+    }
+
+    @Override
+    public MaintainPlanVo findEndMaintainPlanDetails(Integer id) {
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
+        maintainPlanVos.forEach(maintainPlan->{
+            List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
+            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+            maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+        });
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
+        maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
+        maintainPlanVo.setMaintainDays(maintainPlanDao.findMaintainDays(id));
         return maintainPlanVo;
     }
 
@@ -593,19 +619,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0" + maintainPlanDto.getPidRoute().split(",").length + ":" + maintainPlanDto.getStackId() + "]");
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
-        String pidRoute = maintainPlanDto.getPidRoute();
-        if(StringUtil.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            if (length < 5) {
-                pidRoute = pidRoute + ",[0" + length + ":" + maintainPlanDto.getStackId() + "]";
-                maintainPlanDto.setStackId(null);
-                maintainPlanDto.setPidRoute(pidRoute);
-            }
-        }
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainHistoryCollect(maintainPlanDto);
-        for (MaintainPlanVo maintainPlanVo : maintainPlanVos) {
-                maintainPlanVo.setChangeStatus("已开垛");
-        }
+        maintainPlanVos.forEach(maintainPlanVo -> {
+            Integer maintainDays = maintainPlanDao.findMaintainDays(maintainPlanVo.getId());
+            maintainPlanVo.setMaintainDays(maintainDays);
+        });
         return new PageInfo(maintainPlanVos);
     }
 

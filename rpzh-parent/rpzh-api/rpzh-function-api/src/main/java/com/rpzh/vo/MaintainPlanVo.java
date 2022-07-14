@@ -44,6 +44,10 @@ public class MaintainPlanVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdTime;
 
+    @ApiModelProperty(notes = "开垛时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updatedTime;
+
     @ApiModelProperty(notes = "养护天数")
     private Integer maintainDays;
 

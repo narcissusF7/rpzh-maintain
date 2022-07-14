@@ -603,6 +603,7 @@
   <select id = "findWareAreaPrincipalName" resultType="com.rpzh.vo.WareAreaVo">
     select
     principal_id as principalId,
+    principal_name as principalName,
     floor_id as floorId
     from tb_ware_area
     where id = #{areaId}
@@ -610,6 +611,7 @@
   <select id = "findFloorPrincipalName" resultType="com.rpzh.vo.FloorVo">
     select
     principal_id as principalId,
+    principal_name as principalName,
     building_id as buildingId
     from tb_floor
     where id = #{floorId}
@@ -738,13 +740,15 @@
   <select id = "findBuildingPrincipalName" resultType="com.rpzh.vo.BuildingVo">
     select
     principal_id as principalId,
+    principal_name as principalName,
     warehouse_id as warehouseId
     from tb_building
     where id = #{buildingId}
   </select>
   <select id = "findWarehousePrincipalName" resultType="com.rpzh.vo.WarehouseVo">
     select
-    principal_id as principalId
+    principal_id as principalId,
+    principal_name as principalName
     from tb_warehouse
     where id = #{warehouseId}
   </select>
@@ -765,11 +769,5 @@
     id as id
     from tb_stack
     where area_id = #{areaId}
-  </select>
-  <select id="findPidRoutes" resultType="com.rpzh.vo.StackVo">
-    select
-    concat(str1,str2,…)
-    pid_route as pidRoute,
-    area_id as areaId from  tb_stack where id in  <foreach collection="stackIds" item="stackId" open="(" separator="," close=")"> #{stackId} </foreach>
   </select>
 </mapper>

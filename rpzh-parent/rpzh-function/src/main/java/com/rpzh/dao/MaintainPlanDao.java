@@ -43,7 +43,7 @@ public interface MaintainPlanDao {
 
     List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    Integer endMaintainPlan(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId);
+    Integer endMaintainPlan(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId, @Param("maintainDays") long maintainDays);
 
     List<Integer> findAlarmValueSettingId(@Param("ids") List<Integer> ids);
 
@@ -57,7 +57,7 @@ public interface MaintainPlanDao {
 
     List<MaintainPlanVo> findDetails(@Param("id") Integer id);
 
-    MaintainPlanVo findDetailsNew(@Param("id") Integer id, @Param("stackId") Integer stackId);
+    MaintainPlanVo findDetailsNew(@Param("id") Integer id);
 
     int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
@@ -104,4 +104,10 @@ public interface MaintainPlanDao {
     List<Map<String, String>> findUsableStack();
 
     String findMaintainMaxIdByStackId(@Param("stackId") Integer stackId);
+
+    Date findCreatedTime(@Param("maintainPlanId") Integer maintainPlanId);
+
+    Integer findMaintainDays(@Param("id") Integer id);
+
+    MaintainPlanVo findMaintainHistoryById(@Param("id")Integer id);
 }

@@ -2,6 +2,7 @@ package com.rpzh.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.*;
+import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.*;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.*;
@@ -47,27 +48,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         if(ToolUtil.isNotEmpty(endTime)){
             earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000));
         }
-        if(StringUtils.isNotEmpty(pidRoute)){
+        if(StringUtils.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(stackId)){
             int length = pidRoute.split(",").length;
-            List<Integer> stackIds = new ArrayList<>();
-            switch (length){
-                case 4:
-                    stackIds = warehouseDao.findStackByAreId(stackId);
-                    if(ToolUtil.isEmpty(stackIds)){
-                        stackIds.add(0);
-                    }
-                    earlyWarningDto.setStackIds(stackIds);
-                    break;
-                case 5:
-                    stackIds.add(stackId);
-                    earlyWarningDto.setStackIds(stackIds);
-                    break;
-                default:
-                    break;
-            }
-            PageHelper.startPage(earlyWarningDto.getPage(), earlyWarningDto.getSize());
-            earlyWarningInfos = earlyWarningDao.findHistoryWarningInfo(earlyWarningDto);
-            return new PageInfo<>(earlyWarningInfos);
+            earlyWarningDto.setPidRoute(pidRoute + ",[0"+length+":"+stackId+"]");
         }
         PageHelper.startPage(earlyWarningDto.getPage(), earlyWarningDto.getSize());
         earlyWarningInfos = earlyWarningDao.findHistoryWarningData(earlyWarningDto);
@@ -92,10 +75,15 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         if(StringUtils.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(siteId)) {
             earlyWarningDto.setPidRoute(SiteRouteUtil.route(pidRoute,siteId+""));
         }
+        //查询满足条件的所有id
+        List<Integer> ids = earlyWarningDao.findIds(earlyWarningDto);
+        if(ToolUtil.isEmpty(ids)){
+            return new Result(false, StatusCode.ERROR, "暂无数据");
+        }
         //查询预警总数量
-        Integer sum = earlyWarningDao.findSum(earlyWarningDto);
+        Integer sum = ids.size();
         //报警类型统计 各种类型所占比例
-        List<Map> warningTypeCount = earlyWarningDao.findWarningTypeCount(earlyWarningDto);
+        List<Map> warningTypeCount = earlyWarningDao.findWarningTypeCount(ids);
         if("03".equals(warningTypeCount.get(0).get("warningType"))){
             warningTypeCount.get(0).put("warningType","01");
         }
@@ -138,7 +126,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
         });
         warningTypeNumber.sort((v1, v2) -> v1.get("warningType").toString().compareTo(v2.get("warningType").toString()));
-        List<Map> isDeal = earlyWarningDao.findIsDeal(earlyWarningDto,sum);
+        List<Map> isDeal = earlyWarningDao.findIsDeal(ids,sum);
         for (int i = 0; i < 3; i++) {
             if((i+"").equals(isDeal.get(0).get("deal").toString())){
                 Map map = new HashMap();
@@ -170,16 +158,16 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             dateType = "DATE_FORMAT(warning_time, '%Y')";
         }
         //报警数量统计
-        warningCount = earlyWarningDao.findWarningCountByDay(earlyWarningDto,dateType);
+        warningCount = earlyWarningDao.findWarningCountByDay(ids,dateType);
         for (int i = 0; i < warningCount.size(); i++) {
             Map map = warningCount.get(i);
             String date = map.get("day").toString();
-            Integer noDeal = earlyWarningDao.findNoDealCountByDay(date, earlyWarningDto,dateType);
+            Integer noDeal = earlyWarningDao.findNoDealCountByDay(date, ids,dateType);
             if(ToolUtil.isEmpty(noDeal)){
                 noDeal  = 0;
             }
             map.put("noDeal",noDeal);
-            Integer deal = earlyWarningDao.findDealCountByDay(date, earlyWarningDto,dateType);
+            Integer deal = earlyWarningDao.findDealCountByDay(date, ids,dateType);
             if(ToolUtil.isEmpty(deal)){
                 deal  = 0;
             }

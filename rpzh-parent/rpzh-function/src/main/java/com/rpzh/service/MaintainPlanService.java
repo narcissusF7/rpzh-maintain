@@ -61,6 +61,8 @@ public interface MaintainPlanService {
 
     MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId);
 
+    MaintainPlanVo findEndMaintainPlanDetails(Integer id);
+
     PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto);
 
     PageInfo<MaintainPlanVo> findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto);
