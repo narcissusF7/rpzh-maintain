@@ -1,9 +1,9 @@
 package com.rpzh.controller;
-
-
 import com.rpzh.dto.DataContrastDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
+import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.DataContrastService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
-
+import java.util.ArrayList;
+import java.util.List;
 /**
  * @Author: zyq
  * @Date: 2022/06/23/13:32
@@ -26,7 +27,6 @@ import javax.annotation.Resource;
 @RequestMapping("/maintain/dataContrast")
 @Api(value = "数据对比类", tags = "数据对比类", description = "数据对比类")
 public class DataContrastController {
-
     @Resource
     private DataContrastService dataContrastService;
     @PostMapping("/getNodeData")
@@ -55,5 +55,58 @@ public class DataContrastController {
     })
     public Result getNodeDateList(@ApiIgnore DataContrastDto dataContrastDto){
         return dataContrastService.getNodeDateList(dataContrastDto);
+    }
+
+    @PostMapping("/nodeTypeList")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "nodeType", value = "上一次所选的设备类型 01:氧气 02:包芯温度 03:环境温度 04:环境湿度 " +
+                    "05:垛内平均包芯温度 06:仓间平均氧气 07:仓间平均温度 08:仓间平均湿度", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "contrastType", value = "对比类型 01:设备 02:位置", required = false, dataType = "String")
+    })
+    public Result nodeTypeList(String nodeType,String contrastType){
+        if(ToolUtil.isEmpty(contrastType)){
+            return new Result(false, StatusCode.ERROR, "对比类型不能为空");
+        }
+        List<String> nodeTypes = new ArrayList<>();
+        if(ToolUtil.isEmpty(nodeType)){
+            switch (contrastType){
+                case "01":
+                    nodeTypes.add("无线氧气传感器");
+                    nodeTypes.add("无线包芯温度传感器");
+                    nodeTypes.add("无线温湿度传感器-温度");
+                    nodeTypes.add("无线温湿度传感器-湿度");
+                    break;
+                case "02":
+                    nodeTypes.add("垛内平均包芯温度");
+                    nodeTypes.add("仓间平均氧气");
+                    nodeTypes.add("仓间平均温度");
+                    nodeTypes.add("仓间平均湿度");
+                    break;
+            }
+            return new Result(true, StatusCode.OK, "设备类型成功",nodeTypes);
+        }
+        switch (contrastType){
+            case "01":
+                if("01".equals(nodeType) || "06".equals(nodeType)){
+                    nodeTypes.add("无线氧气传感器");
+                }else if("02".equals(nodeType) || "03".equals(nodeType) || "05".equals(nodeType) || "07".equals(nodeType)){
+                    nodeTypes.add("无线包芯温度传感器");
+                    nodeTypes.add("无线温湿度传感器-温度");
+                }else{
+                    nodeTypes.add("无线温湿度传感器-湿度");
+                }
+                break;
+            case "02":
+                if("01".equals(nodeType) || "06".equals(nodeType)){
+                    nodeTypes.add("仓间平均氧气");
+                }else if("02".equals(nodeType) || "03".equals(nodeType) || "05".equals(nodeType) || "07".equals(nodeType)){
+                    nodeTypes.add("仓间平均温度");
+                    nodeTypes.add("垛内平均包芯温度");
+                }else{
+                    nodeTypes.add("仓间平均温度");
+                }
+                break;
+        }
+        return new Result(true, StatusCode.OK, "设备类型成功",nodeTypes);
     }
 }

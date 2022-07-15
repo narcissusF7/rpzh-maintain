@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -372,5 +373,13 @@ public interface WarehouseDao {
 
     List<StackVo> findStackNotInMaintainPlan();
 
-    List<WarehouseVo> findAllWarehouses(@Param("warehouseIds")Set<Integer> warehouseIds);
+    List<WarehouseVo> findAllWarehouses(@Param("warehouseIds") Set<Integer> warehouseIds);
+
+    List<String> findWareAreaSiteRoute(@Param("siteRoute") String siteRoute);
+
+    List<String> findStackSiteRoute(@Param("siteRoute") String siteRoute);
+
+    List<Map<String,String>> findWareAreaInfos(@Param("areaIds") List<Integer> areaIds);
+
+    List<Map<String,String>> findStackInfos(@Param("stackIds") List<Integer> stackIds);
 }

@@ -528,12 +528,13 @@
         <if test="maintainCountDto.startTime!=null"> and t1.created_time >= #{maintainCountDto.startTime}</if>
         <if test="maintainCountDto.endTime!=null"> and t1.created_time &lt;= #{maintainCountDto.endTime}</if>
     </select>
-    <select id="findSite" resultType="com.rpzh.vo.MaintainCountVo">
+    <select id="findSite" resultType="java.lang.String">
         select  distinct
         concat('[00:0],[01:',t1.warehouse_id,'],[02:',t1.buliding_id,'],[03:',t1.floor_id,'],[04:',t1.area_id,'],[05:',t1.stack_id,']') as pidRoute,
         t2.site_name as stackName,t2.name_cn as nameCn
         from tb_maintain_count t1
         left join tb_stack t2 on t1.stack_id=t2.id
+        where material_code like concat('%',#{materialCode},'%')
     </select>
     <select id="findUsableStack" resultType="java.util.Map">
         SELECT

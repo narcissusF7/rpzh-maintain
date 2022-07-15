@@ -191,21 +191,23 @@ public interface NodeDao {
     List<NodeData> findNodeData(@Param("nodeId") String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 
     @DS("clickhouse")
-    List<NodeData> findData(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoute") String pidRoute, @Param("materialCode") String materialCode);
+    List<NodeData> findDataNode(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoutes") List<String> pidRoutes);
 
     @DS("clickhouse")
-    List<NodeData> findDataList(@Param("column") String column, @Param("gatherType") String gatherType, @Param("tableName") String tableName, @Param("startTime") Date startTime,
-                                @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("pidRoutes") List<String> pidRoutes);
-
-    @DS("clickhouse")
-    List<NodeData> findDataListByEnv(@Param("gatherType") String gatherType, @Param("startTime") Date startTime,
-                                     @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("coreIds") List<String> coreIds, @Param("pidRoutes") List<String> pidRoutes);
+    List<NodeData> findDataContrast(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoutes") List<String> pidRoutes);
 
     List<Map<String, String>> findEnterStack();
 
-    @DS("clickhouse")
-    List<NodeData> findOxygenList(@Param("column") String column, @Param("gatherType") String gatherType, @Param("tableName") String tableName, @Param("startTime") Date startTime,
-                                  @Param("endTime") Date endTime, @Param("nodeIds") List<String> nodeIds, @Param("pidRoutes") List<String> pidRoutes);
-
     List<NodeVo> findAirConditioner(MonitorCondition monitorCondition);
+
+    @DS("clickhouse")
+    List<NodeData> findDataOxygen(@Param("pidRoutes") List<String> pidRoutes);
+
+    @DS("clickhouse")
+    List<Map<String, Object>> findSelectedNode(@Param("nodeId") String nodeId, @Param("startTime") Date startTime, @Param("endTime") Date endTime,
+                                               @Param("gatherType") String gatherType, @Param("columnOne") String columnOne, @Param("tableColumn") String tableColumn);
+
+    @DS("clickhouse")
+    List<Map<String, Object>> findSelectedSiteRoute(@Param("siteRoute") String siteRoute, @Param("startTime") Date startTime, @Param("endTime") Date endTime,
+                                                    @Param("gatherType") String gatherType, @Param("columnOne") String columnOne, @Param("tableColumn") String tableColumn);
 }

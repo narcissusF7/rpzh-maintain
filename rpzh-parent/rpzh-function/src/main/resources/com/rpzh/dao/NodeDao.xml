@@ -374,6 +374,7 @@
         <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
         <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
         <if test="nodeData.warningType!=null and nodeData.warningType!=''">warning_type,</if>
+        <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
         createdTime
         ) values (
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
@@ -396,6 +397,7 @@
         <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
         <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
         <if test="nodeData.warningType!=null and nodeData.warningType!=''">#{nodeData.warningType},</if>
+        <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">#{nodeData.materialCode},</if>
         now()
         )
     </insert>
@@ -465,51 +467,35 @@
         select * from
             (select ${tableColumn},transfer_time as transferTime from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
     </select>
-    <select id="findData" resultType="com.rpzh.pojo.NodeData">
-        select ${column},node_id as nodeId,material_code as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
-        (select max(transfer_time),node_id from ${tableName} where 1=1
-        <if test="pidRoute!=null and pidRoute!=''">and pid_route like concat('%',#{pidRoute},'%') </if>
-        <if test="materialCode!=null and materialCode!=''">and material_code like concat('%',#{materialCode},'%')</if>
+    <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">
+        select oxygen,node_id as nodeId,material_code as materialCode,pid_route as pidRoute from tb_node_o2_history where (transfer_time,node_id) in
+        (select max(transfer_time),node_id from tb_node_o2_history where 1=1
+        <if test="pidRoutes!=null">and pid_route in
+            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+                #{pidRoute}
+            </foreach>
+        </if>
         group by node_id)
     </select>
-    <select id="findOxygenList" resultType="com.rpzh.pojo.NodeData">
-        select round(avg(${column}),1) as ${column},any(pid_route) as pidRoute,node_id as nodeId,${gatherType} transferTime from ${tableName} where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="nodeIds!=null">and node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">#{nodeId}</foreach></if>
-        group by node_id,transferTime union all
-        select round(avg(${column}),1) as ${column},pid_route as pidRoute,null as nodeId,${gatherType} transferTime from  ${tableName} where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,transferTime
+    <select id="findDataNode" resultType="com.rpzh.pojo.NodeData">
+        select ${column},node_id as nodeId,material_code as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
+        (select max(transfer_time),node_id from ${tableName} where site_type = '05'
+        <if test="pidRoutes!=null">and pid_route in
+            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+                #{pidRoute}
+            </foreach>
+        </if>
+        group by node_id)
     </select>
-    <select id="findDataList" resultType="com.rpzh.pojo.NodeData">
-        select round(avg(${column}),1) as ${column},any(pid_route) as pidRoute,node_id as nodeId,${gatherType} transferTime from ${tableName} where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="nodeIds!=null">and node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">#{nodeId}</foreach></if>
-        group by node_id,transferTime union all
-        select round(avg(a.temp),1) as temp,pidRoute,null as nodeId,a.transferTime from (
-        select round(avg(${column}),1) as ${column},pid_route as pidRoute,${gatherType} transferTime from  ${tableName} where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,transferTime union all
-        select round(avg(${column}),1) as ${column},pid_route as pidRoute,${gatherType} transferTime from  tb_air_conditioner_history where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,transferTime) a group by pidRoute,transferTime
-    </select>
-    <select id="findDataListByEnv" resultType="com.rpzh.pojo.NodeData">
-        select round(avg(temp),1) as temp,any(pid_route) as pidRoute,node_id AS nodeId,${gatherType} as transferTime from tb_node_env_history_test where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="nodeIds!=null">and node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">#{nodeId}</foreach></if>
-        group by node_id,transferTime union all
-        select round(avg(temp),1) as temp,any(pid_route) as pidRoute,node_id AS nodeId,${gatherType} as transferTime from tb_node_temp_core_chip_history where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="coreIds!=null">and node_id in <foreach collection="coreIds" item="nodeId" open="(" separator="," close=")">#{nodeId}</foreach></if>
-        group by node_id,transferTime union all
-        select round(avg(a.temp),1) as temp,pidRoute,null as nodeId,a.transferTime from
-        (select avg(temp) as temp, ${gatherType} transferTime,pid_route as pidRoute from tb_node_env_history_test where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,stack_id,transferTime union all
-        select avg(temp) as temp,${gatherType} transferTime,pid_route as pidRoute from tb_air_conditioner_history where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,transferTime union all
-        select avg(temp) as temp,${gatherType} transferTime,pid_route as pidRoute from  tb_node_temp_core_chip_history where
-        transfer_time>=#{startTime} and transfer_time &lt;= #{endTime} <if test="pidRoutes!=null and pidRoutes != ''">and pid_route in <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">#{pidRoute}</foreach></if>
-        group by pid_route,transferTime
-        ) a group by pidRoute,transferTime
+    <select id="findDataContrast" resultType="com.rpzh.pojo.NodeData">
+        select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
+        (select max(transfer_time),node_id from ${tableName} where site_type = '04'
+        <if test="pidRoutes!=null">and pid_route in
+            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+                #{pidRoute}
+            </foreach>
+        </if>
+        group by node_id) group by pid_route
     </select>
     <select id="findAirConditioner" resultType="com.rpzh.vo.NodeVo">
         SELECT
@@ -523,5 +509,18 @@
             </if>
         </where>
         order by pidRoute
+    </select>
+
+    <select id="findSelectedNode" resultType="java.util.Map">
+        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where node_id = #{nodeId}
+        <if test="startTime !=null">and transfer_time >= #{startTime}</if>
+        <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
+        group by dayTime
+    </select>
+    <select id="findSelectedSiteRoute" resultType="java.util.Map">
+        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where pid_route = #{siteRoute}
+        <if test="startTime !=null">and transfer_time >= #{startTime}</if>
+        <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
+        group by dayTime
     </select>
 </mapper>

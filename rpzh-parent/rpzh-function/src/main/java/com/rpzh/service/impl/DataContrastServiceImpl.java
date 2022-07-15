@@ -1,9 +1,8 @@
 package com.rpzh.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.DataContrastDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
@@ -12,10 +11,7 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.DataContrastService;
 import com.rpzh.util.GetBetweenDayUtils;
-import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.DataContrastVo;
-import com.rpzh.vo.DataVo;
-import com.rpzh.vo.MaintainCountVo;
+import com.rpzh.util.SiteRouteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,380 +27,269 @@ import java.util.stream.Collectors;
  * @Description: 功能
  */
 @Service
-@Slf4j
 public class DataContrastServiceImpl implements DataContrastService {
-    public static String MAINTAIN ="MAINTAIN_NODE_TYPE_";
-    @Resource
-    private RedisTemplate redisTemplate;
 
     @Resource
     private MaintainPlanDao maintainPlanDao;
     @Resource
     private NodeDao nodeDao;
 
+    @Resource
+    private WarehouseDao warehouseDao;
+
     @Override
     public Result getNodeData(NodeDto nodeDto) {
+        //获取设备类型
         String nodeType = nodeDto.getNodeType();
+        //获取对比类型
         String contrastType = nodeDto.getContrastType();
         if(StringUtil.isEmpty(nodeType) || StringUtil.isEmpty(contrastType)){
             return new Result(false, StatusCode.ERROR, "设备类型或对比类型不能为空!");
         }
-        String username = TokenDecode.getUserInfo().get("username");
-        Integer flag = nodeDto.getFlag();
-        Object o = redisTemplate.opsForValue().get(MAINTAIN+username);
-        //被重置过
-        if(flag==0){
-            if(ToolUtil.isNotEmpty(o)) {
-                // 把redis中的之前的设备类型值删除
-                redisTemplate.delete(MAINTAIN+username);
-            }
-            // 往redis中存入本次的设备类型值
-            redisTemplate.opsForValue().set(MAINTAIN+username, nodeType);
-        }
-        //未被重置   判断本次的设备类型与上一次的设备类型是否相同
-        if(flag==1){
-            String type = o.toString();
-            // 01:氧气 02:包芯温度 03:环境温度 04:环境湿度
-            boolean o2Flag = nodeType.equals("01") && !type.equals("01");
-            boolean tempFlag = (nodeType.equals("02") || nodeType.equals("03")) && (type.equals("01") || type.equals("04"));
-            boolean moistureFlag = nodeType.equals("04") && !type.equals("04");
-            if (o2Flag || tempFlag || moistureFlag) {
-                return new Result(false, StatusCode.ERROR, "设备类型与之前选择的不同!",1);
-            }
-        }
+        //位置id
         Integer stackId = nodeDto.getStackId();
+        //位置路由
         String siteRoute = nodeDto.getSiteRoute();
         if(StringUtil.isNotEmpty(siteRoute)) {
-            siteRoute = siteRoute + ",[0" + siteRoute.split(",").length + ":" + stackId + "]";
+            //当前路径拼接
+            siteRoute = SiteRouteUtil.route(siteRoute,stackId+"");
         }
+        //获取物料等级
         String materialCode = nodeDto.getMaterialCode();
         String nodeName = "";
-        List<MaintainCountVo> maintainCountVos = maintainPlanDao.findSite(materialCode);
-        Map<String,String> map = new HashMap<>();
-        if(maintainCountVos.size()>0) {
-            //垛位位置
-            maintainCountVos.forEach(maintainCountVo -> {
-                map.put(maintainCountVo.getPidRoute()+"_name", maintainCountVo.getStackName());
-                //物料代码为空  仓间位置
-                if(StringUtil.isEmpty(materialCode)) {
-                    map.put(maintainCountVo.getPidRoute().split(",\\[05")[0]+"_name", maintainCountVo.getStackName().replace(maintainCountVo.getNameCn(),""));
-                }
-            });
+        //满足条件的所有位置路由
+        List<String> siteRoutes = null;
+        //物料代码不为空
+        if(ToolUtil.isNotEmpty(materialCode)) {
+            //根据物料代码查询位置路由
+            siteRoutes = maintainPlanDao.findSite(materialCode);
         }
-        List<NodeData> data = new ArrayList<>();
-        //01:氧气传感器,02:包芯温度传感器,03:温湿度传感器-温度,温湿度传感器-湿度
-        switch (nodeType){
-            case "01":
-                nodeName = "氧气设备";
-                data = nodeDao.findData("tb_node_o2_history", "oxygen", siteRoute,materialCode);
-                break;
-            case "02":
-                nodeName = "包芯温度";
-                data = nodeDao.findData("tb_node_temp_core_chip_history", "temp", siteRoute,materialCode);
-                break;
-            case "03":
-                nodeName = "环境温度";
-                data = nodeDao.findData("tb_node_env_history_test", "temp", siteRoute,materialCode);
-                if(StringUtil.isEmpty(materialCode)) {
-                    List<NodeData> airData1 = nodeDao.findData("tb_air_conditioner_history", "temp", siteRoute, materialCode);
-                    for (NodeData airData : airData1) {
-                        data.add(airData);
-                    }
-                }
-                break;
-            case "04":
-                nodeName = "环境湿度";
-                data = nodeDao.findData("tb_node_env_history_test", "humiture", siteRoute,materialCode);
-                if(StringUtil.isEmpty(materialCode)) {
-                    List<NodeData> airData2 = nodeDao.findData("tb_air_conditioner_history", "humiture", siteRoute, materialCode);
-                    for (NodeData airData : airData2) {
-                        data.add(airData);
-                    }
-                }
-                break;
-        }
-        data.sort((v1, v2) -> v1.getPidRoute().compareTo(v2.getPidRoute()));
-        //对比的类型:1:设备   2:位置
-        if("1".equals(contrastType)){
-            String name = nodeName;
-            data.forEach(d ->{
-                d.setSiteName(map.get(d.getPidRoute()+"_name"));
-                d.setNodeName(name);
-                d.setType(nodeType);
-            });
-        }
-        if("2".equals(contrastType)){
-            List<NodeData> nodeInfo = new ArrayList<>();
-            int index = 0;
-            nodeInfo.add(getNodeData(nodeType, data.get(0),map));
-            for (int i = 1; i < data.size(); i++) {
-                if(data.get(i-1).getPidRoute().equals(data.get(i).getPidRoute())){
-                    nodeInfo.get(index).setOxygen(nodeInfo.get(index).getOxygen()+data.get(i).getOxygen());
-                    nodeInfo.get(index).setTemp(nodeInfo.get(index).getTemp()+data.get(i).getTemp());
-                    nodeInfo.get(index).setHumiture(nodeInfo.get(index).getHumiture()+data.get(i).getHumiture());
-                    nodeInfo.get(index).setCount(nodeInfo.get(index).getCount()+1);
-                }
-                if(!data.get(i-1).getPidRoute().equals(data.get(i).getPidRoute())){
-                    nodeInfo.add(getNodeData(nodeType, data.get(i),map));
-                    index++;
+        //前端传入的位置路由和满足条件的所有位置路由都不为空
+        if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteRoutes)) {
+            int size = siteRoutes.size();
+            for (int i = 0; i < size; i++) {
+                //满足条件的所有位置路由不包含前端传入的位置路由
+                if (!siteRoutes.get(i).contains(siteRoute)){
+                    siteRoutes.remove(i);
+                    size--;
                 }
             }
-            nodeInfo.forEach(nodeData -> {
-                nodeData.setType(nodeType);
-                nodeData.setOxygen(Double.parseDouble(String.format("%.1f",nodeData.getOxygen()/nodeData.getCount())));
-                nodeData.setTemp(Double.parseDouble(String.format("%.1f",nodeData.getTemp()/nodeData.getCount())));
-                nodeData.setHumiture(Double.parseDouble(String.format("%.1f",nodeData.getHumiture()/nodeData.getCount())));
-            });
-            data = nodeInfo;
         }
-        return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",data);
-    }
+        //前端传入的位置路由不为空,满足条件的所有位置路由为空
+        if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isEmpty(siteRoutes)) {
+            int size = siteRoute.split(",").length;
+            if(size<5){
+                siteRoutes.addAll(warehouseDao.findWareAreaSiteRoute(siteRoute));
+                siteRoutes.addAll(warehouseDao.findStackSiteRoute(siteRoute));
+            }else if(size==5){
+                siteRoutes.addAll(warehouseDao.findStackSiteRoute(siteRoute));
+            }else if(size==6){
+                siteRoutes.add(siteRoute);
+            }
+        }
+        List<NodeData> data = new ArrayList<>();
+        if("01".equals(nodeType) && "01".equals(contrastType)){
+            nodeName = "氧气设备";
+            data = nodeDao.findDataOxygen(siteRoutes);
+        }else if("02".equals(nodeType) && "01".equals(contrastType)){
+            nodeName = "垛内包芯温度设备";
+            data = nodeDao.findDataNode("tb_node_temp_core_chip_history", "temp", siteRoutes);
+        }else if("03".equals(nodeType) && "01".equals(contrastType)){
+            nodeName = "垛内环境温湿度设备-温度";
+            data = nodeDao.findDataNode("tb_node_env_history", "temp", siteRoutes);
+        }else if("04".equals(nodeType) && "01".equals(contrastType)){
+            nodeName = "垛内环境温湿度设备-湿度";
+            data = nodeDao.findDataNode("tb_node_env_history", "humiture", siteRoutes);
+        }else if("05".equals(nodeType) && "02".equals(contrastType)) {
+            nodeName = "垛内平均包芯温度";
+            data = nodeDao.findDataContrast("tb_node_temp_core_chip_history", "avg(temp) as temp", siteRoutes);
+        } else if("06".equals(nodeType) && "02".equals(contrastType)) {
+            nodeName = "仓间平均氧气";
+            data = nodeDao.findDataContrast("tb_node_o2_history", "avg(oxygen) as oxygen", siteRoutes);
+        }else if("07".equals(nodeType) && "02".equals(contrastType)) {
+            nodeName = "仓间平均温度";
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(temp) as temp", siteRoutes);
+        }else if("08".equals(nodeType) && "02".equals(contrastType)) {
+            nodeName = "仓间平均湿度";
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(humiture) as humiture", siteRoutes);
+        }else {
+            return new Result(false, StatusCode.ERROR, "设备类型出错了!");
+        }
 
-    public NodeData getNodeData(String nodeType,NodeData nodeData,Map<String,String> map){
-        int length = nodeData.getPidRoute().split(",").length;
-        String nodeName = "";
-        if(length==5){
-            nodeName = "仓间平均";
-        }else{
-            nodeName = "垛位平均";
+        if(ToolUtil.isEmpty(data)){
+            return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",new HashMap<>());
         }
-        nodeData.setNodeId(null);
-        switch (nodeType){
-            case "01":
-                nodeData.setNodeName(nodeName + "氧气含量");
-                break;
-            case "02":
-                nodeData.setNodeName(nodeName +"包芯温度");
-                break;
-            case "03":
-                nodeData.setNodeName(nodeName +"环境温度");
-                break;
-            case "04":
-                nodeData.setNodeName(nodeName +"环境湿度");
-                break;
+        List<Integer> areaIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==5).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("04:")[1].split("]")[0])).distinct().collect(Collectors.toList());
+        Map<String, String> mapInfos = new HashMap<>();
+        if(ToolUtil.isNotEmpty(areaIds)) {
+            warehouseDao.findWareAreaInfos(areaIds).forEach(wareAreaInfo -> {
+                mapInfos.put(wareAreaInfo.get("siteRoute"), wareAreaInfo.get("siteName") + "--" + "04");
+            });
         }
-        nodeData.setSiteName(map.get(nodeData.getPidRoute()+"_name"));
-        nodeData.setCount(1d);
-        return nodeData;
+        List<Integer> stackIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==6).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("05:")[1].split("]")[0])).distinct().collect(Collectors.toList());
+        if(ToolUtil.isNotEmpty(stackIds)) {
+            warehouseDao.findStackInfos(stackIds).forEach(stackInfo -> {
+                mapInfos.put(stackInfo.get("siteRoute"), stackInfo.get("siteName") + "--" + "05");
+            });
+        }
+        String node = nodeName;
+        data.forEach(dataInfo -> {
+            String[] mapVo = mapInfos.get(dataInfo.getPidRoute()).split("--");
+            dataInfo.setSiteName(mapVo[0]);
+            if("01".equals(nodeType) && "04".equals(mapVo[1])){
+                dataInfo.setNodeName("仓间"+node);
+            }else if("01".equals(nodeType) && "05".equals(mapVo[1])){
+                dataInfo.setNodeName("垛内"+node);
+            }else{
+                dataInfo.setNodeName(node);
+            }
+        });
+        return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",data);
     }
 
     @Override
     public Result getNodeDateList(DataContrastDto dataContrastDto) {
-        //TODO   优化
-        String nodeDataInfos = dataContrastDto.getNodeDatas();
-        List<NodeData> nodeDataDtos = JSON.parseArray(nodeDataInfos, NodeData.class);
-        if(nodeDataDtos.size()>64){
-            return new Result(false, StatusCode.ERROR, "所选设备超过64个!");
+        String siteRoute = dataContrastDto.getSiteRoute();
+        String nodeType = dataContrastDto.getNodeType();
+        String nodeId = dataContrastDto.getNodeId();
+        String siteName = dataContrastDto.getSiteName();
+        if(ToolUtil.isEmpty(siteName) || ToolUtil.isEmpty(siteRoute) || ToolUtil.isEmpty(nodeType)){
+            return new Result(false, StatusCode.ERROR, "设备类型或位置不能为空!");
         }
+        //时间类型
+        String gatherType= dataContrastDto.getGatherType();
+        //采集的开始时间startTime、结束时间endTime
         Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
         dataContrastDto.setStartTime(setTime.get("startTime"));
         dataContrastDto.setEndTime(setTime.get("endTime"));
-        Map<String,String> keyInfo = new HashMap<>();
-        nodeDataDtos.forEach(dtos -> {
-            String nodeId = dtos.getNodeId();
-            if(StringUtil.isNotEmpty(nodeId)){
-                nodeId = nodeId + "、";
-            }
-            keyInfo.put(dtos.getNodeId()+ "-" + dtos.getPidRoute(),nodeId + dtos.getSiteName() + "、" + dtos.getNodeName());
-        });
-        //采集的开始时间、结束时间startTime endTime
-        //对比的开始时间、结束时beginTime finishTime
-        Date startTime = dataContrastDto.getStartTime();
-        Date endTime = dataContrastDto.getEndTime();
-        //对比的开始时间
-        Date beginTime = dataContrastDto.getBeginTime();
-        Date finishTime = dataContrastDto.getFinishTime();
-        String gatherType= dataContrastDto.getGatherType();
-        Calendar startCalendar = Calendar.getInstance();
-        startCalendar.setTime(startTime);
-        Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTime(endTime);
-        SimpleDateFormat simpleDateFormat;
-        int year = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-        int month = year * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-        long day = ((endTime.getTime() - startTime.getTime()) / (1000*3600*24));
-        Calendar beginCalendar = Calendar.getInstance();
-        Calendar finishCalendar = Calendar.getInstance();
-        int yearContrast = 0;
-        int monthContrast = 0;
-        long  dayContrast = 0;
-        int flag=0;
-        if(ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)){
-            beginCalendar.setTime(beginTime);
-            finishCalendar.setTime(finishTime);
-            yearContrast = finishCalendar.get(Calendar.YEAR) - beginCalendar.get(Calendar.YEAR);
-            monthContrast = year * 12 + finishCalendar.get(Calendar.MONTH) - beginCalendar.get(Calendar.MONTH);
-            dayContrast = ((finishTime.getTime() - beginTime.getTime()) / (1000*3600*24));
-            flag=1;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String startTime = sdf.format(dataContrastDto.getStartTime());
+        String endTime = sdf.format(dataContrastDto.getEndTime());
+        String beginTime = null;
+        String finishTime = null;
+        if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+            beginTime = sdf.format(dataContrastDto.getBeginTime());
+            finishTime = sdf.format(dataContrastDto.getFinishTime());
         }
-        List<DataContrastVo> days = new ArrayList<>();
-        List<DataContrastVo> daysContrast = new ArrayList<>();
+        List<String> timeDays = new ArrayList<>();
+        List<String> contrastDays = new ArrayList<>();
         switch (gatherType){
             case "1":
-                gatherType = "formatDateTime(transfer_time,'%m月%d日')";
-                simpleDateFormat = new SimpleDateFormat("MM月dd日");
-                for (long i = 0;i<=day;i++){
-                    String format = simpleDateFormat.format(new Date(startTime.getTime() + i * 1000 * 60 * 60 * 24));
-                    DataContrastVo dataContrastVo = new DataContrastVo(format);
-                    days.add(dataContrastVo);
-                }
-                if(flag==1){
-                    for (long i = 0;i<=dayContrast;i++){
-                        String format = simpleDateFormat.format(new Date(beginTime.getTime() + i * 1000 * 60 * 60 * 24));
-                        DataContrastVo dataContrastVo = new DataContrastVo(format);
-                        daysContrast.add(dataContrastVo);
-                    }
+                gatherType = "formatDateTime(transfer_time,'%Y-%m-%d')";
+                timeDays = GetBetweenDayUtils.getBetweenDays(startTime, endTime);
+                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
+                    contrastDays = GetBetweenDayUtils.getBetweenDays(beginTime, finishTime);
                 }
                 break;
             case "2":
                 gatherType = "toMonday(transfer_time)";
-                simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                startCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                endCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                int l = endCalendar.get(Calendar.WEEK_OF_YEAR) - startCalendar.get(Calendar.WEEK_OF_YEAR);
-                for (int i = 0;i<=l;i++){
-                    String format = simpleDateFormat.format(startCalendar.getTime());
-                    DataContrastVo dataContrastVo = new DataContrastVo(format);
-                    days.add(dataContrastVo);
-                    startCalendar.add(Calendar.DATE,7);
-                }
-                if(flag==1){
-                    beginCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                    finishCalendar.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-                    int k = finishCalendar.get(Calendar.WEEK_OF_YEAR) - beginCalendar.get(Calendar.WEEK_OF_YEAR);
-                    for (int i = 0;i<=k;i++){
-                        String format = simpleDateFormat.format(beginCalendar.getTime());
-                        DataContrastVo dataContrastVo = new DataContrastVo(format);
-                        daysContrast.add(dataContrastVo);
-                        beginCalendar.add(Calendar.DATE,7);
-                    }
+                timeDays = GetBetweenDayUtils.getBetweenWeek(startTime, endTime);
+                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
+                    contrastDays = GetBetweenDayUtils.getBetweenWeek(beginTime, finishTime);
                 }
                 break;
             case "3":
-                gatherType = "formatDateTime(transfer_time,'%Y年%m月')";
-                simpleDateFormat = new SimpleDateFormat("yyyy年MM月");
-                for (long i = 0;i<=month;i++){
-                    String format = simpleDateFormat.format(startCalendar.getTime());
-                    DataContrastVo dataContrastVo = new DataContrastVo(format);
-                    days.add(dataContrastVo);
-                    startCalendar.add(Calendar.MONTH,1);
-                }
-                if(flag==1){
-                    for (long i = 0;i<=monthContrast;i++){
-                        String format = simpleDateFormat.format(beginCalendar.getTime());
-                        DataContrastVo dataContrastVo = new DataContrastVo(format);
-                        daysContrast.add(dataContrastVo);
-                        beginCalendar.add(Calendar.MONTH,1);
-                    }
+                gatherType = "formatDateTime(transfer_time,'%Y-%m')";
+                timeDays = GetBetweenDayUtils.getMonthBetweenDate(startTime, endTime);
+                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
+                    contrastDays = GetBetweenDayUtils.getMonthBetweenDate(beginTime, finishTime);
                 }
                 break;
             case "4":
-                gatherType = "formatDateTime(transfer_time,'%Y年')";
-                simpleDateFormat = new SimpleDateFormat("yyyy年");
-                for (long i = 0;i<=year;i++){
-                    String format = simpleDateFormat.format(startCalendar.getTime());
-                    DataContrastVo dataContrastVo = new DataContrastVo(format);
-                    days.add(dataContrastVo);
-                    startCalendar.add(Calendar.YEAR,1);
-                }
-                if(flag==1){
-                    for (long i = 0;i<=yearContrast;i++){
-                        String format = simpleDateFormat.format(beginCalendar.getTime());
-                        DataContrastVo dataContrastVo = new DataContrastVo(format);
-                        daysContrast.add(dataContrastVo);
-                        beginCalendar.add(Calendar.YEAR,1);
-                    }
+                gatherType = "formatDateTime(transfer_time,'%Y')";
+                timeDays = GetBetweenDayUtils.getYearBetweenDate(startTime, endTime);
+                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
+                    contrastDays = GetBetweenDayUtils.getYearBetweenDate(beginTime, finishTime);
                 }
                 break;
         }
-        log.info("days{}",days);
-        log.info("daysContrast{}",daysContrast);
-        String username = TokenDecode.getUserInfo().get("username");
-        redisTemplate.opsForValue().set(username+"_days",JSON.toJSONString(days));
-        redisTemplate.opsForValue().set(username+"_daysContrast",JSON.toJSONString(daysContrast));
-        //获取所选的位置设备所有的位置路由
-        List<String> pidRoutes=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isEmpty(nodeData.getNodeId())).map(NodeData::getPidRoute).collect(Collectors.toList());
-        long count = nodeDataDtos.stream().map(NodeData::getType).distinct().count();
-        List<NodeData> gatherListByEnv = new ArrayList<>();
-        List<NodeData> contrastListByEnv = new ArrayList<>();
-        List<DataVo> dataVos = new ArrayList<>();
-        //所选设备中包含包芯温度和环境温度
-        if(count!=1){
-            List<String> core=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("02")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-            List<String> env=nodeDataDtos.stream().filter((NodeData nodeData)->nodeData.getType().equals("03")).map(NodeData::getNodeId).filter(Objects::nonNull).distinct().collect(Collectors.toList());
-            gatherListByEnv = nodeDao.findDataListByEnv(gatherType, startTime, endTime, env,core, pidRoutes);
-            if(flag==1) {
-                contrastListByEnv = nodeDao.findDataListByEnv(gatherType, beginTime, finishTime, env, core, pidRoutes);
+        String nodeName = "";
+        List<Map<String,Object>> data = new ArrayList<>();
+        List<Map<String,Object>> contrastData = new ArrayList<>();
+        if("01".equals(nodeType)){
+            if(siteRoute.split(",").length==5) {
+                nodeName = "仓间氧气设备";
+            }else{
+                nodeName = "垛内氧气设备";
+            }
+            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"oxygen","tb_node_o2_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"oxygen","tb_node_o2_history");
+            }
+        }else if("02".equals(nodeType)){
+            nodeName = "垛内包芯温度设备";
+            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_temp_core_chip_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_temp_core_chip_history");
+            }
+        }else if("03".equals(nodeType)){
+            nodeName = "垛内环境温湿度设备-温度";
+            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_env_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_env_history");
+            }
+        }else if("04".equals(nodeType)){
+            nodeName = "垛内环境温湿度设备-湿度";
+            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"humiture","tb_node_env_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"humiture","tb_node_env_history");
+            }
+        }else if("05".equals(nodeType)) {
+            nodeName = "垛内平均包芯温度";
+            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_temp_core_chip_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_temp_core_chip_history");
+            }
+        } else if("06".equals(nodeType)) {
+            nodeName = "仓间平均氧气";
+            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"oxygen","tb_node_o2_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"oxygen","tb_node_o2_history");
+            }
+        }else if("07".equals(nodeType)) {
+            nodeName = "仓间平均温度";
+            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_env_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_env_history");
+            }
+        }else{
+            nodeName = "仓间平均湿度";
+            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"humiture","tb_node_env_history");
+            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"humiture","tb_node_env_history");
             }
         }
-        //所选设备中只包含一种设备
-        if(count==1){
-            List<String> node=nodeDataDtos.stream().filter((NodeData nodeData)->StringUtil.isNotEmpty(nodeData.getNodeId())).map(NodeData::getNodeId).distinct().collect(Collectors.toList());
-            String type = nodeDataDtos.get(0).getType();
-            if("01".equals(type)){
-                gatherListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", startTime, endTime, node, pidRoutes);
-                if(flag==1) {
-                    contrastListByEnv = nodeDao.findOxygenList("oxygen",gatherType,"tb_node_o2_history", beginTime, finishTime,node, pidRoutes);
-                }
-            }else if("02".equals(type)){
-                gatherListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", startTime, endTime, node, pidRoutes);
-                if(flag==1) {
-                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
-                }
-            }else if("03".equals(type)){
-                gatherListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
-                if(flag==1) {
-                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
-                }
-            }else{
-                gatherListByEnv = nodeDao.findOxygenList("humiture",gatherType,"tb_node_env_history_test", startTime, endTime, node, pidRoutes);
-                if(flag==1) {
-                    contrastListByEnv = nodeDao.findOxygenList("temp",gatherType,"tb_node_temp_core_chip_history", beginTime, finishTime, node, pidRoutes);
-                }
+        if(!"".equals(nodeId)){
+            nodeId = nodeId + "、";
+        }
+        nodeName = nodeId + siteName + "、" + nodeName;
+        List<String> days = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
+        for (String timeDay : timeDays) {
+            if(!days.contains(timeDay)){
+                Map<String,Object> map = new HashMap<>();
+                map.put("dayTime",timeDay);
+                map.put("data",0);
+                data.add(map);
             }
         }
-        List<String> nodeNames = new ArrayList<>();
-        contrastListByEnv.forEach(data->{
-            DataContrastVo dataContrastVo = new DataContrastVo(data.getTransferTime());
-            String nodeName = keyInfo.get(data.getNodeId()  + "-" + data.getPidRoute());
-            if(!nodeNames.contains(nodeName)){
-                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_daysContrast").toString(), DataContrastVo.class);
-                int i = dayData.indexOf(dataContrastVo);
-                dataContrastVo.setNode(data.getTemp());
-                dayData.set(i,dataContrastVo);
-                DataVo dataVo = new DataVo(nodeName,dayData);
-                dataVos.add(dataVo);
-                nodeNames.add(nodeName);
-            }else{
-                int i = nodeNames.indexOf(nodeName);
-                List<DataContrastVo> dataContrastVos = dataVos.get(i).getDataContrastVos();
-                int index = dataContrastVos.indexOf(dataContrastVo);
-                dataContrastVos.get(index).setNode(data.getTemp());
+        data.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
+        Map<String,Object> mapInfo = new HashMap<>();
+        mapInfo.put("data",data);
+        mapInfo.put("nodeName",nodeName);
+        if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
+            List<String> contrastDates = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
+            for (String contrastDay : contrastDays) {
+                if(!contrastDays.contains(contrastDay)){
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("dayTime",contrastDay);
+                    map.put("data",0);
+                    contrastData.add(map);
+                }
             }
-        });
-        Map<String,List<DataVo>> k = new HashMap<>();
-        k.put("contrastListByEnv",dataVos);
-        List<DataVo> dataVos1 = new ArrayList<>();
-        List<String> nodeNames1 = new ArrayList<>();
-        gatherListByEnv.forEach(data->{
-            DataContrastVo dataContrastVo = new DataContrastVo(data.getTransferTime());
-            String nodeName = keyInfo.get(data.getNodeId()  + "-" + data.getPidRoute());
-            if(!nodeNames1.contains(nodeName)){
-                List<DataContrastVo> dayData = JSONArray.parseArray(redisTemplate.opsForValue().get(username+"_days").toString(), DataContrastVo.class);
-                int i = dayData.indexOf(dataContrastVo);
-                dataContrastVo.setNode(data.getTemp());
-                dayData.set(i,dataContrastVo);
-                DataVo dataVo = new DataVo(nodeName,dayData);
-                dataVos1.add(dataVo);
-                nodeNames1.add(nodeName);
-            }else{
-                int i = nodeNames1.indexOf(nodeName);
-                List<DataContrastVo> dataContrastVos = dataVos1.get(i).getDataContrastVos();
-                int index = dataContrastVos.indexOf(dataContrastVo);
-                dataContrastVos.get(index).setNode(data.getTemp());
-            }
-        });
-        k.put("gatherListByEnv",dataVos1);
-        return new Result<>(true, StatusCode.OK, "数据对比成功!",k);
+            contrastData.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
+            mapInfo.put("contrastData",contrastData);
+        }
+
+        return new Result<>(true, StatusCode.OK, "数据对比成功!",mapInfo);
     }
 }
