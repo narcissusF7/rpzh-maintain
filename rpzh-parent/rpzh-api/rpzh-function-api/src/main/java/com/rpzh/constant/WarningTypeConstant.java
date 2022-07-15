@@ -6,7 +6,7 @@ import javax.xml.soap.Node;
 
 public class WarningTypeConstant {
     //预警类型:  01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,
-    // 07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警
+    // 07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警
     public static String NODE_LOW_BATTERY_BREAKDOWN ="01";
     public static String NODE_SIGNAL_STRENGTH_BREAKDOWN ="02";
     public static String NODE_PACKET_LOSS_BREAKDOWN ="03";

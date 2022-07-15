@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.TaskManagementDao;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.TaskDto;
@@ -53,6 +54,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
     @Resource
     private WarehouseDao warehouseDao;
+
+    @Resource
+    private EarlyWarningDao earlyWarningDao;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -241,12 +245,24 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         taskDto.setFinishTime(nowTime);
         //获取处理结果
         String dealResult = taskDto.getDealResult();
+        String affirm = "";
         //如果处理结果为空,状态为处理中
         if (ToolUtil.isEmpty(dealResult)) {
             taskDto.setStatus("3");
+            //设置预警表中的处理状态为正在处理
+            affirm = "1";
         } else {
             //设置任务状态为完成
             taskDto.setStatus("1");
+            //设置预警表中的处理状态为已处理
+            affirm = "0";
+        }
+        TaskVo taskDetail = taskManagementDao.findTaskDetail(Long.parseLong(taskDto.getId()));
+        String type = taskDetail.getType();
+        String siteRoute = taskDetail.getSiteRoute();
+        String principal = taskDetail.getPrincipal();
+        if(!"01,02,03".contains(type)){
+            earlyWarningDao.updateTackId(affirm,type,siteRoute,Integer.parseInt(taskDto.getId()),principal);
         }
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;
