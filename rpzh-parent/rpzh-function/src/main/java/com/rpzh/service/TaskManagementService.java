@@ -148,4 +148,11 @@ public interface TaskManagementService {
      * @return
      */
     List<Map> taskAvlFinishTime(TaskDto taskDto);
+
+    /**
+     * 查询垛位下所有的虫情板
+     * @param siteRoute
+     * @return
+     */
+    List<String> findPestBoardByRoute(String siteRoute);
 }

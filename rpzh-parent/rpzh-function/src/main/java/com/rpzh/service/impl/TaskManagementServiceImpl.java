@@ -871,6 +871,19 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     }
 
     /**
+     * 查询垛位下所有的虫情板
+     *
+     * @param siteRoute
+     * @return
+     */
+    @Override
+    public List<String> findPestBoardByRoute(String siteRoute) {
+        //获取路径下所有的虫情板
+        List<String> pestBoardList = taskManagementDao.findPestBoard(siteRoute);
+        return pestBoardList;
+    }
+
+    /**
      * 获取两个日期之间的所有日期 (年月日)
      *
      * @param startTime 开始时间

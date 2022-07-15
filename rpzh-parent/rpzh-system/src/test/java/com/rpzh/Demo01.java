@@ -1,5 +1,8 @@
 package com.rpzh;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -10,19 +13,16 @@ import java.util.*;
  * @Description: good good study,day day up
  */
 public class Demo01 {
-    public static void main(String[] args) {
-        List<Map> list = new ArrayList<>();
-        Map map = new HashMap();
-        map.put("day","2020-2");
-        list.add(map);
-        Map map1 = new HashMap();
-        map1.put("day","2020-3");
-        list.add(map1);
-        System.out.println(list);
-        for (Map map2 : list) {
-            map2.put("sum",0);
-        }
-        System.out.println(list);
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+
+
+    public void main(String[] args) {
+
+
+
+
     }
     /**
      * 获取两个日期之间的所有月份 (年月)
@@ -56,11 +56,5 @@ public class Demo01 {
             e.printStackTrace();
         }
         return list;
-    }
-}
-class MyComparator implements Comparator<String> {
-    @Override
-    public int compare(String o1, String o2) {
-        return o2.compareTo(o1);//降序排列
     }
 }

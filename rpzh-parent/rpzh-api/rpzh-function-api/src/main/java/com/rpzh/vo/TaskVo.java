@@ -28,6 +28,9 @@ public class TaskVo {
     @ApiModelProperty(notes = "任务类型,01:虫情巡查,02:虫情杀虫,03:仓库检查,04:仓间温度预警,05:垛内温度预警,06:垛内湿度预警,07:翻垛任务,08:移垛任务")
     private String type;
 
+    @ApiModelProperty(notes = "位置路径")
+    private String siteRoute;
+
     //发起时间
     @ApiModelProperty(notes = "发起时间,创建时间")
     private String createdTime;

@@ -117,7 +117,7 @@
  </foreach>
 </delete>
 <select id="findTaskDetail" resultMap="findTask">
-  SELECT id,task_num,type,task_detail,task_address,principal,end_time,create_time,status,
+  SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,
   deal_method,deal_result,evaluate
   FROM tb_task
   where id = #{id}

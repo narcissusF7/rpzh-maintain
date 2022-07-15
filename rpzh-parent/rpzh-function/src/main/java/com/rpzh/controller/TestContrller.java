@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -37,6 +38,8 @@ import java.util.Map;
 @Slf4j
 public class TestContrller{
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
@@ -70,6 +73,7 @@ public class TestContrller{
     /**
      * rocketmq发送数据
      * @return
+     * http://localhost:16900/maintain/test/rocketmq 测试路径
      */
     @RequestMapping("/rocketmq")
     public String test(){
@@ -83,6 +87,23 @@ public class TestContrller{
     }
 
 
+    /**
+     * http://localhost:16900/maintain/test/test2
+     * @return
+     */
+    @RequestMapping("/test2")
+    public String test2(){
+        redisTemplate.opsForHash().put("rpzh","nickname","超级管理员");
+        redisTemplate.opsForHash().put("rpzh","phonenumber","13156555668");
+        redisTemplate.opsForHash().put("rpzh","userId","1");
+        String nickname = (String) redisTemplate.opsForHash().get("rpzh", "nickname");
+        String phonenumber = (String) redisTemplate.opsForHash().get("rpzh", "phonenumber");
+        String userId = (String) redisTemplate.opsForHash().get("rpzh", "userId");
+        System.out.println(nickname);
+        System.out.println(phonenumber);
+        System.out.println(userId);
+        return "成功";
+    }
 
     /**
      * 参考这个方法

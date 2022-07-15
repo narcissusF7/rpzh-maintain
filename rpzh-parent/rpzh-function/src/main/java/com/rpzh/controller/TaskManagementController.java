@@ -221,6 +221,7 @@ public class TaskManagementController {
     })
     @PostMapping("/taskDispose")
     public Result taskDispose(@ApiIgnore TaskDto taskDto){
+
         String id = taskDto.getId();
         if (ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "请选择要处理的任务");
@@ -261,24 +262,28 @@ public class TaskManagementController {
     @ApiOperation(value = "工作任务菜单虫情巡查任务中一键虫情上报", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteRoute", value = "任务地址路径", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "任务地址id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "taskAddress", value = "任务地址名称", required = true,dataType = "String")
     })
     @PostMapping("/oneButtonPestReport")
-    public Result oneButtonPestReport(@ApiIgnore String siteRoute,@ApiIgnore String taskAddress,@ApiIgnore String id){
+    public Result oneButtonPestReport(@ApiIgnore String siteRoute,@ApiIgnore String taskAddress){
         if (ToolUtil.isEmpty(siteRoute)){
             return new Result(false, StatusCode.ERROR, "位置路径不能为空");
         }
         if (ToolUtil.isEmpty(taskAddress)){
             return new Result(false, StatusCode.ERROR, "任务地址名称不能为空");
         }
-        if (ToolUtil.isEmpty(id)){
-            return new Result(false, StatusCode.ERROR, "当前位置id不能为空");
-        }
-        //拼接id
-        siteRoute = SiteRouteUtil.route(siteRoute, id);
         int insertFlag = taskManagementService.oneButtonPestReport(siteRoute,taskAddress);
         return new Result(true,StatusCode.OK,"一键上报成功");
+    }
+
+    @ApiOperation(value = "获取垛位下所有的虫情板", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "siteRoute", value = "位置路径", required = true,dataType = "String")
+    })
+    @PostMapping("/findPestBoardByRoute")
+    public Result findPestBoardByRoute(@ApiIgnore String siteRoute){
+        List<String> pestBoardList = taskManagementService.findPestBoardByRoute(siteRoute);
+        return new Result(true,StatusCode.OK,"查询成功",pestBoardList);
     }
 
 
