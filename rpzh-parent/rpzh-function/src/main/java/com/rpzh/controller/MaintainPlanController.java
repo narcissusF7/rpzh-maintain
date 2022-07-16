@@ -131,9 +131,9 @@ public class MaintainPlanController {
         if (ToolUtil.isEmpty(maintainPlanDto.getMaintainDays())) {
             return new Result(false, StatusCode.ERROR, "养护天数不能为空!");
         }
-        if (ToolUtil.isEmpty(maintainPlanDto.getAftercareDateStart()) || ToolUtil.isEmpty(maintainPlanDto.getOxygenReductionTime())
+        if (ToolUtil.isEmpty(maintainPlanDto.getAftercareDateStart()) || ToolUtil.isEmpty(maintainPlanDto.getOxygenReductionDay())
                 || ToolUtil.isEmpty(maintainPlanDto.getExpireTime())) {
-            return new Result(false, StatusCode.ERROR, "调养日期,降氧完成时间,到期提醒时间不能为空!");
+            return new Result(false, StatusCode.ERROR, "调养日期,降氧完成天数,到期提醒时间不能为空!");
         }
         if (ToolUtil.isEmpty(maintainPlanDto.getMaintainCount())) {
             return new Result(false, StatusCode.ERROR, "养护数量没有填写!");
