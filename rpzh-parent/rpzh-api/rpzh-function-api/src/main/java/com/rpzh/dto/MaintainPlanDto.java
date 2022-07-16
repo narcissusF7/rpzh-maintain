@@ -69,9 +69,7 @@ public class MaintainPlanDto {
     @JsonFormat(pattern = "yyyy-MM-dd 00:00:00", timezone = "GMT+8")
     private Date aftercareDateEnd;
     //降氧完成时间
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private String oxygenReductionTime;
+    private String oxygenReductionDay;
     //负责人id集合
     private List<Integer> principalIds;
     //负责人id
@@ -84,7 +82,6 @@ public class MaintainPlanDto {
     private String expireTime;
     //养护数量
     private Double maintainCount=0d;
-
     //预警设置表id
     private Integer alarmValueSettingId;
     //放在养护阶段表中的养护计划id

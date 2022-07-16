@@ -1,16 +1,13 @@
 package com.rpzh.controller;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.collect.Lists;
-import com.rabbitmq.client.Return;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.MaintainCountDto;
-import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
@@ -18,7 +15,6 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.StringUtils;
-import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainCountVo;
 import io.swagger.annotations.Api;
@@ -26,14 +22,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import com.rpzh.vo.MaintainPlanVo;
 import springfox.documentation.annotations.ApiIgnore;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
@@ -95,7 +89,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
             @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "oxygenReductionDay", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
             @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
@@ -257,7 +251,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
             @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "oxygenReductionDay", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
             @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
@@ -351,7 +345,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainDays", value = "养护天数", required = true, dataType = "int"),
             @ApiImplicitParam(name = "aftercareDateStart", value = "开始调养日期", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成时间", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "oxygenReductionDay", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
             @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),

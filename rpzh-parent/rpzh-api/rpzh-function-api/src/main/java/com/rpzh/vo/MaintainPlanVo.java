@@ -59,9 +59,8 @@ public class MaintainPlanVo {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date aftercareDateEnd;
 
-    @ApiModelProperty(notes = "降氧完成时间")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private Date oxygenReductionTime;
+    @ApiModelProperty(notes = "降氧完成天数")
+    private Integer oxygenReductionDay;
 
     @ApiModelProperty(notes = "负责人")
     private String principalName;
