@@ -78,5 +78,9 @@ public class BuildingDto {
     //备注
     @ApiModelProperty("备注")
     private String remark;
+    @ApiModelProperty("负责人id")
+    private Integer principalId;
+    @ApiModelProperty("负责人账号")
+    private String principalName;
 
 }

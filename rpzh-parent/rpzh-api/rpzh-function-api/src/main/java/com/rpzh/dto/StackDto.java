@@ -48,4 +48,9 @@ public class StackDto {
     private Integer maintainPlanId;
     private int page;
     private int size;
+
+    @ApiModelProperty("负责人id")
+    private Integer principalId;
+    @ApiModelProperty("负责人账号")
+    private String principalName;
 }

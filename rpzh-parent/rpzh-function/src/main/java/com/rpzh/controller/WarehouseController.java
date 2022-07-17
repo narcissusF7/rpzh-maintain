@@ -50,6 +50,10 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildTime)) {
             return new Result(false, StatusCode.ERROR, "仓库建造时间不能为空");
         }
+
+        if (ToolUtil.isEmpty(warehouseDto.getPrincipalName())) {
+            return new Result(false, StatusCode.ERROR, "负责人账号不能为空");
+        }
         //仓库代码唯一
         String code = warehouseDto.getCode();
         int codeCount = warehouseService.findCodeCount(code);

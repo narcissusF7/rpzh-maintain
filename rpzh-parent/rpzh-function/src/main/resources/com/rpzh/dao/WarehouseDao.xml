@@ -4,615 +4,662 @@
   <select id="findWarehouseInfo" resultType="com.rpzh.vo.WarehouseVo">
     select storage_age as age,name as name from tb_warehouse where id= #{siteId}
   </select>
-<select id="findNameCount" resultType="int">
-  SELECT count(*)
-  FROM tb_warehouse
-  WHERE name = #{name}
-</select>
-<insert id="addWarehouse">
-  INSERT INTO tb_warehouse
-  (
-  <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>
-  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time,</if>
-  <if test="warehouseDto.code != null and warehouseDto.code != ''">code,</if>
-  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">use_volume, </if>
-  <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">use_volume_unit, </if>
-  <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area, </if>
-  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit,</if>
-  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">is_automation,</if>
-  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> is_statistics,</if>
-  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using,</if>
-  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark,</if>
-  <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''"> created_time,</if>
-  <if test="warehouseDto.username != null and warehouseDto.username != ''">created_user,</if>
-  <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">pid_route,</if>
-  <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">site_name,</if>
-  <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''">ware_type,</if>
-  last_updated_time
-  )
- VALUES
- (
-  <if test="warehouseDto.name != null and warehouseDto.name != ''">#{warehouseDto.name},</if>
-  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">#{warehouseDto.buildTime},</if>
-  <if test="warehouseDto.code != null and warehouseDto.code != ''">#{warehouseDto.code},</if>
-  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">#{warehouseDto.useVolume},</if>
-   <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">#{warehouseDto.useVolumeUnit},</if>
-   <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''">#{warehouseDto.useArea}, </if>
-  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> #{warehouseDto.useAreaUnit},</if>
-  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">#{warehouseDto.isAutomation},</if>
-  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> #{warehouseDto.isStatistics},</if>
-  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''">#{warehouseDto.isUsing},</if>
-  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> #{warehouseDto.remark},</if>
-  <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''">#{warehouseDto.createdTime},</if>
-  <if test="warehouseDto.username != null and warehouseDto.username != ''">#{warehouseDto.username},</if>
-  <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">#{warehouseDto.pidRoute},</if>
-  <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">#{warehouseDto.siteName},</if>
-  <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''">#{warehouseDto.wareType},</if>
-  sysdate()
- )
-</insert>
-<select id="findWareName" resultType="java.lang.String">
-  SELECT name
-  FROM tb_warehouse
-  WHERE name = #{name} and id != #{id}
-  limit 1
-</select>
-<update id="updateWarehouse">
-  UPDATE tb_warehouse
-  <set>
-  <if test="warehouseDto.name != null and warehouseDto.name != ''">name =  #{warehouseDto.name},</if>
-  <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time = #{warehouseDto.buildTime},</if>
-  <if test="warehouseDto.code != null and warehouseDto.code != ''">code = #{warehouseDto.code},</if>
-  <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''"> use_volume =  #{warehouseDto.useVolume},</if>
-  <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''"> use_volume_unit =  #{warehouseDto.useVolumeUnit},</if>
-  <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area =  #{warehouseDto.useArea},</if>
-  <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit = #{warehouseDto.useAreaUnit},</if>
-  <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''"> is_automation =  #{warehouseDto.isAutomation},</if>
-  <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''">  is_statistics = #{warehouseDto.isStatistics},</if>
-  <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using =  #{warehouseDto.isUsing},</if>
-  <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark =  #{warehouseDto.remark},</if>
-  <if test="warehouseDto.username != null and warehouseDto.username != ''"> last_updated_user = #{warehouseDto.username},</if>
-  <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''"> ware_type = #{warehouseDto.wareType},</if>
-  last_updated_time = sysdate()
-  </set>
-  WHERE
-  id = #{warehouseDto.id}
-</update>
-<select id="findCodeCount" resultType="int">
-  SELECT count(*)
-  FROM `tb_warehouse`
-  WHERE code = #{code}
-</select>
-<select id="findWareCode" resultType="java.lang.String">
-  SELECT code
-  FROM tb_warehouse
-  WHERE code = #{code} and id != #{id}
-  limit 1
-</select>
-<select id="findWarehouse" resultType="com.rpzh.vo.WarehouseVo">
-  SELECT id as id,name as name,build_time as buildTime,code as code,use_volume as useVolume,use_area as useArea,use_area_unit as useAreaUnit,is_automation as isAutomation,is_statistics as isStatistics,is_using as isUsing,
-  remark as remark,
-  created_time as createdTime,created_user as createdUser,
-  last_updated_time as lastUpdatedTime,last_updated_user as lastUpdatedUser,created_user_id as createdUserId,pid_route as pidRoute,site_name as siteName
-  FROM tb_warehouse
-  WHERE id = #{warehouseId}
-</select>
-<insert id="addBuilding">
-  INSERT INTO tb_building
-  (
-  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no,</if>
-  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> use_volume,</if>
-  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> use_volume_unit,</if>
-  <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> use_area,</if>
-  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit,</if>
-  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> building_orientation,</if>
-  <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark,</if>
-  <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> created_time,</if>
-  <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> created_user,</if>
-  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id,</if>
-  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">pid_route,</if>
-  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">building_name,</if>
-  <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> site_name,</if>
-  <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''"> building_type,</if>
-  last_updated_time
-  )
-  VALUES
-  	(
-  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">#{buildingDto.buildingNo},</if>
-  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> #{buildingDto.useVolume},</if>
-  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> #{buildingDto.useVolumeUnit},</if>
-  <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> #{buildingDto.useArea},</if>
-  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> #{buildingDto.useAreaUnit},</if>
-  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> #{buildingDto.buildingOrientation},</if>
-  <if test="buildingDto.remark != null and buildingDto.remark != ''"> #{buildingDto.remark},</if>
-  <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> #{buildingDto.createdTime},</if>
-  <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> #{buildingDto.createdUser},</if>
-  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> #{buildingDto.warehouseId},</if>
-  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">#{buildingDto.pidRoute},</if>
-  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">#{buildingDto.buildingName},</if>
-  <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> #{buildingDto.siteName},</if>
-  <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''"> #{buildingDto.buildingType},</if>
-  sysdate()
-  	)
-</insert>
-<update id="updateBuilding">
-  UPDATE tb_building
-  <set>
-  <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no =  #{buildingDto.buildingNo},</if>
-  <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''">use_volume =  #{buildingDto.useVolume},</if>
-  <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''">use_volume_unit=  #{buildingDto.useVolumeUnit},</if>
-  <if test="buildingDto.useArea != null and buildingDto.useArea != ''">use_area = #{buildingDto.useArea},</if>
-  <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit = #{buildingDto.useAreaUnit},</if>
-  <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''">building_orientation = #{buildingDto.buildingOrientation},</if>
-  <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark = #{buildingDto.remark},</if>
-  <if test="buildingDto.updateUser != null and buildingDto.updateUser != ''">last_updated_user =  #{buildingDto.updateUser},</if>
-  <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id =  #{buildingDto.warehouseId},</if>
-  <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''"> pid_route = #{buildingDto.pidRoute},</if>
-  <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''"> building_name  =  #{buildingDto.buildingName},</if>
-  <if test="buildingDto.siteName != null and buildingDto.siteName != ''">site_name  =  #{buildingDto.siteName},</if>
-  <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''">building_type  =  #{buildingDto.buildingType},</if>
-   last_updated_time = sysdate()
-  </set>
-  WHERE id = #{buildingDto.id}
-</update>
-<select id="findBuilding" resultType="com.rpzh.vo.BuildingVo">
-  SELECT
-  `id` as id,
-  `building_no` as buildingNo,
-  `use_volume` as useVolume,
-  `use_volume_unit` as useVolumeUnit,
-  `use_area` as useArea,
-  `use_area_unit` as useAreaUnit,
-  `building_orientation` as buildingOrientation,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `warehouse_id` as warehouseId,
-  `pid_route` as pidRoute,
-  `building_name` as buildingName,
-  `site_name` as siteName
-  FROM tb_building
-  WHERE id = #{buildingId}
-</select>
-<insert id="addFloor">
-  INSERT INTO tb_floor
-  (
-  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no,</if>
-  <if test="floorDto.isPartition != null and floorDto.isPartition != ''">is_partition,</if>
-  <if test="floorDto.remark != null and floorDto.remark != ''">remark,</if>
-  <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  created_user,</if>
-  <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id,</if>
-  <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route,</if>
-  <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name,</if>
-  <if test="floorDto.siteName != null and floorDto.siteName != ''"> site_name,</if>
-  <if test="floorDto.floorType != null and floorDto.floorType != ''">floor_type,</if>
-   created_time,
-   last_updated_time
-  )
-  VALUES
-  	(
-  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> #{floorDto.floorNo},</if>
-  <if test="floorDto.isPartition != null and floorDto.isPartition != ''">#{floorDto.isPartition},</if>
-  <if test="floorDto.remark != null and floorDto.remark != ''">#{floorDto.remark},</if>
-  <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  #{floorDto.createdUser},</if>
-  <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> #{floorDto.buildingId},</if>
-  <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> #{floorDto.pidRoute},</if>
-  <if test="floorDto.floorName != null and floorDto.floorName != ''"> #{floorDto.floorName},</if>
-  <if test="floorDto.siteName != null and floorDto.siteName != ''"> #{floorDto.siteName},</if>
-  <if test="floorDto.floorType != null and floorDto.floorType != ''">#{floorDto.floorType},</if>
-   sysdate(),
-   sysdate()
-  	)
-</insert>
-<update id="updateFloor">
-  UPDATE tb_floor
-  <set>
-  <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no = #{floorDto.floorNo},</if>
- <if test="floorDto.isPartition != null and floorDto.isPartition != ''"> is_partition= #{floorDto.isPartition},</if>
- <if test="floorDto.remark != null and floorDto.remark != ''">remark =  #{floorDto.remark},</if>
- <if test="floorDto.updateUser != null and floorDto.updateUser != ''"> last_updated_user =  #{floorDto.updateUser},</if>
- <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id =  #{floorDto.buildingId},</if>
- <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route =  #{floorDto.pidRoute},</if>
- <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name =  #{floorDto.floorName},</if>
- <if test="floorDto.siteName != null and floorDto.siteName != ''">site_name =  #{floorDto.siteName},</if>
- <if test="floorDto.floorType != null and floorDto.floorType != ''">floor_type =  #{floorDto.floorType},</if>
- last_updated_time = sysdate()
-  </set>
-  WHERE id = #{floorDto.id}
-</update>
-<select id="findFloor" resultType="com.rpzh.vo.FloorVo">
-  SELECT
-  `id` as id,
-  `floor_no` as floorNo,
-  `is_partition` as isPartition,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `pid_route` as pidRoute,
-  `floor_name` as floorName,
-  `site_name` as siteName
-   FROM `tb_floor`
-   WHERE id = #{floorId}
-</select>
-<insert id="addWarearea">
-  INSERT INTO tb_ware_area
-  (
-  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no, </if>
-  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark,  </if>
-  <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> created_user,</if>
-  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id,</if>
-  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route,</if>
-  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name,</if>
-  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name,</if>
-  <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> ware_area_type,</if>
-  created_time,
-  last_updated_time
-   )
-  VALUES
-  	(
-  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> #{wareAreaDto.areaNo}, </if>
-  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> #{wareAreaDto.remark},  </if>
-  <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> #{wareAreaDto.createdUser},</if>
-  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> #{wareAreaDto.floorId},</if>
-  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> #{wareAreaDto.pidRoute},</if>
-  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> #{wareAreaDto.areaName},</if>
-  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> #{wareAreaDto.siteName},</if>
-  <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> #{wareAreaDto.wareAreaType},</if>
-   sysdate(),
-   sysdate()
-  	)
-</insert>
-<update id="updateWarearea">
-  UPDATE tb_ware_area
-  <set>
-  <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no = #{wareAreaDto.areaNo},</if>
-  <if test="wareAreaDto.updateUser != null and wareAreaDto.updateUser != ''"> last_updated_user =#{wareAreaDto.updateUser},</if>
-  <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id =#{wareAreaDto.floorId},</if>
-  <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route =#{wareAreaDto.pidRoute},</if>
-  <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name = #{wareAreaDto.areaName},</if>
-  <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name = #{wareAreaDto.siteName},</if>
-  <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> ware_area_type = #{wareAreaDto.wareAreaType},</if>
-  <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark = #{wareAreaDto.remark},</if>
-  last_updated_time = sysdate()
-   </set>
-  WHERE id = #{wareAreaDto.id}
+  <select id="findNameCount" resultType="int">
+    SELECT count(*)
+    FROM tb_warehouse
+    WHERE name = #{name}
+  </select>
+  <insert id="addWarehouse">
+    INSERT INTO tb_warehouse
+    (
+    <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>
+    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time,</if>
+    <if test="warehouseDto.code != null and warehouseDto.code != ''">code,</if>
+    <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">use_volume, </if>
+    <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">use_volume_unit, </if>
+    <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area, </if>
+    <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit,</if>
+    <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">is_automation,</if>
+    <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> is_statistics,</if>
+    <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using,</if>
+    <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark,</if>
+    <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''"> created_time,</if>
+    <if test="warehouseDto.username != null and warehouseDto.username != ''">created_user,</if>
+    <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">pid_route,</if>
+    <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">site_name,</if>
+    <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''">ware_type,</if>
+    <if test="warehouseDto.principalId != null and warehouseDto.principalId != ''">principal_id,</if>
+    <if test="warehouseDto.principalName != null and warehouseDto.principalName != ''">principal_name,</if>
+    last_updated_time
+    )
+    VALUES
+    (
+    <if test="warehouseDto.name != null and warehouseDto.name != ''">#{warehouseDto.name},</if>
+    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">#{warehouseDto.buildTime},</if>
+    <if test="warehouseDto.code != null and warehouseDto.code != ''">#{warehouseDto.code},</if>
+    <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">#{warehouseDto.useVolume},</if>
+    <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">#{warehouseDto.useVolumeUnit},</if>
+    <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''">#{warehouseDto.useArea}, </if>
+    <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> #{warehouseDto.useAreaUnit},</if>
+    <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''">#{warehouseDto.isAutomation},</if>
+    <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> #{warehouseDto.isStatistics},</if>
+    <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''">#{warehouseDto.isUsing},</if>
+    <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> #{warehouseDto.remark},</if>
+    <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''">#{warehouseDto.createdTime},</if>
+    <if test="warehouseDto.username != null and warehouseDto.username != ''">#{warehouseDto.username},</if>
+    <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">#{warehouseDto.pidRoute},</if>
+    <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">#{warehouseDto.siteName},</if>
+    <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''">#{warehouseDto.wareType},</if>
+    <if test="warehouseDto.principalId != null and warehouseDto.principalId != ''">#{warehouseDto.principalId},</if>
+    <if test="warehouseDto.principalName != null and warehouseDto.principalName != ''">#{warehouseDto.principalName},</if>
+    sysdate()
+    )
+    <selectKey keyProperty="warehouseDto.id" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+  <select id="findWareName" resultType="java.lang.String">
+    SELECT name
+    FROM tb_warehouse
+    WHERE name = #{name} and id != #{id}
+      limit 1
+  </select>
+  <update id="updateWarehouse">
+    UPDATE tb_warehouse
+    <set>
+      <if test="warehouseDto.name != null and warehouseDto.name != ''">name =  #{warehouseDto.name},</if>
+      <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time = #{warehouseDto.buildTime},</if>
+      <if test="warehouseDto.code != null and warehouseDto.code != ''">code = #{warehouseDto.code},</if>
+      <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''"> use_volume =  #{warehouseDto.useVolume},</if>
+      <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''"> use_volume_unit =  #{warehouseDto.useVolumeUnit},</if>
+      <if test="warehouseDto.useArea != null and warehouseDto.useArea != ''"> use_area =  #{warehouseDto.useArea},</if>
+      <if test="warehouseDto.useAreaUnit != null and warehouseDto.useAreaUnit != ''"> use_area_unit = #{warehouseDto.useAreaUnit},</if>
+      <if test="warehouseDto.isAutomation != null and warehouseDto.isAutomation != ''"> is_automation =  #{warehouseDto.isAutomation},</if>
+      <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''">  is_statistics = #{warehouseDto.isStatistics},</if>
+      <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''"> is_using =  #{warehouseDto.isUsing},</if>
+      <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> remark =  #{warehouseDto.remark},</if>
+      <if test="warehouseDto.username != null and warehouseDto.username != ''"> last_updated_user = #{warehouseDto.username},</if>
+      <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''"> ware_type = #{warehouseDto.wareType},</if>
+      <if test="warehouseDto.principalId != null and warehouseDto.principalId != ''">principal_id = #{warehouseDto.principalId},</if>
+      <if test="warehouseDto.principalName != null and warehouseDto.principalName != ''">principal_name = #{warehouseDto.principalName},</if>
+      last_updated_time = sysdate()
+    </set>
+    WHERE
+    id = #{warehouseDto.id}
   </update>
-<select id="findWareArea" resultType="com.rpzh.vo.WareAreaVo">
-  SELECT
-  `id` as id,
-  `area_no` as areaNo,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `floor_id` as floorId,
-  `pid_route` as pidRoute,
-  `area_name` as areaName,
-  `site_name` as siteName,
-  `remark` as remark
-   FROM `tb_ware_area`
-  WHERE id = #{areaId}
-</select>
-<insert id="addStack">
-  INSERT INTO tb_stack
-  (
-  <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no, </if>
-  <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn, </if>
-  <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> created_user, </if>
-  <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id, </if>
-  <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route, </if>
-  <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name, </if>
-  <if test="stackDto.remark != null and stackDto.remark != ''"> remark, </if>
-  <if test="stackDto.stackType != null and stackDto.stackType != ''"> stack_type, </if>
-  created_time,
-  last_updated_time
-  )
-  VALUES
-  (
-  <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> #{stackDto.stackNo}, </if>
-  <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> #{stackDto.nameCn}, </if>
-  <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> #{stackDto.createdUser}, </if>
-  <if test="stackDto.areaId != null and stackDto.areaId != ''"> #{stackDto.areaId}, </if>
-  <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> #{stackDto.pidRoute}, </if>
-  <if test="stackDto.siteName != null and stackDto.siteName != ''"> #{stackDto.siteName}, </if>
-  <if test="stackDto.remark != null and stackDto.remark != ''"> #{stackDto.remark}, </if>
-  <if test="stackDto.stackType != null and stackDto.stackType != ''"> #{stackDto.stackType}, </if>
-   sysdate(),
-   sysdate()
-  )
-</insert>
-<update id="updateStack">
-  UPDATE tb_stack
-  <set>
- <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no = #{stackDto.stackNo}, </if>
- <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn =  #{stackDto.nameCn}, </if>
- <if test="stackDto.lastUpdatedUser != null and stackDto.lastUpdatedUser != ''"> last_updated_user =  #{stackDto.lastUpdatedUser}, </if>
- <if test="stackDto.lastUpdatedUserId != null and stackDto.lastUpdatedUserId != ''"> last_updated_user_id =  #{stackDto.lastUpdatedUserId}, </if>
- <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id =  #{stackDto.areaId}, </if>
- <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route =  #{stackDto.pidRoute}, </if>
- <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name =  #{stackDto.siteName}, </if>
- <if test="stackDto.remark != null and stackDto.remark != ''"> remark =  #{stackDto.remark}, </if>
- <if test="stackDto.stackType != null and stackDto.stackType != ''"> stack_type =  #{stackDto.stackType}, </if>
- last_updated_time = sysdate()
-  </set>
-  WHERE id = #{stackDto.id}
-</update>
-<delete id="delWarehose">
-  DELETE
-  FROM tb_warehouse
-  WHERE id = #{warehouseNodeId}
-</delete>
-<select id="findBuildingCount" resultType="int">
-  SELECT count(1)
-  FROM tb_building
-  WHERE warehouse_id = #{warehouseNodeId}
-</select>
-<select id="findFloorCount" resultType="int">
-  SELECT count(1)
-  FROM tb_floor
-  WHERE building_id = #{warehouseNodeId}
-</select>
-<delete id="delBuilding">
-  DELETE
-  FROM tb_building
-  WHERE id = #{warehouseNodeId}
-</delete>
-<select id="findWareAreaCount" resultType="int">
-  SELECT count(1)
-  FROM tb_ware_area
-  WHERE floor_id = #{warehouseNodeId}
-</select>
-<delete id="delFloor">
-  DELETE
-  FROM tb_floor
-  WHERE id = #{warehouseNodeId}
-</delete>
-<select id="findStackCount" resultType="int">
-  SELECT count(1)
-  FROM tb_stack
-  WHERE area_id = #{warehouseNodeId}
-</select>
-<delete id="delWareArea">
-  DELETE
-  FROM tb_ware_area
-  WHERE id = #{warehouseNodeId}
-</delete>
-<delete id="delStack">
-  DELETE
-  FROM tb_stack
-  WHERE id in
-  <foreach collection="stackIds" item="id" open="(" separator="," close=")">
-  #{id}
-  </foreach>
-</delete>
-<select id="findAllWarehouse" resultType="com.rpzh.vo.WarehouseVo">
-  SELECT
-  `id` as id,
-  `name` as name,
-  `build_time` as buildTime,
-  `code` as code,
-  `use_volume` as useVolume,
-  `use_volume_unit` as useVolumeUnit,
-  `use_area` as useArea,
-  `use_area_unit` as useAreaUnit,
-  `is_automation` as isAutomation,
-  `is_statistics` as isStatistics,
-  `is_using` as isUsing,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `pid_route` as pidRoute,
-  `ware_type` as wareType,
-  `site_name` as siteName
-  FROM tb_warehouse
-  <where>
-  <if test="warehouseNodeId != null and warehouseNodeId != ''">
-      and id = #{warehouseNodeId}
-  </if>
-  </where>
-</select>
-<select id="findBuildingById" resultType="com.rpzh.vo.BuildingVo">
-  SELECT
-  `id` as id,
-  `building_no` as buildingNo,
-  `use_volume` as useVolume,
-  `use_volume_unit` as useVolumeUnit,
-  `use_area` as useArea,
-  `use_area_unit` as useAreaUnit,
-  `building_orientation` as buildingOrientation,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `warehouse_id` as warehouseId,
-  `pid_route` as pidRoute,
-  `building_name` as buildingName,
-  `site_name` as siteName
-  FROM `tb_building`
-  WHERE warehouse_id = #{warehouseNodeId}
-</select>
-<select id="findFloorById" resultType="com.rpzh.vo.FloorVo">
-  SELECT
-  `id` as id,
-  `floor_no` as floorNo,
-  `is_partition` as isPartition,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `building_id` as buildingId,
-  `pid_route` as pidRoute,
-  `floor_name` as floorName,
-  `site_name` as siteName
-  FROM tb_floor
-  WHERE building_id = #{warehouseNodeId}
-</select>
-<select id="findWareAreaById" resultType="com.rpzh.vo.WareAreaVo">
-  SELECT
-  `id` as id,
-  `area_no` as areaNo,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `floor_id` as floorId,
-  `pid_route` as pidRoute,
-  `area_name` as areaName,
-  `site_name` as siteName,
-  `remark` as remark
-  FROM `tb_ware_area`
-  WHERE floor_id = #{warehouseNodeId}
-</select>
-<select id="getStackPage" resultType="com.rpzh.vo.StackVo">
-  SELECT
-  `id` as id,
-  `stack_no` as stackNo,
-  `name_cn` as nameCn,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `area_id` as areaId,
-  `pid_route` as pidRoute,
-  `site_name` as siteName,
-  `remark` as remark
-  FROM `tb_stack`
-  WHERE area_id = #{stackDto.wareAreaId}
-</select>
-<select id="findWarehouseById" resultType="com.rpzh.vo.WarehouseVo">
-  SELECT
-  `id` as id,
-  `name` as name,
-  `build_time` as buildTime,
-  `code` as code,
-  `use_volume` as useVolume,
-  `use_volume_unit` as useVolumeUnit,
-  `use_area` as useArea,
-  `use_area_unit` as useAreaUnit,
-  `is_automation` as isAutomation,
-  `is_statistics` as isStatistics,
-  `is_using` as isUsing,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `pid_route` as pidRoute,
-  `ware_type` as wareType,
-  `site_name` as siteName
-  FROM tb_warehouse
-  where id = #{warehouseNodeId}
-</select>
-<select id="findBuildById" resultType="com.rpzh.vo.BuildingVo">
-  SELECT
-  `id` as id,
-  `building_no` as buildingNo,
-  `use_volume` as useVolume,
-  `use_volume_unit` as useVolumeUnit,
-  `use_area` as useArea,
-  `use_area_unit` as useAreaUnit,
-  `building_orientation` as buildingOrientation,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `warehouse_id` as warehouseId,
-  `pid_route` as pidRoute,
-  `building_name` as buildingName,
-  `building_type` as buildingType,
-  `site_name` as siteName
-  FROM `tb_building`
-  where id = #{warehouseNodeId}
-</select>
-<select id="findOneFloor" resultType="com.rpzh.vo.FloorVo">
-   SELECT
-  `id` as id,
-  `floor_no` as floorNo,
-  `is_partition` as isPartition,
-  `remark` as remark,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `building_id` as buildingId,
-  `pid_route` as pidRoute,
-  `floor_type` as floorType,
-  `floor_name` as floorName,
-  `site_name` as siteName
-  FROM tb_floor
-  where id = #{warehouseNodeId}
-</select>
-<select id="findWareAreaByOne" resultType="com.rpzh.vo.WareAreaVo">
-  SELECT
-  `id` as id,
-  `area_no` as areaNo,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `floor_id` as floorId,
-  `pid_route` as pidRoute,
-  `area_name` as areaName,
-  `site_name` as siteName,
-  `ware_area_type` as wareAreaType,
-  `remark` as remark
-  FROM `tb_ware_area`
-  where id = #{warehouseNodeId}
-</select>
-<select id="findStackById" resultType="com.rpzh.vo.StackVo">
-  SELECT
-  `id` as id,
-  `stack_no` as stackNo,
-  `name_cn` as nameCn,
-  `created_time` as createdTime,
-  `created_user` as createdUser,
-  `last_updated_time` as lastUpdatedTime,
-  `last_updated_user` as lastUpdatedUser,
-  `area_id` as areaId,
-  `pid_route` as pidRoute,
-  `site_name` as siteName,
-  `stack_type` as stackType,
-  `remark` as remark
-  FROM `tb_stack`
-  where id = #{stackId}
-</select>
-<select id="findWareType" resultType="java.lang.String">
- SELECT ware_type
- FROM tb_warehouse
- WHERE id = #{warehouseId}
-</select>
-<select id="findBuildType" resultType="java.lang.String">
-  SELECT building_type
-  FROM `tb_building`
-  WHERE id = #{buildingId}
-</select>
-<select id="findFloorType" resultType="java.lang.String">
-  SELECT floor_type
-  FROM tb_floor
-  WHERE id = #{floorId}
-</select>
-<select id="findWareAreaType" resultType="java.lang.String">
-  SELECT ware_area_type
-  FROM tb_ware_area
-  WHERE id = #{areaId}
-</select>
+  <select id="findCodeCount" resultType="int">
+    SELECT count(*)
+    FROM `tb_warehouse`
+    WHERE code = #{code}
+  </select>
+  <select id="findWareCode" resultType="java.lang.String">
+    SELECT code
+    FROM tb_warehouse
+    WHERE code = #{code} and id != #{id}
+      limit 1
+  </select>
+  <select id="findWarehouse" resultType="com.rpzh.vo.WarehouseVo">
+    SELECT id as id,name as name,build_time as buildTime,code as code,use_volume as useVolume,use_area as useArea,use_area_unit as useAreaUnit,is_automation as isAutomation,is_statistics as isStatistics,is_using as isUsing,
+           remark as remark,
+           created_time as createdTime,created_user as createdUser,
+           last_updated_time as lastUpdatedTime,last_updated_user as lastUpdatedUser,created_user_id as createdUserId,pid_route as pidRoute,site_name as siteName
+            ,principal_id as principalId , principal_name as principalName
+    FROM tb_warehouse
+    WHERE id = #{warehouseId}
+  </select>
+  <insert id="addBuilding">
+    INSERT INTO tb_building
+    (
+    <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no,</if>
+    <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> use_volume,</if>
+    <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> use_volume_unit,</if>
+    <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> use_area,</if>
+    <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit,</if>
+    <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> building_orientation,</if>
+    <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark,</if>
+    <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> created_time,</if>
+    <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> created_user,</if>
+    <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id,</if>
+    <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">pid_route,</if>
+    <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">building_name,</if>
+    <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> site_name,</if>
+    <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''"> building_type,</if>
+    <if test="buildingDto.principalId != null and buildingDto.principalId != ''">principal_id,</if>
+    <if test="buildingDto.principalName != null and buildingDto.principalName != ''">principal_name,</if>
+    last_updated_time
+    )
+    VALUES
+    (
+    <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">#{buildingDto.buildingNo},</if>
+    <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> #{buildingDto.useVolume},</if>
+    <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> #{buildingDto.useVolumeUnit},</if>
+    <if test="buildingDto.useArea != null and buildingDto.useArea != ''"> #{buildingDto.useArea},</if>
+    <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> #{buildingDto.useAreaUnit},</if>
+    <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> #{buildingDto.buildingOrientation},</if>
+    <if test="buildingDto.remark != null and buildingDto.remark != ''"> #{buildingDto.remark},</if>
+    <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> #{buildingDto.createdTime},</if>
+    <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> #{buildingDto.createdUser},</if>
+    <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> #{buildingDto.warehouseId},</if>
+    <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">#{buildingDto.pidRoute},</if>
+    <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''">#{buildingDto.buildingName},</if>
+    <if test="buildingDto.siteName != null and buildingDto.siteName != ''"> #{buildingDto.siteName},</if>
+    <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''"> #{buildingDto.buildingType},</if>
+    <if test="buildingDto.principalId != null and buildingDto.principalId != ''">#{buildingDto.principalId},</if>
+    <if test="buildingDto.principalName != null and buildingDto.principalName != ''">#{buildingDto.principalName},</if>
+    sysdate()
+    )
+
+    <selectKey keyProperty="buildingDto.id" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+  <update id="updateBuilding">
+    UPDATE tb_building
+    <set>
+      <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no =  #{buildingDto.buildingNo},</if>
+      <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''">use_volume =  #{buildingDto.useVolume},</if>
+      <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''">use_volume_unit=  #{buildingDto.useVolumeUnit},</if>
+      <if test="buildingDto.useArea != null and buildingDto.useArea != ''">use_area = #{buildingDto.useArea},</if>
+      <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> use_area_unit = #{buildingDto.useAreaUnit},</if>
+      <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''">building_orientation = #{buildingDto.buildingOrientation},</if>
+      <if test="buildingDto.remark != null and buildingDto.remark != ''"> remark = #{buildingDto.remark},</if>
+      <if test="buildingDto.updateUser != null and buildingDto.updateUser != ''">last_updated_user =  #{buildingDto.updateUser},</if>
+      <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> warehouse_id =  #{buildingDto.warehouseId},</if>
+      <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''"> pid_route = #{buildingDto.pidRoute},</if>
+      <if test="buildingDto.buildingName != null and buildingDto.buildingName != ''"> building_name  =  #{buildingDto.buildingName},</if>
+      <if test="buildingDto.siteName != null and buildingDto.siteName != ''">site_name  =  #{buildingDto.siteName},</if>
+      <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''">building_type  =  #{buildingDto.buildingType},</if>
+      <if test="buildingDto.principalId != null and buildingDto.principalId != ''">principal_id = #{buildingDto.principalId},</if>
+      <if test="buildingDto.principalName != null and buildingDto.principalName != ''">principal_name = #{buildingDto.principalName},</if>
+      last_updated_time = sysdate()
+    </set>
+    WHERE id = #{buildingDto.id}
+  </update>
+  <select id="findBuilding" resultType="com.rpzh.vo.BuildingVo">
+    SELECT
+      `id` as id,
+      `building_no` as buildingNo,
+      `use_volume` as useVolume,
+      `use_volume_unit` as useVolumeUnit,
+      `use_area` as useArea,
+      `use_area_unit` as useAreaUnit,
+      `building_orientation` as buildingOrientation,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `warehouse_id` as warehouseId,
+      `pid_route` as pidRoute,
+      `building_name` as buildingName,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_building
+    WHERE id = #{buildingId}
+  </select>
+  <insert id="addFloor">
+    INSERT INTO tb_floor
+    (
+    <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no,</if>
+    <if test="floorDto.isPartition != null and floorDto.isPartition != ''">is_partition,</if>
+    <if test="floorDto.remark != null and floorDto.remark != ''">remark,</if>
+    <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  created_user,</if>
+    <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id,</if>
+    <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route,</if>
+    <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name,</if>
+    <if test="floorDto.siteName != null and floorDto.siteName != ''"> site_name,</if>
+    <if test="floorDto.floorType != null and floorDto.floorType != ''">floor_type,</if>
+    <if test="floorDto.principalId != null and floorDto.principalId != ''">principal_id,</if>
+    <if test="floorDto.principalName != null and floorDto.principalName != ''">principal_name,</if>
+    created_time,
+    last_updated_time
+    )
+    VALUES
+    (
+    <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> #{floorDto.floorNo},</if>
+    <if test="floorDto.isPartition != null and floorDto.isPartition != ''">#{floorDto.isPartition},</if>
+    <if test="floorDto.remark != null and floorDto.remark != ''">#{floorDto.remark},</if>
+    <if test="floorDto.createdUser != null and floorDto.createdUser != ''">  #{floorDto.createdUser},</if>
+    <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> #{floorDto.buildingId},</if>
+    <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> #{floorDto.pidRoute},</if>
+    <if test="floorDto.floorName != null and floorDto.floorName != ''"> #{floorDto.floorName},</if>
+    <if test="floorDto.siteName != null and floorDto.siteName != ''"> #{floorDto.siteName},</if>
+    <if test="floorDto.floorType != null and floorDto.floorType != ''">#{floorDto.floorType},</if>
+    <if test="floorDto.principalId != null and floorDto.principalId != ''">#{floorDto.principalId},</if>
+    <if test="floorDto.principalName != null and floorDto.principalName != ''">#{floorDto.principalName},</if>
+    sysdate(),
+    sysdate()
+    )
+    <selectKey keyProperty="floorDto.id" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+  <update id="updateFloor">
+    UPDATE tb_floor
+    <set>
+      <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no = #{floorDto.floorNo},</if>
+      <if test="floorDto.isPartition != null and floorDto.isPartition != ''"> is_partition= #{floorDto.isPartition},</if>
+      <if test="floorDto.remark != null and floorDto.remark != ''">remark =  #{floorDto.remark},</if>
+      <if test="floorDto.updateUser != null and floorDto.updateUser != ''"> last_updated_user =  #{floorDto.updateUser},</if>
+      <if test="floorDto.buildingId != null and floorDto.buildingId != ''"> building_id =  #{floorDto.buildingId},</if>
+      <if test="floorDto.pidRoute != null and floorDto.pidRoute != ''"> pid_route =  #{floorDto.pidRoute},</if>
+      <if test="floorDto.floorName != null and floorDto.floorName != ''"> floor_name =  #{floorDto.floorName},</if>
+      <if test="floorDto.siteName != null and floorDto.siteName != ''">site_name =  #{floorDto.siteName},</if>
+      <if test="floorDto.floorType != null and floorDto.floorType != ''">floor_type =  #{floorDto.floorType},</if>
+      <if test="floorDto.principalId != null and floorDto.principalId != ''">principal_id = #{floorDto.principalId},</if>
+      <if test="floorDto.principalName != null and floorDto.principalName != ''">principal_name = #{floorDto.principalName},</if>
+      last_updated_time = sysdate()
+    </set>
+    WHERE id = #{floorDto.id}
+  </update>
+  <select id="findFloor" resultType="com.rpzh.vo.FloorVo">
+    SELECT
+      `id` as id,
+      `floor_no` as floorNo,
+      `is_partition` as isPartition,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `pid_route` as pidRoute,
+      `floor_name` as floorName,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM `tb_floor`
+    WHERE id = #{floorId}
+  </select>
+  <insert id="addWarearea">
+    INSERT INTO tb_ware_area
+    (
+    <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no, </if>
+    <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark,  </if>
+    <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> created_user,</if>
+    <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id,</if>
+    <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route,</if>
+    <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name,</if>
+    <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name,</if>
+    <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> ware_area_type,</if>
+    <if test="wareAreaDto.principalId != null and wareAreaDto.principalId != ''">principal_id,</if>
+    <if test="wareAreaDto.principalName != null and wareAreaDto.principalName != ''">principal_name,</if>
+    created_time,
+    last_updated_time
+    )
+    VALUES
+    (
+    <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> #{wareAreaDto.areaNo}, </if>
+    <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> #{wareAreaDto.remark},  </if>
+    <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> #{wareAreaDto.createdUser},</if>
+    <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> #{wareAreaDto.floorId},</if>
+    <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> #{wareAreaDto.pidRoute},</if>
+    <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> #{wareAreaDto.areaName},</if>
+    <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> #{wareAreaDto.siteName},</if>
+    <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> #{wareAreaDto.wareAreaType},</if>
+    <if test="wareAreaDto.principalId != null and wareAreaDto.principalId != ''">#{wareAreaDto.principalId},</if>
+    <if test="wareAreaDto.principalName != null and wareAreaDto.principalName != ''">#{wareAreaDto.principalName},</if>
+    sysdate(),
+    sysdate()
+    )
+    <selectKey keyProperty="wareAreaDto.id" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+  <update id="updateWarearea">
+    UPDATE tb_ware_area
+    <set>
+      <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no = #{wareAreaDto.areaNo},</if>
+      <if test="wareAreaDto.updateUser != null and wareAreaDto.updateUser != ''"> last_updated_user =#{wareAreaDto.updateUser},</if>
+      <if test="wareAreaDto.floorId != null and wareAreaDto.floorId != ''"> floor_id =#{wareAreaDto.floorId},</if>
+      <if test="wareAreaDto.pidRoute != null and wareAreaDto.pidRoute != ''"> pid_route =#{wareAreaDto.pidRoute},</if>
+      <if test="wareAreaDto.areaName != null and wareAreaDto.areaName != ''"> area_name = #{wareAreaDto.areaName},</if>
+      <if test="wareAreaDto.siteName != null and wareAreaDto.siteName != ''"> site_name = #{wareAreaDto.siteName},</if>
+      <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> ware_area_type = #{wareAreaDto.wareAreaType},</if>
+      <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark = #{wareAreaDto.remark},</if>
+      <if test="wareAreaDto.principalId != null and wareAreaDto.principalId != ''">principal_id = #{wareAreaDto.principalId},</if>
+      <if test="wareAreaDto.principalName != null and wareAreaDto.principalName != ''">principal_name = #{wareAreaDto.principalName},</if>
+      last_updated_time = sysdate()
+    </set>
+    WHERE id = #{wareAreaDto.id}
+  </update>
+  <select id="findWareArea" resultType="com.rpzh.vo.WareAreaVo">
+    SELECT
+      `id` as id,
+      `area_no` as areaNo,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `floor_id` as floorId,
+      `pid_route` as pidRoute,
+      `area_name` as areaName,
+      `site_name` as siteName,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
+    FROM `tb_ware_area`
+    WHERE id = #{areaId}
+  </select>
+  <insert id="addStack">
+    INSERT INTO tb_stack
+    (
+    <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no, </if>
+    <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn, </if>
+    <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> created_user, </if>
+    <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id, </if>
+    <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route, </if>
+    <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name, </if>
+    <if test="stackDto.remark != null and stackDto.remark != ''"> remark, </if>
+    <if test="stackDto.stackType != null and stackDto.stackType != ''"> stack_type, </if>
+    <if test="stackDto.principalId != null and stackDto.principalId != ''">principal_id,</if>
+    <if test="stackDto.principalName != null and stackDto.principalName != ''">principal_name,</if>
+    created_time,
+    last_updated_time
+    )
+    VALUES
+    (
+    <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> #{stackDto.stackNo}, </if>
+    <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> #{stackDto.nameCn}, </if>
+    <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> #{stackDto.createdUser}, </if>
+    <if test="stackDto.areaId != null and stackDto.areaId != ''"> #{stackDto.areaId}, </if>
+    <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> #{stackDto.pidRoute}, </if>
+    <if test="stackDto.siteName != null and stackDto.siteName != ''"> #{stackDto.siteName}, </if>
+    <if test="stackDto.remark != null and stackDto.remark != ''"> #{stackDto.remark}, </if>
+    <if test="stackDto.stackType != null and stackDto.stackType != ''"> #{stackDto.stackType}, </if>
+    <if test="stackDto.principalId != null and stackDto.principalId != ''">#{stackDto.principalId},</if>
+    <if test="stackDto.principalName != null and stackDto.principalName != ''">#{stackDto.principalName},</if>
+    sysdate(),
+    sysdate()
+    )
+    <selectKey keyProperty="stackDto.stackId" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+  </insert>
+  <update id="updateStack">
+    UPDATE tb_stack
+    <set>
+      <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no = #{stackDto.stackNo}, </if>
+      <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn =  #{stackDto.nameCn}, </if>
+      <if test="stackDto.lastUpdatedUser != null and stackDto.lastUpdatedUser != ''"> last_updated_user =  #{stackDto.lastUpdatedUser}, </if>
+      <if test="stackDto.lastUpdatedUserId != null and stackDto.lastUpdatedUserId != ''"> last_updated_user_id =  #{stackDto.lastUpdatedUserId}, </if>
+      <if test="stackDto.areaId != null and stackDto.areaId != ''"> area_id =  #{stackDto.areaId}, </if>
+      <if test="stackDto.pidRoute != null and stackDto.pidRoute != ''"> pid_route =  #{stackDto.pidRoute}, </if>
+      <if test="stackDto.siteName != null and stackDto.siteName != ''"> site_name =  #{stackDto.siteName}, </if>
+      <if test="stackDto.remark != null and stackDto.remark != ''"> remark =  #{stackDto.remark}, </if>
+      <if test="stackDto.stackType != null and stackDto.stackType != ''"> stack_type =  #{stackDto.stackType}, </if>
+      <if test="stackDto.principalId != null and stackDto.principalId != ''">principal_id = #{stackDto.principalId},</if>
+      <if test="stackDto.principalName != null and stackDto.principalName != ''">principal_name = #{stackDto.principalName},</if>
+      last_updated_time = sysdate()
+    </set>
+    WHERE id = #{stackDto.stackId}
+  </update>
+  <delete id="delWarehose">
+    DELETE
+    FROM tb_warehouse
+    WHERE id = #{warehouseNodeId}
+  </delete>
+  <select id="findBuildingCount" resultType="int">
+    SELECT count(1)
+    FROM tb_building
+    WHERE warehouse_id = #{warehouseNodeId}
+  </select>
+  <select id="findFloorCount" resultType="int">
+    SELECT count(1)
+    FROM tb_floor
+    WHERE building_id = #{warehouseNodeId}
+  </select>
+  <delete id="delBuilding">
+    DELETE
+    FROM tb_building
+    WHERE id = #{warehouseNodeId}
+  </delete>
+  <select id="findWareAreaCount" resultType="int">
+    SELECT count(1)
+    FROM tb_ware_area
+    WHERE floor_id = #{warehouseNodeId}
+  </select>
+  <delete id="delFloor">
+    DELETE
+    FROM tb_floor
+    WHERE id = #{warehouseNodeId}
+  </delete>
+  <select id="findStackCount" resultType="int">
+    SELECT count(1)
+    FROM tb_stack
+    WHERE area_id = #{warehouseNodeId}
+  </select>
+  <delete id="delWareArea">
+    DELETE
+    FROM tb_ware_area
+    WHERE id = #{warehouseNodeId}
+  </delete>
+  <delete id="delStack">
+    DELETE
+    FROM tb_stack
+    WHERE id in
+    <foreach collection="stackIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+  <select id="findAllWarehouse" resultType="com.rpzh.vo.WarehouseVo">
+    SELECT
+    `id` as id,
+    `name` as name,
+    `build_time` as buildTime,
+    `code` as code,
+    `use_volume` as useVolume,
+    `use_volume_unit` as useVolumeUnit,
+    `use_area` as useArea,
+    `use_area_unit` as useAreaUnit,
+    `is_automation` as isAutomation,
+    `is_statistics` as isStatistics,
+    `is_using` as isUsing,
+    `remark` as remark,
+    `created_time` as createdTime,
+    `created_user` as createdUser,
+    `last_updated_time` as lastUpdatedTime,
+    `last_updated_user` as lastUpdatedUser,
+    `pid_route` as pidRoute,
+    `ware_type` as wareType,
+    `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_warehouse
+    <where>
+      <if test="warehouseNodeId != null and warehouseNodeId != ''">
+        and id = #{warehouseNodeId}
+      </if>
+    </where>
+  </select>
+  <select id="findBuildingById" resultType="com.rpzh.vo.BuildingVo">
+    SELECT
+      `id` as id,
+      `building_no` as buildingNo,
+      `use_volume` as useVolume,
+      `use_volume_unit` as useVolumeUnit,
+      `use_area` as useArea,
+      `use_area_unit` as useAreaUnit,
+      `building_orientation` as buildingOrientation,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `warehouse_id` as warehouseId,
+      `pid_route` as pidRoute,
+      `building_name` as buildingName,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM `tb_building`
+    WHERE warehouse_id = #{warehouseNodeId}
+  </select>
+  <select id="findFloorById" resultType="com.rpzh.vo.FloorVo">
+    SELECT
+      `id` as id,
+      `floor_no` as floorNo,
+      `is_partition` as isPartition,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `building_id` as buildingId,
+      `pid_route` as pidRoute,
+      `floor_name` as floorName,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_floor
+    WHERE building_id = #{warehouseNodeId}
+  </select>
+  <select id="findWareAreaById" resultType="com.rpzh.vo.WareAreaVo">
+    SELECT
+      `id` as id,
+      `area_no` as areaNo,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `floor_id` as floorId,
+      `pid_route` as pidRoute,
+      `area_name` as areaName,
+      `site_name` as siteName,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
+    FROM `tb_ware_area`
+    WHERE floor_id = #{warehouseNodeId}
+  </select>
+  <select id="getStackPage" resultType="com.rpzh.vo.StackVo">
+    SELECT
+      `id` as id,
+      `stack_no` as stackNo,
+      `name_cn` as nameCn,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `area_id` as areaId,
+      `pid_route` as pidRoute,
+      `site_name` as siteName,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
+    FROM `tb_stack`
+    WHERE area_id = #{stackDto.wareAreaId}
+  </select>
+  <select id="findWarehouseById" resultType="com.rpzh.vo.WarehouseVo">
+    SELECT
+      `id` as id,
+      `name` as name,
+      `build_time` as buildTime,
+      `code` as code,
+      `use_volume` as useVolume,
+      `use_volume_unit` as useVolumeUnit,
+      `use_area` as useArea,
+      `use_area_unit` as useAreaUnit,
+      `is_automation` as isAutomation,
+      `is_statistics` as isStatistics,
+      `is_using` as isUsing,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `pid_route` as pidRoute,
+      `ware_type` as wareType,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_warehouse
+    where id = #{warehouseNodeId}
+  </select>
+  <select id="findBuildById" resultType="com.rpzh.vo.BuildingVo">
+    SELECT
+      `id` as id,
+      `building_no` as buildingNo,
+      `use_volume` as useVolume,
+      `use_volume_unit` as useVolumeUnit,
+      `use_area` as useArea,
+      `use_area_unit` as useAreaUnit,
+      `building_orientation` as buildingOrientation,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `warehouse_id` as warehouseId,
+      `pid_route` as pidRoute,
+      `building_name` as buildingName,
+      `building_type` as buildingType,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM `tb_building`
+    where id = #{warehouseNodeId}
+  </select>
+  <select id="findOneFloor" resultType="com.rpzh.vo.FloorVo">
+    SELECT
+      `id` as id,
+      `floor_no` as floorNo,
+      `is_partition` as isPartition,
+      `remark` as remark,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `building_id` as buildingId,
+      `pid_route` as pidRoute,
+      `floor_type` as floorType,
+      `floor_name` as floorName,
+      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_floor
+    where id = #{warehouseNodeId}
+  </select>
+  <select id="findWareAreaByOne" resultType="com.rpzh.vo.WareAreaVo">
+    SELECT
+      `id` as id,
+      `area_no` as areaNo,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `floor_id` as floorId,
+      `pid_route` as pidRoute,
+      `area_name` as areaName,
+      `site_name` as siteName,
+      `ware_area_type` as wareAreaType,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
+    FROM `tb_ware_area`
+    where id = #{warehouseNodeId}
+  </select>
+  <select id="findStackById" resultType="com.rpzh.vo.StackVo">
+    SELECT
+      `id` as id,
+      `stack_no` as stackNo,
+      `name_cn` as nameCn,
+      `created_time` as createdTime,
+      `created_user` as createdUser,
+      `last_updated_time` as lastUpdatedTime,
+      `last_updated_user` as lastUpdatedUser,
+      `area_id` as areaId,
+      `pid_route` as pidRoute,
+      `site_name` as siteName,
+      `stack_type` as stackType,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
+    FROM `tb_stack`
+    where id = #{stackId}
+  </select>
+  <select id="findWareType" resultType="java.lang.String">
+    SELECT ware_type
+    FROM tb_warehouse
+    WHERE id = #{warehouseId}
+  </select>
+  <select id="findBuildType" resultType="java.lang.String">
+    SELECT building_type
+    FROM `tb_building`
+    WHERE id = #{buildingId}
+  </select>
+  <select id="findFloorType" resultType="java.lang.String">
+    SELECT floor_type
+    FROM tb_floor
+    WHERE id = #{floorId}
+  </select>
+  <select id="findWareAreaType" resultType="java.lang.String">
+    SELECT ware_area_type
+    FROM tb_ware_area
+    WHERE id = #{areaId}
+  </select>
   <select id = "findWareAreaPrincipalName" resultType="com.rpzh.vo.WareAreaVo">
     select
-    principal_id as principalId,
-    principal_name as principalName,
-    floor_id as floorId
+      principal_id as principalId,
+      principal_name as principalName,
+      floor_id as floorId
     from tb_ware_area
     where id = #{areaId}
   </select>
   <select id = "findFloorPrincipalName" resultType="com.rpzh.vo.FloorVo">
     select
-    principal_id as principalId,
-    principal_name as principalName,
-    building_id as buildingId
+      principal_id as principalId,
+      principal_name as principalName,
+      building_id as buildingId
     from tb_floor
     where id = #{floorId}
   </select>
@@ -636,76 +683,76 @@
     `last_updated_user` as lastUpdatedUser,
     `pid_route` as pidRoute,
     `ware_type` as wareType,
-    `site_name` as siteName
+    `site_name` as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_warehouse
     where 1=1
     <if test="warehouseIds != null"> and id in  <foreach collection="warehouseIds" item="id" open="(" separator="," close=")">
       #{id}
     </foreach></if>
   </select>
-    <select id="findAllBulid" resultType="com.rpzh.vo.BuildingVo">
+  <select id="findAllBulid" resultType="com.rpzh.vo.BuildingVo">
     SELECT
-      `id` as id,
-      `building_no` as buildingNo,
-      `use_volume` as useVolume,
-      `use_volume_unit` as useVolumeUnit,
-      `use_area` as useArea,
-      `use_area_unit` as useAreaUnit,
-      `building_orientation` as buildingOrientation,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `warehouse_id` as warehouseId,
-      `pid_route` as pidRoute,
-      `building_name` as buildingName,
-      `building_type` as buildingType,
-      `site_name` as siteName
+    `id` as id,
+    `building_no` as buildingNo,
+    `use_volume` as useVolume,
+    `use_volume_unit` as useVolumeUnit,
+    `use_area` as useArea,
+    `use_area_unit` as useAreaUnit,
+    `building_orientation` as buildingOrientation,
+    `remark` as remark,
+    `created_time` as createdTime,
+    `created_user` as createdUser,
+    `last_updated_time` as lastUpdatedTime,
+    `last_updated_user` as lastUpdatedUser,
+    `warehouse_id` as warehouseId,
+    `pid_route` as pidRoute,
+    `building_name` as buildingName,
+    `building_type` as buildingType,
+    `site_name` as siteName,principal_id as principalId , principal_name as principalName
     FROM `tb_building`
     where 1=1
-      <if test="buildingIds != null"> and id in  <foreach collection="buildingIds" item="id" open="(" separator="," close=")">
-        #{id}
-      </foreach></if>
+    <if test="buildingIds != null"> and id in  <foreach collection="buildingIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach></if>
   </select>
-    <select id="findAllFloor" resultType="com.rpzh.vo.FloorVo">
+  <select id="findAllFloor" resultType="com.rpzh.vo.FloorVo">
     SELECT
-      `id` as id,
-      `floor_no` as floorNo,
-      `is_partition` as isPartition,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `building_id` as buildingId,
-      `pid_route` as pidRoute,
-      `floor_name` as floorName,
-      `site_name` as siteName
+    `id` as id,
+    `floor_no` as floorNo,
+    `is_partition` as isPartition,
+    `remark` as remark,
+    `created_time` as createdTime,
+    `created_user` as createdUser,
+    `last_updated_time` as lastUpdatedTime,
+    `last_updated_user` as lastUpdatedUser,
+    `building_id` as buildingId,
+    `pid_route` as pidRoute,
+    `floor_name` as floorName,
+    `site_name` as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_floor
     where 1=1
-      <if test="floorIds != null"> and id in  <foreach collection="floorIds" item="id" open="(" separator="," close=")">
-        #{id}
-      </foreach></if>
+    <if test="floorIds != null"> and id in  <foreach collection="floorIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach></if>
   </select>
-    <select id="findAllWareArea" resultType="com.rpzh.vo.WareAreaVo">
+  <select id="findAllWareArea" resultType="com.rpzh.vo.WareAreaVo">
     SELECT
-      id as id,
-      area_no as areaNo,
-      created_time as createdTime,
-      created_user as createdUser,
-      floor_id as floorId,
-      pid_route as pidRoute,
-      area_name as areaName,
-      site_name as siteName,
-      remark as remark
+    id as id,
+    area_no as areaNo,
+    created_time as createdTime,
+    created_user as createdUser,
+    floor_id as floorId,
+    pid_route as pidRoute,
+    area_name as areaName,
+    site_name as siteName,
+    remark as remark,principal_id as principalId , principal_name as principalName
     FROM tb_ware_area
     where 1=1
     <if test="areaIds != null"> and id in  <foreach collection="areaIds" item="id" open="(" separator="," close=")">
       #{id}
     </foreach></if>
   </select>
-    <select id="findAllStack" resultType="com.rpzh.vo.StackVo">
+  <select id="findAllStack" resultType="com.rpzh.vo.StackVo">
     SELECT
       `id` as id,
       `stack_no` as stackNo,
@@ -717,8 +764,8 @@
       `area_id` as areaId,
       `pid_route` as pidRoute,
       `site_name` as siteName,
-  `stack_type` as stackType,
-  `remark` as remark
+      `stack_type` as stackType,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
     FROM `tb_stack`
   </select>
   <select id="findStackNotInMaintainPlan" resultType="com.rpzh.vo.StackVo">
@@ -733,22 +780,22 @@
       `area_id` as areaId,
       `pid_route` as pidRoute,
       `site_name` as siteName,
-  `stack_type` as stackType,
-  `remark` as remark
+      `stack_type` as stackType,
+      `remark` as remark,principal_id as principalId , principal_name as principalName
     FROM `tb_stack` where id not in (select stack_id from tb_maintain_plan where is_end = '0')
   </select>
   <select id = "findBuildingPrincipalName" resultType="com.rpzh.vo.BuildingVo">
     select
-    principal_id as principalId,
-    principal_name as principalName,
-    warehouse_id as warehouseId
+      principal_id as principalId,
+      principal_name as principalName,
+      warehouse_id as warehouseId
     from tb_building
     where id = #{buildingId}
   </select>
   <select id = "findWarehousePrincipalName" resultType="com.rpzh.vo.WarehouseVo">
     select
-    principal_id as principalId,
-    principal_name as principalName
+      principal_id as principalId,
+      principal_name as principalName
     from tb_warehouse
     where id = #{warehouseId}
   </select>
@@ -758,36 +805,16 @@
 
   <select id="findStackPrincipalName" resultType="com.rpzh.vo.StackVo">
     select
-    principal_id as principalId,
-    area_id as areaId
+      principal_id as principalId,
+      area_id as areaId
     from tb_stack
     where id = #{stackId}
   </select>
 
-    <select id="findStackByAreId" resultType="java.lang.Integer">
+  <select id="findStackByAreId" resultType="java.lang.Integer">
     select
-    id as id
+      id as id
     from tb_stack
     where area_id = #{areaId}
-  </select>
-  <select id="findWareAreaSiteRoute" resultType="java.lang.String">
-    select concat(pid_route,',[04:',id,']') as pid_route from tb_ware_area where pid_route like concat('%',#{siteRoute},'%')
-  </select>
-  <select id="findStackSiteRoute" resultType="java.lang.String">
-    select concat(pid_route,',[05:',id,']') as pid_route from tb_stack where pid_route like concat('%',#{siteRoute},'%')
-  </select>
-  <select id="findWareAreaInfos" resultType="java.util.Map">
-        select site_name as siteName,concat(pid_route,',[04:',id,']') as siteRoute from tb_ware_area where
-    id in
-    <foreach collection="areaIds" item="id" open="(" separator="," close=")">
-      #{id}
-    </foreach>
-    </select>
-  <select id="findStackInfos" resultType="java.util.Map">
-    select site_name as siteName,concat(pid_route,',[05:',id,']') as siteRoute from tb_stack where
-    id in
-    <foreach collection="stackIds" item="id" open="(" separator="," close=")">
-      #{id}
-    </foreach>
   </select>
 </mapper>
