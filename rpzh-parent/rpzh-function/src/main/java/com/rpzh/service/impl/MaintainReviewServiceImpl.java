@@ -5,12 +5,15 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.MaintainReviewDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.feign.UserFeign;
 import com.rpzh.service.MaintainReviewService;
 import com.rpzh.vo.MaintainPlanVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: zyq
@@ -21,6 +24,8 @@ import java.util.List;
 public class MaintainReviewServiceImpl implements MaintainReviewService {
     @Resource
     private MaintainReviewDao maintainReviewDao;
+    @Resource
+    private UserFeign userFeign;
     @Override
     public PageInfo<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto) {
         String pidRoute = maintainPlanDto.getPidRoute();
@@ -37,6 +42,16 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         List<MaintainPlanVo> maintainPlanVos = maintainReviewDao.findReviewTable(maintainPlanDto, column);
+        maintainPlanVos.forEach(maintainPlanVo -> {
+            List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
+            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+            maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+        });
         return new PageInfo<>(maintainPlanVos);
+    }
+
+    @Override
+    public MaintainPlanVo findMiantainBaseInfo(Integer id) {
+        return null;
     }
 }

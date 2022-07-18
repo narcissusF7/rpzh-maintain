@@ -14,7 +14,7 @@ import java.util.List;
 public class UserFeignImpl implements UserFeign {
     //根据id查询用户名
     @Override
-    public Result findUsernameById(List<Integer> ids) {
+    public List<String> findUsernameById(List<Integer> ids) {
         throw new RuntimeException("服务器异常");
     }
 

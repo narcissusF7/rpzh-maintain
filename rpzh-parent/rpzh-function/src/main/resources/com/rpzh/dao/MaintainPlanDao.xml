@@ -272,6 +272,8 @@
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
+        <if test="maintainPlanDto.startTime != null and maintainPlanDto.startTime != ''"> and t2.updated_time >= #{maintainPlanDto.startTime}</if>
+        <if test="maintainPlanDto.endTime != null and maintainPlanDto.endTime != ''"> and t2.updated_time &lt;= #{maintainPlanDto.endTime}</if>
         ORDER BY t2.id
     </select>
     <select id="findMaintainHistoryById" resultType="com.rpzh.vo.MaintainPlanVo">

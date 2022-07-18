@@ -1,7 +1,5 @@
 package com.rpzh.service.impl;
-
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.*;
 import com.github.pagehelper.util.StringUtil;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
@@ -223,11 +220,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVo.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
         List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-        maintainPlanVo.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+        maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
         maintainPlanVo.setPrincipalIds(principalId);
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
         });
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
@@ -539,7 +536,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVos.forEach(maintainPlan->{
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
             List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
@@ -552,7 +549,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVos.forEach(maintainPlan->{
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
             List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlan.setPrincipalName(userFeign.findUsernameById(principalId).getData().toString().replaceAll("\\[","").replaceAll("\\]",""));
+            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
