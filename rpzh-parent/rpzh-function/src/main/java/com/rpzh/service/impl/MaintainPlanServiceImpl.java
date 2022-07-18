@@ -131,18 +131,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
-    public AlarmValueSettingVo findAlarmSettingTemplateByPhases(String materialCode, String maintenceStyle, String phases) {
-        String[] codes = materialCode.split(",");
-        for (String code : codes) {
-            AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(code, maintenceStyle, phases);
-            if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
-                return alarmValueSettingVo;
-            }
-        }
-        return new AlarmValueSettingVo();
-    }
-
-    @Override
     public List<String> findAlarmSettingTemplateList(){
         return alarmSettingTemplateDao.findAlarmSettingTemplateList();
     }
@@ -420,8 +408,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         }
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
+        Set<Integer> pids = new HashSet<>();
+        pids.addAll(principalIds);
         Integer stackId = maintainPlanDto.getStackId();
-        maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
+        maintainPlanDto.setPrincipalId(StringUtils.join(pids,","));
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
         String updateUser = TokenDecode.getUserInfo().get("username");
         Date nowDate = new Date();
@@ -491,9 +481,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             redisTemplate.opsForHash().delete(MAINTAIN + maintainPlanDto.getStageId());
         }
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        Set<Integer> pids = new HashSet<>();
+        pids.addAll(principalIds);
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
-        maintainPlanDto.setPrincipalId(StringUtils.join(principalIds,","));
+        maintainPlanDto.setPrincipalId(StringUtils.join(pids,","));
         String createUser = TokenDecode.getUserInfo().get("username");
         Date date = new Date();
         maintainPlanDto.setCreateUser(createUser);
@@ -799,7 +791,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
-        List<String> materialCodes = alarmValueSettingDto.getMaterialCodes();
+        List<String> materialCodes =  Arrays.asList(alarmValueSettingDto.getMaterialCode().split(","));
         for (String materialCode : materialCodes) {
             alarmValueSettingDto.setMaterialCode(materialCode);
             alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(alarmValueSettingDto);

@@ -46,7 +46,7 @@
             t2.phases as phases,
             t2.maintain_days AS maintainDays,
             t2.aftercare_date_start AS aftercareDateStart,
-            t2.oxygen_reduction_day AS oxygenReductionDay,
+            t2.oxygen_reduction_day AS oxygenReductionTime,
             t2.created_time AS createdTime,
             t2.expire_time AS expireTime,
             t2.maintain_count as maintainCount,
@@ -68,7 +68,7 @@
             t2.phases as phases,
             t2.maintain_days AS maintainDays,
             t2.aftercare_date_start AS aftercareDateStart,
-            t2.oxygen_reduction_day AS oxygenReductionDay,
+            t2.oxygen_reduction_day AS oxygenReductionTime,
             t2.created_time AS createdTime,
             t1.principal_name AS principalName,
             t2.expire_time AS expireTime,
@@ -131,7 +131,7 @@
             <if test="maintainPlanDto.aftercareDateStart != null">aftercare_date_start = #{maintainPlanDto.aftercareDateStart},</if>
             <if test="maintainPlanDto.aftercareDateEnd != null">aftercare_date_end = #{maintainPlanDto.aftercareDateEnd},</if>
             <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count = #{maintainPlanDto.maintainCount},</if>
-            <if test="maintainPlanDto.oxygenReductionDay != null and maintainPlanDto.oxygenReductionDay != ''">oxygen_reduction_day = #{maintainPlanDto.oxygenReductionDay},</if>
+            <if test="maintainPlanDto.oxygenReductionTime != null and maintainPlanDto.oxygenReductionTime != ''">oxygen_reduction_day = #{maintainPlanDto.oxygenReductionTime},</if>
             <if test="maintainPlanDto.expireTime != null">expire_time = #{maintainPlanDto.expireTime},</if>
             <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">phases=#{maintainPlanDto.phases},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">update_user = #{maintainPlanDto.updateUser},</if>
@@ -175,7 +175,7 @@
         <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">maintain_days,</if>
         <if test="maintainPlanDto.aftercareDateStart != null">aftercare_date_start,</if>
         <if test="maintainPlanDto.aftercareDateEnd != null">aftercare_date_end,</if>
-        <if test="maintainPlanDto.oxygenReductionDay != null and maintainPlanDto.oxygenReductionDay != ''">oxygen_reduction_day,</if>
+        <if test="maintainPlanDto.oxygenReductionTime != null and maintainPlanDto.oxygenReductionTime != ''">oxygen_reduction_day,</if>
         <if test="maintainPlanDto.expireTime != null">expire_time,</if>
         <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count,</if>
         <if test="maintainPlanDto.alarmValueSettingId != null and maintainPlanDto.alarmValueSettingId !=''">alarm_value_setting_id,</if>
@@ -188,8 +188,7 @@
         <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">#{maintainPlanDto.maintainDays},</if>
         <if test="maintainPlanDto.aftercareDateStart != null">#{maintainPlanDto.aftercareDateStart},</if>
         <if test="maintainPlanDto.aftercareDateEnd != null">#{maintainPlanDto.aftercareDateEnd},</if>
-        <if test="maintainPlanDto.oxygenReductionDay != null and maintainPlanDto.oxygenReductionDay != ''">#{maintainPlanDto.oxygenReductionDay},</if>
-        <if test="maintainPlanDto.oxygenReductionTime != null">#{maintainPlanDto.oxygenReductionTime},</if>
+        <if test="maintainPlanDto.oxygenReductionTime != null and maintainPlanDto.oxygenReductionTime != ''">#{maintainPlanDto.oxygenReductionTime},</if>
         <if test="maintainPlanDto.expireTime != null">#{maintainPlanDto.expireTime},</if>
         <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">#{maintainPlanDto.maintainCount},</if>
         <if test="maintainPlanDto.alarmValueSettingId != null and maintainPlanDto.alarmValueSettingId !=''">#{maintainPlanDto.alarmValueSettingId},</if>
@@ -199,7 +198,7 @@
         )
     </insert>
     <select id="findStageIdById" resultType="java.lang.Integer">
-        select id from tb_maintain_plan_stage where maintain_plan_id = #{id} and is_change ='0'
+        select id from tb_maintain_plan_stage where is_change ='0' and (maintain_plan_id,created_time) in (select maintain_plan_id,max(created_time) from tb_maintain_plan_stage where maintain_plan_id = #{id})
     </select>
     <select id="findIdByStackId" resultType="java.lang.Integer">
         select id from tb_maintain_plan where stack_id = #{stackId} and is_end='0'

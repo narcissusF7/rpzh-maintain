@@ -60,7 +60,7 @@ public class MaintainPlanVo {
     private Date aftercareDateEnd;
 
     @ApiModelProperty(notes = "降氧完成天数")
-    private Integer oxygenReductionDay;
+    private Integer oxygenReductionTime;
 
     @ApiModelProperty(notes = "负责人")
     private String principalName;
@@ -119,4 +119,6 @@ public class MaintainPlanVo {
     private List<MaintainPlanVo> maintainPlanVos;
     @ApiModelProperty(notes = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位")
     public String pidRoute;
+    @ApiModelProperty(notes = "养护阶段集合")
+    private String 评吸意见;
 }

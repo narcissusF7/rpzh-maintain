@@ -131,7 +131,7 @@ public class MaintainPlanController {
         if (ToolUtil.isEmpty(maintainPlanDto.getMaintainDays())) {
             return new Result(false, StatusCode.ERROR, "养护天数不能为空!");
         }
-        if (ToolUtil.isEmpty(maintainPlanDto.getAftercareDateStart()) || ToolUtil.isEmpty(maintainPlanDto.getOxygenReductionDay())
+        if (ToolUtil.isEmpty(maintainPlanDto.getAftercareDateStart()) || ToolUtil.isEmpty(maintainPlanDto.getOxygenReductionTime())
                 || ToolUtil.isEmpty(maintainPlanDto.getExpireTime())) {
             return new Result(false, StatusCode.ERROR, "调养日期,降氧完成天数,到期提醒时间不能为空!");
         }
@@ -397,7 +397,7 @@ public class MaintainPlanController {
 
     /**
      * 历史汇总单中的详情
-     * @param maintainPlanDto
+     * @param id
      * @return
      */
     @PostMapping("/findEndMaintainPlanDetails")
@@ -405,8 +405,8 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
-    public Result<MaintainPlanVo> findEndMaintainPlanDetails(@ApiIgnore MaintainPlanDto maintainPlanDto) {
-        MaintainPlanVo maintainPlanVo = maintainPlanService.findEndMaintainPlanDetails(maintainPlanDto.getId());
+    public Result<MaintainPlanVo> findEndMaintainPlanDetails(Integer id) {
+        MaintainPlanVo maintainPlanVo = maintainPlanService.findEndMaintainPlanDetails(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
     }
 
@@ -606,8 +606,13 @@ public class MaintainPlanController {
     }
 
     @PostMapping(value = "findAlarmSettingTemplateByPhases")
-    public Result findAlarmSettingTemplateByPhases(String materialCode, String maintenceStyle, String phases){
-        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmSettingTemplateByPhases(materialCode, maintenceStyle, phases);
+    public Result findAlarmSettingTemplateByPhases(String materialCode, String maintenceStyle, String phases,String pidRoute){
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto();
+        alarmValueSettingDto.setPhases(phases);
+        alarmValueSettingDto.setMaintenceStyle(maintenceStyle);
+        alarmValueSettingDto.setMaterialCode(materialCode);
+        alarmValueSettingDto.setPidRoute(pidRoute);
+        AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(alarmValueSettingDto);
         return new Result(true, StatusCode.OK, "查询成功",alarmValueSettingVo);
     }
 }

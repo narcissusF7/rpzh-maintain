@@ -69,7 +69,7 @@ public class MaintainPlanDto {
     @JsonFormat(pattern = "yyyy-MM-dd 00:00:00", timezone = "GMT+8")
     private Date aftercareDateEnd;
     //降氧完成时间
-    private String oxygenReductionDay;
+    private String oxygenReductionTime;
     //负责人id集合
     private List<Integer> principalIds;
     //负责人id

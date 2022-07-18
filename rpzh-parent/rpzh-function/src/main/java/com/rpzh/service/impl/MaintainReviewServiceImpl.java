@@ -1,7 +1,16 @@
 package com.rpzh.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.MaintainReviewDao;
+import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainReviewService;
+import com.rpzh.vo.MaintainPlanVo;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author: zyq
@@ -10,4 +19,24 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MaintainReviewServiceImpl implements MaintainReviewService {
+    @Resource
+    private MaintainReviewDao maintainReviewDao;
+    @Override
+    public PageInfo<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto) {
+        String pidRoute = maintainPlanDto.getPidRoute();
+        String column = "";
+        if(ToolUtil.isNotEmpty(pidRoute)){
+            if(pidRoute.contains("04")){
+                column = "t3.id = #{maintainPlanDto.stackId}";
+            }else if(!pidRoute.contains("04") && pidRoute.contains("03")){
+                column = "t3.area_id = #{maintainPlanDto.stackId}";
+            }else{
+                maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0"+maintainPlanDto.getPidRoute().split(",").length+":" + maintainPlanDto.getStackId() + "]");
+                column = "t3.pid_route = #{maintainPlanDto.siteRoute}";
+            }
+        }
+        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
+        List<MaintainPlanVo> maintainPlanVos = maintainReviewDao.findReviewTable(maintainPlanDto, column);
+        return new PageInfo<>(maintainPlanVos);
+    }
 }
