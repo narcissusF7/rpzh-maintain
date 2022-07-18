@@ -164,7 +164,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String principalName = buildingDto.getPrincipalName();
         Map<String,Object> map = new HashMap<>();
         if (ToolUtil.isEmpty(principalName)){
-            sitePrincipalMap(warehouseVo.getPidRoute(),map);
+            map = sitePrincipalMap(buildingDto.getPidRoute(),map);
         }else {
             getUserInfo(principalName,map);
         }
@@ -219,7 +219,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String principalName = floorDto.getPrincipalName();
         Map<String,Object> map = new HashMap<>();
         if (ToolUtil.isEmpty(principalName)){
-            sitePrincipalMap(floorDto.getPidRoute(),map);
+            map = sitePrincipalMap(floorDto.getPidRoute(),map);
         }else {
             getUserInfo(principalName,map);
         }
@@ -274,7 +274,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String principalName = wareAreaDto.getPrincipalName();
         Map<String,Object> map = new HashMap<>();
         if (ToolUtil.isEmpty(principalName)){
-            sitePrincipalMap(wareAreaDto.getPidRoute(),map);
+            map = sitePrincipalMap(wareAreaDto.getPidRoute(),map);
         }else {
             getUserInfo(principalName,map);
         }
@@ -330,7 +330,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String principalName = stackDto.getPrincipalName();
         Map<String,Object> map = new HashMap<>();
         if (ToolUtil.isEmpty(principalName)){
-            sitePrincipalMap(stackDto.getPidRoute(),map);
+            map = sitePrincipalMap(stackDto.getPidRoute(),map);
         }else {
             getUserInfo(principalName,map);
         }
@@ -808,8 +808,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         String[] strs =  pidRoute.split(",");
         //如果负责人账号为空 向上查找
         for (int i = 0; i < strs.length; i++) {
-            Integer level = strs.length-i;
-            String str = strs[strs.length-1-i];
+            Integer level = strs.length-i-1;
+            String str = strs[level];
             Integer id = Integer.parseInt(str.substring(4,str.length()-1));
             Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
             if (!ToolUtil.isEmpty(o)){
@@ -851,7 +851,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 map = sitePrincipalMap(pidRoute, map);
 
             }else {
-                map = JSONObject.parseObject(o+"",HashMap.class);
+//                map = JSONObject.parseObject(o+"",HashMap.class);
                 getUserInfo(principalName,map);
             }
             redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,strs.length+"_" + siteId,JSONObject.toJSONString(map));
