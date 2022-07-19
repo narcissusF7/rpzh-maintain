@@ -170,9 +170,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         int addFlag = warehouseDao.addBuilding(buildingDto);
+        if (!ToolUtil.isEmpty(principalName)){
+            //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+buildingDto.getId(), JSONObject.toJSONString(map));
 
-        //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+buildingDto.getId(), JSONObject.toJSONString(map));
+        }
 
         return addFlag;
     }
@@ -226,9 +228,10 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         int addFlag = warehouseDao.addFloor(floorDto);
 
-        //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"3_"+floorDto.getId(), JSONObject.toJSONString(map));
-
+        if (!ToolUtil.isEmpty(principalName)) {
+            //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "3_" + floorDto.getId(), JSONObject.toJSONString(map));
+        }
         return addFlag;
     }
 
@@ -280,10 +283,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         int addFlag = warehouseDao.addWarearea(wareAreaDto);
-
-        //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"4_"+wareAreaDto.getId(), JSONObject.toJSONString(map));
-
+        if (!ToolUtil.isEmpty(principalName)) {
+            //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "4_" + wareAreaDto.getId(), JSONObject.toJSONString(map));
+        }
         return addFlag;
     }
 
@@ -336,10 +339,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
 
         int addFlag = warehouseDao.addStack(stackDto);
-
-        //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"5_"+stackDto.getStackId(), JSONObject.toJSONString(map));
-
+        if (!ToolUtil.isEmpty(principalName)) {
+            //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "5_" + stackDto.getStackId(), JSONObject.toJSONString(map));
+        }
         return addFlag;
     }
 
