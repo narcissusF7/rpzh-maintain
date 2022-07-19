@@ -67,33 +67,32 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
             @ApiImplicitParam(name = "alarmValueSettingDtos", value = "阶段集合", required = true,dataType = "List"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].maintenceStyle", value = "养护方式", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].phases", value = "养护阶段", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     @ApiOperation(value = "添加预警设置模板")
-    public Result insertAlarmSettingTemplate(@ApiIgnore AlarmSettingTemplateDto alarmSettingTemplateDto) {
-        alarmSettingTemplateService.insertAlarmSettingTemplate(alarmSettingTemplateDto);
-        return new Result<>(true, StatusCode.OK, "添加预警设置模板成功!");
+    public Result insertAlarmSettingTemplate(@ApiIgnore AlarmValueSettingDto alarmSettingTemplateDto) {
+        return alarmSettingTemplateService.insertAlarmSettingTemplate(alarmSettingTemplateDto);
     }
 
     @PostMapping(value = "/findColorAndAlertUpgradeDay")
@@ -122,10 +121,20 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false,dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false,dataType = "String")
     })
-    @ApiOperation(value = "预警设置修改前回显")
-    public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String maintenceStyle) {
-        AlarmSettingTemplateVo alarmSettingTemplateVo = alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle);
-        return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmSettingTemplateVo);
+    @ApiOperation(value = "下一阶段点上一步")
+    public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String maintenceStyle,String phases) {
+        AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle,phases);
+        return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
+    }
+
+    @PostMapping(value = "/beforeAlarmValueSetting")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "第几次点下一阶段", required = false,dataType = "int")
+    })
+    @ApiOperation(value = "修改前回显")
+    public Result<AlarmValueSettingVo> beforeAlarmValueSetting(Integer id) {
+        AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateService.findAlarmSettingTemplate(id);
+        return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
     }
 
     @PostMapping(value = "/updateAlarmSettingTemplate")
@@ -133,32 +142,32 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
             @ApiImplicitParam(name = "alarmValueSettingDtos", value = "阶段集合", required = true,dataType = "List"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].maintenceStyle", value = "养护方式", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].phases", value = "养护阶段", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos[i].coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperTwo", value = "垛内氧气上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenUpperThree", value = "垛内氧气上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackOxygenLower", value = "垛内氧气下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperOne", value = "包芯温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperTwo", value = "包芯温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipUpperThree", value = "包芯温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "tempCoreChipLower", value = "包芯温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperOne", value = "垛内温度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperTwo", value = "垛内温度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempUpperThree", value = "垛内温度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackTempLower", value = "垛内温度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperOne", value = "垛内湿度上限一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperTwo", value = "垛内湿度上限二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureUpperThree", value = "垛内湿度上限三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "stackMoistureLower", value = "垛内湿度下限",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempOne", value = "平均包芯高于环境一级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempTwo", value = "平均包芯高于环境二级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempHighEnvTempThree", value = "平均包芯高于环境三级",required = true,dataType ="double"),
+            @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
-    @ApiOperation(value = "添加预警设置模板")
-    public Result updateAlarmSettingTemplate(@ApiIgnore AlarmSettingTemplateDto alarmSettingTemplateDto) {
-        alarmSettingTemplateService.updateAlarmSettingTemplate(alarmSettingTemplateDto);
+    @ApiOperation(value = "更改预警设置模板")
+    public Result updateAlarmSettingTemplate(@ApiIgnore AlarmValueSettingDto alarmValueSettingDto) {
+        alarmSettingTemplateService.updateAlarmSettingTemplate(alarmValueSettingDto);
         return new Result<>(true, StatusCode.OK, "更改预警设置模板成功!");
     }
 

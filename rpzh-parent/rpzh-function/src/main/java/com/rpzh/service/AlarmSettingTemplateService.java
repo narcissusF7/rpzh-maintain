@@ -23,15 +23,17 @@ public interface AlarmSettingTemplateService {
 
     Result deleteAlarmSettingTemplate(List<String> materialCodes);
 
-    void insertAlarmSettingTemplate(AlarmSettingTemplateDto alarmSettingTemplateDto);
+    Result insertAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 
     SettingColorAndDayVo findColorAndAlertUpgradeDay();
 
     Result updateOrInsertColorAndAlertUpgradeDay(SettingColorAndDayDto settingColorAndDayDto);
 
-    AlarmSettingTemplateVo findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle);
+    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle,String phases);
 
-    void updateAlarmSettingTemplate(AlarmSettingTemplateDto alarmSettingTemplateDto);
+    void updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 
     Result findLogData(LogAlarmSettingDto logAlarmSettingDto);
+
+    AlarmValueSettingVo findAlarmSettingTemplate(Integer id);
 }

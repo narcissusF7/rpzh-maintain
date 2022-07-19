@@ -22,5 +22,7 @@ public interface MaterialDao {
 
     int updateMaterialStatus(@Param("stackId") Integer stackId);
 
-    List<MaterialVo> findCount(@Param("stackId") Integer stackId, @Param("materialCodes")List<String> materialCodes);
+    List<MaterialVo> findCount(@Param("stackId") Integer stackId, @Param("materialCodes") List<String> materialCodes);
+
+    List<String> findAllMaterialCodes();
 }

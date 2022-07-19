@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,5 +54,23 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
     @Override
     public MaintainPlanVo findMiantainBaseInfo(Integer id) {
         return null;
+    }
+
+    @Override
+    public List<MaintainPlanVo> findMaintainPlanReview(Integer id) {
+        List<MaintainPlanVo> maintainPlanInfos = maintainReviewDao.findMaintainPlanReview(id);
+        Date startTime = maintainPlanInfos.get(0).getCreatedTime();
+        Date endTime = maintainPlanInfos.get(maintainPlanInfos.size()-1).getCreatedTime();
+
+        return maintainPlanInfos;
+    }
+
+    @Override
+    public MaintainPlanVo findMaintainBaseInfo(Integer id) {
+        MaintainPlanVo maintainBaseInfo = maintainReviewDao.findMaintainBaseInfo(id);
+        List<String> principalIds = Arrays.asList(maintainBaseInfo.getPrincipalId().split(","));
+        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+        maintainBaseInfo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+        return maintainBaseInfo;
     }
 }

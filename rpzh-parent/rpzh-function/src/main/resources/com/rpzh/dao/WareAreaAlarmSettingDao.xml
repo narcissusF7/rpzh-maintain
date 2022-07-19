@@ -76,10 +76,10 @@
     <select id="findWareAreaAlarmSettingInfo" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
         select
         id as id,
-        concat_ws('℃,',warehouse_oxygen_upper_one,warehouse_oxygen_upper_two,concat_ws('',warehouse_oxygen_upper_three,'℃')) as oxygenList,
-        concat_ws('',warehouse_oxygen_lower,'℃') as warehouseOxygenLower,
-        concat_ws('%,',warehouse_temp_upper_one,warehouse_temp_upper_two,concat_ws('',warehouse_temp_upper_three,'%')) as tempList,
-        concat_ws('',warehouse_temp_lower,'%') as warehouseTempLower,
+        concat_ws('%,',warehouse_oxygen_upper_one,warehouse_oxygen_upper_two,concat_ws('',warehouse_oxygen_upper_three,'%')) as oxygenList,
+        concat_ws('',warehouse_oxygen_lower,'%') as warehouseOxygenLower,
+        concat_ws('℃,',warehouse_temp_upper_one,warehouse_temp_upper_two,concat_ws('',warehouse_temp_upper_three,'℃')) as tempList,
+        concat_ws('',warehouse_temp_lower,'℃') as warehouseTempLower,
         concat_ws('%,',warehouse_moisture_upper_one,warehouse_moisture_upper_two,concat_ws('',warehouse_moisture_upper_three,'%')) as moistureList,
         concat_ws('',warehouse_moisture_lower,'%') as warehouseMoistureLower,
         create_user as createUser,
@@ -92,7 +92,7 @@
         tb_ware_area_alarm_setting t1
         where 1=1
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat('%', #{wareAreaAlarmSettingDto.pidRoute}, '%')</if>
-        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user #{wareAreaAlarmSettingDto.createUser}</if>
+        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user =  #{wareAreaAlarmSettingDto.createUser}</if>
         <if test="wareAreaAlarmSettingDto.startTime != null">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
         <if test="wareAreaAlarmSettingDto.endTime != null">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
     </select>

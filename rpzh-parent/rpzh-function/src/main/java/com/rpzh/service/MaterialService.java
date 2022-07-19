@@ -12,4 +12,5 @@ import java.util.List;
  */
 public interface MaterialService {
     MaterialVo findMaterialInfo(Integer stackId);
+    List<String> findAllMaterialCodes();
 }

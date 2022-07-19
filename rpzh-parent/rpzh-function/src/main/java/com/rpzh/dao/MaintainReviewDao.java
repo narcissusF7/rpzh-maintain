@@ -14,5 +14,9 @@ import java.util.List;
  */
 @Mapper
 public interface MaintainReviewDao {
-    List<MaintainPlanVo> findReviewTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("column")String column);
+    List<MaintainPlanVo> findReviewTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto, @Param("column") String column);
+
+    List<MaintainPlanVo> findMaintainPlanReview(@Param("id") Integer id);
+
+    MaintainPlanVo findMaintainBaseInfo(@Param("id") Integer id);
 }

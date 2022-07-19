@@ -72,4 +72,9 @@ public class MaterialServiceImpl implements MaterialService {
         return materialVo;
     }
 
+    @Override
+    public List<String> findAllMaterialCodes() {
+        return materialDao.findAllMaterialCodes();
+    }
+
 }

@@ -45,7 +45,7 @@ public interface AlarmSettingTemplateDao {
     Integer findCount();
 
     //根据物料代码和养护方式查询各阶段的预警规则
-    List<AlarmValueSettingVo> findAlarmSettingTemplateByMaterialCode(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle);
+    AlarmValueSettingVo findAlarmSettingTemplateId(@Param("id")Integer id);
 
     ///根据物料代码和养护方式查询预警规则的基本信息
     AlarmValueSettingVo findNameByMaintenceStyle(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle);
@@ -65,5 +65,7 @@ public interface AlarmSettingTemplateDao {
     //查询所有的预警规则名称
     List<String> findAlarmSettingTemplateList();
 
-    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCodeAndPhases(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle,@Param("phases")String phases);
+    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCodeAndPhases(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle, @Param("phases") String phases);
+
+    Integer findSum(@Param("alarmValueSettingDto")AlarmValueSettingDto alarmValueSettingDto);
 }

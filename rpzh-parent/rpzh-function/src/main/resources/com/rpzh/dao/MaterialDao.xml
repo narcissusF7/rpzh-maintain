@@ -28,4 +28,7 @@ material_code as materialCode,
         #{materialCode}
     </foreach> AND is_end = '0' GROUP BY material_code
 </select>
+    <select id="findAllMaterialCodes" resultType="java.lang.String">
+        select distinct material_code from tb_material
+    </select>
 </mapper>

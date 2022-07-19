@@ -74,4 +74,11 @@ public class MaterialController {
         AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(alarmValueSettingDto);
         return new Result(true, StatusCode.OK, "查询预警设置值成功!", alarmValueSettingVo);
     }
+
+    @PostMapping("/findAllMaterialCodes")
+    @ApiOperation(value = "查询所有物料代码")
+    public Result findAllMaterialCodes() {
+        List<String> materialCodes = materialService.findAllMaterialCodes();
+        return new Result(true, StatusCode.OK, "查询所有物料代码成功!", materialCodes);
+    }
 }

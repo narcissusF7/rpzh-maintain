@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zyq
@@ -83,7 +84,9 @@ public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "预警规则名称")
     private String earlyWarningRuleName;
     @ApiModelProperty(notes = "物料代码集合")
-    private String materialCodes;
+    private List<String> materialCodes;
+    @ApiModelProperty(notes = "物料代码")
+    private String materialCode;
     @ApiModelProperty(notes = "养护方式")
     private String maintenceStyle;
     @ApiModelProperty(notes = "预警设置id")
