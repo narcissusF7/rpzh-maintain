@@ -26,9 +26,6 @@ public interface AlarmSettingTemplateDao {
     //删除预警模板设置
     Integer delete(@Param("ids") List<Integer> ids);
 
-    //根据物料代码查询各阶段的id
-    List<Integer> findMaterialCodes(@Param("materialCodes") List<String> materialCodes);
-
     //创建预警规则
     int insertAlarmSettingTemplate(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
@@ -43,9 +40,6 @@ public interface AlarmSettingTemplateDao {
 
     //判断是否存在升级规则
     Integer findCount();
-
-    //根据物料代码和养护方式查询各阶段的预警规则
-    AlarmValueSettingVo findAlarmSettingTemplateId(@Param("id")Integer id);
 
     ///根据物料代码和养护方式查询预警规则的基本信息
     AlarmValueSettingVo findNameByMaintenceStyle(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle);
@@ -67,5 +61,15 @@ public interface AlarmSettingTemplateDao {
 
     AlarmValueSettingVo findAlarmSettingTemplateByMaterialCodeAndPhases(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle, @Param("phases") String phases);
 
-    Integer findSum(@Param("alarmValueSettingDto")AlarmValueSettingDto alarmValueSettingDto);
+    Integer findSum(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    int deleteStage(@Param("ids") List<Integer> ids);
+
+    int insertAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    Integer findTemplateId(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    int updateAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    Integer findSumByMaintenceStyle(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 }

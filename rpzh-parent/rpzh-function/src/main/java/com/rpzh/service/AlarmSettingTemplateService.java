@@ -21,7 +21,7 @@ public interface AlarmSettingTemplateService {
 
     PageInfo<AlarmValueSettingVo> findAlarmSettingTemplateTable(AlarmValueSettingDto alarmValueSettingDto);
 
-    Result deleteAlarmSettingTemplate(List<String> materialCodes);
+    Result deleteAlarmSettingTemplate(List<Integer> ids);
 
     Result insertAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 
@@ -29,7 +29,7 @@ public interface AlarmSettingTemplateService {
 
     Result updateOrInsertColorAndAlertUpgradeDay(SettingColorAndDayDto settingColorAndDayDto);
 
-    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle,String phases);
+    Result findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle,String phases);
 
     void updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 

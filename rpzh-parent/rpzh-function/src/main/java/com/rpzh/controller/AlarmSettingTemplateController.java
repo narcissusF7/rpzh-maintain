@@ -54,11 +54,11 @@ public class AlarmSettingTemplateController {
 
     @PostMapping(value = "/deleteAlarmSettingTemplate")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "materialCodes", value = "物料代码集合", required = true,dataType = "List")
+            @ApiImplicitParam(name = "ids", value = "id集合", required = true,dataType = "List")
     })
     @ApiOperation(value = "删除预警模板设置")
-    public Result deleteAlarmValueSetting(@RequestParam List<String> materialCodes) {
-        Result result = alarmSettingTemplateService.deleteAlarmSettingTemplate(materialCodes);
+    public Result deleteAlarmValueSetting(@RequestParam List<Integer> ids) {
+        Result result = alarmSettingTemplateService.deleteAlarmSettingTemplate(ids);
         return result;
     }
 
@@ -123,13 +123,12 @@ public class AlarmSettingTemplateController {
     })
     @ApiOperation(value = "下一阶段点上一步")
     public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String maintenceStyle,String phases) {
-        AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle,phases);
-        return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
+        return alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle,phases);
     }
 
     @PostMapping(value = "/beforeAlarmValueSetting")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "第几次点下一阶段", required = false,dataType = "int")
+            @ApiImplicitParam(name = "id", value = "预警设置表主键id", required = false,dataType = "int")
     })
     @ApiOperation(value = "修改前回显")
     public Result<AlarmValueSettingVo> beforeAlarmValueSetting(Integer id) {

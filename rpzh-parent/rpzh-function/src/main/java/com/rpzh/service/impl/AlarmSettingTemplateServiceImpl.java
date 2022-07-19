@@ -56,12 +56,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     }
 
     @Override
-    public Result deleteAlarmSettingTemplate(List<String> materialCodes) {
-        if(ToolUtil.isEmpty(materialCodes)){
-            return new Result(false, StatusCode.ERROR, "预警模板ids不能为空!");
+    public Result deleteAlarmSettingTemplate(List<Integer> ids) {
+        if(ToolUtil.isEmpty(ids)){
+            return new Result(false, StatusCode.ERROR, "ids不能为空!");
         }
-        List<Integer> ids = alarmSettingTemplateDao.findMaterialCodes(materialCodes);
         alarmSettingTemplateDao.delete(ids);
+        alarmSettingTemplateDao.deleteStage(ids);
         return new Result(true, StatusCode.OK, "删除预警设置成功!");
     }
 
@@ -76,6 +76,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         alarmValueSettingDto.setUpdateUser(createUser);
         if(ToolUtil.isNotEmpty(alarmValueSettingDto.getAlarmValueSettingId())){
             alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
+            alarmSettingTemplateDao.updateAlarmSettingTemplateStage(alarmValueSettingDto);
         }else {
             Integer count = alarmSettingTemplateDao.findSum(alarmValueSettingDto);
             if(count>0){
@@ -83,7 +84,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
             }
             alarmValueSettingDto.setCreatedTime(date);
             alarmValueSettingDto.setCreateUser(createUser);
-            alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingDto);
+            if(alarmSettingTemplateDao.findSumByMaintenceStyle(alarmValueSettingDto)<1) {
+                alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingDto);
+            }
+            Integer templateId = alarmSettingTemplateDao.findTemplateId(alarmValueSettingDto);
+            alarmValueSettingDto.setAlarmValueSettingId(templateId);
+            alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSettingDto);
         }
         logAlarmSettingDto.setEarlyWarningRuleName(alarmValueSettingDto.getEarlyWarningRuleName());
         logAlarmSettingDto.setLogDate(date);
@@ -128,7 +134,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     }
 
     @Override
-    public AlarmValueSettingVo findAlarmSettingTemplateByMaterialCode(String materialCode, String maintenceStyle,String phases) {
+    public Result findAlarmSettingTemplateByMaterialCode(String materialCode, String maintenceStyle,String phases) {
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto();
+        alarmValueSettingDto.setMaterialCode(materialCode);
+        alarmValueSettingDto.setMaintenceStyle(maintenceStyle);
+        alarmValueSettingDto.setPhases(phases);
+        Integer count = alarmSettingTemplateDao.findSum(alarmValueSettingDto);
         AlarmValueSettingVo alarmValueSettingVo;
         if(ToolUtil.isEmpty(phases)) {
             alarmValueSettingVo = alarmSettingTemplateDao.findNameByMaintenceStyle(materialCode, maintenceStyle);
@@ -140,7 +151,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         }else{
             alarmValueSettingVo.setMaterialCodes(Arrays.asList(alarmValueSettingVo.getMaterialCode()));
         }
-        return alarmValueSettingVo;
+        return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
     }
 
     @Override
@@ -150,36 +161,21 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         Date date = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
         String ipAddr = IpUtils.getIpAddr(Objects.requireNonNull(IpUtils.getRequest()));
-        AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateById(alarmValueSettingDto.getAlarmValueSettingId());
-        if(ToolUtil.isNotEmpty(alarmValueSettingVo)) {
-            boolean flag = alarmValueSettingVo.getEarlyWarningRuleName().equalsIgnoreCase(earlyWarningRuleName) && alarmValueSettingVo.getMaterialCode().equals(materialCode);
-            boolean o2StackFlag = alarmValueSettingVo.getStackOxygenUpperOne().equals(alarmValueSettingDto.getStackOxygenUpperOne()) && alarmValueSettingVo.getStackOxygenUpperTwo().equals(alarmValueSettingDto.getStackOxygenUpperTwo()) &&
-                    alarmValueSettingVo.getStackOxygenUpperThree().equals(alarmValueSettingDto.getStackOxygenUpperThree()) && alarmValueSettingVo.getStackOxygenLower().equals(alarmValueSettingDto.getStackOxygenLower());
-            boolean tempCoreFlag = alarmValueSettingVo.getTempCoreChipUpperOne().equals(alarmValueSettingDto.getTempCoreChipUpperOne()) && alarmValueSettingVo.getTempCoreChipUpperTwo().equals(alarmValueSettingDto.getTempCoreChipUpperTwo()) &&
-                    alarmValueSettingVo.getTempCoreChipUpperThree().equals(alarmValueSettingDto.getTempCoreChipUpperThree()) && alarmValueSettingVo.getTempCoreChipLower().equals(alarmValueSettingDto.getTempCoreChipLower());
-            boolean tempStackFlag = alarmValueSettingVo.getStackTempUpperOne().equals(alarmValueSettingDto.getStackTempUpperOne()) && alarmValueSettingVo.getStackTempUpperTwo().equals(alarmValueSettingDto.getStackTempUpperTwo()) &&
-                    alarmValueSettingVo.getStackTempUpperThree().equals(alarmValueSettingDto.getStackTempUpperThree()) && alarmValueSettingVo.getStackTempLower().equals(alarmValueSettingDto.getStackTempLower());
-            boolean moistureStackFlag = alarmValueSettingVo.getStackMoistureUpperOne().equals(alarmValueSettingDto.getStackMoistureUpperOne()) && alarmValueSettingVo.getStackMoistureUpperTwo().equals(alarmValueSettingDto.getStackMoistureUpperTwo()) &&
-                    alarmValueSettingVo.getStackMoistureUpperThree().equals(alarmValueSettingDto.getStackMoistureUpperThree()) && alarmValueSettingVo.getStackMoistureLower().equals(alarmValueSettingDto.getStackMoistureLower());
-            boolean coreHighEnvFlag = alarmValueSettingVo.getCoreTempHighEnvTempOne().equals(alarmValueSettingDto.getCoreTempHighEnvTempOne()) && alarmValueSettingVo.getCoreTempHighEnvTempTwo().equals(alarmValueSettingDto.getCoreTempHighEnvTempTwo()) &&
-                    alarmValueSettingVo.getCoreTempHighEnvTempThree().equals(alarmValueSettingDto.getCoreTempHighEnvTempThree()) && alarmValueSettingVo.getCoreTempLowEnvTemp().equals(alarmValueSettingDto.getCoreTempLowEnvTemp());
-            if (!(o2StackFlag && tempCoreFlag && tempStackFlag && moistureStackFlag && coreHighEnvFlag && flag)) {
-                alarmValueSettingDto.setMaterialCode(materialCode);
-                alarmValueSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
-                alarmValueSettingDto.setUpdatedTime(date);
-                alarmValueSettingDto.setUpdateUser(createUser);
-                alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
-                LogAlarmSettingDto logAlarmSettingDto = new LogAlarmSettingDto();
-                logAlarmSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
-                logAlarmSettingDto.setLogDate(date);
-                logAlarmSettingDto.setLogUserName(createUser);
-                logAlarmSettingDto.setLogType(UPDATETYPE);
-                logAlarmSettingDto.setPhases(alarmValueSettingDto.getPhases());
-                logAlarmSettingDto.setLogIp(ipAddr);
-                logAlarmSettingDto.setMaterialCode(materialCode);
-                alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
-            }
-        }
+        alarmValueSettingDto.setMaterialCode(materialCode);
+        alarmValueSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
+        alarmValueSettingDto.setUpdatedTime(date);
+        alarmValueSettingDto.setUpdateUser(createUser);
+        alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
+        alarmSettingTemplateDao.updateAlarmSettingTemplateStage(alarmValueSettingDto);
+        LogAlarmSettingDto logAlarmSettingDto = new LogAlarmSettingDto();
+        logAlarmSettingDto.setEarlyWarningRuleName(earlyWarningRuleName);
+        logAlarmSettingDto.setLogDate(date);
+        logAlarmSettingDto.setLogUserName(createUser);
+        logAlarmSettingDto.setLogType(UPDATETYPE);
+        logAlarmSettingDto.setPhases(alarmValueSettingDto.getPhases());
+        logAlarmSettingDto.setLogIp(ipAddr);
+        logAlarmSettingDto.setMaterialCode(materialCode);
+        alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
     }
 
     @Override
