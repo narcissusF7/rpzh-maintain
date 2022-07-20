@@ -8,6 +8,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
+import com.rpzh.util.SendMessageUtil;
 import com.rpzh.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -69,6 +70,18 @@ public class TestContrller{
         return new Result(true, StatusCode.OK, "发送成功",pageInfo);
     }
 
+    /**
+     * http://localhost:16900/maintain/test/testSendMessage
+     * 发送短信测试
+     * @return
+     */
+    @RequestMapping("/testSendMessage")
+    public String testSendMessage(){
+        String tel = "13155555555";
+        String content = "养护系统发送短信测试";
+        MessageVo messageVo = SendMessageUtil.sendSms(tel, content, "h1");
+        return "执行中";
+    }
 
     /**
      * rocketmq发送数据
