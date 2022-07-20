@@ -20,6 +20,8 @@ spring:
         max-active: 32
         max-idle: 32
         min-idle: 0
+  main:
+    allow-bean-definition-overriding: true
   rabbitmq: #RabbitMq配置
     host: 120.24.91.199
     port: 5672

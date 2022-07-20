@@ -33,13 +33,12 @@ public class TestFileController {
      */
     @RequestMapping("/testredis")
     public String test2(String username){
-        redisTemplate.opsForHash().put("USER_"+"rpzh","nickname","超级管理员");
-        redisTemplate.opsForHash().put("USER_"+"rpzh","phonenumber","13156555668");
-        redisTemplate.opsForHash().put("USER_"+"rpzh","userId","1");
-        String nickname = (String) redisTemplate.opsForHash().get("USER_"+username, "nickname");
-        String phonenumber = (String) redisTemplate.opsForHash().get("USER_"+username, "phonenumber");
-        System.out.println(nickname);
-        System.out.println(phonenumber);
+//        redisTemplate.opsForHash().put("USER_"+"rpzh","nickname","超级管理员");
+//        redisTemplate.opsForHash().put("USER_"+"rpzh","phonenumber","13156555668");
+        String nickname1 = (String) redisTemplate.opsForHash().get("USER_"+username, "nickname");
+        String phonenumber1 = (String) redisTemplate.opsForHash().get("USER_"+username, "phonenumber");
+        System.out.println(nickname1);
+        System.out.println(phonenumber1);
         System.out.println("---------------------");
         return "成功";
     }
