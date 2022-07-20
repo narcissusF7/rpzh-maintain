@@ -13,6 +13,15 @@ spring:
         server-addr: 127.0.0.1:8866
         # 配置文件格式
         file-extension: yml
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 32
+        max-idle: 32
+        min-idle: 0
   servlet:
     multipart:
       max-file-size: 10MB    #单个文件大小

@@ -11,6 +11,15 @@ spring:
         server-addr: localhost:8866
         # 配置文件格式
         file-extension: yml
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 32
+        max-idle: 32
+        min-idle: 0
   rabbitmq: #RabbitMq配置
     host: 120.24.91.199
     port: 5672
@@ -57,10 +66,6 @@ spring:
   #    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
   #    username: root
   #    password: root
-
-  redis:
-    host: 127.0.0.1
-    port: 6379
 logging:
   level:
     io.swagger.models.parameters.AbstractSerializableParameter: error

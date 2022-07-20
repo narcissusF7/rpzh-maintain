@@ -8,6 +8,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SendMessageUtil;
 import com.rpzh.vo.*;
 import io.swagger.annotations.Api;
@@ -48,6 +49,9 @@ public class TestContrller{
     //mq主题
     @Value("${rocketmq.topic}")
     private String topic;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Autowired
     private NodeService nodeService;
@@ -105,16 +109,19 @@ public class TestContrller{
      * @return
      */
     @RequestMapping("/test2")
-    public String test2(){
-        redisTemplate.opsForHash().put("rpzh","nickname","超级管理员");
-        redisTemplate.opsForHash().put("rpzh","phonenumber","13156555668");
-        redisTemplate.opsForHash().put("rpzh","userId","1");
-        String nickname = (String) redisTemplate.opsForHash().get("rpzh", "nickname");
-        String phonenumber = (String) redisTemplate.opsForHash().get("rpzh", "phonenumber");
-        String userId = (String) redisTemplate.opsForHash().get("rpzh", "userId");
+    public String test2(String username){
+        redisTemplate.opsForHash().put("USER_"+"rpzh","nickname","超级管理员");
+        redisTemplate.opsForHash().put("USER_"+"rpzh","phonenumber","13156555668");
+        redisTemplate.opsForHash().put("USER_"+"rpzh","userId","1");
+        String nickname = (String) redisTemplate.opsForHash().get("USER_"+username, "nickname");
+        String phonenumber = (String) redisTemplate.opsForHash().get("USER_"+username, "phonenumber");
+        Object nickname1 = redisUtil.hget("USER_"+username, "nickname");
+        Object phonenumber1 = redisUtil.hget("USER_"+username,"phonenumber");
         System.out.println(nickname);
         System.out.println(phonenumber);
-        System.out.println(userId);
+        System.out.println("---------------------");
+        System.out.println(nickname1);
+        System.out.println(phonenumber1);
         return "成功";
     }
 
