@@ -900,6 +900,17 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     }
 
     /**
+     * 查询所有的过期任务
+     *
+     * @return
+     */
+    @Override
+    public List<Map> findAllOverdueTask() {
+        List<Map> taskList = taskManagementDao.findAllOverdueTask();
+        return taskList;
+    }
+
+    /**
      * 获取两个日期之间的所有日期 (年月日)
      *
      * @param startTime 开始时间

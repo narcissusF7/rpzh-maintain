@@ -550,4 +550,9 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
   and site_route like concat(#{route}, '%')
 </if>
 </select>
+<select id="findAllOverdueTask" resultType="java.util.Map">
+  SELECT task_num as taskNum,principal
+  FROM tb_task
+  WHERE status = '2'
+</select>
 </mapper>

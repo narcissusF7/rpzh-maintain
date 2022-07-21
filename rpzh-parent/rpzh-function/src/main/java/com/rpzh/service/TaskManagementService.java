@@ -155,4 +155,10 @@ public interface TaskManagementService {
      * @return
      */
     List<String> findPestBoardByRoute(String siteRoute);
+
+    /**
+     * 查询所有的过期任务
+     * @return
+     */
+    List<Map> findAllOverdueTask();
 }

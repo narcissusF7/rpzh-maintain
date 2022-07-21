@@ -340,4 +340,10 @@ public interface TaskManagementDao {
      * @return
      */
     List<Map> taskAvlFinishTime(@Param("day")String day, @Param("principal")String principal, @Param("route")String route);
+
+    /**
+     * 查询所有的过期任务
+     * @return
+     */
+    List<Map> findAllOverdueTask();
 }
