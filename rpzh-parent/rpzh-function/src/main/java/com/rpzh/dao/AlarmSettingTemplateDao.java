@@ -42,7 +42,7 @@ public interface AlarmSettingTemplateDao {
     Integer findCount();
 
     ///根据物料代码和养护方式查询预警规则的基本信息
-    AlarmValueSettingVo findNameByMaintenceStyle(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle);
+    AlarmValueSettingVo findNameByMaintenceStyle(@Param("materialCode") String materialCode, @Param("earlyWarningRuleName") String earlyWarningRuleName);
 
     //更新预警规则
     int updateAlarmSettingTemplate(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
@@ -59,7 +59,7 @@ public interface AlarmSettingTemplateDao {
     //查询所有的预警规则名称
     List<String> findAlarmSettingTemplateList();
 
-    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCodeAndPhases(@Param("materialCode") String materialCode, @Param("maintenceStyle") String maintenceStyle, @Param("phases") String phases);
+    AlarmValueSettingVo findAlarmSettingTemplateByMaterialCodeAndPhases(@Param("materialCode") String materialCode, @Param("earlyWarningRuleName") String earlyWarningRuleName, @Param("phases") String phases);
 
     Integer findSum(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
@@ -71,7 +71,7 @@ public interface AlarmSettingTemplateDao {
 
     int updateAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findSumByMaintenceStyle(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
-
     Integer findCountByName(@Param("earlyWarningRuleName")String earlyWarningRuleName);
+
+    Integer findCountByNameAndPhases(@Param("earlyWarningRuleName")String earlyWarningRuleName,@Param("phases") String phases);
 }

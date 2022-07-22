@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.service.MaintainReviewService;
 import com.rpzh.vo.MaintainPlanVo;
 import io.swagger.annotations.Api;
@@ -48,7 +49,13 @@ public class MaintainReviewController {
     @PostMapping("/findMaintainPlanReview")
     public Result<MaintainPlanVo> findMaintainPlanReview(Integer id) {
         List<MaintainPlanVo> maintainPlanVos = maintainReviewService.findMaintainPlanReview(id);
-        return new Result(true, StatusCode.OK, "查询成功!", maintainPlanVos);
+        return new Result(true, StatusCode.OK, "养护计划追溯查询成功!", maintainPlanVos);
+    }
+
+    @PostMapping("/findEarlyWarningReview")
+    public Result<EarlyWarning> findEarlyWarningReview(Integer id) {
+        List<EarlyWarning> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
+        return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", maintainPlanVos);
     }
 
     @PostMapping("/findMaintainBaseInfo")

@@ -118,12 +118,12 @@ public class AlarmSettingTemplateController {
     @PostMapping(value = "/findAlarmValueSetting")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true,dataType = "String")
     })
     @ApiOperation(value = "新建时在点击下一阶段后再点上一步时回显/修改时预警设置各个阶段回显")
-    public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String maintenceStyle,String phases) {
-        return alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle,phases);
+    public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String earlyWarningRuleName,String phases) {
+        return alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,earlyWarningRuleName,phases);
     }
 
     @PostMapping(value = "/beforeAlarmValueSetting")

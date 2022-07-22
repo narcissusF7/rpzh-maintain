@@ -100,13 +100,13 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
             alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
             alarmSettingTemplateDao.updateAlarmSettingTemplateStage(alarmValueSettingDto);
         }else {
-            Integer count = alarmSettingTemplateDao.findSum(alarmValueSettingDto);
+            Integer count = alarmSettingTemplateDao.findCountByNameAndPhases(alarmValueSettingDto.getEarlyWarningRuleName(),alarmValueSettingDto.getPhases());
             if(count>0){
                 return new Result(false, StatusCode.ERROR, "已存在!");
             }
             alarmValueSettingDto.setCreatedTime(date);
             alarmValueSettingDto.setCreateUser(createUser);
-            if(alarmSettingTemplateDao.findSumByMaintenceStyle(alarmValueSettingDto)<1) {
+            if(alarmSettingTemplateDao.findCountByName(alarmValueSettingDto.getEarlyWarningRuleName())<1) {
                 alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingDto);
             }
             Integer templateId = alarmSettingTemplateDao.findTemplateId(alarmValueSettingDto);
@@ -156,16 +156,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     }
 
     @Override
-    public Result findAlarmSettingTemplateByMaterialCode(String materialCode, String maintenceStyle,String phases) {
-        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto();
-        alarmValueSettingDto.setMaterialCode(materialCode);
-        alarmValueSettingDto.setMaintenceStyle(maintenceStyle);
-        alarmValueSettingDto.setPhases(phases);
+    public Result findAlarmSettingTemplateByMaterialCode(String materialCode, String earlyWarningRuleName,String phases) {
         AlarmValueSettingVo alarmValueSettingVo;
         if(ToolUtil.isEmpty(phases)) {
-            alarmValueSettingVo = alarmSettingTemplateDao.findNameByMaintenceStyle(materialCode, maintenceStyle);
+            alarmValueSettingVo = alarmSettingTemplateDao.findNameByMaintenceStyle(materialCode, earlyWarningRuleName);
         }else{
-            alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(materialCode, maintenceStyle,phases);
+            alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(materialCode, earlyWarningRuleName,phases);
         }
         if(ToolUtil.isEmpty(alarmValueSettingVo)){
             alarmValueSettingVo = new AlarmValueSettingVo("1");

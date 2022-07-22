@@ -29,7 +29,7 @@ public interface AlarmSettingTemplateService {
 
     Result updateOrInsertColorAndAlertUpgradeDay(SettingColorAndDayDto settingColorAndDayDto);
 
-    Result findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle,String phases);
+    Result findAlarmSettingTemplateByMaterialCode(String materialCode,String earlyWarningRuleName,String phases);
 
     Result updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 

@@ -64,4 +64,12 @@
         </foreach>
         group by maintain_stage_id
     </select>
+    <select id="findStackIdAndTime">
+        SELECT
+      MIN(t2.created_time) createdTime,MAX(t2.updated_time) s,
+            t1.stack_id AS stackId
+        FROM tb_maintain_plan t1
+        LEFT JOIN tb_maintain_plan_stage t2 ON t1.id = t2.maintain_plan_id
+        WHERE t1.id= #{id};
+    </select>
 </mapper>
