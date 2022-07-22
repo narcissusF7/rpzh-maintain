@@ -458,7 +458,7 @@
         <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=''">
             AND site_type = #{monitorCondition.siteType}
         </if>
-        order by pidRoute
+        order by siteRoute
     </select>
     <select id="findEnterStack" resultType="java.util.Map">
         select node_id nodeId, node_type nodeType from tb_node where status = 1;
@@ -500,15 +500,15 @@
     <select id="findAirConditioner" resultType="com.rpzh.vo.NodeVo">
         SELECT
         air_conditioning_no AS nodeId,
-        site_route siteRoute
+        pid_route as siteRoute
         FROM
-        tb_node
+        tb_air_conditioning
         <where>
             <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
                 site_route like concat ('%',#{monitorCondition.pidRoute},'%')
             </if>
         </where>
-        order by pidRoute
+        order by siteRoute
     </select>
 
     <select id="findSelectedNode" resultType="java.util.Map">
@@ -522,5 +522,38 @@
         <if test="startTime !=null">and transfer_time >= #{startTime}</if>
         <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
         group by dayTime
+    </select>
+    <select id="findNowNodeData" resultType="java.util.Map">
+        select avg(temp) as temp,avg(humiture) as humiture from tb_air_conditioner_history where
+        (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_air_conditioner_history where
+        node_id in
+        <foreach collection="airNodes" item="nodeId" open="(" separator="," close=")">
+            #{nodeId}
+        </foreach>
+        group by node_id)
+    </select>
+    <select id="findStackEnv" resultType="java.util.Map">
+        select avg(temp) as temp,avg(humiture) as humiture from tb_node_env_history where
+        (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_env_history
+        where maintain_plan_id = #{id}
+        group by node_id)
+    </select>
+    <select id="findStackCore" resultType="java.lang.Double">
+        select avg(temp) as temp from tb_node_temp_core_chip_history where
+        (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
+        where maintain_plan_id = #{id}
+        group by node_id)
+    </select>
+    <select id="findO2StackData" resultType="java.lang.Double">
+        select avg(oxygen) as oxygen from tb_node_o2_history
+        where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
+        where maintain_plan_id = #{id} and site_type = '05'
+        group by node_id)
+    </select>
+    <select id="findO2AreaData" resultType="java.lang.Double">
+        select avg(oxygen) as oxygen from tb_node_o2_history
+        where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
+        where pid_route = #{pidRoute} and site_type = '04'
+        group by node_id)
     </select>
 </mapper>

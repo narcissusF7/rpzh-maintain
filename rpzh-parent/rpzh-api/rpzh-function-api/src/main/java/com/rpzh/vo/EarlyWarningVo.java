@@ -38,6 +38,8 @@ public class EarlyWarningVo {
     private String warningNews;
     @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
     private String warningType;
+    @ApiModelProperty(notes = "预警类型名称警")
+    private String warningName;
     @ApiModelProperty(notes = "设备id")
     private String nodeId;
     @ApiModelProperty(notes = "垛位id")
@@ -48,8 +50,10 @@ public class EarlyWarningVo {
     private String materialCode;
     @ApiModelProperty(notes = "负责人")
     private String principalName;
-    @ApiModelProperty(notes = "是否确认,0:误报,1:已预警,2,未确认")
+    @ApiModelProperty(notes = "是否确认,0:已处理,1:已预警,2,未确认")
     private String affirm;
+    @ApiModelProperty(notes = "处理")
+    private String affirmName;
     @ApiModelProperty(notes = "处理时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date dealTime;
@@ -77,5 +81,8 @@ public class EarlyWarningVo {
     private String dealSuggestion;
     @ApiModelProperty(notes = "仓间id")
     private Integer areaId;
+    @ApiModelProperty(notes = "位置路由")
     private String siteRoute;
+    private String nodeName;
+    private String color;
 }

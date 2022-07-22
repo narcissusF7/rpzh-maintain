@@ -32,7 +32,7 @@ public interface EarlyWarningDao {
 
     List<EarlyWarningVo> findEarlyWarningByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    EarlyWarningVo findById(@Param("id") Integer id);
+    List<EarlyWarningVo> findByIds(@Param("ids") List<Integer> ids);
 
     Integer misreport(@Param("id") Integer id);
 
@@ -56,9 +56,7 @@ public interface EarlyWarningDao {
 
     List<Map> findWarningTypeCount(@Param("ids") List<Integer> ids);
 
-    List<Map> findIsDeal(@Param("ids") List<Integer> ids, @Param("count") Integer count);
-
-    Integer findNoDealCountByDay(@Param("date") String date, @Param("ids") List<Integer> ids, @Param("dateType") String dateType);
+    Map findIsDeal(@Param("ids") List<Integer> ids, @Param("count") Integer count);
 
     Integer findDealCountByDay(@Param("date") String date, @Param("ids") List<Integer> ids, @Param("dateType") String dateType);
 
@@ -69,12 +67,14 @@ public interface EarlyWarningDao {
     String findNewTime(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
                        @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    List<EarlyWarningVo> findWarningDataWarningTypeIsOne(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
-                                                         @Param("siteRoute") String siteRoute);
+    List<Map> findWarningDataWarningTypeIsOne(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute);
 
-    List<EarlyWarningVo> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
-                                                            @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
+    List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
     int updateTackId(@Param("affirm") String affirm, @Param("warningType") String warningType,
                      @Param("siteRoute") String siteRout, @Param("id") Integer id, @Param("principal") String principal);
+
+    Map<String, String> findColor();
+
+    String findPrincipal(@Param("earlyWarningDto")EarlyWarningDto earlyWarningDto);
 }

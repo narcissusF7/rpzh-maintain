@@ -40,7 +40,6 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false,dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false,dataType = "String"),
             @ApiImplicitParam(name = "creatrUser", value = "创建人", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "status", value = "状态(0:停用,1:启用)", required = false,dataType = "Integer"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "size", value = "每页数量,默认为10", required = false,dataType = "Integer"),
@@ -66,7 +65,7 @@ public class AlarmSettingTemplateController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos", value = "阶段集合", required = true,dataType = "List"),
+            @ApiImplicitParam(name = "alarmValueSettingId", value = "预警规则id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
@@ -118,10 +117,11 @@ public class AlarmSettingTemplateController {
 
     @PostMapping(value = "/findAlarmValueSetting")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false,dataType = "String")
+            @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true,dataType = "String")
     })
-    @ApiOperation(value = "下一阶段点上一步")
+    @ApiOperation(value = "新建时在点击下一阶段后再点上一步时回显/修改时预警设置各个阶段回显")
     public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String maintenceStyle,String phases) {
         return alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,maintenceStyle,phases);
     }
@@ -130,7 +130,7 @@ public class AlarmSettingTemplateController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "预警设置表主键id", required = false,dataType = "int")
     })
-    @ApiOperation(value = "修改前回显")
+    @ApiOperation(value = "修改时属性设置回显")
     public Result<AlarmValueSettingVo> beforeAlarmValueSetting(Integer id) {
         AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateService.findAlarmSettingTemplate(id);
         return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
@@ -140,7 +140,7 @@ public class AlarmSettingTemplateController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "alarmValueSettingDtos", value = "阶段集合", required = true,dataType = "List"),
+            @ApiImplicitParam(name = "alarmValueSettingId", value = "预警规则id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),

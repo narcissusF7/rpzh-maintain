@@ -1,6 +1,7 @@
 package com.rpzh.controller;
 
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
@@ -12,6 +13,7 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.StringUtils;
@@ -182,6 +184,14 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询成功!", maintainPlanInfo);
     }
 
+    @PostMapping(value = "/findCountByName")
+    @ApiOperation(value = "判断预警名称是否已存在")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警名称", required = true, dataType = "String")
+    })
+    public Result findCountByName(String earlyWarningRuleName){
+        return maintainPlanService.findCountByName(earlyWarningRuleName);
+    }
     /**
      * 删除养护计划
      * @param ids  养护计划id

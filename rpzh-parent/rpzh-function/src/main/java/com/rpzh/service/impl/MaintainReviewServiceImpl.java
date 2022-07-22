@@ -52,11 +52,6 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
     }
 
     @Override
-    public MaintainPlanVo findMiantainBaseInfo(Integer id) {
-        return null;
-    }
-
-    @Override
     public List<MaintainPlanVo> findMaintainPlanReview(Integer id) {
         List<MaintainPlanVo> maintainPlanInfos = maintainReviewDao.findMaintainPlanReview(id);
         Date startTime = maintainPlanInfos.get(0).getCreatedTime();

@@ -12,7 +12,6 @@ import java.util.List;
  */
 public interface MaintainReviewService {
     PageInfo<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto);
-    MaintainPlanVo findMiantainBaseInfo(Integer id);
     List<MaintainPlanVo> findMaintainPlanReview(Integer id);
     MaintainPlanVo findMaintainBaseInfo(Integer id);
 }

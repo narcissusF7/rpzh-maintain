@@ -198,7 +198,7 @@ public interface NodeDao {
 
     List<Map<String, String>> findEnterStack();
 
-    List<NodeVo> findAirConditioner(MonitorCondition monitorCondition);
+    List<NodeVo> findAirConditioner(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     @DS("clickhouse")
     List<NodeData> findDataOxygen(@Param("pidRoutes") List<String> pidRoutes);
@@ -210,4 +210,19 @@ public interface NodeDao {
     @DS("clickhouse")
     List<Map<String, Object>> findSelectedSiteRoute(@Param("siteRoute") String siteRoute, @Param("startTime") Date startTime, @Param("endTime") Date endTime,
                                                     @Param("gatherType") String gatherType, @Param("columnOne") String columnOne, @Param("tableColumn") String tableColumn);
+
+    @DS("clickhouse")
+    Map<String, Double> findNowNodeData(@Param("airNodes") List<String> airNodes);
+
+    @DS("clickhouse")
+    Map<String, Double> findStackEnv(@Param("id") Integer id);
+
+    @DS("clickhouse")
+    Double findStackCore(@Param("id") Integer id);
+
+    @DS("clickhouse")
+    Double findO2StackData(@Param("id") Integer id);
+
+    @DS("clickhouse")
+    Double findO2AreaData(@Param("pidRoute")String pidRoute);
 }

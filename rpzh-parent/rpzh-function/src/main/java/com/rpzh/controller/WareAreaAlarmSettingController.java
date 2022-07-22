@@ -52,8 +52,7 @@ public class WareAreaAlarmSettingController {
     })
     @ApiOperation(value = "添加仓间预警规则成功")
     public Result insertWareAreaAlarmSetting(@ApiIgnore WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        wareAreaAlarmSettingService.insertWareAreaAlarmSetting(wareAreaAlarmSettingDto);
-        return new Result<>(true, StatusCode.OK, "添加仓间预警规则成功!");
+        return wareAreaAlarmSettingService.insertWareAreaAlarmSetting(wareAreaAlarmSettingDto);
     }
 
     @PostMapping(value = "/deleteWareAreaAlarmSetting")
@@ -68,10 +67,11 @@ public class WareAreaAlarmSettingController {
 
     @PostMapping(value = "/findWareAreaAlarmSettingInfo")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pidRoute", value = "位置路由",required = true,dataType ="String"),
-            @ApiImplicitParam(name = "createUser", value = "制定人",required = true,dataType ="String"),
-            @ApiImplicitParam(name = "startTime", value = "开始时间",required = true,dataType ="String"),
-            @ApiImplicitParam(name = "endTime", value = "结束时间",required = true,dataType ="String")
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由",required = false,dataType ="String"),
+            @ApiImplicitParam(name = "stackId", value = "位置id",required = false,dataType ="int"),
+            @ApiImplicitParam(name = "createUser", value = "制定人",required = false,dataType ="String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间",required = false,dataType ="String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType ="String")
     })
     @ApiOperation(value = "查询仓间预警规则")
     public Result findWareAreaAlarmSettingInfo(@ApiIgnore WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
@@ -104,9 +104,7 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "warehouseTempUpperOne", value = "仓间温度上限一级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "warehouseTempUpperTwo", value = "仓间温度上限二级",required = true,dataType ="double"),
             @ApiImplicitParam(name = "warehouseTempUpperThree", value = "仓间温度上限三级",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "warehouseTempLower", value = "仓间温度下限",required = true,dataType ="double"),
-            @ApiImplicitParam(name = "pidRoute", value = "位置路由",required = true,dataType ="String"),
-            @ApiImplicitParam(name = "stackId", value = "位置id",required = true,dataType ="Integer")
+            @ApiImplicitParam(name = "warehouseTempLower", value = "仓间温度下限",required = true,dataType ="double")
     })
     @ApiOperation(value = "修改仓间预警规则成功")
     public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {

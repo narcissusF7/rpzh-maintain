@@ -47,7 +47,7 @@
         left join tb_maintain_plan_stage t2 on  t1.id = t2.maintain_plan_id
         where t1.id = #{id}
     </select>
-    <select id="findNodeData" resultType="com.rpzh.vo.AlarmValueSettingVo">
-        select
+    <select id="findOxygenData" resultType="com.rpzh.vo.AlarmValueSettingVo">
+        select avg(oxygen) as oxygen,maintain_stage_id as stageId from tb_node_o2_history where maintain_plan_id = #{id} group by maintain_stage_id
     </select>
 </mapper>

@@ -1,6 +1,7 @@
 package com.rpzh.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rpzh.entity.AlertSettingSetDefault;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,73 +17,73 @@ import java.util.List;
 @ApiModel(description = "预警规则数据返回")
 public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "垛内氧气上限一级")
-    public Double stackOxygenUpperOne;
+    public Double stackOxygenUpperOne= AlertSettingSetDefault.stackOxygenUpperOne;
     @ApiModelProperty(notes = "垛内氧气上限二级")
-    private Double stackOxygenUpperTwo;
+    private Double stackOxygenUpperTwo=AlertSettingSetDefault.stackOxygenUpperTwo;
     @ApiModelProperty(notes = "垛内氧气上限三级")
-    private Double stackOxygenUpperThree;
+    private Double stackOxygenUpperThree=AlertSettingSetDefault.stackOxygenUpperThree;
     @ApiModelProperty(notes = "垛内氧气下限")
-    private Double stackOxygenLower;
+    private Double stackOxygenLower=AlertSettingSetDefault.stackOxygenLower;
     @ApiModelProperty(notes = "仓间氧气上限一级")
-    private Double warehouseOxygenUpperOne;
+    private Double warehouseOxygenUpperOne=AlertSettingSetDefault.warehouseOxygenUpperOne;
     @ApiModelProperty(notes = "仓间氧气上限二级")
-    private Double warehouseOxygenUpperTwo;
+    private Double warehouseOxygenUpperTwo=AlertSettingSetDefault.warehouseOxygenUpperTwo;
     @ApiModelProperty(notes = "仓间氧气上限三级")
-    private Double warehouseOxygenUpperThree;
+    private Double warehouseOxygenUpperThree=AlertSettingSetDefault.warehouseOxygenUpperThree;
     @ApiModelProperty(notes = "仓间氧气下限")
-    private Double warehouseOxygenLower;
+    private Double warehouseOxygenLower=AlertSettingSetDefault.warehouseOxygenLower;
     @ApiModelProperty(notes = "包芯温度上限一级")
-    private Double tempCoreChipUpperOne;
+    private Double tempCoreChipUpperOne=AlertSettingSetDefault.tempCoreChipUpperOne;
     @ApiModelProperty(notes = "包芯温度上限二级")
-    private Double tempCoreChipUpperTwo;
+    private Double tempCoreChipUpperTwo=AlertSettingSetDefault.tempCoreChipUpperTwo;
     @ApiModelProperty(notes = "包芯温度上限三级")
-    private Double tempCoreChipUpperThree;
+    private Double tempCoreChipUpperThree=AlertSettingSetDefault.tempCoreChipUpperThree;
     @ApiModelProperty(notes = "包芯温度下限")
-    private Double tempCoreChipLower;
+    private Double tempCoreChipLower=AlertSettingSetDefault.tempCoreChipLower;
     @ApiModelProperty(notes = "垛内温度上限一级")
-    private Double stackTempUpperOne;
+    private Double stackTempUpperOne=AlertSettingSetDefault.stackTempUpperOne;
     @ApiModelProperty(notes = "垛内温度上限二级")
-    private Double stackTempUpperTwo;
+    private Double stackTempUpperTwo=AlertSettingSetDefault.stackTempUpperTwo;
     @ApiModelProperty(notes = "垛内温度上限三级")
-    private Double stackTempUpperThree;
+    private Double stackTempUpperThree=AlertSettingSetDefault.stackTempUpperThree;
     @ApiModelProperty(notes = "垛内温度下限")
-    private Double stackTempLower;
+    private Double stackTempLower=AlertSettingSetDefault.stackTempLower;
     @ApiModelProperty(notes = "垛内水分上限一级")
-    private Double stackMoistureUpperOne;
+    private Double stackMoistureUpperOne=AlertSettingSetDefault.stackMoistureUpperOne;
     @ApiModelProperty(notes = "垛内水分上限二级")
-    private Double stackMoistureUpperTwo;
+    private Double stackMoistureUpperTwo=AlertSettingSetDefault.stackMoistureUpperTwo;
     @ApiModelProperty(notes = "垛内水分上限三级")
-    private Double stackMoistureUpperThree;
+    private Double stackMoistureUpperThree=AlertSettingSetDefault.stackMoistureUpperThree;
     @ApiModelProperty(notes = "垛内水分下限")
-    private Double stackMoistureLower;
+    private Double stackMoistureLower=AlertSettingSetDefault.stackMoistureLower;
     @ApiModelProperty(notes = "仓间温度上限一级")
-    private Double warehouseTempUpperOne;
+    private Double warehouseTempUpperOne=AlertSettingSetDefault.warehouseTempUpperOne;
     @ApiModelProperty(notes = "仓间温度上限二级")
-    private Double warehouseTempUpperTwo;
+    private Double warehouseTempUpperTwo=AlertSettingSetDefault.warehouseTempUpperTwo;
     @ApiModelProperty(notes = "仓间温度上限三级")
-    private Double warehouseTempUpperThree;
+    private Double warehouseTempUpperThree=AlertSettingSetDefault.warehouseTempUpperThree;
     @ApiModelProperty(notes = "仓间温度下限")
-    private Double warehouseTempLower;
+    private Double warehouseTempLower=AlertSettingSetDefault.warehouseTempLower;
     @ApiModelProperty(notes = "仓间水分上限一级")
-    private Double warehouseMoistureUpperOne;
+    private Double warehouseMoistureUpperOne=AlertSettingSetDefault.warehouseMoistureUpperOne;
     @ApiModelProperty(notes = "仓间水分上限二级")
-    private Double warehouseMoistureUpperTwo;
+    private Double warehouseMoistureUpperTwo=AlertSettingSetDefault.warehouseMoistureUpperTwo;
     @ApiModelProperty(notes = "仓间水分上限三级")
-    private Double warehouseMoistureUpperThree;
+    private Double warehouseMoistureUpperThree=AlertSettingSetDefault.warehouseMoistureUpperThree;
     @ApiModelProperty(notes = "仓间水分下限")
-    private Double warehouseMoistureLower;
+    private Double warehouseMoistureLower=AlertSettingSetDefault.warehouseMoistureLower;
     @ApiModelProperty(notes = "平均包芯高于环境一级")
-    private Double coreTempHighEnvTempOne;
+    private Double coreTempHighEnvTempOne=AlertSettingSetDefault.coreTempHighEnvTempOne;
     @ApiModelProperty(notes = "平均包芯高于环境二级")
-    private Double coreTempHighEnvTempTwo;
+    private Double coreTempHighEnvTempTwo=AlertSettingSetDefault.coreTempHighEnvTempTwo;
     @ApiModelProperty(notes = "平均包芯高于环境三级")
-    private Double coreTempHighEnvTempThree;
+    private Double coreTempHighEnvTempThree=AlertSettingSetDefault.coreTempHighEnvTempThree;
     @ApiModelProperty(notes = "平均包芯低于环境")
-    private Double coreTempLowEnvTemp;
+    private Double coreTempLowEnvTemp=AlertSettingSetDefault.coreTempLowEnvTemp;
     @ApiModelProperty(notes = "预警设置表id")
     private Integer alarmValueSettingId;
     @ApiModelProperty(notes = "预警规则名称")
-    private String earlyWarningRuleName;
+    private String earlyWarningRuleName="通用规则名称";
     @ApiModelProperty(notes = "物料代码集合")
     private List<String> materialCodes;
     @ApiModelProperty(notes = "物料代码")

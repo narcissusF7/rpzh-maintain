@@ -35,6 +35,8 @@ public interface MaintainPlanService {
 
     List<String> findAlarmSettingTemplateList();
 
+    Result findCountByName(String earlyWarningRuleName);
+
     /**
      * 删除养护计划
      * @param stageIds 养护计划id

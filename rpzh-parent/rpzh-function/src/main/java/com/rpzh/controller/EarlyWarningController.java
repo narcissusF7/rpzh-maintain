@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -40,11 +41,19 @@ public class EarlyWarningController {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
     }
 
+    @PostMapping("/findVideoMonitoring")
+    @ApiOperation(value = "视频监控")
+    @ApiImplicitParams({
+    })
+    public Result findVideoMonitoring(){
+        return null;
+    }
+
     @PostMapping("/findEarlyWarningInfo")
     @ApiOperation(value = "预警信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
-            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = false,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false)
     })
@@ -53,10 +62,11 @@ public class EarlyWarningController {
     }
 
     @PostMapping("/findEarlyWarningByWarningType")
-    @ApiOperation(value = "预警信息")
+    @ApiOperation(value = "预警设备")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
-            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
+                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false)
     })
@@ -65,13 +75,18 @@ public class EarlyWarningController {
     }
 
     @PostMapping("/findEarlyWarningBySiteId")
-    @ApiOperation(value = "预警信息")
+    @ApiOperation(value = "预警设备详情")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
+            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
+                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
             @ApiImplicitParam(name = "areaId", value = "仓间Id", required = true,dataType = "Integer"),
-            @ApiImplicitParam(name = "affirm", value = "是否处理", dataType = "String",required = true),
-            @ApiImplicitParam(name = "warningTime", value = "预警时间",dataType = "String",required = true)
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "warningGrade", value = "预警等级", dataType = "String",required = true),
+            @ApiImplicitParam(name = "isAffirm", value = "是否处理", dataType = "String",required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false),
     })
     public Result findEarlyWarningBySiteId(@ApiIgnore EarlyWarningDto earlyWarningDto){
         return earlyWarningService.findEarlyWarningBySiteId(earlyWarningDto);
@@ -91,7 +106,7 @@ public class EarlyWarningController {
     }
 
     @PostMapping("/findNodeData")
-    @ApiOperation(value = "预警信息")
+    @ApiOperation(value = "查看传感器实时数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "nodeType", value = "设备类型 01:无线氧气传感器,03:无线温湿度传感器,04:无线包芯温度传感器)", dataType = "String",required = true),
             @ApiImplicitParam(name = "warningType", value = "预警类型)", dataType = "String",required = true),
@@ -103,4 +118,12 @@ public class EarlyWarningController {
         return earlyWarningService.findNodeData(earlyWarningDto);
     }
 
+    @Resource
+    private RedisTemplate redisTemplate;
+    @PostMapping("/test")
+    public Result test(){
+        redisTemplate.opsForValue().set("1","2");
+        Object o = redisTemplate.opsForValue().get("1");
+        return new Result<>(true, StatusCode.OK, "处理误报成功",o);
+    }
 }

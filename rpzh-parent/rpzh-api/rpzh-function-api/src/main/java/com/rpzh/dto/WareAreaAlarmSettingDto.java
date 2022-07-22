@@ -27,6 +27,8 @@ public class WareAreaAlarmSettingDto {
     private Double warehouseTempUpperTwo;
     //仓间温度上限三级
     private Double warehouseTempUpperThree;
+    //仓间温度下限
+    private Double warehouseTempLower;
     //仓间氧气上限一级
     private Double warehouseOxygenUpperOne;
     //仓间氧气上限二级

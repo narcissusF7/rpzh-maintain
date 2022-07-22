@@ -40,6 +40,9 @@
     <select id="findMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">
         SELECT
             t1.id as id,
+            t1.material_code as materialCode,
+            t3.pid_route as pidRoute,
+            t3.area_id as areaId,
             t3.site_name as stackName,
             t1.stack_id as stackId,
             t1.maintence_style as maintenceStyle,
@@ -56,7 +59,7 @@
             t2.alarm_value_setting_id AS alarmValueSettingId
         FROM tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
-        left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
+        left join (select id,site_name,concat(pid_route,',[05:',id,']') as pid_route,area_id from tb_stack) t3 on t3.id = t1.stack_id
         WHERE t1.id= #{id}
     </select>
     <select id="findMaintainPlanByStack" resultType="com.rpzh.vo.MaintainPlanVo">

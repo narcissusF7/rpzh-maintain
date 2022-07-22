@@ -178,7 +178,8 @@ public class GetBetweenDayUtils {
         //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
         if(ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)){
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, 0);
+            /*calendar.add(Calendar.MONTH, 0);*/
+            calendar.add(Calendar.MONTH, -1);
             calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);

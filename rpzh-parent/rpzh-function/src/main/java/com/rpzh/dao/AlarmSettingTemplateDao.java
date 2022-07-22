@@ -18,7 +18,7 @@ import java.util.List;
 @Mapper
 public interface AlarmSettingTemplateDao {
     //根据规则名称查询预警设置值
-    AlarmValueSettingVo findAlarmSettingTemplate(@Param("earlyWarningRuleName") String earlyWarningRuleName);
+    AlarmValueSettingVo findAlarmSettingTemplate(@Param("earlyWarningRuleName") String earlyWarningRuleName, @Param("phases") String phases);
 
     //根据条件查询预警设置列表
     List<AlarmValueSettingVo> findAlarmSettingTemplateTable(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
@@ -72,4 +72,6 @@ public interface AlarmSettingTemplateDao {
     int updateAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
     Integer findSumByMaintenceStyle(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
+
+    Integer findCountByName(@Param("earlyWarningRuleName")String earlyWarningRuleName);
 }

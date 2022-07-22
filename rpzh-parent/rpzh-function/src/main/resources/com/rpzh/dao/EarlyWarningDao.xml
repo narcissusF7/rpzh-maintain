@@ -71,7 +71,7 @@
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-        GROUP BY is_affirm,site_route) ORDER BY is_affirm DESC,warning_grade DESC,site_route desc
+        GROUP BY site_route) ORDER BY is_affirm DESC,warning_grade DESC,site_route desc
     </select>
     <select id="findEarlyWarningByNotOne" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
@@ -97,29 +97,27 @@
     select warning_time from tb_early_warning where is_affirm = #{affirm} and
     warning_grade = #{warningGrade} and warning_type = #{warningType} and site_route = #{siteRoute} LIMIT 1
 </select>
-    <select id="findWarningDataWarningTypeIsOne" resultType="com.rpzh.vo.EarlyWarningVo">
+    <select id="findWarningDataWarningTypeIsOne" resultType="java.util.Map">
         SELECT
         t.id as id,
         t.node_id as nodeId,
+        t.warning_grade as warningGrade,
         t.node_type as nodeType,
         t.warning_type as warningType,
         t2.site_x as siteX,t2.site_y as siteY,t2.site_z as siteZ FROM tb_early_warning t left JOIN tb_node t2  ON t.node_id =t2.node_id
-        WHERE (t.node_id,warning_time) IN
-        (SELECT node_id,MAX(warning_time) FROM tb_early_warning WHERE warning_type IN ('01','02','03')
-        AND is_affirm = #{affirm} and site_route = #{siteRoute} and warning_grade = #{warningGrade}
-        GROUP BY node_id)
+        WHERE warning_type IN ('01','02','03')
+        AND is_affirm = #{affirm} and t.site_route = #{siteRoute}
     </select>
-    <select id="findWarningDataWarningTypeIsNotOne" resultType="com.rpzh.vo.EarlyWarningVo">
+    <select id="findWarningDataWarningTypeIsNotOne" resultType="java.util.Map">
         SELECT
         t.id as id,
+        t.warning_grade as warningGrade,
         t.node_id as nodeId,
         t.node_type as nodeType,
         t.warning_type as warningType,t.warning_val as warningVal,
         t2.site_x as siteX,t2.site_y as siteY,t2.site_z as siteZ FROM tb_early_warning t left JOIN tb_node t2  ON t.node_id =t2.node_id
-        WHERE (t.node_id,warning_time) IN
-        (SELECT node_id,MAX(warning_time) FROM tb_early_warning WHERE warning_type = #{warningType}
-        AND is_affirm = #{affirm} and site_route = #{siteRoute} and warning_grade = #{warningGrade}
-        GROUP BY node_id)
+        WHERE warning_type = #{warningType}
+        AND is_affirm = #{affirm} and t.site_route = #{siteRoute}
     </select>
 
     <select id="findUndoCount" resultType="java.lang.Integer">
@@ -184,7 +182,7 @@
 
     <select id="findHistoryWarningData" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
-        t1.node_id,t1.warning_type,t1.warning_grade,t1.warning_val,t1.principal as principalName,
+        t1.node_id as nodeId,t1.warning_type as warningType,t1.warning_grade as warningGrade,t1.warning_val as warningVal,t1.principal as principalName,
         t2.deal_method AS dealSuggestion,t2.create_time AS dealTime,t2.deal_result AS remark,
         (CASE
         WHEN (stack_id IS NULL ) THEN (SELECT site_name FROM tb_ware_area t WHERE t.id = t1.area_id)
@@ -195,8 +193,8 @@
         <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and t1.site_route like concat('%',#{earlyWarningDto.pidRoute},'%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t1.warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t1.warning_grade = #{earlyWarningDto.warningGrade}</if>
-        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t1.node_id = #{earlyWarningDto.nodeId}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t1.principal = #{earlyWarningDto.principalName}</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t1.node_id like concat('%',#{earlyWarningDto.nodeId},'%')</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t1.principal like concat('%',#{earlyWarningDto.principalName},'%')</if>
         <if test="earlyWarningDto.startTime != null">and t2.create_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null">and t2.create_time &lt;= #{earlyWarningDto.endTime}</if>
         ORDER BY t1.site_route
@@ -204,7 +202,7 @@
 
     <select id="findIds" resultType="java.lang.Integer">
         SELECT id FROM tb_early_warning where 1=1
-        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and pid_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat('%',#{earlyWarningDto.principalName}, '%')</if>
         <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
@@ -217,13 +215,6 @@
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY day
         ORDER BY day
-    </select>
-    <select id="findNoDealCountByDay" resultType="java.lang.Integer">
-        SELECT count(1) as sum
-        FROM tb_early_warning
-        WHERE is_affirm = '2' and ${dateType} = #{date}
-        <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
-        GROUP BY ${dateType}
     </select>
     <select id="findDealCountByDay" resultType="java.lang.Integer">
         SELECT count(1) as sum
@@ -240,23 +231,17 @@
     ORDER BY warning_type
 </select>
     <select id="findIsDeal" resultType="java.util.Map">
-        SELECT count(1) as sum,concat(round(COUNT(1)/#{count}* 100,2),'%') as ratio,is_affirm AS deal
+        SELECT count(1) as sumDeal,round(COUNT(1)/#{count},2) * 100 as ratioDeal
         FROM tb_early_warning
-        WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
-        GROUP BY is_affirm
-        order by is_affirm
+        WHERE is_affirm = '0' <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
     </select>
-    <select id="findById" resultType="com.rpzh.vo.EarlyWarningVo">
+    <select id="findByIds" resultType="com.rpzh.vo.EarlyWarningVo">
         select
-        warning_val_one as warningValOne,
-        warning_time_one as warningTimeOne,
-        warning_val_two as warningValTwo,
-        warning_time_two as warningTimeTwo,
-        warning_val_three as warningValThree,
-        warning_time_three as warningTimeThree
-        from  tb_early_warning where id =#{id}
+        warning_grade as warningGrade,
+        warning_val as warningVal,
+        warning_time as warningTime
+        from  tb_early_warning where id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
     </select>
-
     <delete id="misreport">
         delete from tb_early_warning where id = #{id}
     </delete>
@@ -287,5 +272,14 @@
     </select>
     <select id="findMaxTime" resultType="java.lang.String">
         select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId}
+    </select>
+    <select id="findColor" resultType="java.util.Map">
+        select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as oneColor,
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') as twoColor,
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as threeColor
+        from tb_general_setting limit 1
+    </select>
+    <select id="findPrincipal" resultType="java.lang.String">
+        select principal from tb_early_warning WHERE site_route = #{earlyWarningDto.pidRoute} and is_affirm = #{earlyWarningDto.isAffirm} and  warning_grade =#{earlyWarningDto.warningGrade}  limit 1
     </select>
 </mapper>

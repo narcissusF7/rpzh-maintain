@@ -14,7 +14,7 @@ import java.util.List;
  * @Description: 功能
  */
 public interface WareAreaAlarmSettingService {
-    void insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
+    Result insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
 
     Result deleteWareAreaAlarmSetting(List<Integer> ids);
     PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);

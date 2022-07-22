@@ -22,6 +22,8 @@ public class MaintainPlanVo {
     @ApiModelProperty(notes = "养护阶段id")
     private Integer stageId;
 
+    private Integer areaId;
+
     @ApiModelProperty(notes = "物料代码")
     private String materialCode;
 

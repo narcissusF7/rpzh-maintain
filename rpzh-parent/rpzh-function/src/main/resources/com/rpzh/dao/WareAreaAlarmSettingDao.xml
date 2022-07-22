@@ -85,6 +85,7 @@
         create_user as createUser,
         updated_time as updatedTime,
         (case site_type
+        when '01' then (select site_name from tb_warehouse t where t.id = t1.site_id)
         when '02' then (select site_name from tb_building t where t.id = t1.site_id)
         when '03' then (select site_name from tb_floor t where t.id = t1.site_id)
         when '04' then (select site_name from tb_ware_area t where t.id = t1.site_id) end) as siteName
@@ -92,7 +93,7 @@
         tb_ware_area_alarm_setting t1
         where 1=1
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat('%', #{wareAreaAlarmSettingDto.pidRoute}, '%')</if>
-        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user =  #{wareAreaAlarmSettingDto.createUser}</if>
+        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user like concat('%', #{wareAreaAlarmSettingDto.createUser}, '%')</if>
         <if test="wareAreaAlarmSettingDto.startTime != null">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
         <if test="wareAreaAlarmSettingDto.endTime != null">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
     </select>
@@ -111,7 +112,7 @@
             warehouse_moisture_upper_three as warehouseMoistureUpperThree,
             warehouse_moisture_lower as warehouseMoistureLower
         from
-        tb_ware_area_alarm_setting t1
+        tb_ware_area_alarm_setting
         where id = #{wareAreaAlarmSettingDto.id}
     </select>
     <update id="updateWareAreaAlarmSetting">
@@ -129,9 +130,6 @@
             <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != null and wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != ''">warehouse_moisture_upper_two = #{wareAreaAlarmSettingDto.warehouseMoistureUpperTwo},</if>
             <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree != null and wareAreaAlarmSettingDto.warehouseMoistureUpperThree != ''">warehouse_moisture_upper_three = #{wareAreaAlarmSettingDto.warehouseMoistureUpperThree},</if>
             <if test="wareAreaAlarmSettingDto.warehouseMoistureLower != null and wareAreaAlarmSettingDto.warehouseMoistureLower != ''">warehouse_moisture_lower = #{wareAreaAlarmSettingDto.warehouseMoistureLower},</if>
-            <if test="wareAreaAlarmSettingDto.stackId != null and wareAreaAlarmSettingDto.stackId != ''">site_id = #{wareAreaAlarmSettingDto.stackId},</if>
-            <if test="wareAreaAlarmSettingDto.siteType != null and wareAreaAlarmSettingDto.siteType != ''">site_type = #{wareAreaAlarmSettingDto.siteType},</if>
-            <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">pid_route = #{wareAreaAlarmSettingDto.pidRoute},</if>
             updated_time = #{wareAreaAlarmSettingDto.updatedTime} ,update_user = #{wareAreaAlarmSettingDto.updateUser}
         </set>
         where id = #{wareAreaAlarmSettingDto.id}
@@ -146,5 +144,8 @@
         log_date as logDate
         from log_alarm_setting
         where alarmValueSetting_id = #{logAlarmSettingDto.alarmValueSettingId}
+    </select>
+    <select id="findCount" resultType="java.lang.Integer">
+        select count(*) from tb_ware_area_alarm_setting where pid_route = #{pidRoute}
     </select>
 </mapper>

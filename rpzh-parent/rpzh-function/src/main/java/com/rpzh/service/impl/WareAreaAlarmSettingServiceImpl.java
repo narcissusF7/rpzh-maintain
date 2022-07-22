@@ -2,6 +2,7 @@ package com.rpzh.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.AlarmSettingTemplateDao;
 import com.rpzh.dao.WareAreaAlarmSettingDao;
 import com.rpzh.dto.LogAlarmSettingDto;
@@ -11,6 +12,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.util.IpUtils;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
@@ -38,8 +40,14 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     private final String UPDATETYPE = "修改";
 
     @Override
-    public void insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        String siteType = "0" + wareAreaAlarmSettingDto.getPidRoute().split(",").length;
+    public Result insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+        String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
+        String siteType = "0" + pidRoute.split(",").length;
+        pidRoute = pidRoute + ",[" + siteType + ":" + wareAreaAlarmSettingDto.getStackId() + "]";
+        if(wareAreaAlarmSettingDao.findCount(pidRoute)>0){
+            return new Result(false, StatusCode.ERROR, "该位置已存在预警规则!");
+        }
+        wareAreaAlarmSettingDto.setPidRoute(pidRoute);
         wareAreaAlarmSettingDto.setSiteType(siteType);
         Date date = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");
@@ -57,6 +65,7 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         logAlarmSettingDto.setAlarmValueSettingId(id);
         logAlarmSettingDto.setLogIp(ipAddr);
         alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
+        return new Result(true, StatusCode.OK, "配置仓间预警规则模板成功!");
     }
 
     @Override
@@ -73,6 +82,11 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         String endTime = wareAreaAlarmSettingDto.getEndTime();
         if(ToolUtil.isNotEmpty(endTime)){
             wareAreaAlarmSettingDto.setEndTime(endTime.replace("00:00:00","23:59:59"));
+        }
+        String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
+        Integer stackId = wareAreaAlarmSettingDto.getStackId();
+        if(StringUtil.isNotEmpty(pidRoute)){
+            wareAreaAlarmSettingDto.setPidRoute(SiteRouteUtil.route(pidRoute,stackId+""));
         }
         PageHelper.startPage(wareAreaAlarmSettingDto.getPage(), wareAreaAlarmSettingDto.getSize());
         List<WareAreaAlarmSettingVo> wareAreaAlarmSettingInfos = wareAreaAlarmSettingDao.findWareAreaAlarmSettingInfo(wareAreaAlarmSettingDto);
@@ -92,8 +106,6 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
 
     @Override
     public void updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        String siteType = "0" + wareAreaAlarmSettingDto.getPidRoute().split(",").length;
-        wareAreaAlarmSettingDto.setSiteType(siteType);
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         wareAreaAlarmSettingDto.setUpdateUser(updateUser);

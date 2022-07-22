@@ -21,7 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,30 +132,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
+    public Result findCountByName(String earlyWarningRuleName) {
+        Integer count = alarmSettingTemplateDao.findCountByName(earlyWarningRuleName);
+        if(count>0){
+            return new Result(false, StatusCode.ERROR, "该预警名称已存在!");
+        }
+        return new Result(true, StatusCode.OK, "");
+    }
+
+    @Override
     public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName) {
+        String user = TokenDecode.getUserInfo().get("username");
+        String phases = redisTemplate.opsForValue().get(user + "phases").toString();
         //根据预警规则名称获取预警模板数值
-        AlarmValueSettingVo alarmSettingTemplate = alarmSettingTemplateDao.findAlarmSettingTemplate(earlyWarningRuleName);
+        AlarmValueSettingVo alarmSettingTemplate = alarmSettingTemplateDao.findAlarmSettingTemplate(earlyWarningRuleName,phases);
         if(ToolUtil.isEmpty(alarmSettingTemplate)){
-            alarmSettingTemplate.setStackOxygenUpperOne(AlertSettingSetDefault.stackOxygenUpperOne);
-            alarmSettingTemplate.setStackOxygenUpperTwo(AlertSettingSetDefault.stackOxygenUpperTwo);
-            alarmSettingTemplate.setStackOxygenUpperThree(AlertSettingSetDefault.stackOxygenUpperThree);
-            alarmSettingTemplate.setStackOxygenLower(AlertSettingSetDefault.stackOxygenLower);
-            alarmSettingTemplate.setTempCoreChipUpperOne(AlertSettingSetDefault.tempCoreChipUpperOne);
-            alarmSettingTemplate.setTempCoreChipUpperTwo(AlertSettingSetDefault.tempCoreChipUpperTwo);
-            alarmSettingTemplate.setTempCoreChipUpperThree(AlertSettingSetDefault.tempCoreChipUpperThree);
-            alarmSettingTemplate.setTempCoreChipLower(AlertSettingSetDefault.tempCoreChipLower);
-            alarmSettingTemplate.setStackTempUpperOne(AlertSettingSetDefault.stackTempUpperOne);
-            alarmSettingTemplate.setStackTempUpperTwo(AlertSettingSetDefault.stackTempUpperTwo);
-            alarmSettingTemplate.setStackTempUpperThree(AlertSettingSetDefault.stackTempUpperThree);
-            alarmSettingTemplate.setStackTempLower(AlertSettingSetDefault.stackTempLower);
-            alarmSettingTemplate.setStackMoistureUpperOne(AlertSettingSetDefault.stackMoistureUpperOne);
-            alarmSettingTemplate.setStackMoistureUpperTwo(AlertSettingSetDefault.stackMoistureUpperTwo);
-            alarmSettingTemplate.setStackMoistureUpperThree(AlertSettingSetDefault.stackMoistureUpperThree);
-            alarmSettingTemplate.setStackMoistureLower(AlertSettingSetDefault.stackMoistureLower);
-            alarmSettingTemplate.setCoreTempHighEnvTempOne(AlertSettingSetDefault.coreTempHighEnvTempOne);
-            alarmSettingTemplate.setCoreTempHighEnvTempTwo(AlertSettingSetDefault.coreTempHighEnvTempTwo);
-            alarmSettingTemplate.setCoreTempHighEnvTempThree(AlertSettingSetDefault.coreTempHighEnvTempThree);
-            alarmSettingTemplate.setCoreTempLowEnvTemp(AlertSettingSetDefault.coreTempLowEnvTemp);
+            alarmSettingTemplate = new AlarmValueSettingVo();
         }
         return alarmSettingTemplate;
     }
@@ -228,57 +219,24 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         });
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
-        AlarmValueSettingVo alarmValueSettingVo;
-        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-        if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + maintainPlanVo.getStageId()))){
-            alarmValueSettingVo = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + maintainPlanVo.getStageId()).entries()),AlarmValueSettingVo.class);
-        }else {
-            alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
-            //获取所有的字段
-            for (Field field : fields) {
-                try {
-                    field.setAccessible(true);
-                    //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                    redisTemplate.opsForHash().put(MAINTAIN + maintainPlanVo.getStageId(), field.getName(), field.get(alarmValueSettingVo));
-                } catch (IllegalAccessException exception) {
-                    exception.printStackTrace();
-                }
-            }
-        }
+        AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);;
         //01：无线氧气传感器,03：无线温湿度传感器,04： 无线包芯温度传感器,
-        Integer stackId = maintainPlanVo.getStackId();
-        StackVo stackVo = warehouseDao.findPidRoute(stackId);
-        String pidRoute = stackVo.getPidRoute();
-        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
+        String pidRoute = maintainPlanVo.getPidRoute();
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
-        Integer areaId = stackVo.getAreaId();
-        List<String> conditioningDatas = airConditioningDao.findAirConditioningData(areaId);
-        Map<String, Object> nodeDate = getNodeDate("05", stackId, null);
-        if(ToolUtil.isNotEmpty(nodeDate)) {
-            maintainPlanVo.setStackOxygenNow(Double.parseDouble(nodeDate.get("o2Avg").toString()));
-            maintainPlanVo.setTempCoreChipNow(Double.parseDouble(nodeDate.get("coreTempAvg").toString()));
-            maintainPlanVo.setStackTempNow(Double.parseDouble(nodeDate.get("tempAvg").toString()));
-            maintainPlanVo.setStackMoistureNow(Double.parseDouble(nodeDate.get("humitureAvg").toString()));
-            maintainPlanVo.setCoreTempHighEnvTempNow(Double.parseDouble(nodeDate.get("coreTempHighEnvTemp").toString()));
-        }
-        nodeDate = getNodeDate("04", null, pidRoute);
-        if(ToolUtil.isNotEmpty(nodeDate)) {
-            maintainPlanVo.setWarehouseOxygenNow(Double.parseDouble(nodeDate.get("o2Avg").toString()));
-            Double tempSum = Double.parseDouble(nodeDate.get("tempSum").toString());
-            Double humitureSum = Double.parseDouble(nodeDate.get("humitureSum").toString());
-            Integer tempCount = Integer.parseInt(nodeDate.get("tempCount").toString());
-            NodeData nodeData;
-            for (String conditioningData : conditioningDatas) {
-                nodeData = new ObjectMapper().convertValue(redisTemplate.opsForValue().get(MAINTAIN + conditioningData), NodeData.class);
-                humitureSum = humitureSum + nodeData.getHumiture();
-                tempSum = tempSum + nodeData.getTemp();
-            }
-            Integer size = tempCount + conditioningDatas.size();
-            Double tempAvg = size > 0 ? tempSum / (double) size : 0d;
-            Double humitureAvg = size > 0 ? humitureSum / (double) size : 0d;
-            maintainPlanVo.setWarehouseTempNow(Double.parseDouble(String.format("%.2f", tempAvg)));
-            maintainPlanVo.setWarehouseMoistureNow(Double.parseDouble(String.format("%.2f", humitureAvg)));
-        }
+        Integer areaId = maintainPlanVo.getAreaId();
+        List<String> airNodes = airConditioningDao.findAirConditioningData(areaId);
+        Map<String, Double> map = nodeDao.findNowNodeData(airNodes);
+        maintainPlanVo.setWarehouseTempNow(map.get("temp"));
+        maintainPlanVo.setWarehouseMoistureNow(map.get("humiture"));
+        Map<String, Double> stackEnv = nodeDao.findStackEnv(id);
+        maintainPlanVo.setStackTempNow(stackEnv.get("temp"));
+        maintainPlanVo.setStackMoistureNow(stackEnv.get("humiture"));
+        Double stackCore = nodeDao.findStackCore(id);
+        maintainPlanVo.setTempCoreChipNow(stackCore);
+        maintainPlanVo.setCoreTempHighEnvTempNow(stackCore-stackEnv.get("humiture"));
+        maintainPlanVo.setStackOxygenNow(nodeDao.findO2StackData(id));
+        maintainPlanVo.setWarehouseOxygenNow(nodeDao.findO2AreaData(pidRoute));
         return maintainPlanVo;
     }
 
@@ -298,9 +256,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVo.setPidRoute(pidRoute + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]");
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
-        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
+        String createUser = TokenDecode.getUserInfo().get("username");
+        System.out.println(maintainPlanVo.getPhases());
+        redisTemplate.opsForValue().set(createUser+"phases",maintainPlanVo.getPhases());
         return maintainPlanVo;
     }
 
@@ -341,61 +301,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             }
         }
         return phases;
-    }
-
-    public Map<String,Object> getNodeDate(String siteType,Integer stackId,String pidRoute){
-        List<NodeVo> nodeVos = nodeDao.findNodeIdBySiteType(siteType, stackId, pidRoute);
-        if(nodeVos.size()==0){
-            return null;
-        }
-        Double o2Sum = 0d;
-        Double tempSum = 0d;
-        Double humitureSum = 0d;
-        Double coreTempSum = 0d;
-        int o2Count = 0,tempCount = 0,coreTempCount = 0;
-        for (NodeVo nodeVo : nodeVos) {
-            String nodeType = nodeVo.getNodeType();
-            String nodeId = nodeVo.getNodeId();
-            Object nodeInfo = redisTemplate.opsForValue().get(MAINTAIN + nodeId);
-            if(ToolUtil.isNotEmpty(nodeInfo)){
-            NodeData nodeData = JSON.parseObject(nodeInfo.toString(), NodeData.class);
-                switch (nodeType) {
-                    case "01":
-                        o2Sum = o2Sum + nodeData.getOxygen();
-                        o2Count = o2Count + 1;
-                        break;
-                    case "03":
-                        coreTempSum = coreTempSum + nodeData.getTemp();
-                        coreTempCount = coreTempCount + 1;
-                        break;
-                    case "04":
-                        tempSum = tempSum + nodeData.getTemp();
-                        humitureSum = humitureSum + nodeData.getHumiture();
-                        tempCount = tempCount + 1;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        Map<String,Object> nodeDataMap = new HashMap<>();
-        Double o2Avg = o2Count>0 ? o2Sum/ (double)o2Count:0d;
-        nodeDataMap.put("o2Avg",String.format("%.2f",o2Avg));
-        if(siteType.equals("04")){
-            nodeDataMap.put("tempSum",tempSum);
-            nodeDataMap.put("humitureSum",humitureSum);
-            nodeDataMap.put("tempCount",tempCount);
-        }
-        if(siteType.equals("05")) {
-            Double tempAvg = tempCount > 0 ? tempSum / (double) tempCount : 0d;
-            nodeDataMap.put("tempAvg", String.format("%.2f",tempAvg));
-            Double humitureAvg = tempCount > 0 ? humitureSum / (double) tempCount : 0d;
-            nodeDataMap.put("humitureAvg", String.format("%.2f",humitureAvg));
-            Double coreTempAvg = coreTempCount > 0 ? coreTempSum / (double) coreTempCount : 0d;
-            nodeDataMap.put("coreTempAvg", String.format("%.2f",coreTempAvg));
-            nodeDataMap.put("coreTempHighEnvTemp", String.format("%.2f",coreTempAvg-tempAvg));
-        }
-        return nodeDataMap;
     }
 
     @Override
@@ -788,7 +693,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
-        List<String> materialCodes =  Arrays.asList(alarmValueSettingDto.getMaterialCode().split(","));
+        List<String> materialCodes = alarmValueSettingDto.getMaterialCodes();
+        String createUser = TokenDecode.getUserInfo().get("username");
+        redisTemplate.opsForValue().set(createUser+"phases",alarmValueSettingDto.getPhases());
         for (String materialCode : materialCodes) {
             alarmValueSettingDto.setMaterialCode(materialCode);
             alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(alarmValueSettingDto);
@@ -801,38 +708,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         }
         //向上查找仓间预警数值
         String pidRoute = alarmValueSettingDto.getPidRoute();
-        Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute,fields);
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         return alarmValueSettingVo;
     }
 
-    public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute,Field[] fields){
-        String[] pidRoutes = pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(",");
+    public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute){
+       List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
+        pidRoutes.sort((v1, v2) -> v2.compareTo(v1));
         AlarmValueSettingVo alarmValueSettingVo1=null;
         //从下往上找
-        for (int i = pidRoutes.length - 1; i >= 0; i--) {
-            String[] route = pidRoutes[i].split(":");
-            if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + route[0]+route[1]))){
-                alarmValueSettingVo1 = JSON.parseObject(JSON.toJSONString(redisTemplate.boundHashOps(MAINTAIN + route[0]+route[1]).entries()),AlarmValueSettingVo.class);
+        for (String routes : pidRoutes) {
+            String[] route = routes.split(":");
+            alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
+            if(ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
                 break;
-            }
-        }
-        if(ToolUtil.isEmpty(alarmValueSettingVo1)){
-            for (String routes : pidRoutes) {
-                String[] route = routes.split(":");
-                alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
-                if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
-                    for (Field field : fields) {
-                        try {
-                            field.setAccessible(true);
-                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                            redisTemplate.opsForHash().put(MAINTAIN + route[0]+route[1], field.getName(), field.get(alarmValueSettingVo1));
-                        } catch (IllegalAccessException exception) {
-                            exception.printStackTrace();
-                        }
-                    }
-                    break;
-                }
             }
         }
         if(ToolUtil.isNotEmpty(alarmValueSettingVo1)){
@@ -848,20 +737,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             alarmValueSettingVo.setWarehouseMoistureUpperTwo(alarmValueSettingVo1.getWarehouseMoistureUpperTwo());
             alarmValueSettingVo.setWarehouseMoistureUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
             alarmValueSettingVo.setWarehouseMoistureLower(alarmValueSettingVo1.getWarehouseMoistureLower());
-        }
-        if(ToolUtil.isEmpty(alarmValueSettingVo1)){
-            alarmValueSettingVo.setWarehouseOxygenUpperOne(AlertSettingSetDefault.warehouseOxygenUpperOne);
-            alarmValueSettingVo.setWarehouseOxygenUpperTwo(AlertSettingSetDefault.warehouseOxygenUpperTwo);
-            alarmValueSettingVo.setWarehouseOxygenUpperThree(AlertSettingSetDefault.warehouseOxygenUpperThree);
-            alarmValueSettingVo.setWarehouseOxygenLower(AlertSettingSetDefault.warehouseOxygenLower);
-            alarmValueSettingVo.setWarehouseTempUpperOne(AlertSettingSetDefault.warehouseTempUpperOne);
-            alarmValueSettingVo.setWarehouseTempUpperTwo(AlertSettingSetDefault.warehouseTempUpperTwo);
-            alarmValueSettingVo.setWarehouseTempUpperThree(AlertSettingSetDefault.warehouseTempUpperThree);
-            alarmValueSettingVo.setWarehouseTempLower(AlertSettingSetDefault.warehouseTempLower);
-            alarmValueSettingVo.setWarehouseMoistureUpperOne(AlertSettingSetDefault.warehouseMoistureUpperOne);
-            alarmValueSettingVo.setWarehouseMoistureUpperTwo(AlertSettingSetDefault.warehouseMoistureUpperTwo);
-            alarmValueSettingVo.setWarehouseMoistureUpperThree(AlertSettingSetDefault.warehouseMoistureUpperThree);
-            alarmValueSettingVo.setWarehouseMoistureLower(AlertSettingSetDefault.warehouseMoistureLower);
         }
         return alarmValueSettingVo;
     }
