@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.DataReportDao">
+    <insert id="insertData">
+        INSERT INTO tb_node_o2_history
+        (id,
+         `type`,
+         oxygen,
+         node_id,
+         frequency,
+         voltage,
+         signal_strength,
+         stack_id,
+         maintain_plan_id,
+         maintain_stage_id,
+         gather_site,
+         site_type,
+         transfer_time,
+         alert_level,
+         pid_route,
+         createdTime,
+         site_x,
+         site_y,
+         site_z, warning_type)
+        VALUES (#{id},
+                #{type},
+                #{doubleValue},
+                #{s},
+                #{v},
+                #{v1},
+                #{i},
+                #{i1},
+                #{i2},
+                #{i3},
+                #{address},
+                #{c},
+                #{parse},
+                #{i4},
+                #{s1},
+                #{parse1},
+                #{s2},
+                #{s3},
+                #{s4},
+                #{s5});
+
+    </insert>
+
+    <select id="findStackComparison" resultType="com.rpzh.vo.DataReportVo">
+        select gather_site as gatherSite,
+        pid_route as pidRoute,
+        <if test="type==1">
+            max(temp) as maxData,
+            min(temp) as minData,
+            round(avg(temp),2) as avgData
+        </if>
+        <if test="type==2">
+            max(humiture) as maxData,
+            min(humiture) as minData,
+            round(avg(humiture),2) as avgData
+        </if>
+        <if test="type==3">
+            max(oxygen) as maxData,
+            min(oxygen) as minData,
+            round(avg(oxygen),2) as avgData
+        </if>
+        from
+        <if test="type==1 or type==2 ">tb_node_env_history</if>
+        <if test="type==3">tb_node_o2_history</if>
+        <where>
+            site_type = '05'
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by gather_site,pidRoute
+        having 1=1
+        <if test="dateType==2 and valOne!=null">
+            and maxData >=#{valOne}
+        </if>
+        <if test="dateType==2 and valTwo!=null">
+            and maxData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==3 and valOne!=null">
+            and minData >=#{valOne}
+        </if>
+        <if test="dateType==3 and valTwo!=null">
+            and minData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==4 and valOne!=null">
+            and avgData >=#{valOne}
+        </if>
+        <if test="dateType==4 and valTwo!=null">
+            and avgData &lt;=#{valTwo}
+        </if>
+    </select>
+    <select id="findEnvDeviceParticularsInfo" resultType="com.rpzh.vo.DataReportVo">
+        SELECT tneh.temp as tempData,
+        tneh.humiture as humitureData,
+        createdTime as createTime,
+        node_id as nodeId,
+        gather_site as gatherSite
+        from tb_node_env_history tneh
+        WHERE pid_route = #{gatherSiteRoute}
+        <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+            and createdTime >= #{acquisitionTimeOne}
+        </if>
+        <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+            and createdTime &lt;= #{acquisitionTimeTwo}
+        </if>
+        ORDER by createdTime desc
+    </select>
+    <select id="findO2DeviceParticularsInfo" resultType="com.rpzh.vo.DataReportVo">
+        SELECT oxygen as o2Data,
+        createdTime as createTime,
+        node_id as nodeId,
+        gather_site as gatherSite
+        FROM tb_node_o2_history tnoh
+        WHERE pid_route = #{gatherSiteRoute}
+        <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+            and createdTime >= #{acquisitionTimeOne}
+        </if>
+        <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+            and createdTime &lt;= #{acquisitionTimeTwo}
+        </if>
+        ORDER by createdTime desc
+    </select>
+
+    <select id="findEnvStackComparisonData" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSiteOne,
+        node_id as nodeIdOne,
+        round(avg(tneh.temp),2) as tempDataOne,
+        round(avg(tneh.humiture),2) as humitureDataOne,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_env_history tneh
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by createTime,gatherSiteOne,nodeIdOne
+        ORDER BY createTime desc
+    </select>
+    <select id="findStackComparisonByWarehouse" resultType="com.rpzh.vo.DataReportVo">
+        select gather_site as gatherSite,
+        pid_route as pidRoute,
+        <if test="type==1">
+            max(temp) as maxData,
+            min(temp) as minData,
+            round(avg(temp),2) as avgData
+        </if>
+        <if test="type==2">
+            max(humiture) as maxData,
+            min(humiture) as minData,
+            round(avg(humiture),2) as avgData
+        </if>
+        from
+        tb_node_env_history
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by gatherSite,pidRoute
+        having 1=1
+        <if test="dateType==2 and valOne!=null">
+            and maxData >=#{valOne}
+        </if>
+        <if test="dateType==2 and valTwo!=null">
+            and maxData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==3 and valOne!=null">
+            and minData >=#{valOne}
+        </if>
+        <if test="dateType==3 and valTwo!=null">
+            and minData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==4 and valOne!=null">
+            and avgData >=#{valOne}
+        </if>
+        <if test="dateType==4 and valTwo!=null">
+            and avgData &lt;=#{valTwo}
+        </if>
+    </select>
+    <select id="findStackComparisonByWarehouseNow" resultType="com.rpzh.vo.DataReportVo">
+        select gather_site as gatherSite,
+        <if test="type==1">
+            temp as nowData
+        </if>
+        <if test="type==2">
+            humiture as nowData
+        </if>
+        from
+        tb_node_env_history
+        <where>
+            createdTime in (select max(createdTime) from tb_node_env_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+            <if test="dateType==1 and valOne!=null">
+                and nowData >=#{valOne}
+            </if>
+            <if test="dateType==1 and valTwo!=null">
+                and nowData &lt;=#{valTwo}
+            </if>
+        </where>
+        order by createdTime desc
+    </select>
+
+    <select id="findStackAndCoreInfo" resultType="com.rpzh.vo.DataReportVo">
+        SELECT gather_site as gatherSite,
+        tneh.temp as tempData,
+        pid_route as pidRoute,
+        round(avg(tntcch.temp),2) as coreTempData,
+        round(coreTempData - tempData,2) as differenceValue,
+        formatDateTime(createdTime,'%F %H:%M') as createTime
+        FROM tb_node_env_history tneh,
+        tb_node_temp_core_chip_history tntcch
+        <where>
+            site_type = '05'
+            and createdTime in (select max(createdTime) from tb_node_env_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by gather_site,tempData,pidRoute,createTime
+        having 1=1
+        <if test="dateType==5 and valOne!=null">
+            and tempData >=#{valOne}
+        </if>
+        <if test="dateType==5 and valTwo!=null">
+            and tempData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==6 and valOne!=null">
+            and coreTempData >=#{valOne}
+        </if>
+        <if test="dateType==6 and valTwo!=null">
+            and coreTempData &lt;=#{valTwo}
+        </if>
+        <if test="dateType==7 and valOne!=null">
+            and differenceValue >=#{valOne}
+        </if>
+        <if test="dateType==7 and valTwo!=null">
+            and differenceValue &lt;=#{valTwo}
+        </if>
+    </select>
+    <select id="findStackAndCoreInfoList" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSiteOne,
+        node_id as nodeIdOne,
+        round(avg(tneh.temp),2) as coreTempDataOne,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_temp_core_chip_history tneh
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by createTime,nodeIdOne,gatherSiteOne,pidRoute
+        order by createTime desc
+    </select>
+    <select id="findEnvSummaryReport" resultType="com.rpzh.vo.DataReportVo">
+        SELECT
+        tneh.temp as tempData,
+        tneh.humiture as humitureData,
+        tneh.gather_site as gatherSite,
+        pid_route as pidRoute
+        from tb_node_env_history tneh
+        <where>
+            createdTime in (select max(createdTime) from tb_node_env_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                and pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="tempOne!=null">
+                and tempData >=#{tempOne}
+            </if>
+            <if test="tempTwo!=null">
+                and tempData &lt;=#{tempTwo}
+            </if>
+            <if test="humitureOne!=null">
+                and humitureData >=#{humitureOne}
+            </if>
+            <if test="humitureTwo!=null">
+                and humitureData &lt;=#{humitureTwo}
+            </if>
+        </where>
+        group by gatherSite,tempData,humitureData,tneh.createdTime,pidRoute
+        order by tneh.createdTime desc
+    </select>
+    <select id="findO2SummaryReport" resultType="com.rpzh.vo.DataReportVo">
+        SELECT tnoh.oxygen as o2Data,
+        tnoh.gather_site as gatherSite,
+        pid_route as pidRoute
+        from tb_node_o2_history tnoh
+        <where>
+            createdTime in (select max(createdTime) from tb_node_o2_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                and pid_route = #{gatherSiteRoute}
+            </if>
+
+            <if test="o2One!=null">
+                and o2Data >=#{o2One}
+            </if>
+            <if test="o2Two!=null">
+                and o2Data &lt;=#{o2Two}
+            </if>
+        </where>
+        group by gatherSite,o2Data,tnoh.createdTime,pidRoute
+        order by tnoh.createdTime desc
+    </select>
+
+    <select id="findTempSummaryReport" resultType="com.rpzh.vo.DataReportVo">
+        SELECT round(avg(tntcch.temp),2) as coreTempData,
+        tntcch.gather_site as gatherSite,
+        pid_route as pidRoute
+        from tb_node_temp_core_chip_history tntcch
+        <where>
+            createdTime in (select max(createdTime) from tb_node_temp_core_chip_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                and pid_route = #{gatherSiteRoute}
+            </if>
+        </where>
+        group by gatherSite,tntcch.createdTime,pidRoute
+        having 1 = 1
+        <if test="coreTempOne!=null">
+            and coreTempData >=#{coreTempOne}
+        </if>
+        <if test="coreTempTwo!=null">
+            and coreTempData &lt;=#{coreTempTwo}
+        </if>
+        order by tntcch.createdTime desc
+    </select>
+
+    <select id="findO2StackComparisonData" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSiteOne,
+        node_id as nodeIdOne,
+        round(avg(tneh.oxygen),2) as o2DataOne,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_o2_history tneh
+        <where>
+            createdTime in (select max(createdTime) from tb_node_env_history)
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                and pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeOne}
+            </if>
+        </where>
+        group by createTime,gatherSiteOne,nodeIdOne
+        ORDER BY createTime desc
+    </select>
+    <select id="findStackComparisonNow" resultType="com.rpzh.vo.DataReportVo">
+        select gather_site as gatherSite,
+        pid_route as pidRoute,
+        <if test="type==1">
+            temp as nowData
+        </if>
+        <if test="type==2">
+            humiture as nowData
+        </if>
+        <if test="type==3">
+            oxygen as nowData
+        </if>
+        from
+        <if test="type==1 or type==2 ">tb_node_env_history</if>
+        <if test="type==3">tb_node_o2_history</if>
+        <where>
+            site_type = '05'
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+    </select>
+    <select id="findEnvSummaryReportDetails" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSite,
+        round(avg(tneh.temp),2) as tempData,
+        round(avg(tneh.humiture),2) as humitureData,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_env_history tneh
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by createTime,gatherSite
+        ORDER BY createTime desc
+    </select>
+    <select id="findO2SummaryReportDetails" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSite,
+        round(avg(tneh.oxygen),2) as o2Data,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_o2_history tneh
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by createTime,gatherSite
+        ORDER BY createTime desc
+    </select>
+    <select id="findTempSummaryReportDetails" resultType="com.rpzh.vo.DataReportVo">
+        select
+        gather_site as gatherSite,
+        round(avg(tneh.temp),2) as coreTempData,
+        toStartOfInterval(createdTime , INTERVAL
+        <if test="samplingFrequency!=null">
+            #{samplingFrequency}
+        </if>
+        <if test="samplingFrequencyUnit!=null and samplingFrequencyUnit!=''">
+            <if test="samplingFrequencyUnit eq 'h'.toString()">
+                hour
+            </if>
+            <if test="samplingFrequencyUnit eq 'd'.toString() or samplingFrequencyUnit eq 'w'.toString()">
+                day
+            </if>
+            <if test="samplingFrequencyUnit eq 'm'.toString()">
+                month
+            </if>
+            <if test="samplingFrequencyUnit eq 'y'.toString()">
+                year
+            </if>
+        </if>
+        ) as
+        createTime
+        from tb_node_temp_core_chip_history tneh
+        <where>
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
+                pid_route = #{gatherSiteRoute}
+            </if>
+            <if test="acquisitionTimeOne!=null and acquisitionTimeOne!=''">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null and acquisitionTimeTwo!=''">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+        group by createTime,gatherSite
+        ORDER BY createTime desc
+    </select>
+</mapper>
