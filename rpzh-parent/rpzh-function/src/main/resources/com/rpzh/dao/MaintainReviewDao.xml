@@ -37,6 +37,7 @@
 </select>
     <select id="findMaintainPlanReview" resultType="com.rpzh.vo.MaintainPlanVo">
         select
+        t2.id as id,
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
         t2.maintain_days as maintainDays,
@@ -45,9 +46,22 @@
         t2.oxygen_reduction_day as oxygenReductionDay
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on  t1.id = t2.maintain_plan_id
-        where t1.id = #{id}
+        where t1.id = #{id} order by t2.id
     </select>
-    <select id="findOxygenData" resultType="com.rpzh.vo.AlarmValueSettingVo">
-        select avg(oxygen) as oxygen,maintain_stage_id as stageId from tb_node_o2_history where maintain_plan_id = #{id} group by maintain_stage_id
+    <select id="findOxygenOrCoreData" resultType="java.lang.Double">
+        select round(avg(${column}),1) as ${column},maintain_stage_id as stageId from ${table} where
+        maintain_stage_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        group by maintain_stage_id
+    </select>
+    <select id="findEnvData" resultType="java.util.Map">
+        select round(avg(humiture),1) as humiture,round(avg(temp),1) as temp from tb_node_env_history where
+        maintain_stage_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        group by maintain_stage_id
     </select>
 </mapper>

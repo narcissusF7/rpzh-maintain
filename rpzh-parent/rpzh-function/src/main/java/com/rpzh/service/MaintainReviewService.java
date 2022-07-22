@@ -2,6 +2,7 @@ package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.MaintainPlanVo;
 import java.util.List;
 
@@ -14,4 +15,5 @@ public interface MaintainReviewService {
     PageInfo<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto);
     List<MaintainPlanVo> findMaintainPlanReview(Integer id);
     MaintainPlanVo findMaintainBaseInfo(Integer id);
+    List<EarlyWarning> findEarlyWarningReview(Integer id);
 }

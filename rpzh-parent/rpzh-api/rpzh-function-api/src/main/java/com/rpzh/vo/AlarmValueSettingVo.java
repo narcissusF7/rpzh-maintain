@@ -105,6 +105,29 @@ public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "位置id")
     private Integer siteId;
 
+    public AlarmValueSettingVo(){}
+    public AlarmValueSettingVo(String flag){
+        this.stackOxygenUpperOne = null ;
+        this.stackOxygenUpperThree = null ;
+        this.stackOxygenUpperTwo = null ;
+        this.stackOxygenLower = null ;
+        this.stackTempUpperOne = null ;
+        this.stackTempUpperTwo = null ;
+        this.stackTempUpperThree = null ;
+        this.stackTempLower = null ;
+        this.stackMoistureUpperOne = null ;
+        this.stackMoistureUpperThree = null ;
+        this.stackMoistureUpperTwo = null ;
+        this.stackMoistureLower = null ;
+        this.tempCoreChipUpperOne = null ;
+        this.tempCoreChipUpperThree = null ;
+        this.tempCoreChipUpperTwo = null ;
+        this.tempCoreChipLower = null ;
+        this.coreTempHighEnvTempOne = null ;
+        this.coreTempHighEnvTempThree = null ;
+        this.coreTempHighEnvTempTwo = null ;
+        this.coreTempLowEnvTemp = null ;
+    }
     public static String[] getColumn(String type,String siteType) {
         if ("04".equals(siteType)){
             switch (type){

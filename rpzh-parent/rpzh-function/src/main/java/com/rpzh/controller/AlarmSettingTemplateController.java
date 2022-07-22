@@ -166,8 +166,7 @@ public class AlarmSettingTemplateController {
     })
     @ApiOperation(value = "更改预警设置模板")
     public Result updateAlarmSettingTemplate(@ApiIgnore AlarmValueSettingDto alarmValueSettingDto) {
-        alarmSettingTemplateService.updateAlarmSettingTemplate(alarmValueSettingDto);
-        return new Result<>(true, StatusCode.OK, "更改预警设置模板成功!");
+        return  alarmSettingTemplateService.updateAlarmSettingTemplate(alarmValueSettingDto);
     }
 
     @PostMapping(value = "/findLogData")

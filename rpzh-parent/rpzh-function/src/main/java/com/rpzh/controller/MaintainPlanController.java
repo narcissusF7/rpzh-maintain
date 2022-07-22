@@ -621,6 +621,7 @@ public class MaintainPlanController {
         alarmValueSettingDto.setPhases(phases);
         alarmValueSettingDto.setMaintenceStyle(maintenceStyle);
         alarmValueSettingDto.setMaterialCode(materialCode);
+        alarmValueSettingDto.setMaterialCodes(Arrays.asList(materialCode.split(",")));
         alarmValueSettingDto.setPidRoute(pidRoute);
         AlarmValueSettingVo alarmValueSettingVo = maintainPlanService.findAlarmValueSetting(alarmValueSettingDto);
         return new Result(true, StatusCode.OK, "查询成功",alarmValueSettingVo);

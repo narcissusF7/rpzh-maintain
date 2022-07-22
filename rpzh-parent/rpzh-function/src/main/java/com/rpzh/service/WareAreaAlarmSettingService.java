@@ -19,6 +19,6 @@ public interface WareAreaAlarmSettingService {
     Result deleteWareAreaAlarmSetting(List<Integer> ids);
     PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
     Result findWareAreaAlarmSettingById(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
-    void updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
+    Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
     Result findLogData(LogAlarmSettingDto logAlarmSettingDto);
 }

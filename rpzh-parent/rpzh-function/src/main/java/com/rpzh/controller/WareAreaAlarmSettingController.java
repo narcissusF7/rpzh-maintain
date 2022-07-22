@@ -108,8 +108,7 @@ public class WareAreaAlarmSettingController {
     })
     @ApiOperation(value = "修改仓间预警规则成功")
     public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        wareAreaAlarmSettingService.updateWareAreaAlarmSetting(wareAreaAlarmSettingDto);
-        return new Result<>(true, StatusCode.OK, "修改仓间预警规则成功!");
+        return wareAreaAlarmSettingService.updateWareAreaAlarmSetting(wareAreaAlarmSettingDto);
     }
 
     @PostMapping(value = "/findLogData")

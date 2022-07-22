@@ -1,11 +1,16 @@
 package com.rpzh.dao;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.pojo.NodeData;
+import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainPlanVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @Author: zyq
@@ -19,4 +24,10 @@ public interface MaintainReviewDao {
     List<MaintainPlanVo> findMaintainPlanReview(@Param("id") Integer id);
 
     MaintainPlanVo findMaintainBaseInfo(@Param("id") Integer id);
+
+    @DS("clickhouse")
+    List<Double> findOxygenOrCoreData(@Param("column") String column, @Param("table") String table, @Param("ids") Set<Integer> ids);
+
+    @DS("clickhouse")
+    List<Map<String,Double>> findEnvData(@Param("ids") Set<Integer> ids);
 }

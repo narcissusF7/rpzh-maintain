@@ -31,7 +31,7 @@ public interface AlarmSettingTemplateService {
 
     Result findAlarmSettingTemplateByMaterialCode(String materialCode,String maintenceStyle,String phases);
 
-    void updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
+    Result updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto);
 
     Result findLogData(LogAlarmSettingDto logAlarmSettingDto);
 

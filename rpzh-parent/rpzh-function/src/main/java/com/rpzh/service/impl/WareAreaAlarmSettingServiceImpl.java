@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.AlarmSettingTemplateDao;
 import com.rpzh.dao.WareAreaAlarmSettingDao;
+import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.entity.Result;
@@ -39,8 +40,25 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
 
     private final String UPDATETYPE = "修改";
 
+    public boolean getFlag(WareAreaAlarmSettingDto wareAreaAlarmSettingDto){
+        return wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() == null ||
+                wareAreaAlarmSettingDto.getWarehouseOxygenUpperThree() == null ||
+                wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() == null ||
+                wareAreaAlarmSettingDto.getWarehouseOxygenLower() == null ||
+                wareAreaAlarmSettingDto.getWarehouseTempUpperOne() == null ||
+                wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() == null ||
+                wareAreaAlarmSettingDto.getWarehouseTempUpperThree() == null ||
+                wareAreaAlarmSettingDto.getWarehouseTempLower() == null ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() == null ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureUpperThree() == null ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() == null ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureLower() == null;
+    }
     @Override
     public Result insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+        if(getFlag(wareAreaAlarmSettingDto)){
+            return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
         String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
         String siteType = "0" + pidRoute.split(",").length;
         pidRoute = pidRoute + ",[" + siteType + ":" + wareAreaAlarmSettingDto.getStackId() + "]";
@@ -105,7 +123,10 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     }
 
     @Override
-    public void updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+    public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+        if(getFlag(wareAreaAlarmSettingDto)){
+            return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         wareAreaAlarmSettingDto.setUpdateUser(updateUser);
@@ -119,6 +140,7 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         logAlarmSettingDto.setAlarmValueSettingId(wareAreaAlarmSettingDto.getId());
         logAlarmSettingDto.setLogIp(ipAddr);
         alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
+        return new Result<>(true, StatusCode.OK, "修改仓间预警规则成功!");
     }
 
     @Override
