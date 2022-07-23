@@ -133,8 +133,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public Result findCountByName(String earlyWarningRuleName) {
-        Integer count = alarmSettingTemplateDao.findCountByName(earlyWarningRuleName);
-        if(count>0){
+        Integer id = alarmSettingTemplateDao.findCountByName(earlyWarningRuleName);
+        if(ToolUtil.isNotEmpty(id)){
             return new Result(false, StatusCode.ERROR, "该预警名称已存在!");
         }
         return new Result(true, StatusCode.OK, "");

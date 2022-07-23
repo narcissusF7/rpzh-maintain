@@ -4,6 +4,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.vo.AlarmValueSettingVo;
+import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.MaintainPlanVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -29,5 +30,12 @@ public interface MaintainReviewDao {
     List<Double> findOxygenOrCoreData(@Param("column") String column, @Param("table") String table, @Param("ids") Set<Integer> ids);
 
     @DS("clickhouse")
-    List<Map<String,Double>> findEnvData(@Param("ids") Set<Integer> ids);
+    List<Map<String, Double>> findEnvData(@Param("ids") Set<Integer> ids);
+
+    MaintainPlanVo findStackIdAndTime(@Param("id") Integer id);
+
+    List<EarlyWarningVo> findEarlyWarningReview(@Param("maintainPlanVo") MaintainPlanVo maintainPlanVo);
+
+    @DS("clickhouse")
+    List<Map> findDataReview(@Param("tableName")String tableName,@Param("columnName") String columnName,@Param("id")Integer id,@Param("startTime")String startTime,@Param("endTime")String endTime);
 }

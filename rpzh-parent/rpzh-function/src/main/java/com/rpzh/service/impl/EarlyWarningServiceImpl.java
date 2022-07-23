@@ -1,4 +1,5 @@
 package com.rpzh.service.impl;
+
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.*;
 import com.rpzh.dao.*;
@@ -10,6 +11,7 @@ import com.rpzh.service.EarlyWarningService;
 import com.rpzh.util.*;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
@@ -34,18 +36,20 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     private WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
     @Resource
     private PestMonitoringDao pestMonitoringDao;
+    //redis中用户key前缀
+    private static final String USER = "USER_";
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto) {
         String pidRoute = earlyWarningDto.getPidRoute();
         Integer stackId = earlyWarningDto.getStackId();
         List<EarlyWarningVo> earlyWarningInfos = new ArrayList<>();
-        Date endTime = earlyWarningDto.getEndTime();
-        if(ToolUtil.isNotEmpty(endTime)){
-            earlyWarningDto.setEndTime(new Date(endTime.getTime() + 24 * 60 * 60 * 1000));
+        if(ToolUtil.isNotEmpty(earlyWarningDto.getEndTime())){
+            earlyWarningDto.setEndTime(new Date(earlyWarningDto.getEndTime().getTime() + 24 * 60 * 60 * 1000-1));
         }
         if(StringUtils.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(stackId)){
-            int length = pidRoute.split(",").length;
-            earlyWarningDto.setPidRoute(pidRoute + ",[0"+length+":"+stackId+"]");
+            earlyWarningDto.setPidRoute(SiteRouteUtil.route(pidRoute,stackId+""));
         }
         PageHelper.startPage(earlyWarningDto.getPage(), earlyWarningDto.getSize());
         earlyWarningInfos = earlyWarningDao.findHistoryWarningData(earlyWarningDto);
@@ -57,7 +61,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     public Result findWarningCount(EarlyWarningDto earlyWarningDto) {
         String pidRoute = earlyWarningDto.getPidRoute();
         Integer siteId = earlyWarningDto.getSiteId();
-        Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime()+" 00:00:00", earlyWarningDto.getFinishTime()+" 00:00:00");
+        Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
         //设置开始时间
         earlyWarningDto.setBeginTime(time.get("startTime"));
         //设置结束时间
@@ -76,30 +80,17 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         List<Map> warningCount = new ArrayList<>();
         List<Map> isDealCount = new ArrayList<>();
         List<Map> warningTypeCount = new ArrayList<>();
+        List<Map> warningTypeNumber = new ArrayList<>();
         if(ToolUtil.isEmpty(ids)){
-            map1.put("sum",0);
-            Map<String,Integer> countMap = new HashMap<>();
-            countMap.put("warningType",0);
-            countMap.put("sum",0);
-            warningTypeCount.add(countMap);
-            map1.put("warningTypeCount",warningTypeCount);
-            map1.put("warningTypeNumber",warningTypeCount);
-            countMap = new HashMap<>();
-            countMap.put("day",0);
-            countMap.put("sum",0);
-            warningCount.add(countMap);
-            countMap.put("deal",0);
-            countMap.put("treatmentRate",0);
-            countMap.put("noDeal",0);
-            isDealCount.add(countMap);
-            map1.put("isDealCount",isDealCount);
-            map1.put("warningCount",warningCount);
-            countMap = new HashMap<>();
-            countMap.put("ratioDeal",0);
-            countMap.put("sumDeal",0);
-            countMap.put("sumNotDeal",0);
-            countMap.put("ratioNotDeal",0);
-            map1.put("dayCount",countMap);
+            warningTypeCount.add(getMap(Arrays.asList("warningType,sum".split(",")),Arrays.asList("0,0".split(","))));
+            warningTypeNumber.add(getMap(Arrays.asList("设备故障","垛内虫数预警","仓间粉螟预警","平均包芯高于环境预警","包芯温度预警","仓间湿度预警","垛内湿度预警","仓间温度预警","垛内温度预警","仓间氧气预警",
+                    "垛内氧气预警","仓间虫数预警"),Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0)));
+            warningCount.add(getMap(Arrays.asList("day,sum".split(",")),Arrays.asList("0,0".split(","))));
+            isDealCount.add(getMap(Arrays.asList("day,sum,deal,treatmentRate,noDeal".split(",")),Arrays.asList("0,0,0,0,0".split(","))));
+            Map countMap = getMap(Arrays.asList("ratioDeal,sumDeal,sumNotDeal,ratioNotDeal".split(",")),Arrays.asList("0,0,0,0".split(",")));
+            List<Object> values = Arrays.asList(0,warningTypeCount,warningTypeNumber,warningCount,isDealCount,countMap);
+            List<String> keys = Arrays.asList("sum","warningTypeCount","warningTypeNumber","warningCount","isDealCount","dayCount");
+            map1 = getMap(keys,values);
             return new Result(true, StatusCode.OK, "暂无数据",map1);
         }
         //查询预警总数量
@@ -113,9 +104,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 typeWarning = "0"+i;
             }
             if(!type.contains(typeWarning)){
-                Map map = new HashMap();
-                map.put("sum",0);
-                map.put("warningType",typeWarning);
+                Map map = getMap(Arrays.asList("sum","warningType"),Arrays.asList("0",typeWarning));
                 warningTypeCount.add(map);
             }else{
                 warningTypeCount.get(type.indexOf(typeWarning)).put("sum",Math.round(Double.parseDouble(warningTypeCount.get(type.indexOf(typeWarning)).get("sum").toString())));
@@ -128,7 +117,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         warningTypeCount.forEach(warnings -> {
             warnings.put("warningType",getWarningType(warnings.get("warningType").toString()).get("warningType"));
         });
-        List<Map> warningTypeNumber =  JSON.parseArray(JSON.toJSONString(warningTypeCount),Map.class).stream().filter((Map map)-> !"0".equals(map.get("sum").toString())).collect(Collectors.toList());
+        warningTypeNumber =  JSON.parseArray(JSON.toJSONString(warningTypeCount),Map.class).stream().filter((Map map)-> !"0".equals(map.get("sum").toString())).collect(Collectors.toList());
         long sumType = 0;
         for (int i = 0; i < warningTypeNumber.size(); i++) {
             if(i<warningTypeNumber.size()-1){
@@ -139,7 +128,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 warningTypeNumber.get(i).put("sum", 100 - sumType);
             }
         }
-
         //报警类型统计 各种类型所占总数
         Map isDeal = earlyWarningDao.findIsDeal(ids,sum);
         String sumDeal = isDeal.get("sumDeal").toString();
@@ -191,13 +179,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         List<Map> addWarningCount = new ArrayList<>();
         betweenDays.forEach(betweenDay -> {
             if(!day.contains(betweenDay)){
-                Map<String,String> map = new HashMap<>();
-                map.put("day",betweenDay);
-                map.put("sum",0+"");
-                map.put("deal",0+"");
-                map.put("noDeal",0+"");
-                map.put("processing",0+"");
-                map.put("treatmentRate",0+"");
+                Map<String,Object> map = getMap(Arrays.asList("day","sum","deal","noDeal","processing","treatmentRate"),Arrays.asList(betweenDay,0,0,0,0,0));
                 addWarningCount.add(map);
             }
         });
@@ -213,12 +195,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             map.remove("processing");
             map.remove("treatmentRate");
         }
-        map1.put("sum",sum);
-        map1.put("warningTypeCount",warningTypeNumber);
-        map1.put("warningCount",warningCount);
-        map1.put("warningTypeNumber",warningTypeCount);
-        map1.put("dayCount",isDeal);
-        map1.put("isDealCount",isDealCount);
+        List<Object> values = Arrays.asList(sum,warningTypeNumber,warningTypeCount,warningCount,isDealCount,isDeal);
+        List<String> keys = Arrays.asList("sum","warningTypeCount","warningTypeNumber","warningCount","isDealCount","dayCount");
+        map1 = getMap(keys,values);
         return new Result(true, StatusCode.OK, "查询报警统计成功",map1);
     }
 
@@ -527,9 +506,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             List<String> usernames = Arrays.asList(earlyWarningDao.findPrincipal(earlyWarningDto).split(","));
             usernames.forEach(username -> {
                 Map<String,String> userName = new HashMap<>();
-                //String phonenumber = redisTemplate.opsForHash().get("USER_" + username, "phonenumber").toString();
+                String phonenumber = (String)redisUtil.hget(USER + username, "phonenumber");
                 userName.put("username",username);
-                userName.put("number","");
+                userName.put("number",phonenumber);
                 user.add(userName);
             });
         }
@@ -563,7 +542,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 map.put("name","%");
                 return map;
             case "08":
-                map.put("warningType","垛内温度预警");//
+                map.put("warningType","垛内温度预警");
                 map.put("name","℃");
                 return map;
             case "09":
@@ -593,5 +572,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 map.put("warningType","设备故障");
                 return map;
         }
+    }
+
+    public Map<String,Object> getMap(List<String> keys,List<Object> values){
+       Map<String,Object> map = new HashMap<>();
+        for (int i = 0; i < keys.size(); i++) {
+            map.put(keys.get(i),values.get(i));
+        }
+       return map;
     }
 }

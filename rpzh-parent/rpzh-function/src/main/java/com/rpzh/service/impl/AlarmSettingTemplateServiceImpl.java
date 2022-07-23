@@ -35,9 +35,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     @Resource
     private AlarmSettingTemplateDao alarmSettingTemplateDao;
 
-    private final String INSERTTYPE = "添加";
+    private final String INSERTTYPE = "预警规则添加";
 
-    private final String UPDATETYPE = "修改";
+    private final String UPDATETYPE = "预警规则修改";
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -106,9 +106,11 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
             }
             alarmValueSettingDto.setCreatedTime(date);
             alarmValueSettingDto.setCreateUser(createUser);
-            if(alarmSettingTemplateDao.findCountByName(alarmValueSettingDto.getEarlyWarningRuleName())<1) {
+            Integer aid = alarmSettingTemplateDao.findCountByName(alarmValueSettingDto.getEarlyWarningRuleName());
+            if(ToolUtil.isEmpty(aid)) {
                 alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingDto);
             }
+            alarmValueSettingDto.setAlarmValueSettingId(aid);
             Integer templateId = alarmSettingTemplateDao.findTemplateId(alarmValueSettingDto);
             alarmValueSettingDto.setAlarmValueSettingId(templateId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSettingDto);
@@ -177,6 +179,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
         String earlyWarningRuleName = alarmValueSettingDto.getEarlyWarningRuleName();
+        Integer aid = alarmSettingTemplateDao.findCountByName(earlyWarningRuleName);
+        if(ToolUtil.isNotEmpty(aid)){
+            if(!aid.equals(alarmValueSettingDto.getAlarmValueSettingId())){
+                return new Result(false, StatusCode.ERROR, "预警规则名称已存在!");
+            }
+        }
         String materialCode = alarmValueSettingDto.getMaterialCode();
         Date date = new Date();
         String createUser = TokenDecode.getUserInfo().get("username");

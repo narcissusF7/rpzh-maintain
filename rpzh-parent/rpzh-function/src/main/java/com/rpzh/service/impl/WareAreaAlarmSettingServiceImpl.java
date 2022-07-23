@@ -36,9 +36,9 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     private WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
     @Resource
     private AlarmSettingTemplateDao alarmSettingTemplateDao;
-    private final String INSERTTYPE = "添加";
+    private final String INSERTTYPE = "仓间预警规则添加";
 
-    private final String UPDATETYPE = "修改";
+    private final String UPDATETYPE = "仓间预警规则修改";
 
     public boolean getFlag(WareAreaAlarmSettingDto wareAreaAlarmSettingDto){
         return wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() == null ||

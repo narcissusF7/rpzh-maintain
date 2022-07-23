@@ -146,6 +146,12 @@ public class GetBetweenDayUtils {
     }
 
     public static Map<String,String> get(String startTime,String endTime){
+        if(startTime.contains(":")){
+            startTime = startTime + " 00:00:00";
+        }
+        if(endTime.contains(":")){
+            endTime = endTime + " 00:00:00";
+        }
         //当前时间
         String nowTime = DateUtil.dateNew(new Date()).toString();
         //如果开始时间和结束时间都为空,日期向前推一周

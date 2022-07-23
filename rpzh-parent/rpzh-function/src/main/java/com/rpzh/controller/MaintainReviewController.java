@@ -4,8 +4,10 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.service.MaintainReviewService;
+import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.MaintainPlanVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: zyq
@@ -53,9 +56,21 @@ public class MaintainReviewController {
     }
 
     @PostMapping("/findEarlyWarningReview")
-    public Result<EarlyWarning> findEarlyWarningReview(Integer id) {
-        List<EarlyWarning> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
+    public Result<EarlyWarningVo> findEarlyWarningReview(Integer id) {
+        List<EarlyWarningVo> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
         return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", maintainPlanVos);
+    }
+
+    @PostMapping("/findDataReview")
+    public Result findDataReview(String tableType, Integer id, String startTime, String endTime) {
+        if(ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "养护计划id不能为空!");
+        }
+        if(ToolUtil.isEmpty(tableType)){
+            return new Result(false, StatusCode.ERROR, "设备类型不能为空!");
+        }
+        List<Map> dataReviews = maintainReviewService.findDataReview(tableType, id, startTime, endTime);
+        return new Result(true, StatusCode.OK, "养护数据追溯查询成功!",dataReviews);
     }
 
     @PostMapping("/findMaintainBaseInfo")
