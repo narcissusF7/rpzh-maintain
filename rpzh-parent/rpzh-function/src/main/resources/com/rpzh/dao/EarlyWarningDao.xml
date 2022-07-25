@@ -210,7 +210,9 @@
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
     </select>
     <select id="findWarningCountByDay" resultType="java.util.Map">
-        SELECT count(1) as sum,${dateType} AS day
+        SELECT count(1) as sum,
+        ifnull(count(is_affirm = '0' or null),0) as deal,ifnull(count(is_affirm != '0' or null),0) as noDeal,round((ifnull(count(is_affirm = '0' or null),0)/ifnull(count(1),1)),2) as treatmentRate,
+        ${dateType} AS day
         FROM tb_early_warning
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY day

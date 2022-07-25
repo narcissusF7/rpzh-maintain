@@ -11,6 +11,7 @@ import com.rpzh.feign.UserFeign;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -83,8 +84,14 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setCreateUser(createUser);
         maintainPlanDto.setCreatedTime(nowDate);
         //结束当前阶段的时间
-        Date date  = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        maintainPlanDto.setAftercareDateEnd(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+            System.out.println(date);
+            maintainPlanDto.setAftercareDateEnd(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         //新建养护计划
         maintainPlanDao.insertMaintainPlan(maintainPlanDto);
         //获取当前养护计划的id
@@ -108,9 +115,12 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaintenceStyle(maintenceStyle);
             maintainPlanDto1.setPhases(phases);
             maintainPlanDto1.setNowDate(nowDate);
+            maintainPlanDto1.setNowDate(nowDate);
             maintainPlanDtos.add(maintainPlanDto1);
         }
-        maintainPlanDao.insertMaintainCount(maintainPlanDtos);
+        if(ToolUtil.isNotEmpty(maintainPlanDtos)) {
+            maintainPlanDao.insertMaintainCount(maintainPlanDtos);
+        }
         //将数值插入到预警规则表中
         maintainPlanDto.setId(id);
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
@@ -171,10 +181,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String pidRoute = maintainPlanDto.getPidRoute();
         if(StringUtil.isNotEmpty(pidRoute)) {
             int length = pidRoute.split(",").length;
-            if (length < 5) {
-                pidRoute = pidRoute + ",[0" + length + ":" + maintainPlanDto.getStackId() + "]";
+            if (!pidRoute.contains("04")) {
+                maintainPlanDto.setPidRoute(SiteRouteUtil.route(pidRoute,maintainPlanDto.getStackId()+""));
                 maintainPlanDto.setStackId(null);
-                maintainPlanDto.setPidRoute(pidRoute);
             }
         }
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto);
@@ -195,12 +204,14 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 redisTemplate.delete(MAINTAIN + stageId);
             }
         }
+        List<Integer> alarmValueSettingIds = maintainPlanDao.findAlarmValueSettingId(ids);
         for (Integer id : ids) {
             maintainPlanDao.deleteMaintainCount(id);
         }
         maintainPlanDao.deleteMaintainPlanById(ids);
-        List<Integer> alarmValueSettingIds = maintainPlanDao.findAlarmValueSettingId(ids);
-        alarmValueSettingDao.deleteIds(alarmValueSettingIds);
+        if(ToolUtil.isNotEmpty(alarmValueSettingIds)) {
+            alarmValueSettingDao.deleteIds(alarmValueSettingIds);
+        }
         maintainPlanDao.deleteMaintainPlanStageById(ids);
         return new Result(true, StatusCode.OK, "删除成功!");
     }
@@ -220,23 +231,26 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);;
-        //01：无线氧气传感器,03：无线温湿度传感器,04： 无线包芯温度传感器,
         String pidRoute = maintainPlanVo.getPidRoute();
         alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         Integer areaId = maintainPlanVo.getAreaId();
         List<String> airNodes = airConditioningDao.findAirConditioningData(areaId);
-        Map<String, Double> map = nodeDao.findNowNodeData(airNodes);
-        maintainPlanVo.setWarehouseTempNow(map.get("temp"));
-        maintainPlanVo.setWarehouseMoistureNow(map.get("humiture"));
-        Map<String, Double> stackEnv = nodeDao.findStackEnv(id);
-        maintainPlanVo.setStackTempNow(stackEnv.get("temp"));
-        maintainPlanVo.setStackMoistureNow(stackEnv.get("humiture"));
-        Double stackCore = nodeDao.findStackCore(id);
-        maintainPlanVo.setTempCoreChipNow(stackCore);
-        maintainPlanVo.setCoreTempHighEnvTempNow(stackCore-stackEnv.get("humiture"));
-        maintainPlanVo.setStackOxygenNow(nodeDao.findO2StackData(id));
-        maintainPlanVo.setWarehouseOxygenNow(nodeDao.findO2AreaData(pidRoute));
+        if(ToolUtil.isNotEmpty(airNodes)) {
+            Map<String, Double> map = nodeDao.findNowNodeData(airNodes);
+            maintainPlanVo.setWarehouseTempNow(Double.parseDouble(String.format("%.2f", map.get("temp"))));
+            maintainPlanVo.setWarehouseMoistureNow(Double.parseDouble(String.format("%.2f", map.get("humiture"))));
+        }
+        if(ToolUtil.isNotEmpty(id)) {
+            Map<String, Double> stackEnv = nodeDao.findStackEnv(id);
+            maintainPlanVo.setStackTempNow(Double.parseDouble(String.format("%.2f", stackEnv.get("temp"))));
+            maintainPlanVo.setStackMoistureNow(Double.parseDouble(String.format("%.2f", stackEnv.get("humiture"))));
+            Double stackCore = nodeDao.findStackCore(id);
+            maintainPlanVo.setTempCoreChipNow(Double.parseDouble(String.format("%.2f", stackCore)));
+            maintainPlanVo.setCoreTempHighEnvTempNow(Double.parseDouble(String.format("%.2f", stackCore - stackEnv.get("temp"))));
+            maintainPlanVo.setStackOxygenNow(Double.parseDouble(String.format("%.2f", nodeDao.findO2StackData(id))));
+            maintainPlanVo.setWarehouseOxygenNow(Double.parseDouble(String.format("%.2f", nodeDao.findO2AreaData(pidRoute))));
+        }
         return maintainPlanVo;
     }
 
@@ -319,8 +333,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Date nowDate = new Date();
         maintainPlanDto.setUpdateUser(updateUser);
         maintainPlanDto.setUpdatedTime(nowDate);
-        Date date = new Date(nowDate.getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        maintainPlanDto.setAftercareDateEnd(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
+            maintainPlanDto.setAftercareDateEnd(date);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         maintainPlanDao.updateMaintainPlan(maintainPlanDto);
         maintainPlanDao.updateMaintainPlanStage(maintainPlanDto);
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
@@ -406,7 +425,12 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
         int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
         maintainPlanDto.setMaintainDays(day);
-        maintainPlanDto.setAftercareDateEnd(new Date());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            maintainPlanDto.setAftercareDateEnd(new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";

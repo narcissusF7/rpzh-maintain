@@ -94,28 +94,28 @@ public class MaintainPlanVo {
     private AlarmValueSettingVo alarmValueSettingVo;
 
     @ApiModelProperty(notes = "垛内氧气当前数值")
-    private Double stackOxygenNow;
+    private Double stackOxygenNow=0d;
 
     @ApiModelProperty(notes = "仓间氧气当前数值")
-    private Double warehouseOxygenNow;
+    private Double warehouseOxygenNow=0d;
 
     @ApiModelProperty(notes = "包芯温度当前数值")
-    private Double tempCoreChipNow;
+    private Double tempCoreChipNow=0d;
 
     @ApiModelProperty(notes = "垛内温度当前数值")
-    private Double stackTempNow;
+    private Double stackTempNow=0d;
 
     @ApiModelProperty(notes = "垛内水分当前数值")
-    private Double stackMoistureNow;
+    private Double stackMoistureNow=0d;
 
     @ApiModelProperty(notes = "仓间水分当前数值")
-    private Double warehouseMoistureNow;
+    private Double warehouseMoistureNow=0d;
 
     @ApiModelProperty(notes = "仓间温度当前数值")
-    private Double warehouseTempNow;
+    private Double warehouseTempNow=0d;
 
     @ApiModelProperty(notes = "平均包芯高于环境的当前数值")
-    private Double coreTempHighEnvTempNow;
+    private Double coreTempHighEnvTempNow=0d;
 
     @ApiModelProperty(notes = "养护阶段集合")
     private List<MaintainPlanVo> maintainPlanVos;

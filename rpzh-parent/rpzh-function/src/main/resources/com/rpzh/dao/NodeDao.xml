@@ -524,7 +524,7 @@
         group by dayTime
     </select>
     <select id="findNowNodeData" resultType="java.util.Map">
-        select avg(temp) as temp,avg(humiture) as humiture from tb_air_conditioner_history where
+        select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_air_conditioner_history where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_air_conditioner_history where
         node_id in
         <foreach collection="airNodes" item="nodeId" open="(" separator="," close=")">
@@ -533,25 +533,25 @@
         group by node_id)
     </select>
     <select id="findStackEnv" resultType="java.util.Map">
-        select avg(temp) as temp,avg(humiture) as humiture from tb_node_env_history where
+        select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_node_env_history where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_env_history
         where maintain_plan_id = #{id}
         group by node_id)
     </select>
     <select id="findStackCore" resultType="java.lang.Double">
-        select avg(temp) as temp from tb_node_temp_core_chip_history where
+        select ifNotFinite(avg(temp),0) as temp from tb_node_temp_core_chip_history where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where maintain_plan_id = #{id}
         group by node_id)
     </select>
     <select id="findO2StackData" resultType="java.lang.Double">
-        select avg(oxygen) as oxygen from tb_node_o2_history
+        select ifNotFinite(avg(oxygen),0) as oxygen from tb_node_o2_history
         where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where maintain_plan_id = #{id} and site_type = '05'
         group by node_id)
     </select>
     <select id="findO2AreaData" resultType="java.lang.Double">
-        select avg(oxygen) as oxygen from tb_node_o2_history
+        select ifNotFinite(avg(oxygen),0) as oxygen from tb_node_o2_history
         where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where pid_route = #{pidRoute} and site_type = '04'
         group by node_id)
