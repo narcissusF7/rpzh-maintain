@@ -83,8 +83,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         List<Map> warningTypeNumber = new ArrayList<>();
         if(ToolUtil.isEmpty(ids)){
             warningTypeCount.add(getMap(Arrays.asList("warningType,sum".split(",")),Arrays.asList("0,0".split(","))));
-            warningTypeNumber.add(getMap(Arrays.asList("设备故障","垛内虫数预警","仓间粉螟预警","平均包芯高于环境预警","包芯温度预警","仓间湿度预警","垛内湿度预警","仓间温度预警","垛内温度预警","仓间氧气预警",
-                    "垛内氧气预警","仓间虫数预警"),Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0)));
+            List<String> types = Arrays.asList("设备故障", "垛内虫数预警", "仓间粉螟预警", "平均包芯高于环境预警", "包芯温度预警", "仓间湿度预警", "垛内湿度预警", "仓间温度预警", "垛内温度预警", "仓间氧气预警",
+                    "垛内氧气预警", "仓间虫数预警");
+            for (String type : types) {
+                Map map = new HashMap();
+                map.put(type,0);
+                warningTypeNumber.add(map);
+            }
             warningCount.add(getMap(Arrays.asList("day,sum".split(",")),Arrays.asList("0,0".split(","))));
             isDealCount.add(getMap(Arrays.asList("day,sum,deal,treatmentRate,noDeal".split(",")),Arrays.asList("0,0,0,0,0".split(","))));
             Map countMap = getMap(Arrays.asList("ratioDeal,sumDeal,sumNotDeal,ratioNotDeal".split(",")),Arrays.asList("0,0,0,0".split(",")));
