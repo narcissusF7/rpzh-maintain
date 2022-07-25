@@ -17,6 +17,7 @@
         <module>rpzh-function</module>
         <module>rpzh-device</module>
         <module>rpzh-file</module>
+        <module>rpzh-job</module>
     </modules>
     <packaging>pom</packaging>
     <description>养护系统父工程</description>

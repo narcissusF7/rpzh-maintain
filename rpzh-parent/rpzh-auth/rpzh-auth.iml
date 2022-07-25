@@ -23,7 +23,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-data-redis/2.3.7.RELEASE/spring-boot-starter-data-redis-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-data-redis/2.3.7.RELEASE/spring-boot-starter-data-redis-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -32,7 +32,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter/2.3.7.RELEASE/spring-boot-starter-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter/2.3.7.RELEASE/spring-boot-starter-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -41,7 +41,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot/2.3.7.RELEASE/spring-boot-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot/2.3.7.RELEASE/spring-boot-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -50,7 +50,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-core/5.2.12.RELEASE/spring-core-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-core/5.2.12.RELEASE/spring-core-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -59,7 +59,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-jcl/5.2.12.RELEASE/spring-jcl-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-jcl/5.2.12.RELEASE/spring-jcl-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -68,7 +68,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-context/5.2.12.RELEASE/spring-context-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-context/5.2.12.RELEASE/spring-context-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -77,7 +77,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-aop/5.2.12.RELEASE/spring-aop-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-aop/5.2.12.RELEASE/spring-aop-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -86,7 +86,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-beans/5.2.12.RELEASE/spring-beans-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-beans/5.2.12.RELEASE/spring-beans-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -95,7 +95,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-expression/5.2.12.RELEASE/spring-expression-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-expression/5.2.12.RELEASE/spring-expression-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -104,7 +104,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-autoconfigure/2.3.7.RELEASE/spring-boot-autoconfigure-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-autoconfigure/2.3.7.RELEASE/spring-boot-autoconfigure-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -113,7 +113,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-logging/2.3.7.RELEASE/spring-boot-starter-logging-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-logging/2.3.7.RELEASE/spring-boot-starter-logging-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -122,7 +122,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -131,7 +131,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/ch/qos/logback/logback-core/1.2.3/logback-core-1.2.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-core/1.2.3/logback-core-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -140,7 +140,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -149,7 +149,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/logging/log4j/log4j-to-slf4j/2.13.3/log4j-to-slf4j-2.13.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/logging/log4j/log4j-to-slf4j/2.13.3/log4j-to-slf4j-2.13.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -158,7 +158,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/logging/log4j/log4j-api/2.13.3/log4j-api-2.13.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/logging/log4j/log4j-api/2.13.3/log4j-api-2.13.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -167,7 +167,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/slf4j/jul-to-slf4j/1.7.30/jul-to-slf4j-1.7.30.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/jul-to-slf4j/1.7.30/jul-to-slf4j-1.7.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -176,7 +176,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -185,7 +185,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/yaml/snakeyaml/1.26/snakeyaml-1.26.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/yaml/snakeyaml/1.26/snakeyaml-1.26.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -194,7 +194,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/data/spring-data-redis/2.3.6.RELEASE/spring-data-redis-2.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-redis/2.3.6.RELEASE/spring-data-redis-2.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -203,7 +203,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/data/spring-data-keyvalue/2.3.6.RELEASE/spring-data-keyvalue-2.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-keyvalue/2.3.6.RELEASE/spring-data-keyvalue-2.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -212,7 +212,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/data/spring-data-commons/2.3.6.RELEASE/spring-data-commons-2.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/data/spring-data-commons/2.3.6.RELEASE/spring-data-commons-2.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -221,7 +221,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-tx/5.2.12.RELEASE/spring-tx-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-tx/5.2.12.RELEASE/spring-tx-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -230,7 +230,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-oxm/5.2.12.RELEASE/spring-oxm-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-oxm/5.2.12.RELEASE/spring-oxm-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -239,7 +239,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-context-support/5.2.12.RELEASE/spring-context-support-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-context-support/5.2.12.RELEASE/spring-context-support-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -248,7 +248,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/lettuce/lettuce-core/5.3.5.RELEASE/lettuce-core-5.3.5.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/lettuce/lettuce-core/5.3.5.RELEASE/lettuce-core-5.3.5.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -257,7 +257,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-common/4.1.55.Final/netty-common-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-common/4.1.55.Final/netty-common-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -266,7 +266,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-handler/4.1.55.Final/netty-handler-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-handler/4.1.55.Final/netty-handler-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -275,7 +275,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-resolver/4.1.55.Final/netty-resolver-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.55.Final/netty-resolver-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -284,7 +284,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-buffer/4.1.55.Final/netty-buffer-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-buffer/4.1.55.Final/netty-buffer-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -293,7 +293,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-transport/4.1.55.Final/netty-transport-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-transport/4.1.55.Final/netty-transport-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -302,7 +302,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/netty/netty-codec/4.1.55.Final/netty-codec-4.1.55.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/netty/netty-codec/4.1.55.Final/netty-codec-4.1.55.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -311,7 +311,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/projectreactor/reactor-core/3.3.12.RELEASE/reactor-core-3.3.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/projectreactor/reactor-core/3.3.12.RELEASE/reactor-core-3.3.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -320,7 +320,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/reactivestreams/reactive-streams/1.0.3/reactive-streams-1.0.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/reactivestreams/reactive-streams/1.0.3/reactive-streams-1.0.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -329,7 +329,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-data/5.3.6.RELEASE/spring-security-data-5.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-data/5.3.6.RELEASE/spring-security-data-5.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -338,7 +338,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -347,7 +347,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -356,7 +356,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-core/5.3.6.RELEASE/spring-security-core-5.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-core/5.3.6.RELEASE/spring-security-core-5.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -365,7 +365,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -374,7 +374,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter-openfeign/2.2.6.RELEASE/spring-cloud-starter-openfeign-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-openfeign/2.2.6.RELEASE/spring-cloud-starter-openfeign-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -383,7 +383,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter/2.2.6.RELEASE/spring-cloud-starter-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter/2.2.6.RELEASE/spring-cloud-starter-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -392,7 +392,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-context/2.2.6.RELEASE/spring-cloud-context-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-context/2.2.6.RELEASE/spring-cloud-context-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -401,7 +401,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-crypto/5.3.6.RELEASE/spring-security-crypto-5.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-crypto/5.3.6.RELEASE/spring-security-crypto-5.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -410,7 +410,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-commons/2.2.6.RELEASE/spring-cloud-commons-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-commons/2.2.6.RELEASE/spring-cloud-commons-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -419,7 +419,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-rsa/1.0.9.RELEASE/spring-security-rsa-1.0.9.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-rsa/1.0.9.RELEASE/spring-security-rsa-1.0.9.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -428,7 +428,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/bouncycastle/bcpkix-jdk15on/1.56/bcpkix-jdk15on-1.56.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/bouncycastle/bcpkix-jdk15on/1.56/bcpkix-jdk15on-1.56.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -437,7 +437,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/bouncycastle/bcprov-jdk15on/1.52/bcprov-jdk15on-1.52.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/bouncycastle/bcprov-jdk15on/1.52/bcprov-jdk15on-1.52.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -446,7 +446,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-openfeign-core/2.2.6.RELEASE/spring-cloud-openfeign-core-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-openfeign-core/2.2.6.RELEASE/spring-cloud-openfeign-core-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -455,7 +455,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-netflix-ribbon/2.2.6.RELEASE/spring-cloud-netflix-ribbon-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-ribbon/2.2.6.RELEASE/spring-cloud-netflix-ribbon-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -464,7 +464,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-netflix-archaius/2.2.6.RELEASE/spring-cloud-netflix-archaius-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-netflix-archaius/2.2.6.RELEASE/spring-cloud-netflix-archaius-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -473,7 +473,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-aop/2.3.7.RELEASE/spring-boot-starter-aop-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-aop/2.3.7.RELEASE/spring-boot-starter-aop-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -482,7 +482,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/form/feign-form-spring/3.8.0/feign-form-spring-3.8.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/form/feign-form-spring/3.8.0/feign-form-spring-3.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -491,7 +491,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/form/feign-form/3.8.0/feign-form-3.8.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/form/feign-form/3.8.0/feign-form-3.8.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -500,7 +500,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-web/5.2.12.RELEASE/spring-web-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-web/5.2.12.RELEASE/spring-web-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -509,7 +509,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-fileupload/commons-fileupload/1.3.3/commons-fileupload-1.3.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-fileupload/commons-fileupload/1.3.3/commons-fileupload-1.3.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -518,7 +518,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-io/commons-io/2.5/commons-io-2.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-io/commons-io/2.5/commons-io-2.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -527,7 +527,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/feign-core/10.10.1/feign-core-10.10.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/feign-core/10.10.1/feign-core-10.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -536,7 +536,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/feign-slf4j/10.10.1/feign-slf4j-10.10.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/feign-slf4j/10.10.1/feign-slf4j-10.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -545,7 +545,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/feign-hystrix/10.10.1/feign-hystrix-10.10.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/feign-hystrix/10.10.1/feign-hystrix-10.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -554,7 +554,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/archaius/archaius-core/0.7.6/archaius-core-0.7.6.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/archaius/archaius-core/0.7.6/archaius-core-0.7.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -563,7 +563,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -572,7 +572,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-configuration/commons-configuration/1.8/commons-configuration-1.8.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-configuration/commons-configuration/1.8/commons-configuration-1.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -581,7 +581,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-lang/commons-lang/2.6/commons-lang-2.6.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-lang/commons-lang/2.6/commons-lang-2.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -590,7 +590,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-logging/commons-logging/1.2/commons-logging-1.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -599,7 +599,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/29.0-jre/guava-29.0-jre.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -608,7 +608,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -617,7 +617,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -626,7 +626,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/checkerframework/checker-qual/2.11.1/checker-qual-2.11.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/2.11.1/checker-qual-2.11.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -635,7 +635,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -644,7 +644,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -653,7 +653,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.11.3/jackson-annotations-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -662,7 +662,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.11.3/jackson-core-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -671,7 +671,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -680,7 +680,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/hystrix/hystrix-core/1.5.18/hystrix-core-1.5.18.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/hystrix/hystrix-core/1.5.18/hystrix-core-1.5.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -689,7 +689,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/reactivex/rxjava/1.3.8/rxjava-1.3.8.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/reactivex/rxjava/1.3.8/rxjava-1.3.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -698,7 +698,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -707,7 +707,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-web/2.3.7.RELEASE/spring-boot-starter-web-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-web/2.3.7.RELEASE/spring-boot-starter-web-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -716,7 +716,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-json/2.3.7.RELEASE/spring-boot-starter-json-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-json/2.3.7.RELEASE/spring-boot-starter-json-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -725,7 +725,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.11.3/jackson-datatype-jdk8-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.11.3/jackson-datatype-jdk8-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -734,7 +734,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.11.3/jackson-datatype-jsr310-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.11.3/jackson-datatype-jsr310-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -743,7 +743,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/jackson/module/jackson-module-parameter-names/2.11.3/jackson-module-parameter-names-2.11.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/module/jackson-module-parameter-names/2.11.3/jackson-module-parameter-names-2.11.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -752,7 +752,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-tomcat/2.3.7.RELEASE/spring-boot-starter-tomcat-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-tomcat/2.3.7.RELEASE/spring-boot-starter-tomcat-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -761,7 +761,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/tomcat/embed/tomcat-embed-core/9.0.41/tomcat-embed-core-9.0.41.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-core/9.0.41/tomcat-embed-core-9.0.41.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -770,7 +770,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/glassfish/jakarta.el/3.0.3/jakarta.el-3.0.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/glassfish/jakarta.el/3.0.3/jakarta.el-3.0.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -779,7 +779,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/tomcat/embed/tomcat-embed-websocket/9.0.41/tomcat-embed-websocket-9.0.41.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-websocket/9.0.41/tomcat-embed-websocket-9.0.41.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -788,7 +788,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-webmvc/5.2.12.RELEASE/spring-webmvc-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-webmvc/5.2.12.RELEASE/spring-webmvc-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -797,7 +797,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/jsonwebtoken/jjwt/0.9.0/jjwt-0.9.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/jsonwebtoken/jjwt/0.9.0/jjwt-0.9.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -806,7 +806,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-validation/2.3.7.RELEASE/spring-boot-starter-validation-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-validation/2.3.7.RELEASE/spring-boot-starter-validation-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -815,7 +815,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/hibernate/validator/hibernate-validator/6.1.6.Final/hibernate-validator-6.1.6.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/hibernate/validator/hibernate-validator/6.1.6.Final/hibernate-validator-6.1.6.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -824,7 +824,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -833,7 +833,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/jboss/logging/jboss-logging/3.4.1.Final/jboss-logging-3.4.1.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.4.1.Final/jboss-logging-3.4.1.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -842,7 +842,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -851,7 +851,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-spring-boot-starter/2.0.2/knife4j-spring-boot-starter-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-spring-boot-starter/2.0.2/knife4j-spring-boot-starter-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -860,7 +860,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-spring-boot-autoconfigure/2.0.2/knife4j-spring-boot-autoconfigure-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-spring-boot-autoconfigure/2.0.2/knife4j-spring-boot-autoconfigure-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -869,7 +869,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-spring/2.0.2/knife4j-spring-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-spring/2.0.2/knife4j-spring-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -878,7 +878,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-annotations/2.0.2/knife4j-annotations-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-annotations/2.0.2/knife4j-annotations-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -887,7 +887,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-core/2.0.2/knife4j-core-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-core/2.0.2/knife4j-core-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -896,7 +896,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/javassist/javassist/3.25.0-GA/javassist-3.25.0-GA.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -905,7 +905,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/swagger/swagger-models/1.5.22/swagger-models-1.5.22.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-models/1.5.22/swagger-models-1.5.22.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -914,7 +914,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/swagger/swagger-annotations/1.5.22/swagger-annotations-1.5.22.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/swagger/swagger-annotations/1.5.22/swagger-annotations-1.5.22.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -923,7 +923,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-swagger2/2.9.2/springfox-swagger2-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-swagger2/2.9.2/springfox-swagger2-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -932,7 +932,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-spi/2.9.2/springfox-spi-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-spi/2.9.2/springfox-spi-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -941,7 +941,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-core/2.9.2/springfox-core-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-core/2.9.2/springfox-core-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -950,7 +950,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/net/bytebuddy/byte-buddy/1.10.18/byte-buddy-1.10.18.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/net/bytebuddy/byte-buddy/1.10.18/byte-buddy-1.10.18.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -959,7 +959,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/plugin/spring-plugin-core/1.2.0.RELEASE/spring-plugin-core-1.2.0.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/plugin/spring-plugin-core/1.2.0.RELEASE/spring-plugin-core-1.2.0.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -968,7 +968,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/plugin/spring-plugin-metadata/1.2.0.RELEASE/spring-plugin-metadata-1.2.0.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/plugin/spring-plugin-metadata/1.2.0.RELEASE/spring-plugin-metadata-1.2.0.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -977,7 +977,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-schema/2.9.2/springfox-schema-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-schema/2.9.2/springfox-schema-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -986,7 +986,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-swagger-common/2.9.2/springfox-swagger-common-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-swagger-common/2.9.2/springfox-swagger-common-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -995,7 +995,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-spring-web/2.9.2/springfox-spring-web-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-spring-web/2.9.2/springfox-spring-web-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1004,7 +1004,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/mapstruct/mapstruct/1.2.0.Final/mapstruct-1.2.0.Final.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.2.0.Final/mapstruct-1.2.0.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1013,7 +1013,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/springfox/springfox-bean-validators/2.9.2/springfox-bean-validators-2.9.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/springfox/springfox-bean-validators/2.9.2/springfox-bean-validators-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1022,7 +1022,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/xiaoymin/knife4j-spring-ui/2.0.2/knife4j-spring-ui-2.0.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/xiaoymin/knife4j-spring-ui/2.0.2/knife4j-spring-ui-2.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1031,7 +1031,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/cn/hutool/hutool-all/5.7.15/hutool-all-5.7.15.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/cn/hutool/hutool-all/5.7.15/hutool-all-5.7.15.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1040,7 +1040,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.10/commons-lang3-3.10.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1049,7 +1049,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/fastjson/1.2.83/fastjson-1.2.83.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/fastjson/1.2.83/fastjson-1.2.83.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1058,7 +1058,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/poi/poi/3.17/poi-3.17.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/poi/poi/3.17/poi-3.17.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1067,7 +1067,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-codec/commons-codec/1.14/commons-codec-1.14.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.14/commons-codec-1.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1076,7 +1076,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1085,7 +1085,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/poi/poi-ooxml/4.1.2/poi-ooxml-4.1.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/poi/poi-ooxml/4.1.2/poi-ooxml-4.1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1094,7 +1094,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/poi/poi-ooxml-schemas/4.1.2/poi-ooxml-schemas-4.1.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/poi/poi-ooxml-schemas/4.1.2/poi-ooxml-schemas-4.1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1103,7 +1103,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/xmlbeans/xmlbeans/3.1.0/xmlbeans-3.1.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/xmlbeans/xmlbeans/3.1.0/xmlbeans-3.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1112,7 +1112,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/commons/commons-compress/1.19/commons-compress-1.19.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-compress/1.19/commons-compress-1.19.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1121,7 +1121,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/virtuald/curvesapi/1.06/curvesapi-1.06.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1130,7 +1130,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/projectlombok/lombok/1.18.16/lombok-1.18.16.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.16/lombok-1.18.16.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1139,7 +1139,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/json/json/20190722/json-20190722.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/json/json/20190722/json-20190722.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1148,7 +1148,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/pagehelper/pagehelper/5.2.1/pagehelper-5.2.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/pagehelper/pagehelper/5.2.1/pagehelper-5.2.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1157,7 +1157,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/jsqlparser/jsqlparser/4.0/jsqlparser-4.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/jsqlparser/jsqlparser/4.0/jsqlparser-4.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1166,7 +1166,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/cloud/spring-cloud-starter-alibaba-nacos-config/2.2.5.RELEASE/spring-cloud-starter-alibaba-nacos-config-2.2.5.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/spring-cloud-starter-alibaba-nacos-config/2.2.5.RELEASE/spring-cloud-starter-alibaba-nacos-config-2.2.5.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1175,7 +1175,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/spring/spring-context-support/1.0.10/spring-context-support-1.0.10.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/spring/spring-context-support/1.0.10/spring-context-support-1.0.10.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1184,7 +1184,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/nacos/nacos-client/1.4.1/nacos-client-1.4.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/nacos/nacos-client/1.4.1/nacos-client-1.4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1193,7 +1193,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/nacos/nacos-common/1.4.1/nacos-common-1.4.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/nacos/nacos-common/1.4.1/nacos-common-1.4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1202,7 +1202,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/httpcomponents/httpasyncclient/4.1.4/httpasyncclient-4.1.4.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpasyncclient/4.1.4/httpasyncclient-4.1.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1211,7 +1211,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/httpcomponents/httpcore/4.4.14/httpcore-4.4.14.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpcore/4.4.14/httpcore-4.4.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1220,7 +1220,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/httpcomponents/httpcore-nio/4.4.14/httpcore-nio-4.4.14.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpcore-nio/4.4.14/httpcore-nio-4.4.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1229,7 +1229,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1238,7 +1238,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/nacos/nacos-api/1.4.1/nacos-api-1.4.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/nacos/nacos-api/1.4.1/nacos-api-1.4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1247,7 +1247,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/prometheus/simpleclient/0.5.0/simpleclient-0.5.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/prometheus/simpleclient/0.5.0/simpleclient-0.5.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1256,7 +1256,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-actuator/2.3.7.RELEASE/spring-boot-starter-actuator-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-actuator/2.3.7.RELEASE/spring-boot-starter-actuator-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1265,7 +1265,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-actuator-autoconfigure/2.3.7.RELEASE/spring-boot-actuator-autoconfigure-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-actuator-autoconfigure/2.3.7.RELEASE/spring-boot-actuator-autoconfigure-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1274,7 +1274,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-actuator/2.3.7.RELEASE/spring-boot-actuator-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-actuator/2.3.7.RELEASE/spring-boot-actuator-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1283,7 +1283,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/micrometer/micrometer-core/1.5.9/micrometer-core-1.5.9.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/micrometer/micrometer-core/1.5.9/micrometer-core-1.5.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1292,7 +1292,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1301,7 +1301,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-spring-boot-starter/2.0.4/mapper-spring-boot-starter-2.0.4.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-spring-boot-starter/2.0.4/mapper-spring-boot-starter-2.0.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1310,7 +1310,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-jdbc/2.3.7.RELEASE/spring-boot-starter-jdbc-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-jdbc/2.3.7.RELEASE/spring-boot-starter-jdbc-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1319,7 +1319,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/zaxxer/HikariCP/3.4.5/HikariCP-3.4.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/zaxxer/HikariCP/3.4.5/HikariCP-3.4.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1328,7 +1328,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/spring-jdbc/5.2.12.RELEASE/spring-jdbc-5.2.12.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-jdbc/5.2.12.RELEASE/spring-jdbc-5.2.12.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1337,7 +1337,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/mybatis/mybatis/3.4.6/mybatis-3.4.6.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/mybatis/mybatis/3.4.6/mybatis-3.4.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1346,7 +1346,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/mybatis/mybatis-spring/1.3.2/mybatis-spring-1.3.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/mybatis/mybatis-spring/1.3.2/mybatis-spring-1.3.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1355,7 +1355,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-core/1.0.5/mapper-core-1.0.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-core/1.0.5/mapper-core-1.0.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1364,7 +1364,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1373,7 +1373,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-base/1.0.5/mapper-base-1.0.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-base/1.0.5/mapper-base-1.0.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1382,7 +1382,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-weekend/1.1.4.1/mapper-weekend-1.1.4.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-weekend/1.1.4.1/mapper-weekend-1.1.4.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1391,7 +1391,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-spring/1.0.5/mapper-spring-1.0.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-spring/1.0.5/mapper-spring-1.0.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1400,7 +1400,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-extra/1.0.5/mapper-extra-1.0.5.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-extra/1.0.5/mapper-extra-1.0.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1409,7 +1409,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/tk/mybatis/mapper-spring-boot-autoconfigure/2.0.4/mapper-spring-boot-autoconfigure-2.0.4.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/tk/mybatis/mapper-spring-boot-autoconfigure/2.0.4/mapper-spring-boot-autoconfigure-2.0.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1418,7 +1418,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/mysql/mysql-connector-java/8.0.22/mysql-connector-java-8.0.22.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/mysql/mysql-connector-java/8.0.22/mysql-connector-java-8.0.22.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1427,7 +1427,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/pagehelper/pagehelper-spring-boot-starter/1.2.3/pagehelper-spring-boot-starter-1.2.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/pagehelper/pagehelper-spring-boot-starter/1.2.3/pagehelper-spring-boot-starter-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1436,7 +1436,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/mybatis/spring/boot/mybatis-spring-boot-starter/2.1.3/mybatis-spring-boot-starter-2.1.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/mybatis/spring/boot/mybatis-spring-boot-starter/2.1.3/mybatis-spring-boot-starter-2.1.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1445,7 +1445,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/mybatis/spring/boot/mybatis-spring-boot-autoconfigure/2.1.3/mybatis-spring-boot-autoconfigure-2.1.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/mybatis/spring/boot/mybatis-spring-boot-autoconfigure/2.1.3/mybatis-spring-boot-autoconfigure-2.1.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1454,7 +1454,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/github/pagehelper/pagehelper-spring-boot-autoconfigure/1.2.3/pagehelper-spring-boot-autoconfigure-1.2.3.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/github/pagehelper/pagehelper-spring-boot-autoconfigure/1.2.3/pagehelper-spring-boot-autoconfigure-1.2.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1463,7 +1463,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/junit/junit/4.13.1/junit-4.13.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.13.1/junit-4.13.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1472,7 +1472,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1481,7 +1481,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1490,7 +1490,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter-oauth2/2.2.4.RELEASE/spring-cloud-starter-oauth2-2.2.4.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-oauth2/2.2.4.RELEASE/spring-cloud-starter-oauth2-2.2.4.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1499,7 +1499,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter-security/2.2.4.RELEASE/spring-cloud-starter-security-2.2.4.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-security/2.2.4.RELEASE/spring-cloud-starter-security-2.2.4.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1508,7 +1508,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-security/2.2.4.RELEASE/spring-cloud-security-2.2.4.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-security/2.2.4.RELEASE/spring-cloud-security-2.2.4.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1517,7 +1517,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/boot/spring-boot-starter-security/2.3.7.RELEASE/spring-boot-starter-security-2.3.7.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-starter-security/2.3.7.RELEASE/spring-boot-starter-security-2.3.7.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1526,7 +1526,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-config/5.3.6.RELEASE/spring-security-config-5.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-config/5.3.6.RELEASE/spring-security-config-5.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1535,7 +1535,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-web/5.3.6.RELEASE/spring-security-web-5.3.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-web/5.3.6.RELEASE/spring-security-web-5.3.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1544,7 +1544,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/oauth/boot/spring-security-oauth2-autoconfigure/2.1.2.RELEASE/spring-security-oauth2-autoconfigure-2.1.2.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/oauth/boot/spring-security-oauth2-autoconfigure/2.1.2.RELEASE/spring-security-oauth2-autoconfigure-2.1.2.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1553,7 +1553,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/sun/xml/bind/jaxb-core/2.3.0.1/jaxb-core-2.3.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1562,7 +1562,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/sun/xml/bind/jaxb-impl/2.3.0.1/jaxb-impl-2.3.0.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/sun/xml/bind/jaxb-impl/2.3.0.1/jaxb-impl-2.3.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1571,7 +1571,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/oauth/spring-security-oauth2/2.3.4.RELEASE/spring-security-oauth2-2.3.4.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/oauth/spring-security-oauth2/2.3.4.RELEASE/spring-security-oauth2-2.3.4.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1580,7 +1580,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1589,7 +1589,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1598,7 +1598,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/security/spring-security-jwt/1.0.9.RELEASE/spring-security-jwt-1.0.9.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-jwt/1.0.9.RELEASE/spring-security-jwt-1.0.9.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1607,7 +1607,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/apache/commons/commons-pool2/2.6.2/commons-pool2-2.6.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-pool2/2.6.2/commons-pool2-2.6.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1616,7 +1616,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/cloud/spring-cloud-starter-alibaba-nacos-discovery/2.2.5.RELEASE/spring-cloud-starter-alibaba-nacos-discovery-2.2.5.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/spring-cloud-starter-alibaba-nacos-discovery/2.2.5.RELEASE/spring-cloud-starter-alibaba-nacos-discovery-2.2.5.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1625,7 +1625,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/alibaba/cloud/spring-cloud-alibaba-commons/2.2.5.RELEASE/spring-cloud-alibaba-commons-2.2.5.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/alibaba/cloud/spring-cloud-alibaba-commons/2.2.5.RELEASE/spring-cloud-alibaba-commons-2.2.5.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1634,7 +1634,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter-netflix-ribbon/2.2.6.RELEASE/spring-cloud-starter-netflix-ribbon-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-netflix-ribbon/2.2.6.RELEASE/spring-cloud-starter-netflix-ribbon-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1643,7 +1643,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/org/springframework/cloud/spring-cloud-starter-netflix-archaius/2.2.6.RELEASE/spring-cloud-starter-netflix-archaius-2.2.6.RELEASE.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/cloud/spring-cloud-starter-netflix-archaius/2.2.6.RELEASE/spring-cloud-starter-netflix-archaius-2.2.6.RELEASE.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1652,7 +1652,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/ribbon/ribbon/2.3.0/ribbon-2.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/ribbon/ribbon/2.3.0/ribbon-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1661,7 +1661,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/ribbon/ribbon-core/2.3.0/ribbon-core-2.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/ribbon/ribbon-core/2.3.0/ribbon-core-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1670,7 +1670,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/ribbon/ribbon-transport/2.3.0/ribbon-transport-2.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/ribbon/ribbon-transport/2.3.0/ribbon-transport-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1679,7 +1679,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/ribbon/ribbon-loadbalancer/2.3.0/ribbon-loadbalancer-2.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/ribbon/ribbon-loadbalancer/2.3.0/ribbon-loadbalancer-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1688,7 +1688,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/netflix-commons/netflix-statistics/0.1.1/netflix-statistics-0.1.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/netflix-commons/netflix-statistics/0.1.1/netflix-statistics-0.1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1697,7 +1697,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/servo/servo-core/0.12.21/servo-core-0.12.21.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/servo/servo-core/0.12.21/servo-core-0.12.21.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1706,7 +1706,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/netflix-commons/netflix-commons-util/0.3.0/netflix-commons-util-0.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/netflix-commons/netflix-commons-util/0.3.0/netflix-commons-util-0.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1715,7 +1715,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/javax/inject/javax.inject/1/javax.inject-1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/javax/inject/javax.inject/1/javax.inject-1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1724,7 +1724,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/reactivex/rxnetty/0.4.9/rxnetty-0.4.9.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/reactivex/rxnetty/0.4.9/rxnetty-0.4.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1733,7 +1733,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/reactivex/rxnetty-contexts/0.4.9/rxnetty-contexts-0.4.9.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/reactivex/rxnetty-contexts/0.4.9/rxnetty-contexts-0.4.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1742,7 +1742,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/reactivex/rxnetty-servo/0.4.9/rxnetty-servo-0.4.9.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/reactivex/rxnetty-servo/0.4.9/rxnetty-servo-0.4.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1751,7 +1751,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/netflix/ribbon/ribbon-httpclient/2.3.0/ribbon-httpclient-2.3.0.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/netflix/ribbon/ribbon-httpclient/2.3.0/ribbon-httpclient-2.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1760,7 +1760,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1769,7 +1769,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/sun/jersey/jersey-client/1.19.1/jersey-client-1.19.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/sun/jersey/jersey-client/1.19.1/jersey-client-1.19.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1778,7 +1778,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/sun/jersey/jersey-core/1.19.1/jersey-core-1.19.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/sun/jersey/jersey-core/1.19.1/jersey-core-1.19.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1787,7 +1787,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1796,7 +1796,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/com/sun/jersey/contribs/jersey-apache-client4/1.19.1/jersey-apache-client4-1.19.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/com/sun/jersey/contribs/jersey-apache-client4/1.19.1/jersey-apache-client4-1.19.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1805,7 +1805,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../repositorytwo/io/github/openfeign/feign-httpclient/10.10.1/feign-httpclient-10.10.1.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/io/github/openfeign/feign-httpclient/10.10.1/feign-httpclient-10.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1877,7 +1877,7 @@
     <orderEntry type="library" name="Maven: com.google.guava:guava:29.0-jre" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.11.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.3.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
@@ -1940,7 +1940,7 @@
     <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:3.4.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.2.12.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mybatis:mybatis:3.4.6" level="project" />
-    <orderEntry type="library" name="Maven: org.mybatis:mybatis-spring:2.0.5" level="project" />
+    <orderEntry type="library" name="Maven: org.mybatis:mybatis-spring:1.3.2" level="project" />
     <orderEntry type="library" name="Maven: tk.mybatis:mapper-core:1.0.5" level="project" />
     <orderEntry type="library" name="Maven: javax.persistence:persistence-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: tk.mybatis:mapper-base:1.0.5" level="project" />
@@ -1959,6 +1959,7 @@
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.83" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-data:5.3.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:2.3.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.3.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:5.2.12.RELEASE" level="project" />
@@ -1976,7 +1977,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-jwt:1.0.9.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.56" level="project" />
-    <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter-security:2.2.4.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter:2.2.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-rsa:1.0.9.RELEASE" level="project" />
