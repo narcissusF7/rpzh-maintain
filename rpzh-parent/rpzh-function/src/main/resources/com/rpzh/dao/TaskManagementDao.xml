@@ -556,7 +556,7 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
   WHERE status = '2'
 </select>
 <select id="pestCountDetail" resultType="java.util.Map">
-  SELECT pest_board_id as pestBoardId,beetle_count as beetleCount,mealworm_count as mealwormCount
+  SELECT pest_board_id as pestBoardId,beetle_count as beetle,mealworm_count as mealworm
   FROM
   tb_pest_data_history
   WHERE task_id = #{id}
