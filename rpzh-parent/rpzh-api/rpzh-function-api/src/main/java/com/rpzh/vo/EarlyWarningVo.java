@@ -85,4 +85,6 @@ public class EarlyWarningVo {
     private String siteRoute;
     private String nodeName;
     private String color;
+    private String taskId;
+    private String repairId;
 }

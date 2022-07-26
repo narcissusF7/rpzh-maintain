@@ -109,5 +109,7 @@ public interface MaintainPlanDao {
 
     Integer findMaintainDays(@Param("id") Integer id);
 
-    MaintainPlanVo findMaintainHistoryById(@Param("id")Integer id);
+    MaintainPlanVo findMaintainHistoryById(@Param("id") Integer id);
+
+    MaintainPlanVo findMaintainPlanNow(@Param("id") Integer id,@Param("time")String time);
 }

@@ -465,7 +465,7 @@
     </select>
     <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
         select * from
-            (select ${tableColumn},transfer_time as transferTime from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
+            (select ${tableColumn},transfer_time as transferTime,maintain_plan_id as maintainPlanId,site_type as siteType from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
     </select>
     <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">
         select oxygen,node_id as nodeId,material_code as materialCode,pid_route as pidRoute from tb_node_o2_history where (transfer_time,node_id) in

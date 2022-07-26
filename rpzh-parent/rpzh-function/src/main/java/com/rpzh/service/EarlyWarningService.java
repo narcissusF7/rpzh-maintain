@@ -4,6 +4,9 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.EarlyWarningVo;
+import com.rpzh.vo.RepairDataVo;
+
+import java.util.List;
 
 /**
  * @Author: zyq
@@ -17,6 +20,7 @@ public interface EarlyWarningService {
     PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto);
     Result findWarningCount(EarlyWarningDto earlyWarningDto);
     Integer misreport(Integer id);
-
+    List<RepairDataVo> getRepairData(Integer stackId, Integer areaId);
     Result findNodeData(EarlyWarningDto earlyWarningDto);
+    int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime);
 }

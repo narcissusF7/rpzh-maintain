@@ -27,7 +27,5 @@ public interface WareAreaAlarmSettingDao {
 
     List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
 
-    EarlyWarningVo findAlarmValueSettingByStackId(@Param("column") String column, @Param("pidRoute") String pidRoute);
-
     Integer findCount(@Param("pidRoute")String pidRoute);
 }

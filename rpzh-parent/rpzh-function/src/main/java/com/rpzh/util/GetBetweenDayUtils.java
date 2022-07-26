@@ -1,6 +1,7 @@
 package com.rpzh.util;
 
 import cn.hutool.core.date.DateUtil;
+import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.entity.ToolUtil;
 
 import java.text.ParseException;
@@ -199,5 +200,28 @@ public class GetBetweenDayUtils {
         map.put("startTime",startTime);
         map.put("endTime",endTime);
         return map;
+    }
+
+    public static boolean getFlag(AlarmValueSettingDto alarmValueSettingDto){
+        return alarmValueSettingDto.getStackOxygenUpperOne() == null ||
+                alarmValueSettingDto.getStackOxygenUpperThree() == null ||
+                alarmValueSettingDto.getStackOxygenUpperTwo() == null ||
+                alarmValueSettingDto.getStackOxygenLower() == null ||
+                alarmValueSettingDto.getStackTempUpperOne() == null ||
+                alarmValueSettingDto.getStackTempUpperTwo() == null ||
+                alarmValueSettingDto.getStackTempUpperThree() == null ||
+                alarmValueSettingDto.getStackTempLower() == null ||
+                alarmValueSettingDto.getStackMoistureUpperOne() == null ||
+                alarmValueSettingDto.getStackMoistureUpperThree() == null ||
+                alarmValueSettingDto.getStackMoistureUpperTwo() == null ||
+                alarmValueSettingDto.getStackMoistureLower() == null ||
+                alarmValueSettingDto.getTempCoreChipUpperOne() == null ||
+                alarmValueSettingDto.getTempCoreChipUpperThree() == null ||
+                alarmValueSettingDto.getTempCoreChipUpperTwo() == null ||
+                alarmValueSettingDto.getTempCoreChipLower() == null ||
+                alarmValueSettingDto.getCoreTempHighEnvTempOne() == null ||
+                alarmValueSettingDto.getCoreTempHighEnvTempThree() == null ||
+                alarmValueSettingDto.getCoreTempHighEnvTempTwo() == null ||
+                alarmValueSettingDto.getCoreTempLowEnvTemp() ==null;
     }
 }

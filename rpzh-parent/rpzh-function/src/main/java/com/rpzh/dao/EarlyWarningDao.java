@@ -5,6 +5,8 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,10 +73,15 @@ public interface EarlyWarningDao {
 
     List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    int updateTackId(@Param("affirm") String affirm, @Param("warningType") String warningType,
-                     @Param("siteRoute") String siteRout, @Param("id") Integer id, @Param("principal") String principal);
+    int updateTackId(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRout,
+                     @Param("id") Integer id, @Param("principal") String principal,@Param("dealTime") String dealTime);
 
     Map<String, String> findColor();
 
-    String findPrincipal(@Param("earlyWarningDto")EarlyWarningDto earlyWarningDto);
+    String findPrincipal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<RepairDataVo> findRepairData(@Param("stackId") Integer stackId, @Param("areaId") Integer areaId);
+
+    int updateRepairId(@Param("affirm") String affirm, @Param("deviceId") String deviceId, @Param("id") String id,
+                       @Param("principal") String principal,@Param("dealTime") String dealTime);
 }

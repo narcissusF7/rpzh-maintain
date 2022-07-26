@@ -555,4 +555,8 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
   FROM tb_task
   WHERE status = '2'
 </select>
+    <select id="findInfo" resultType="java.util.Map">
+        select deal_method as dealMethod,deal_result as remark from tb_task
+        where 1=1 <if test="taskId != null and taskId != ''">and id = #{taskId}</if>
+    </select>
 </mapper>

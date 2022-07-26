@@ -262,7 +262,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteRoute = taskDetail.getSiteRoute();
         String principal = taskDetail.getPrincipal();
         if(!"01,02,03".contains(type)){
-            earlyWarningDao.updateTackId(affirm,type,siteRoute,Integer.parseInt(taskDto.getId()),principal);
+            earlyWarningDao.updateTackId(affirm,type,siteRoute,Integer.parseInt(taskDto.getId()),principal,nowTime);
         }
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;

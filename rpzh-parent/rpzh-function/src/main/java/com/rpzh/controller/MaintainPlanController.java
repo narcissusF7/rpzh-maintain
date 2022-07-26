@@ -16,6 +16,7 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.util.GetBetweenDayUtils;
 import com.rpzh.util.StringUtils;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainCountVo;
@@ -151,6 +152,9 @@ public class MaintainPlanController {
         Integer stackIdCount = maintainPlanService.isExistStackId(maintainPlanDto.getStackId());
         if(stackIdCount>0){
             return new Result(false, StatusCode.EXISTERROR, "该垛位已存在养护计划!");
+        }
+        if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
         int result = maintainPlanService.insertMaintainPlan(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "养护计划添加成功",result);
@@ -291,6 +295,10 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     public Result updateMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
+        if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
         Integer i = maintainPlanService.updateMaintainPlan(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "更改养护计划成功",i);
     }
@@ -385,6 +393,10 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     public Result changeMaintainPlanStage(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
+        if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
         Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "转段成功",result);
     }

@@ -5,6 +5,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.EarlyWarningService;
+import com.rpzh.vo.RepairDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -95,7 +96,7 @@ public class EarlyWarningController {
     @PostMapping("/misreport")
     @ApiOperation(value = "误报")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "warningTime", value = "预警时间",dataType = "String",required = true)
+            @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
     })
     public Result misreport(Integer id){
         if(ToolUtil.isEmpty(id)){
@@ -118,12 +119,20 @@ public class EarlyWarningController {
         return earlyWarningService.findNodeData(earlyWarningDto);
     }
 
-    @Resource
-    private RedisTemplate redisTemplate;
-    @PostMapping("/test")
-    public Result test(){
-        redisTemplate.opsForValue().set("1","2");
-        Object o = redisTemplate.opsForValue().get("1");
-        return new Result<>(true, StatusCode.OK, "处理误报成功",o);
+    @PostMapping("/getRepairData")
+    @ApiOperation(value = "设备维修时回显")
+    public Result<RepairDataVo> getRepairData(Integer stackId, Integer areaId){
+        if(ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(areaId)){
+            return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
+        }
+        List<RepairDataVo> repairDataVos = earlyWarningService.getRepairData(stackId, areaId);
+        return new Result<>(true, StatusCode.OK, "查询成功",repairDataVos);
+    }
+
+    @PostMapping("/updateRepairId")
+    @ApiOperation(value = "设备维修")
+    public void updateRepairId(@RequestParam("affirm") String affirm, @RequestParam("deviceId") String deviceId, @RequestParam(name="id",required = false) String id,
+                               @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime) {
+        earlyWarningService.updateRepairId(affirm, deviceId, id, principal,dealTime);
     }
 }

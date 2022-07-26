@@ -5,6 +5,7 @@ import com.rpzh.feign.UserFeign;
 
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: zyq
@@ -21,6 +22,11 @@ public class UserFeignImpl implements UserFeign {
     //根据id查询手机号
     @Override
     public Result findPhoneNumberById(String id) {
+        throw new RuntimeException("服务器异常");
+    }
+
+    @Override
+    public Map<String, String> findRepairInfo(String id) {
         throw new RuntimeException("服务器异常");
     }
 }

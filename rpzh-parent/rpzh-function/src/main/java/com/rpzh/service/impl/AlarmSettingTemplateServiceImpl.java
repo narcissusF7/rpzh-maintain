@@ -9,6 +9,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.AlarmSettingTemplateService;
+import com.rpzh.util.GetBetweenDayUtils;
 import com.rpzh.util.IpUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.AlarmValueSettingVo;
@@ -61,33 +62,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         return new Result(true, StatusCode.OK, "删除预警设置成功!");
     }
 
-    public boolean getFlag(AlarmValueSettingDto alarmValueSettingDto){
-        return alarmValueSettingDto.getStackOxygenUpperOne() == null ||
-        alarmValueSettingDto.getStackOxygenUpperThree() == null ||
-        alarmValueSettingDto.getStackOxygenUpperTwo() == null ||
-        alarmValueSettingDto.getStackOxygenLower() == null ||
-        alarmValueSettingDto.getStackTempUpperOne() == null ||
-        alarmValueSettingDto.getStackTempUpperTwo() == null ||
-        alarmValueSettingDto.getStackTempUpperThree() == null ||
-        alarmValueSettingDto.getStackTempLower() == null ||
-        alarmValueSettingDto.getStackMoistureUpperOne() == null ||
-        alarmValueSettingDto.getStackMoistureUpperThree() == null ||
-        alarmValueSettingDto.getStackMoistureUpperTwo() == null ||
-        alarmValueSettingDto.getStackMoistureLower() == null ||
-        alarmValueSettingDto.getTempCoreChipUpperOne() == null ||
-        alarmValueSettingDto.getTempCoreChipUpperThree() == null ||
-        alarmValueSettingDto.getTempCoreChipUpperTwo() == null ||
-        alarmValueSettingDto.getTempCoreChipLower() == null ||
-        alarmValueSettingDto.getCoreTempHighEnvTempOne() == null ||
-        alarmValueSettingDto.getCoreTempHighEnvTempThree() == null ||
-        alarmValueSettingDto.getCoreTempHighEnvTempTwo() == null ||
-        alarmValueSettingDto.getCoreTempLowEnvTemp() ==null;
-    }
+
 
     @Override
     public Result insertAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto) {
         String materialCode = alarmValueSettingDto.getMaterialCode();
-        if(getFlag(alarmValueSettingDto)){
+        if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
         Date date = new Date();
@@ -175,7 +155,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
 
     @Override
     public Result updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto) {
-        if(getFlag(alarmValueSettingDto)){
+        if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
         String earlyWarningRuleName = alarmValueSettingDto.getEarlyWarningRuleName();
