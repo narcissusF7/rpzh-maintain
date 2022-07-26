@@ -293,4 +293,14 @@
     <select id="findPrincipal" resultType="java.lang.String">
         select principal from tb_early_warning WHERE site_route = #{earlyWarningDto.pidRoute} and is_affirm = #{earlyWarningDto.isAffirm} and  warning_grade =#{earlyWarningDto.warningGrade}  limit 1
     </select>
+
+    <select id="findBySiteRoute" resultType="java.lang.String">
+        select site_route from tb_early_warning group by site_route
+    </select>
+    <select id="findCountEarly" resultType="java.lang.Integer">
+        select count(*) from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+    </select>
+    <select id="findEarlyData" resultType="java.lang.String">
+        select node_id from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
+    </select>
 </mapper>

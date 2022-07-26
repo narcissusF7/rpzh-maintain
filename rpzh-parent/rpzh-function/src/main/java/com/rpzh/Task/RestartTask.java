@@ -35,7 +35,7 @@ public class RestartTask implements SchedulingConfigurer {
                         JobDetail jobDetail = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
                                 .withIdentity("job1", "group1") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
                                 .build();
-                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 7 * * ?"))
+                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * * * ?"))
                                 .build();
                         scheduler.scheduleJob(jobDetail, trigger);
                         scheduler.start();
@@ -44,7 +44,7 @@ public class RestartTask implements SchedulingConfigurer {
                         JobDetail jobDetail = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
                                 .withIdentity("job2", "group2") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
                                 .build();
-                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger2", "group2").withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * ?"))
+                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger2", "group2").withSchedule(CronScheduleBuilder.cronSchedule("0 0 7 * * * ?"))
                                 .build();
                         scheduler.scheduleJob(jobDetail, trigger);
                         scheduler.start();

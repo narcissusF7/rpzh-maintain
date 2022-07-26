@@ -3,9 +3,7 @@ package com.rpzh.util;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.WarehouseDao;
-import com.rpzh.entity.ToolUtil;
 import com.rpzh.feign.UserFeign;
-import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -23,7 +21,7 @@ public class SendUtils implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         //TODO   换成修改的标记flag
-        if(maintainPlanDao.findStageId(11,1)>4){
+        if(maintainPlanDao.findStageId(32,1)<4){
             log.info("111111");
             Scheduler scheduler = null;
             try {
@@ -51,100 +49,27 @@ public class SendUtils implements Job {
             }
             return;
         }
-        List<Integer> stack = earlyWarningDao.findStack();
-        for (Integer stackId : stack) {
-            List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findSendStack(stackId);
-            if(earlyWarningVos.size()==0){
-                return;
+        List<String> siteRoutes = earlyWarningDao.findBySiteRoute();
+        for (String siteRoute : siteRoutes) {
+            String siteName = "";
+            if(siteRoute.contains("05")){
+                siteName = warehouseDao.findStackById(Integer.parseInt(siteRoute.split("05:")[1].split("]")[0])).getSiteName();
+            }else{
+                siteName = warehouseDao.findWareArea(Integer.parseInt(siteRoute.split("04:")[1].split("]")[0])).getSiteName();
             }
-            String siteName = warehouseDao.findStackById(stackId).getSiteName();
-            EarlyWarningVo earlyWarningVo = earlyWarningVos.get(0);
-            String info = "位置:" + siteName +" " + getWarningType(earlyWarningVo.getWarningType()) + " "  + getWarningGrade(earlyWarningVo.getWarningGrade()) + " "+ "当前值 " + earlyWarningVo.getWarningVal();
-            if(ToolUtil.isNotEmpty(earlyWarningVo.getNodeId())){
-                info = "位置:" + siteName +" " + getWarningType(earlyWarningVo.getWarningType()) + " " + getNodeType(earlyWarningVo.getNodeType())+" " + getWarningGrade(earlyWarningVo.getWarningGrade()) + " 当前值 " + earlyWarningVo.getNodeId() + " " +  earlyWarningVo.getWarningVal();
-            }
-            for (int i = 1; i < earlyWarningVos.size(); i++) {
-                if(earlyWarningVos.get(i-1).getWarningType().equals(earlyWarningVos.get(i).getWarningType())){
-                    if(ToolUtil.isNotEmpty(earlyWarningVos.get(i).getNodeId())){
-                        if(earlyWarningVos.get(i-1).getWarningGrade().equals(earlyWarningVos.get(i).getWarningGrade())) {
-                            info = info + ";" + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                        }else{
-                            info = info + ";" + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                        }
-                    }else{
-                        info = info + ";" + earlyWarningVos.get(i).getWarningVal();
-                    }
-                }else{
-                    if(ToolUtil.isNotEmpty(earlyWarningVos.get(i).getNodeId())) {
-                        info = info + "   " + getWarningType(earlyWarningVos.get(i).getWarningType()) + " " + getNodeType(earlyWarningVos.get(i).getNodeType()) + " " + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                    }else{
-                        info = info + "   " + getWarningType(earlyWarningVos.get(i).getWarningType()) + " "  + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getWarningVal();
-                    }
-                }
-            }
-            log.info(info);
-            String principalId = maintainPlanDao.findPrincipalId(stackId);
-            String number = userFeign.findPhoneNumberById(principalId).getData().toString();
+            Integer countEarly = earlyWarningDao.findCountEarly(siteRoute);
+            List<String> oneEarlyData = earlyWarningDao.findEarlyData(siteRoute, "1");
+            List<String> twoEarlyData = earlyWarningDao.findEarlyData(siteRoute, "2");
+            List<String> threeEarlyData = earlyWarningDao.findEarlyData(siteRoute, "3");
+            String message = "位置:"+ siteName +"。预警个数:"+countEarly +"。一级预警有:"+ oneEarlyData.size()+",分别是:"+ oneEarlyData + "。二级预警有:"+
+                    twoEarlyData.size()+",分别是:"+ twoEarlyData + "。三级预警有:"+ threeEarlyData.size()+",分别是:"+ threeEarlyData + "。";
+            log.info(message);
+        }
+            /*String principalId = maintainPlanDao.findPrincipalId(stackId);
+            String number = userFeign.findPhoneNumberById(principalId).getData().toString();*/
                     /*MessageVo messageVo = SendMessageUtil.sendSms(number, "每天第一个固定时间点推送短信", info);
                     //当为0的时候发送成功
                     log.info(messageVo.getResult());*/
-
-        }
-        List<Integer> area = earlyWarningDao.findArea();
-        for (Integer areaId : area) {
-            List<EarlyWarningVo> earlyWarningVos = earlyWarningDao.findSendArea(areaId);
-            if(earlyWarningVos.size()==0){
-                return;
-            }
-            String siteName = warehouseDao.findWareArea(areaId).getSiteName();
-            EarlyWarningVo earlyWarningVo = earlyWarningVos.get(0);
-            String info = "位置:" + siteName +" " + getWarningType(earlyWarningVo.getWarningType()) + " "  + getWarningGrade(earlyWarningVo.getWarningGrade()) + " "+ "当前值 " + earlyWarningVo.getWarningVal();
-            if(ToolUtil.isNotEmpty(earlyWarningVo.getNodeId())){
-                info = "位置:" + siteName +" " + getWarningType(earlyWarningVo.getWarningType()) + " " + getNodeType(earlyWarningVo.getNodeType())+" " + getWarningGrade(earlyWarningVo.getWarningGrade()) + " 当前值 " + earlyWarningVo.getNodeId() + " " +  earlyWarningVo.getWarningVal();
-            }
-            for (int i = 1; i < earlyWarningVos.size(); i++) {
-                if(earlyWarningVos.get(i-1).getWarningType().equals(earlyWarningVos.get(i).getWarningType())){
-                    if(ToolUtil.isNotEmpty(earlyWarningVos.get(i).getNodeId())){
-                        if(earlyWarningVos.get(i-1).getWarningGrade().equals(earlyWarningVos.get(i).getWarningGrade())) {
-                            info = info + ";" + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                        }else{
-                            info = info + ";" + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                        }
-                    }else{
-                        info = info + ";" + earlyWarningVos.get(i).getWarningVal();
-                    }
-                }else {
-                    if(ToolUtil.isNotEmpty(earlyWarningVos.get(i).getNodeId())) {
-                        info = info + "   " + getWarningType(earlyWarningVos.get(i).getWarningType()) + " " + getNodeType(earlyWarningVos.get(i).getNodeType()) + " " + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getNodeId() + " " + earlyWarningVos.get(i).getWarningVal();
-                    }else{
-                        info = info + "   " + getWarningType(earlyWarningVos.get(i).getWarningType()) + " "  + getWarningGrade(earlyWarningVos.get(i).getWarningGrade()) + " 当前值 " + earlyWarningVos.get(i).getWarningVal();
-                    }
-                }
-            }
-            log.info(info);
-            Integer principalId=0;
-            WareAreaVo wareAreaVo = warehouseDao.findWareAreaPrincipalName(areaId);
-            if (!ToolUtil.isEmpty(wareAreaVo.getPrincipalId())) {
-                principalId = wareAreaVo.getPrincipalId();
-            }
-            FloorVo floorVo = warehouseDao.findFloorPrincipalName(wareAreaVo.getFloorId());
-            if (StringUtils.isEmpty(wareAreaVo.getPrincipalName()) && !StringUtils.isEmpty(floorVo.getPrincipalName())) {
-                principalId = floorVo.getPrincipalId();
-            }
-            BuildingVo buildingVo = warehouseDao.findBuildingPrincipalName(floorVo.getBuildingId());
-            if (StringUtils.isEmpty(wareAreaVo.getPrincipalName()) && StringUtils.isEmpty(floorVo.getPrincipalName()) && !StringUtils.isEmpty(buildingVo.getPrincipalName())) {
-                principalId = buildingVo.getPrincipalId();
-            }
-            WarehouseVo warehouseVo = warehouseDao.findWarehousePrincipalName(buildingVo.getWarehouseId());
-            if (StringUtils.isEmpty(wareAreaVo.getPrincipalName()) && StringUtils.isEmpty(floorVo.getPrincipalName())
-                    && StringUtils.isEmpty(buildingVo.getPrincipalName()) && !StringUtils.isEmpty(warehouseVo.getPrincipalName())) {
-                principalId = buildingVo.getPrincipalId();
-            }
-            String number = userFeign.findPhoneNumberById(principalId+"").getData().toString();
-                    /*MessageVo messageVo = SendMessageUtil.sendSms(number, "每天第一个固定时间点推送短信", info);
-                    //当为0的时候发送成功
-                    log.info(messageVo.getResult());*/
-        }
     }
 
     public String getWarningType(String type){

@@ -68,7 +68,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
             Map<String, String> info = new HashMap<>();
             if(ToolUtil.isNotEmpty(earlyWarningInfo.getTaskId())){
-                //info = taskManagementDao.findInfo(earlyWarningInfo.getTaskId());
+                info = taskManagementDao.findInfo(earlyWarningInfo.getTaskId());
             }else{
                 info = userFeign.findRepairInfo(earlyWarningInfo.getRepairId());
             }
