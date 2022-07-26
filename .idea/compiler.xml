@@ -7,30 +7,31 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="rpzh-auth" />
-        <module name="rpzh-carbon" />
-        <module name="rpzh-carbon-api" />
-        <module name="rpzh-common-core" />
-        <module name="rpzh-common-db" />
-        <module name="rpzh-common-log" />
-        <module name="rpzh-file" />
+        <module name="rpzh-humiture" />
         <module name="rpzh-file-api" />
+        <module name="rpzh-temp" />
+        <module name="rpzh-system" />
+        <module name="rpzh-moisture" />
+        <module name="rpzh-log" />
         <module name="rpzh-function" />
-        <module name="rpzh-function-api" />
+        <module name="rpzh-job" />
+        <module name="rpzh-carbon-api" />
         <module name="rpzh-gateway-a" />
+        <module name="rpzh-function-api" />
+        <module name="rpzh-oxygen" />
+        <module name="rpzh-log-api" />
+        <module name="rpzh-oxygen-api" />
+        <module name="rpzh-temp-api" />
+        <module name="rpzh-carbon" />
+        <module name="rpzh-file" />
         <module name="rpzh-gateway-b" />
         <module name="rpzh-gateway-c" />
-        <module name="rpzh-humiture" />
-        <module name="rpzh-humiture-api" />
-        <module name="rpzh-log" />
-        <module name="rpzh-log-api" />
-        <module name="rpzh-moisture" />
-        <module name="rpzh-oxygen" />
-        <module name="rpzh-oxygen-api" />
-        <module name="rpzh-system" />
         <module name="rpzh-system-api" />
-        <module name="rpzh-temp" />
-        <module name="rpzh-temp-api" />
+        <module name="rpzh-humiture-api" />
+        <module name="rpzh-common-log" />
+        <module name="rpzh-common-core" />
+        <module name="rpzh-auth" />
+        <module name="rpzh-common-db" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -53,6 +54,7 @@
       <module name="rpzh-gateway-c" target="1.8" />
       <module name="rpzh-humiture" target="1.8" />
       <module name="rpzh-humiture-api" target="1.8" />
+      <module name="rpzh-job" target="1.8" />
       <module name="rpzh-log" target="1.8" />
       <module name="rpzh-log-api" target="1.8" />
       <module name="rpzh-moisture" target="1.8" />

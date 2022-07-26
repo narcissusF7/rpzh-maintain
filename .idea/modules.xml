@@ -21,6 +21,7 @@
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/rpzh-humiture.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/rpzh-humiture.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/rpzh-humiture-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/rpzh-humiture-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-job/rpzh-job.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-job/rpzh-job.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-log/rpzh-log.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/rpzh-log-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/rpzh-log-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/rpzh-maintain.iml" filepath="$PROJECT_DIR$/.idea/rpzh-maintain.iml" />
