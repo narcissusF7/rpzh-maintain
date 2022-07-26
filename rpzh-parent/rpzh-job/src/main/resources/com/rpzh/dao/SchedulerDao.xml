@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.SchedulerDao">
+<select id="findAllJob" resultType="com.rpzh.entity.ScheduleJob">
+ select job_id as jobId, create_time as createTime, update_time as updateTime, job_name as jobName, job_group as jobGroup,
+ job_status as jobStatus,cron_expression as cronExpression,description as description, bean_class as beanClass,
+ is_concurrent as isConcurrent, spring_id as springId, method_name as methodName
+ from task_schedule_job
+</select>
+<insert id="insert">
+  INSERT INTO task_schedule_job
+  (
+  <if test="scheduleJob.jobName != null and scheduleJob.jobName != ''">job_name,</if>
+  <if test="scheduleJob.jobGroup != null and scheduleJob.jobGroup != ''">job_group,</if>
+  <if test="scheduleJob.jobStatus != null and scheduleJob.jobStatus != ''">job_status,</if>
+  <if test="scheduleJob.cronExpression != null and scheduleJob.cronExpression != ''">cron_expression,</if>
+  <if test="scheduleJob.description != null and scheduleJob.description != ''">description,</if>
+  <if test="scheduleJob.beanClass != null and scheduleJob.beanClass != ''">bean_class,</if>
+  <if test="scheduleJob.isConcurrent != null and scheduleJob.isConcurrent != ''">is_concurrent,</if>
+  <if test="scheduleJob.springId != null and scheduleJob.springId != ''">spring_id,</if>
+  <if test="scheduleJob.methodName != null and scheduleJob.methodName != ''"> method_name,</if>
+  create_time,
+  update_time
+  )
+VALUES
+  (
+<if test="scheduleJob.jobName != null and scheduleJob.jobName != ''">#{scheduleJob.jobName},</if>
+  <if test="scheduleJob.jobGroup != null and scheduleJob.jobGroup != ''">#{scheduleJob.jobGroup},</if>
+  <if test="scheduleJob.jobStatus != null and scheduleJob.jobStatus != ''">#{scheduleJob.jobStatus},</if>
+  <if test="scheduleJob.cronExpression != null and scheduleJob.cronExpression != ''">#{scheduleJob.cronExpression},</if>
+  <if test="scheduleJob.description != null and scheduleJob.description != ''">#{scheduleJob.description},</if>
+  <if test="scheduleJob.beanClass != null and scheduleJob.beanClass != ''">#{scheduleJob.beanClass},</if>
+  <if test="scheduleJob.isConcurrent != null and scheduleJob.isConcurrent != ''">#{scheduleJob.isConcurrent},</if>
+  <if test="scheduleJob.springId != null and scheduleJob.springId != ''">#{scheduleJob.springId},</if>
+  <if test="scheduleJob.methodName != null and scheduleJob.methodName != ''"> #{scheduleJob.methodName},</if>
+  #{scheduleJob.createTime},
+  #{scheduleJob.updateTime}
+	)
+</insert>
+<select id="findJobName" resultType="int">
+SELECT count(*) FROM task_schedule_job
+WHERE job_group = #{jobGroup}
+</select>
+<select id="findJobById" resultType="com.rpzh.entity.ScheduleJob">
+ select job_id as jobId, create_time as createTime, update_time as updateTime, job_name as jobName, job_group as jobGroup,
+ job_status as jobStatus,cron_expression as cronExpression,description as description, bean_class as beanClass,
+ is_concurrent as isConcurrent, spring_id as springId, method_name as methodName
+ from task_schedule_job
+ where job_id = #{jobId}
+</select>
+<update id="updateStatus">
+  UPDATE task_schedule_job
+  SET
+  job_status = #{cmd}
+  WHERE
+  job_id = #{jobId}
+</update>
+<update id="updateJob">
+  UPDATE task_schedule_job
+  SET
+  cron_expression = #{cron}
+  WHERE
+	job_id = #{jobId}
+</update>
+</mapper>
