@@ -1,17 +1,21 @@
 package com.rpzh.controller;
 
+import com.rpzh.dto.MessageIssueDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.ScheduleJob;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.SchedulerService;
 import com.rpzh.utils.SpringUtils;
+import org.quartz.CronScheduleBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * 定时任务管理
@@ -85,6 +89,8 @@ public class SchedulerController {
     }
 
 
+
+
     /**
      * 修改任务状态
      * @param jobId
@@ -118,5 +124,44 @@ public class SchedulerController {
         schedulerService.updateCron(jobId,cron);
         return new Result(true, StatusCode.OK, "修改定时任务成功");
     }
+
+    /**
+     * 短信下发设置
+     * @param messageIssueDto
+     * @return
+     *  每天1点执行一次：   0 0 1 * * ?
+     *
+     *  每天23点执行一次：  0 0 23 * * ?
+     *
+     *  每天中午12点触发:   0 0 12 * * ?
+     */
+    @PostMapping("/messageIssue")
+    public Result messageIssue(MessageIssueDto messageIssueDto){
+        //获取执行时间开始时间
+        String startTime = messageIssueDto.getStartTime();
+        //获取执行时间结束时间
+        String endTime = messageIssueDto.getEndTime();
+        if (ToolUtil.isEmpty(startTime) || ToolUtil.isEmpty(endTime)){
+            return new Result(false, StatusCode.ERROR, "开始时间和结束时间不能为空");
+        }
+        //定时任务表达式
+        String cronStart = "0 0 "+startTime+" * * ?";
+        String cronEnd = "0 0 "+endTime+" * * ?";
+        try {
+            CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cronStart);
+            CronScheduleBuilder scheduleBuilder1 = CronScheduleBuilder.cronSchedule(cronEnd);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, StatusCode.ERROR, "表达式错误,不能解析");
+        }
+        //定时任务,每天两个任务执行,
+        List<Long> idList = schedulerService.findJobId();
+        Long jobId1 = idList.get(0);
+        Long jobId2 = idList.get(1);
+        schedulerService.updateCron(jobId1,cronStart);
+        schedulerService.updateCron(jobId2,cronEnd);
+        return new Result(true,StatusCode.OK,"发送成功");
+    }
+
 
 }

@@ -53,4 +53,10 @@ public interface SchedulerDao {
      * @param cron
      */
     void updateJob(@Param("jobId")Long jobId, @Param("cron")String cron);
+
+    /**
+     * 查询定时任务id
+     * @return
+     */
+    List<Long> findJobId();
 }

@@ -21,6 +21,7 @@
         <module>rpzh-temp-api</module>
         <module>rpzh-function-api</module>
         <module>rpzh-file-api</module>
+        <module>rpzh-job-api</module>
     </modules>
 
 </project>

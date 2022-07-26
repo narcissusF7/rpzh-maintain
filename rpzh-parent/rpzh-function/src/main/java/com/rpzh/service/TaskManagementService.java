@@ -161,4 +161,11 @@ public interface TaskManagementService {
      * @return
      */
     List<Map> findAllOverdueTask();
+
+    /**
+     * 虫情任务处理提交后返回虫数量
+     * @param id
+     * @return
+     */
+    List<Map> pestCountDetail(String id);
 }

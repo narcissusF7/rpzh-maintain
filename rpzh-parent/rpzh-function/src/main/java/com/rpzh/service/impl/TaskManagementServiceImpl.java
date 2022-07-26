@@ -338,7 +338,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                 int mealworm = Integer.parseInt(map.get("mealworm") + "");
                 //虫情预警等级
                 //pestMonitoringService.decideLevel(pestBoardId,beetle,mealworm);
-                int insertPest = taskManagementDao.insertPest(pestBoardId, gatherSite, beetle, mealworm, nowTime);
+                int insertPest = taskManagementDao.insertPest(pestBoardId, gatherSite, beetle, mealworm, nowTime,id);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -909,6 +909,19 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         List<Map> taskList = taskManagementDao.findAllOverdueTask();
         return taskList;
     }
+
+    /**
+     * 虫情任务处理提交后返回虫数量
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map> pestCountDetail(String id) {
+        List<Map> mapList = taskManagementDao.pestCountDetail(id);
+        return mapList;
+    }
+
 
     /**
      * 获取两个日期之间的所有日期 (年月日)

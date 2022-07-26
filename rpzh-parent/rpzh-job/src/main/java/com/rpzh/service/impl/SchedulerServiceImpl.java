@@ -169,6 +169,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     /**
+     * 查询任务id
+     *
+     * @return
+     */
+    @Override
+    public List<Long> findJobId() {
+        List<Long> idList = schedulerDao.findJobId();
+        return idList;
+    }
+
+    /**
      * 删除暂停任务
      * @param scheduleJob
      * @throws

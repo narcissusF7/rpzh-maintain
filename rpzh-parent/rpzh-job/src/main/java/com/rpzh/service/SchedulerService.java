@@ -2,6 +2,8 @@ package com.rpzh.service;
 
 import com.rpzh.entity.ScheduleJob;
 
+import java.util.List;
+
 /**
  * 定时任务
  * @Author liubc
@@ -36,4 +38,10 @@ public interface SchedulerService {
      * @param cron
      */
     void updateCron(Long jobId, String cron);
+
+    /**
+     * 查询任务id
+     * @return
+     */
+    List<Long> findJobId();
 }

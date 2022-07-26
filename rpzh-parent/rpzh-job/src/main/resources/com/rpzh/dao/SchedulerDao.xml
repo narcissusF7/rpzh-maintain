@@ -62,4 +62,7 @@ WHERE job_group = #{jobGroup}
   WHERE
 	job_id = #{jobId}
 </update>
+<select id="findJobId" resultType="java.lang.Long">
+ SELECT job_id FROM task_schedule_job
+</select>
 </mapper>

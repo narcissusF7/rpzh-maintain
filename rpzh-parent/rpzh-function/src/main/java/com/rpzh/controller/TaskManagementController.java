@@ -254,6 +254,25 @@ public class TaskManagementController {
         return new Result(true, StatusCode.OK, "处理成功");
     }
 
+
+    /**
+     * 虫情任务处理提交的虫数量返回
+     * @param
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String")
+    })
+    @PostMapping("/pestCountDetail")
+    public Result pestCountDetail(@ApiIgnore String id){
+        if (ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "位置路径不能为空");
+        }
+        List<Map> mapList = taskManagementService.pestCountDetail(id);
+        return new Result(true, StatusCode.OK, "查询成功", mapList);
+    }
+
+
     /**
      * 一键虫情上报
      * @param siteRoute
@@ -275,6 +294,8 @@ public class TaskManagementController {
         int insertFlag = taskManagementService.oneButtonPestReport(siteRoute,taskAddress);
         return new Result(true,StatusCode.OK,"一键上报成功");
     }
+
+
 
     @ApiOperation(value = "获取垛位下所有的虫情板", tags = "任务管理中心")
     @ApiImplicitParams({
