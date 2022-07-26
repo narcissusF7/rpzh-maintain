@@ -61,8 +61,16 @@ public class SendUtils implements Job {
             List<String> oneEarlyData = earlyWarningDao.findEarlyData(siteRoute, "1");
             List<String> twoEarlyData = earlyWarningDao.findEarlyData(siteRoute, "2");
             List<String> threeEarlyData = earlyWarningDao.findEarlyData(siteRoute, "3");
-            String message = "位置:"+ siteName +"。预警个数:"+countEarly +"。一级预警有:"+ oneEarlyData.size()+",分别是:"+ oneEarlyData + "。二级预警有:"+
-                    twoEarlyData.size()+",分别是:"+ twoEarlyData + "。三级预警有:"+ threeEarlyData.size()+",分别是:"+ threeEarlyData + "。";
+            String message = "位置:"+ siteName +"。预警数:"+countEarly +"个。";
+            if(oneEarlyData.size()>0){
+                message = message + "一级预警有:"+ oneEarlyData.size()+"个,分别是:"+ String.join(",",oneEarlyData) + "。";
+            }
+            if(twoEarlyData.size()>0){
+                message = message + "二级预警有:"+ twoEarlyData.size()+"个,分别是:"+ String.join(",",twoEarlyData) + "。";
+            }
+            if(threeEarlyData.size()>0){
+                message = message + "三级预警有:"+ threeEarlyData.size()+"个,分别是:"+ String.join(",",threeEarlyData) + "。";
+            }
             log.info(message);
         }
             /*String principalId = maintainPlanDao.findPrincipalId(stackId);
@@ -70,38 +78,5 @@ public class SendUtils implements Job {
                     /*MessageVo messageVo = SendMessageUtil.sendSms(number, "每天第一个固定时间点推送短信", info);
                     //当为0的时候发送成功
                     log.info(messageVo.getResult());*/
-    }
-
-    public String getWarningType(String type){
-        switch (type){
-            case "04": return "垛内甲虫预警";
-            case "05": return "仓间甲虫预警";
-            case "06": return "垛内氧气预警";
-            case "07": return "仓间氧气预警";
-            case "08": return "垛内温度预警";
-            case "09": return "仓间温度预警";
-            case "10": return "垛内湿度预警";
-            case "11": return "仓间湿度预警";
-            case "12": return "包芯温度预警";
-            case "13": return "平均包芯高于环境预警";
-            case "14": return "仓间粉螟预警";
-            default: return "";
-        }
-    }
-    public String getNodeType(String type){
-        switch (type){
-            case "01": return "氧气传感器";
-            case "03": return "温湿度传感器";
-            case "04": return "包芯温度传感器";
-            default: return "";
-        }
-    }
-    public String getWarningGrade(Integer warningGrade){
-        switch (warningGrade){
-            case 1: return "一级预警";
-            case 2: return "二级预警";
-            case 3: return "三级预警";
-            default: return "";
-        }
     }
 }
