@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -150,9 +151,9 @@ public class SendUtils implements Job {
     public void get(String message,Map map,String number){
         try {
             map.put("content",message);
-            SendMessageUtil.sendSms(number, message, "h2");
+            //SendMessageUtil.sendSms(number, message, "h2");
             //系统标识,标识是哪个系统发送的消息,养护系统发送
-            //rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
+            rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
             Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -7,6 +7,7 @@ import com.rpzh.vo.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,7 +44,8 @@ public class sendWarningThreeTask{
     @Resource
     private RocketMQTemplate rocketMQTemplate;
     //mq主题
-    private String topic = "messageTopic";
+    @Value("${rocketmq.topic}")
+    private String topic;
 
     @Scheduled(cron="0 0 0 * * ? ")
     public void configureTasks() {
