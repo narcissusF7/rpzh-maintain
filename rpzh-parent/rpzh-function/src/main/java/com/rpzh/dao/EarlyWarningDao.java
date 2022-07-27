@@ -38,18 +38,6 @@ public interface EarlyWarningDao {
 
     Integer misreport(@Param("id") Integer id);
 
-    List<EarlyWarningVo> findSendStack(@Param("stackId") Integer stackId);
-
-    List<Integer> findStack();
-
-    List<Integer> findArea();
-
-    List<EarlyWarningVo> findSendArea(@Param("areaId") Integer areaId);
-
-    List<EarlyWarningVo> findSendStackByWarningThree(@Param("stackId") Integer stackId);
-
-    List<EarlyWarningVo> findSendAreaByWarningThree(@Param("areaId") Integer areaId);
-
     String findMaxTime(@Param("nodeId") String nodeId);
 
     Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
@@ -59,8 +47,6 @@ public interface EarlyWarningDao {
     List<Map> findWarningTypeCount(@Param("ids") List<Integer> ids);
 
     Map findIsDeal(@Param("ids") List<Integer> ids, @Param("count") Integer count);
-
-    Integer findDealCountByDay(@Param("date") String date, @Param("ids") List<Integer> ids, @Param("dateType") String dateType);
 
     List<WarningCountVo> findEarlyWarningCountByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
@@ -87,7 +73,15 @@ public interface EarlyWarningDao {
 
     List<String> findBySiteRoute();
 
-    Integer findCountEarly(@Param("siteRoute")String siteRoute);
+    Integer findCountEarly(@Param("siteRoute") String siteRoute);
 
-    List<String> findEarlyData(@Param("siteRoute")String siteRoute,@Param("warningGrade")String warningGrade);
+    List<String> findEarlyData(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade, @Param("warningType") String warningType);
+
+    Integer findCountWarningGrade(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade);
+
+    List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
+
+    Integer findThreeWarningGradeCount(@Param("siteRoute") String siteRoute);
+
+    List<String> findThreeBySiteRoute();
 }

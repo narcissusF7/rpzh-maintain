@@ -332,8 +332,11 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         if("05".equals(siteType)){
             MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(id, time);
             List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+            String principalName = "";
+            for (String pid : principalIds) {
+                principalName = principalName + (String)redisUtil.hget(USER+"_ID_username", USER+"_"+pid);
+            }
+            maintainPlanVo.setPrincipalName(principalName);
             map.put("maintainPlanVo", maintainPlanVo);
         }
         map.put("nodeData", node);

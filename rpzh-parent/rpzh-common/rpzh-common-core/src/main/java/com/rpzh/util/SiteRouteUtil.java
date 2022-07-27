@@ -28,4 +28,25 @@ public class SiteRouteUtil {
         }
         return siteRoute;
     }
+
+    /**
+     * 从路径中获取垛位id/仓间id/层id/楼栋id/仓库id
+     * @param siteRoute 路径路由
+     * @param siteType 位置类型
+     * @return
+     */
+    public static Integer getSiteId(String siteRoute,String siteType){
+        if ("05".equals(siteType)){
+            return Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
+        }else if ("04".equals(siteType)){
+            return Integer.parseInt(siteRoute.split("04:")[1].split("],\\[05")[0]);
+        }else if ("03".equals(siteType)){
+            return Integer.parseInt(siteRoute.split("03:")[1].split("],\\[04")[0]);
+        }else if ("02".equals(siteType)){
+            return Integer.parseInt(siteRoute.split("02:")[1].split("],\\[03")[0]);
+        }else if ("01".equals(siteType)){
+            return Integer.parseInt(siteRoute.split("01:")[1].split("],\\[02")[0]);
+        }
+        return null;
+    }
 }

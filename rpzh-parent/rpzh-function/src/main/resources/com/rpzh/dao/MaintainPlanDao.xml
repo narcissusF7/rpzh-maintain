@@ -201,7 +201,7 @@
         )
     </insert>
     <select id="findStageIdById" resultType="java.lang.Integer">
-        select id from tb_maintain_plan_stage where is_change ='0' and (maintain_plan_id,created_time) in (select maintain_plan_id,max(created_time) from tb_maintain_plan_stage where maintain_plan_id = #{id})
+        select id from tb_maintain_plan_stage where is_change ='0' and id in (select max(id) from tb_maintain_plan_stage where maintain_plan_id = #{id})
     </select>
     <select id="findIdByStackId" resultType="java.lang.Integer">
         select id from tb_maintain_plan where stack_id = #{stackId} and is_end='0'
@@ -571,5 +571,13 @@
         left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
         WHERE t1.id= #{id} <if test="time != '' and time != null">and t2.created_time &lt; #{time}</if> order by created_time desc limit 1
     </select>
-
+    <select id="findCurrentMaintainPlan" resultType="java.lang.String">
+        select principal_ids from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'
+    </select>
+<select id="test" resultType="java.util.Map">
+        select
+        t1.id as id,
+        t2.id as stageId
+        from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id order by t1.id
+</select>
 </mapper>

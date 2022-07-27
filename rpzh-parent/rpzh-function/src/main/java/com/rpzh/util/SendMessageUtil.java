@@ -74,7 +74,6 @@ public class SendMessageUtil {
 
             HttpPost httpPost = new HttpPost("http://10.154.196.221:8082/sms-restful/smsRest/sendSms/");
             httpPost.setEntity(new UrlEncodedFormEntity(list, "utf-8"));
-
             response = httpClient.execute(httpPost);
             HttpEntity responseEntity = response.getEntity();
             String responseEntityStr = EntityUtils.toString(responseEntity);

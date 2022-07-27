@@ -7,16 +7,14 @@ import com.rpzh.dao.*;
 import com.rpzh.dto.*;
 import com.rpzh.entity.*;
 import com.rpzh.enums.WarehouseNodeType;
-import com.rpzh.feign.UserFeign;
-import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -42,8 +40,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Resource
     private MaterialDao materialDao;
 
-    @Resource
-    private UserFeign userFeign;
+    //redis中用户key前缀
+    private static final String USER = "USER_ID_";
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Resource
     private NodeDao nodeDao;
@@ -87,7 +87,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date date = new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-            System.out.println(date);
             maintainPlanDto.setAftercareDateEnd(date);
         }catch (Exception e){
             e.printStackTrace();
@@ -107,11 +106,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
             maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
             maintainPlanDto1.setMaintainPlanId(id);
-            maintainPlanDto1.setStackId(Integer.parseInt(pidRoute.split("05:")[1].split("]")[0]));
-            maintainPlanDto1.setAreaId(Integer.parseInt(pidRoute.split("04:")[1].split("],\\[05")[0]));
-            maintainPlanDto1.setFloorId(Integer.parseInt(pidRoute.split("03:")[1].split("],\\[04")[0]));
-            maintainPlanDto1.setBuildingId(Integer.parseInt(pidRoute.split("02:")[1].split("],\\[03")[0]));
-            maintainPlanDto1.setWarehouseId(Integer.parseInt(pidRoute.split("01:")[1].split("],\\[02")[0]));
+            maintainPlanDto1.setStackId(stackId);
+            maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
+            maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
+            maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
+            maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
             maintainPlanDto1.setMaintenceStyle(maintenceStyle);
             maintainPlanDto1.setPhases(phases);
             maintainPlanDto1.setNowDate(nowDate);
@@ -221,12 +220,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         maintainPlanVo.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-        maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
-        maintainPlanVo.setPrincipalIds(principalId);
+        String principalName = "";
+        for (String pid : principalIds) {
+            principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+        }
+        maintainPlanVo.setPrincipalName(principalName);
+        maintainPlanVo.setPrincipalIds(principalIds.stream().map(Integer::parseInt).collect(Collectors.toList()));
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+            List<String> peopleIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
+            String peopleName = "";
+            for (String pid : peopleIds) {
+                peopleName = peopleName + (String)redisUtil.hget(USER+"username", USER+pid);
+            }
+            maintainPlan.setPrincipalName(peopleName);
         });
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
@@ -257,6 +264,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public MaintainPlanVo beforeUpdateMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
+        if(ToolUtil.isNotEmpty(maintainPlanVo)){
+            return new MaintainPlanVo();
+        }
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
         List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
         maintainPlanVo.setPrincipalIds(principalId);
@@ -354,11 +364,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
             maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
             maintainPlanDto1.setMaintainPlanId(id);
-            maintainPlanDto1.setStackId(Integer.parseInt(pidRoute.split("05:")[1].split("]")[0]));
-            maintainPlanDto1.setAreaId(Integer.parseInt(pidRoute.split("04:")[1].split("],\\[05")[0]));
-            maintainPlanDto1.setFloorId(Integer.parseInt(pidRoute.split("03:")[1].split("],\\[04")[0]));
-            maintainPlanDto1.setBuildingId(Integer.parseInt(pidRoute.split("02:")[1].split("],\\[03")[0]));
-            maintainPlanDto1.setWarehouseId(Integer.parseInt(pidRoute.split("01:")[1].split("],\\[02")[0]));
+            maintainPlanDto1.setStackId(stackId);
+            maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
+            maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
+            maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
+            maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
             maintainPlanDto1.setMaintenceStyle(maintenceStyle);
             maintainPlanDto1.setPhases(phases);
             maintainPlanDto1.setNowDate(nowDate);
@@ -418,19 +428,18 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         alarmValueSettingDao.changeStatus(alarmValueSettingDto);
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
         maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findIdByEarlyWarningRuleName(maintainPlanDto.getEarlyWarningRuleName()));
-        date = new Date(new Date().getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
-        maintainPlanDto.setAftercareDateEnd(date);
-        maintainPlanDao.insertMaintainStage(maintainPlanDto);
-        maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
-        Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
-        int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
-        maintainPlanDto.setMaintainDays(day);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             maintainPlanDto.setAftercareDateEnd(new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l));
         }catch (Exception e){
             e.printStackTrace();
         }
+        maintainPlanDao.insertMaintainStage(maintainPlanDto);
+        maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
+        Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
+        int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
+        maintainPlanDto.setMaintainDays(day);
+        maintainPlanDto.setAftercareDateEnd(date);
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";
@@ -444,11 +453,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
             maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
             maintainPlanDto1.setMaintainPlanId(id);
-            maintainPlanDto1.setStackId(Integer.parseInt(pidRoute.split("05:")[1].split("]")[0]));
-            maintainPlanDto1.setAreaId(Integer.parseInt(pidRoute.split("04:")[1].split("],\\[05")[0]));
-            maintainPlanDto1.setFloorId(Integer.parseInt(pidRoute.split("03:")[1].split("],\\[04")[0]));
-            maintainPlanDto1.setBuildingId(Integer.parseInt(pidRoute.split("02:")[1].split("],\\[03")[0]));
-            maintainPlanDto1.setWarehouseId(Integer.parseInt(pidRoute.split("01:")[1].split("],\\[02")[0]));
+            maintainPlanDto1.setStackId(stackId);
+            maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
+            maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
+            maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
+            maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
             maintainPlanDto1.setMaintenceStyle(maintenceStyle);
             maintainPlanDto1.setPhases(phases);
             maintainPlanDto1.setNowDate(date);
@@ -464,8 +473,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
-            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+            String principalName = "";
+            for (String pid : principalIds) {
+                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+            }
+            maintainPlan.setPrincipalName(principalName);
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
@@ -477,8 +489,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
-            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlan.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+            String principalName = "";
+            for (String pid : principalIds) {
+                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+            }
+            maintainPlan.setPrincipalName(principalName);
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);

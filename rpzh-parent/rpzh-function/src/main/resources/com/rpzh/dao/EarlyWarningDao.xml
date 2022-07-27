@@ -227,13 +227,6 @@
         GROUP BY day
         ORDER BY day
     </select>
-    <select id="findDealCountByDay" resultType="java.lang.Integer">
-        SELECT count(1) as sum
-        FROM tb_early_warning
-        WHERE is_affirm = '0' and ${dateType} = #{date}
-        <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
-        GROUP BY ${dateType}
-    </select>
     <select id="findWarningTypeCount" resultType="java.util.Map">
     SELECT count(1) as sum,warning_type AS warningType
     FROM tb_early_warning
@@ -259,28 +252,6 @@
     <update id="updateWarningType">
         update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} ORDER BY id DESC LIMIT 1
     </update>
-    <select id="findStack" resultType="java.lang.Integer">
-        SELECT stack_id from tb_early_warning where is_affirm = '2' and stack_id is not null group by stack_id order by stack_id
-    </select>
-    <select id="findSendStack" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
-(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and stack_id = #{stackId} and warning_type not in ('01','02','03') GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
-    </select>
-    <select id="findArea" resultType="java.lang.Integer">
-        SELECT area_id from tb_early_warning where is_affirm = '2' and area_id is not null group by area_id order by area_id
-    </select>
-    <select id="findSendArea" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
-(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and area_id = #{areaId} and warning_type not in ('01','02','03') GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
-    </select>
-    <select id="findSendStackByWarningThree" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
-(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and stack_id = #{stackId} and warning_type not in ('01','02','03') and warning_grade = '3' GROUP BY node_id) ORDER BY warning_type,warning_grade
-    </select>
-    <select id="findSendAreaByWarningThree" resultType="com.rpzh.vo.EarlyWarningVo">
-        SELECT node_id as nodeId,warning_type as warningType,warning_val as warningVal,warning_grade AS warningGrade,node_type as nodeType FROM tb_early_warning WHERE id IN
-(SELECT MAX(id) FROM tb_early_warning WHERE is_affirm = '2' and area_id = #{areaId} and warning_type not in ('01','02','03') and warning_grade = '3' GROUP BY warning_type,node_id) ORDER BY warning_type,warning_grade
-    </select>
     <select id="findMaxTime" resultType="java.lang.String">
         select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId}
     </select>
@@ -295,12 +266,29 @@
     </select>
 
     <select id="findBySiteRoute" resultType="java.lang.String">
-        select site_route from tb_early_warning group by site_route
+        select site_route from tb_early_warning where is_affirm = '2' group by site_route
     </select>
     <select id="findCountEarly" resultType="java.lang.Integer">
         select count(*) from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
+    <select id="findCountWarningGrade" resultType="java.lang.Integer">
+        select count(1) from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
+    </select>
     <select id="findEarlyData" resultType="java.lang.String">
-        select node_id from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
+        select node_id  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
+        <if test="warningType != null and warningType != ''">and ${warningType}</if>
+    </select>
+    <select id="findThreeEarlyData" resultType="java.util.Map">
+        select node_id as nodeId,warning_val as warningVal from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+        <if test="warningType != null and warningType != ''">and ${warningType}</if>
+    </select>
+    <select id="findThreeWarningGradeCount" resultType="java.lang.Integer">
+    select sum(t.countRow) from (
+        select count(1) as countRow from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and
+        warning_grade = '3' and warning_type not in ('01','02','03') union select count(1) as countRow from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type in ('01','02','03')) t
+    </select>
+    <select id="findThreeBySiteRoute" resultType="java.lang.String">
+      select t.site_route from (select site_route from tb_early_warning where is_affirm = '2' and warning_grade = '3'
+      union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
 </mapper>

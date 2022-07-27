@@ -31,20 +31,20 @@ public class RestartTask implements SchedulingConfigurer {
                 try {
                     scheduler = StdSchedulerFactory.getDefaultScheduler();
                     jobGroupNames = scheduler.getJobGroupNames();
-                    if (!jobGroupNames.contains("group1")) {
+                    if (!jobGroupNames.contains("warningCountOne")) {
                         JobDetail jobDetail = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
-                                .withIdentity("job1", "group1") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
+                                .withIdentity("jobOne", "warningCountOne") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
                                 .build();
-                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger1", "group1").withSchedule(CronScheduleBuilder.cronSchedule("0 0 6 * * * * ?"))
+                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("triggerOne", "warningCountOne").withSchedule(CronScheduleBuilder.cronSchedule("0 13 15 * * ?"))
                                 .build();
                         scheduler.scheduleJob(jobDetail, trigger);
                         scheduler.start();
                     }
-                    if (!jobGroupNames.contains("group2")) {
+                    if (!jobGroupNames.contains("warningCountTwo")) {
                         JobDetail jobDetail = JobBuilder.newJob(SendUtils.class) //加载任务类，与HelloJob完成绑定，要求HelloJob实现Job接口
-                                .withIdentity("job2", "group2") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
+                                .withIdentity("warningCountTwo", "warningCountTwo") //参数1：任务的名称（唯一实例）；参数2：任务组的名称
                                 .build();
-                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("trigger2", "group2").withSchedule(CronScheduleBuilder.cronSchedule("0 0 7 * * * ?"))
+                        CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("triggerTwo", "warningCountTwo").withSchedule(CronScheduleBuilder.cronSchedule("0 0 7 * * ?"))
                                 .build();
                         scheduler.scheduleJob(jobDetail, trigger);
                         scheduler.start();

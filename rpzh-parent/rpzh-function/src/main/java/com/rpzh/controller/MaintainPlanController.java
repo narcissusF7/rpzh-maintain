@@ -1,7 +1,6 @@
 package com.rpzh.controller;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
@@ -13,17 +12,13 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.GetBetweenDayUtils;
 import com.rpzh.util.StringUtils;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.MaintainCountVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -95,7 +90,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
-            @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "stackOxygenUpperOne", value = "垛内氧气上限一级",required = true,dataType ="double"),
@@ -268,7 +262,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
-            @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "alarmValueSettingId", value = "预警设置id", required = true,dataType = "String"),
@@ -366,7 +359,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "oxygenReductionTime", value = "降氧完成天数", required = true, dataType = "String"),
             @ApiImplicitParam(name = "expireTime", value = "到期提醒时间", required = true, dataType = "String"),
             @ApiImplicitParam(name = "maintainCount", value = "养护数量", required = true, dataType = "double"),
-            @ApiImplicitParam(name = "materialBatchNum", value = "批次号", required = true, dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true, dataType = "String"),
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "alarmValueSettingId", value = "预警设置id", required = true,dataType = "String"),

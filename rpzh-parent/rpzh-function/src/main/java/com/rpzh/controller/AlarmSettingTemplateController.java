@@ -1,20 +1,12 @@
 package com.rpzh.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.rpzh.dto.AlarmSettingTemplateDto;
-import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.dto.LogAlarmSettingDto;
-import com.rpzh.dto.SettingColorAndDayDto;
+import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.service.AlarmSettingTemplateService;
-import com.rpzh.vo.AlarmSettingTemplateVo;
-import com.rpzh.vo.AlarmValueSettingVo;
-import com.rpzh.vo.SettingColorAndDayVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import com.rpzh.vo.*;
+import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 

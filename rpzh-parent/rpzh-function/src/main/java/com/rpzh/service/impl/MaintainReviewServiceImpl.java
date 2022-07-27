@@ -11,8 +11,10 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainReviewService;
 import com.rpzh.util.GetBetweenDayUtils;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.MaintainPlanVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -29,8 +31,10 @@ import java.util.stream.Collectors;
 public class MaintainReviewServiceImpl implements MaintainReviewService {
     @Resource
     private MaintainReviewDao maintainReviewDao;
-    @Resource
-    private UserFeign userFeign;
+    //redis中用户key前缀
+    private static final String USER = "USER_ID_";
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public PageInfo<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto) {
         String pidRoute = maintainPlanDto.getPidRoute();
@@ -49,8 +53,11 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
         List<MaintainPlanVo> maintainPlanVos = maintainReviewDao.findReviewTable(maintainPlanDto, column);
         maintainPlanVos.forEach(maintainPlanVo -> {
             List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-            List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-            maintainPlanVo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+            String principalName = "";
+            for (String pid : principalIds) {
+                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+            }
+            maintainPlanVo.setPrincipalName(principalName);
         });
         return new PageInfo<>(maintainPlanVos);
     }
@@ -118,8 +125,11 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
     public MaintainPlanVo findMaintainBaseInfo(Integer id) {
         MaintainPlanVo maintainBaseInfo = maintainReviewDao.findMaintainBaseInfo(id);
         List<String> principalIds = Arrays.asList(maintainBaseInfo.getPrincipalId().split(","));
-        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
-        maintainBaseInfo.setPrincipalName(String.join(",",userFeign.findUsernameById(principalId)));
+        String principalName = "";
+        for (String pid : principalIds) {
+            principalName = principalName + (String)redisUtil.hget(USER+"_username", USER+pid);
+        }
+        maintainBaseInfo.setPrincipalName(principalName);
         return maintainBaseInfo;
     }
 }
