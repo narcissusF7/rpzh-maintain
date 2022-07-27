@@ -140,7 +140,7 @@ public interface TaskManagementService {
      * @param taskDto
      * @return
      */
-    Map taskCountByType(TaskDto taskDto);
+    List<Map> taskCountByType(TaskDto taskDto);
 
     /**
      * 任务平均完成时间
@@ -168,4 +168,11 @@ public interface TaskManagementService {
      * @return
      */
     List<Map> pestCountDetail(String id);
+
+    /**
+     * 统计类型占比查询数量
+     * @param taskDto
+     * @return
+     */
+    Map taskCountByTypeMap(TaskDto taskDto);
 }

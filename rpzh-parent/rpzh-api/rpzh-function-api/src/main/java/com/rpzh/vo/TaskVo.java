@@ -16,6 +16,15 @@ public class TaskVo {
     @ApiModelProperty(notes = "主键id")
     private Integer id;
 
+    @ApiModelProperty(notes = "设备id")
+    private String nodeId;
+
+    @ApiModelProperty(notes = "主键类型")
+    private String nodeType;
+
+    @ApiModelProperty(notes = "箱号")
+    private String caseNo;
+
     //任务编号
     @ApiModelProperty(notes = "任务编号")
     private String taskNum;
@@ -30,6 +39,15 @@ public class TaskVo {
 
     @ApiModelProperty(notes = "位置路径")
     private String siteRoute;
+
+    @ApiModelProperty(notes = "移垛任务目标位置")
+    private String targetSiteRoute;
+
+    @ApiModelProperty(notes = "移垛任务目标位置名称")
+    private String targetSiteName;
+
+    @ApiModelProperty(notes = "移垛任务目标位置id")
+    private String targetSiteId;
 
     //发起时间
     @ApiModelProperty(notes = "发起时间,创建时间")
@@ -80,4 +98,13 @@ public class TaskVo {
 
     @ApiModelProperty(notes = "图片图片文件夹名")
     private String pictureFilename;
+
+    @ApiModelProperty(notes = "坐标x")
+    private String x;
+
+    @ApiModelProperty(notes = "坐标y")
+    private String y;
+
+    @ApiModelProperty(notes = "坐标z")
+    private String z;
 }

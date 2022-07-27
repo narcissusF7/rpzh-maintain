@@ -65,4 +65,10 @@ WHERE job_group = #{jobGroup}
 <select id="findJobId" resultType="java.lang.Long">
  SELECT job_id FROM task_schedule_job
 </select>
+<select id="findStatus" resultType="java.lang.String">
+  SELECT job_status
+  FROM
+  task_schedule_job
+  LIMIT 1
+</select>
 </mapper>

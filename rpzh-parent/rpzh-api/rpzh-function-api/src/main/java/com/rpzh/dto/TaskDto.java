@@ -20,6 +20,9 @@ public class TaskDto {
     //任务编号
     private String taskNum;
 
+    //箱号
+    private String caseNo;
+
     //任务类型
     private String type;
 
@@ -31,6 +34,15 @@ public class TaskDto {
 
     //位置路径
     private String siteRoute;
+
+    //移垛任务目标位置
+    private String targetSiteRoute;
+
+    //移垛任务目标位置名称
+    private String targetSiteName;
+
+    //移垛目标位置id
+    private String targetSiteId;
 
     //位置名称
     private String siteName;

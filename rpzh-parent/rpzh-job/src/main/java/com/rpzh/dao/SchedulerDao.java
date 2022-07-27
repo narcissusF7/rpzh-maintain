@@ -59,4 +59,11 @@ public interface SchedulerDao {
      * @return
      */
     List<Long> findJobId();
+
+    /**
+     * 查询定时任务状态
+     * @return
+     */
+    String findStatus();
+
 }

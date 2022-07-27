@@ -89,6 +89,15 @@ public class SchedulerController {
     }
 
 
+    /**
+     * 查询定时任务状态
+     * @return
+     */
+    @PostMapping("/findStatus")
+    public Result findStatus(){
+        String status = schedulerService.findStatus();
+        return new Result(true, StatusCode.OK, "查询状态成功", status);
+    }
 
 
     /**
@@ -106,6 +115,25 @@ public class SchedulerController {
             return new Result(false, StatusCode.ERROR, "命令错误,0:停止,1:启动");
         }
         schedulerService.changeJobStatus(jobId,cmd);
+        return new Result(true, StatusCode.OK, "修改任务状态成功");
+    }
+
+    /**
+     * 改变定时任务状态
+     * 定时任务是否生效0失效1生效
+     * @param status
+     * @return
+     */
+    @PostMapping("/changeStatus")
+    public Result changeStatus(String status){
+        if (!("0".equals(status) || "1".equals(status))){
+            return new Result(false, StatusCode.ERROR, "状态错误,状态只能传0和1");
+        }
+        //这是数据库中的定时任务id,不能修改
+        Long jobId1 = 1L;
+        Long jobId2 = 2L;
+        schedulerService.changeJobStatus(jobId1,status);
+        schedulerService.changeJobStatus(jobId2,status);
         return new Result(true, StatusCode.OK, "修改任务状态成功");
     }
 
@@ -130,6 +158,8 @@ public class SchedulerController {
      * @param messageIssueDto
      * @return
      *  每天1点执行一次：   0 0 1 * * ?
+     *
+     *  每天0点执行一次：   0 0 0 * * ?
      *
      *  每天23点执行一次：  0 0 23 * * ?
      *

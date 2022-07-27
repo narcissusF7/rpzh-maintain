@@ -58,6 +58,9 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "principal", value = "负责人", required = true,dataType = "String"),
             @ApiImplicitParam(name = "taskAddress", value = "任务地点名字", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteRoute", value = "任务地点位置路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "targetSiteName", value = "移垛任务目标位置名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "targetSiteRoute", value = "移垛任务目标位置路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "targetSiteId", value = "移垛任务目标位置路径id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "当前位置id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = true,dataType = "String"),
@@ -91,6 +94,19 @@ public class TaskManagementController {
         }
         if (ToolUtil.isEmpty(taskDto.getDetail())){
             return new Result(false, StatusCode.ERROR, "任务详情不能为空");
+        }
+        if ("03".equals(taskDto.getType())){
+            //移垛任务下目标任务路径和名称不能为空
+            if (ToolUtil.isEmpty(taskDto.getTargetSiteName()) || ToolUtil.isEmpty(taskDto.getTargetSiteRoute()) || ToolUtil.isEmpty(taskDto.getTargetSiteId())){
+                return new Result(false,StatusCode.ERROR,"移垛任务中目标位置,目标路径,目标位置id不能为空");
+            }
+        }
+        if ("03".equals(taskDto.getType())){
+            String route = SiteRouteUtil.route(taskDto.getTargetSiteRoute(), taskDto.getTargetSiteId());
+            if (!(route.contains("05"))){
+                return new Result(false, StatusCode.ERROR, "请选择到垛位");
+            }
+            taskDto.setTargetSiteRoute(route);
         }
         int addFlag = taskManagementService.addTask(taskDto);
         return new Result(true,StatusCode.OK,"添加任务成功");
@@ -319,6 +335,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteName", value = "任务目标地址名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String"),
             @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "caseNo", value = "箱号", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = true,dataType = "integer"),
             @ApiImplicitParam(name = "siteDate", value = "移垛数据:[{\"nodeId\":\"88FFDFD29\",\"x\":15,\"y\":112,\"z\":132},{\"nodeId\":\"88FFDFD30\", \"x\":11, \"y\":122, \"z\":132}]", required = true,dataType = "String")
     })
@@ -513,7 +530,7 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "发布任务菜单任务统计任务量趋势统计", tags = "任务管理中心")
+    @ApiOperation(value = "工作任务菜单任务统计任务量趋势统计", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
@@ -547,7 +564,7 @@ public class TaskManagementController {
     })
     @PostMapping("/taskCountByType")
     public Result taskCountByType(@ApiIgnore TaskDto taskDto){
-        Map typeCount = taskManagementService.taskCountByType(taskDto);
+        List<Map> typeCount = taskManagementService.taskCountByType(taskDto);
         return new Result(true,StatusCode.OK,"查询成功",typeCount);
     }
 
@@ -556,7 +573,7 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "发布任务菜单任务统计任务类型数量", tags = "任务管理中心")
+    @ApiOperation(value = "工作任务菜单任务统计任务类型数量", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
@@ -570,7 +587,7 @@ public class TaskManagementController {
         //获取用户账号
         String username = userInfo.get("username");
         taskDto.setPrincipal(username);
-        Map typeCount = taskManagementService.taskCountByType(taskDto);
+        List<Map> typeCount = taskManagementService.taskCountByType(taskDto);
         return new Result(true,StatusCode.OK,"查询成功",typeCount);
     }
 
@@ -590,47 +607,101 @@ public class TaskManagementController {
     })
     @PostMapping("/taskTypePercent")
     public Result taskTypePercent(@ApiIgnore TaskDto taskDto){
-        Map typeCount = taskManagementService.taskCountByType(taskDto);
+        Map typeCount = taskManagementService.taskCountByTypeMap(taskDto);
         //获取所有的和,所有的任务和
         int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
         //保留两位小数
         DecimalFormat df = new DecimalFormat("######0.00");
-        Map<String,String> map = new HashMap<>();
+        //Map<String,String> map = new HashMap<>();
+        List<Map> mapList = new ArrayList<>();
         //获取百分比
         double percent01 = Double.parseDouble(typeCount.get("01").toString())/sum;
+        Map map01 = new HashMap();
+        map01.put("type", "虫情巡查任务");
+        map01.put("percent",percent01*100);
+        mapList.add(map01);
         double percent02 = Double.parseDouble(typeCount.get("02").toString())/sum;
+        Map map02 = new HashMap();
+        map02.put("type", "翻垛任务");
+        map02.put("percent",percent02*100);
+        mapList.add(map02);
         double percent03 = Double.parseDouble(typeCount.get("03").toString())/sum;
+        Map map03 = new HashMap();
+        map03.put("type", "移垛任务");
+        map03.put("percent",percent03*100);
+        mapList.add(map03);
         double percent04 = Double.parseDouble(typeCount.get("04").toString())/sum;
+        Map map04 = new HashMap();
+        map04.put("type", "垛内甲虫预警任务");
+        map04.put("percent",percent04*100);
+        mapList.add(map04);
         double percent05 = Double.parseDouble(typeCount.get("05").toString())/sum;
+        Map map05 = new HashMap();
+        map05.put("type", "仓间甲虫预警任务");
+        map05.put("percent",percent05*100);
+        mapList.add(map05);
         double percent06 = Double.parseDouble(typeCount.get("06").toString())/sum;
+        Map map06 = new HashMap();
+        map06.put("type", "垛内氧气预警任务");
+        map06.put("percent",percent06*100);
+        mapList.add(map06);
         double percent07 = Double.parseDouble(typeCount.get("07").toString())/sum;
+        Map map07 = new HashMap();
+        map07.put("type", "仓间氧气预警任务");
+        map07.put("percent",percent07*100);
+        mapList.add(map07);
         double percent08 = Double.parseDouble(typeCount.get("08").toString())/sum;
+        Map map08 = new HashMap();
+        map08.put("type", "垛内温度预警任务");
+        map08.put("percent",percent08*100);
+        mapList.add(map08);
         double percent09 = Double.parseDouble(typeCount.get("09").toString())/sum;
+        Map map09 = new HashMap();
+        map09.put("type", "仓间温度预警任务");
+        map09.put("percent",percent09*100);
+        mapList.add(map09);
         double percent10 = Double.parseDouble(typeCount.get("10").toString())/sum;
+        Map map10 = new HashMap();
+        map10.put("type", "垛内湿度预警任务");
+        map10.put("percent",percent10*100);
+        mapList.add(map10);
         double percent11 = Double.parseDouble(typeCount.get("11").toString())/sum;
+        Map map11 = new HashMap();
+        map11.put("type", "仓间湿度预警任务");
+        map11.put("percent",percent11*100);
+        mapList.add(map11);
         double percent12 = Double.parseDouble(typeCount.get("12").toString())/sum;
+        Map map12 = new HashMap();
+        map12.put("type", "包芯温度预警任务");
+        map12.put("percent",percent12*100);
+        mapList.add(map12);
         double percent13 = Double.parseDouble(typeCount.get("13").toString())/sum;
+        Map map13 = new HashMap();
+        map13.put("type", "平均包芯高于环境预警任务");
+        map13.put("percent",percent13*100);
+        mapList.add(map13);
         double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
+        Map map14 = new HashMap();
+        map14.put("type", "仓间粉螟预警任务");
+        map14.put("percent",percent14*100);
+        mapList.add(map14);
         double percent15 = Double.parseDouble(typeCount.get("15").toString())/sum;
+        Map map15 = new HashMap();
+        map15.put("type", "仓库检查任务");
+        map15.put("percent",percent15*100);
+        mapList.add(map15);
         double percent16 = Double.parseDouble(typeCount.get("16").toString())/sum;
-        //虫情巡查
-        map.put("01",df.format(percent01));
-        map.put("02",df.format(percent02));
-        map.put("03",df.format(percent03));
-        map.put("04",df.format(percent04));
-        map.put("05",df.format(percent05));
-        map.put("06",df.format(percent06));
-        map.put("07",df.format(percent07));
-        map.put("08",df.format(percent08));
-        map.put("09",df.format(percent09));
-        map.put("10",df.format(percent10));
-        map.put("11",df.format(percent11));
-        map.put("12",df.format(percent12));
-        map.put("13",df.format(percent13));
-        map.put("14",df.format(percent14));
-        map.put("15",df.format(percent15));
-        map.put("16",df.format(percent16));
-        return new Result(true,StatusCode.OK,"查询成功",map);
+        Map map16 = new HashMap();
+        map16.put("type", "其他任务");
+        map16.put("percent",percent16*100);
+        mapList.add(map16);
+        Map mapCount = new HashMap();
+        mapCount.put("type", "总任务");
+        mapCount.put("count", sum);
+        List allData = new ArrayList();
+        allData.add(mapList);
+        allData.add(mapCount);
+        return new Result(true,StatusCode.OK,"查询成功",allData);
     }
 
 
@@ -653,47 +724,101 @@ public class TaskManagementController {
        //获取用户账号
         String username = userInfo.get("username");
         taskDto.setPrincipal(username);
-        Map typeCount = taskManagementService.taskCountByType(taskDto);
+        Map typeCount = taskManagementService.taskCountByTypeMap(taskDto);
         //获取所有的和,所有的任务和
         int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
         //保留两位小数
         DecimalFormat df = new DecimalFormat("######0.00");
         Map<String,String> map = new HashMap<>();
+        List<Map> mapList = new ArrayList<>();
         //获取百分比
         double percent01 = Double.parseDouble(typeCount.get("01").toString())/sum;
+        Map map01 = new HashMap();
+        map01.put("type", "虫情巡查任务");
+        map01.put("percent",percent01*100);
+        mapList.add(map01);
         double percent02 = Double.parseDouble(typeCount.get("02").toString())/sum;
+        Map map02 = new HashMap();
+        map02.put("type", "翻垛任务");
+        map02.put("percent",percent02*100);
+        mapList.add(map02);
         double percent03 = Double.parseDouble(typeCount.get("03").toString())/sum;
+        Map map03 = new HashMap();
+        map03.put("type", "移垛任务");
+        map03.put("percent",percent03*100);
+        mapList.add(map03);
         double percent04 = Double.parseDouble(typeCount.get("04").toString())/sum;
+        Map map04 = new HashMap();
+        map04.put("type", "垛内甲虫预警任务");
+        map04.put("percent",percent04*100);
+        mapList.add(map04);
         double percent05 = Double.parseDouble(typeCount.get("05").toString())/sum;
+        Map map05 = new HashMap();
+        map05.put("type", "仓间甲虫预警任务");
+        map05.put("percent",percent05*100);
+        mapList.add(map05);
         double percent06 = Double.parseDouble(typeCount.get("06").toString())/sum;
+        Map map06 = new HashMap();
+        map06.put("type", "垛内氧气预警任务");
+        map06.put("percent",percent06*100);
+        mapList.add(map06);
         double percent07 = Double.parseDouble(typeCount.get("07").toString())/sum;
+        Map map07 = new HashMap();
+        map07.put("type", "仓间氧气预警任务");
+        map07.put("percent",percent07*100);
+        mapList.add(map07);
         double percent08 = Double.parseDouble(typeCount.get("08").toString())/sum;
+        Map map08 = new HashMap();
+        map08.put("type", "垛内温度预警任务");
+        map08.put("percent",percent08*100);
+        mapList.add(map08);
         double percent09 = Double.parseDouble(typeCount.get("09").toString())/sum;
+        Map map09 = new HashMap();
+        map09.put("type", "仓间温度预警任务");
+        map09.put("percent",percent09*100);
+        mapList.add(map09);
         double percent10 = Double.parseDouble(typeCount.get("10").toString())/sum;
+        Map map10 = new HashMap();
+        map10.put("type", "垛内湿度预警任务");
+        map10.put("percent",percent10*100);
+        mapList.add(map10);
         double percent11 = Double.parseDouble(typeCount.get("11").toString())/sum;
+        Map map11 = new HashMap();
+        map11.put("type", "仓间湿度预警任务");
+        map11.put("percent",percent11*100);
+        mapList.add(map11);
         double percent12 = Double.parseDouble(typeCount.get("12").toString())/sum;
+        Map map12 = new HashMap();
+        map12.put("type", "包芯温度预警任务");
+        map12.put("percent",percent12*100);
+        mapList.add(map12);
         double percent13 = Double.parseDouble(typeCount.get("13").toString())/sum;
+        Map map13 = new HashMap();
+        map13.put("type", "平均包芯高于环境预警任务");
+        map13.put("percent",percent13*100);
+        mapList.add(map13);
         double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
+        Map map14 = new HashMap();
+        map14.put("type", "仓间粉螟预警任务");
+        map14.put("percent",percent14*100);
+        mapList.add(map14);
         double percent15 = Double.parseDouble(typeCount.get("15").toString())/sum;
+        Map map15 = new HashMap();
+        map15.put("type", "仓库检查任务");
+        map15.put("percent",percent15*100);
+        mapList.add(map15);
         double percent16 = Double.parseDouble(typeCount.get("16").toString())/sum;
-        //虫情巡查
-        map.put("01",df.format(percent01));
-        map.put("02",df.format(percent02));
-        map.put("03",df.format(percent03));
-        map.put("04",df.format(percent04));
-        map.put("05",df.format(percent05));
-        map.put("06",df.format(percent06));
-        map.put("07",df.format(percent07));
-        map.put("08",df.format(percent08));
-        map.put("09",df.format(percent09));
-        map.put("10",df.format(percent10));
-        map.put("11",df.format(percent11));
-        map.put("12",df.format(percent12));
-        map.put("13",df.format(percent13));
-        map.put("14",df.format(percent14));
-        map.put("15",df.format(percent15));
-        map.put("16",df.format(percent16));
-        return new Result(true,StatusCode.OK,"查询成功",map);
+        Map map16 = new HashMap();
+        map16.put("type", "其他任务");
+        map16.put("percent",percent16*100);
+        mapList.add(map16);
+        Map mapCount = new HashMap();
+        mapCount.put("type", "总任务");
+        mapCount.put("count", sum);
+        List allData = new ArrayList();
+        allData.add(mapList);
+        allData.add(mapCount);
+        return new Result(true,StatusCode.OK,"查询成功",allData);
     }
 
 

@@ -180,6 +180,17 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     /**
+     * 查询定时任务状态
+     *
+     * @return
+     */
+    @Override
+    public String findStatus() {
+        String status = schedulerDao.findStatus();
+        return status;
+    }
+
+    /**
      * 删除暂停任务
      * @param scheduleJob
      * @throws
