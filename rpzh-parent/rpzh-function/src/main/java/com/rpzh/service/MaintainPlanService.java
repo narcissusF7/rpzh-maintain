@@ -1,15 +1,11 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
-import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.dto.MaintainCountDto;
+import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
-import com.rpzh.dto.MaintainPlanDto;
-import com.rpzh.vo.AlarmValueSettingVo;
-import com.rpzh.vo.MaintainPlanVo;
+import com.rpzh.vo.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author wbl

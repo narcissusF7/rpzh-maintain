@@ -1,5 +1,4 @@
 package com.rpzh.service.impl;
-
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.*;
 import com.rpzh.dao.*;
@@ -39,6 +38,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     private PestMonitoringDao pestMonitoringDao;
     //redis中用户key前缀
     private static final String USER = "USER_";
+    private static final String USER_ID = "MAINTIAN_USER_ID_USERNAME";
     @Autowired
     private RedisUtil redisUtil;
 
@@ -334,7 +334,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
             String principalName = "";
             for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER+"_ID_username", USER+"_"+pid);
+                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
             }
             maintainPlanVo.setPrincipalName(principalName);
             map.put("maintainPlanVo", maintainPlanVo);
@@ -527,7 +527,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             List<String> usernames = Arrays.asList(earlyWarningDao.findPrincipal(earlyWarningDto).split(","));
             usernames.forEach(username -> {
                 Map<String,String> userName = new HashMap<>();
-                String phonenumber = (String)redisUtil.hget(USER + username, "phonenumber");
+                String phonenumber = (String)redisUtil.hget(USER_ID, "phonenumber");
                 userName.put("username",username);
                 userName.put("number",phonenumber);
                 user.add(userName);

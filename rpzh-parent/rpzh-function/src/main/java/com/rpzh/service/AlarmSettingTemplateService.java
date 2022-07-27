@@ -1,14 +1,10 @@
 package com.rpzh.service;
 
 import com.github.pagehelper.PageInfo;
-import com.rpzh.dto.AlarmSettingTemplateDto;
-import com.rpzh.dto.AlarmValueSettingDto;
-import com.rpzh.dto.LogAlarmSettingDto;
+import com.rpzh.dto.*;
 import com.rpzh.dto.SettingColorAndDayDto;
 import com.rpzh.entity.Result;
-import com.rpzh.vo.AlarmSettingTemplateVo;
-import com.rpzh.vo.AlarmValueSettingVo;
-import com.rpzh.vo.SettingColorAndDayVo;
+import com.rpzh.vo.*;
 
 import java.util.List;
 

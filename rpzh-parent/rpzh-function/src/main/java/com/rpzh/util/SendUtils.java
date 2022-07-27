@@ -22,6 +22,7 @@ public class SendUtils implements Job {
 
     //redis中用户key前缀
     private static final String USER = "USER_ID_";
+    private static final String USER_ID = "MAINTIAN_USER_ID_USERNAME";
     RedisUtil redisUtil = SpringUtils.getBean(RedisUtil.class);
     WarehouseDao warehouseDao = SpringUtils.getBean(WarehouseDao.class);
     MaintainPlanDao maintainPlanDao = SpringUtils.getBean(MaintainPlanDao.class);
@@ -76,7 +77,7 @@ public class SendUtils implements Job {
                 List<String> principalIds = Arrays.asList(maintainPlanDao.findCurrentMaintainPlan(stackId).split(","));
                 for (String pid : principalIds) {
                     Map map = new HashMap();
-                    String principalName = (String)redisUtil.hget(USER+"username", USER+pid);
+                    String principalName = (String)redisUtil.hget(USER_ID, USER+pid);
                     map.put("number",(String)redisUtil.hget("USER_"+principalName,"phonenumber"));
                     map.put("username",principalName);
                     phonenumber.add(map);
@@ -102,7 +103,7 @@ public class SendUtils implements Job {
                         }
                     }
                 }
-                String principalName = (String)redisUtil.hget(USER+"username", USER+id);
+                String principalName = (String)redisUtil.hget(USER_ID, USER+id);
                 Map map = new HashMap();
                 map.put("number",(String)redisUtil.hget("USER_"+principalName,"phonenumber"));
                 map.put("username",principalName);

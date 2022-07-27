@@ -42,6 +42,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     //redis中用户key前缀
     private static final String USER = "USER_ID_";
+    private static final String USER_ID = "MAINTIAN_USER_ID_USERNAME";
     @Autowired
     private RedisUtil redisUtil;
 
@@ -222,7 +223,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
         String principalName = "";
         for (String pid : principalIds) {
-            principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+            principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
         }
         maintainPlanVo.setPrincipalName(principalName);
         maintainPlanVo.setPrincipalIds(principalIds.stream().map(Integer::parseInt).collect(Collectors.toList()));
@@ -231,7 +232,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             List<String> peopleIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
             String peopleName = "";
             for (String pid : peopleIds) {
-                peopleName = peopleName + (String)redisUtil.hget(USER+"username", USER+pid);
+                peopleName = peopleName + (String)redisUtil.hget(USER_ID, USER+pid);
             }
             maintainPlan.setPrincipalName(peopleName);
         });
@@ -475,7 +476,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
             String principalName = "";
             for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
             }
             maintainPlan.setPrincipalName(principalName);
         });
@@ -491,7 +492,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
             String principalName = "";
             for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
             }
             maintainPlan.setPrincipalName(principalName);
         });

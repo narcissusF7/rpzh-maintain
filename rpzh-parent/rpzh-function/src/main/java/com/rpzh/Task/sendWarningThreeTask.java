@@ -37,6 +37,7 @@ public class sendWarningThreeTask{
     @Resource
     private MaintainPlanDao maintainPlanDao;
     private static final String USER = "USER_ID_";
+    private static final String USER_ID = "MAINTIAN_USER_ID_USERNAME";
     @Resource
     private RedisUtil redisUtil;
     @Resource
@@ -44,7 +45,7 @@ public class sendWarningThreeTask{
     //mq主题
     private String topic = "messageTopic";
 
-    @Scheduled(cron="0 0 0/2 * * ? ")
+    @Scheduled(cron="0 0 0 * * ? ")
     public void configureTasks() {
         List<String> siteRoutes = earlyWarningDao.findThreeBySiteRoute();
         for (String siteRoute : siteRoutes) {
@@ -59,7 +60,7 @@ public class sendWarningThreeTask{
                 List<String> principalIds = Arrays.asList(maintainPlanDao.findCurrentMaintainPlan(stackId).split(","));
                 for (String pid : principalIds) {
                     Map map = new HashMap();
-                    String principalName = (String)redisUtil.hget(USER+"username", USER+pid);
+                    String principalName = (String)redisUtil.hget(USER_ID, USER+pid);
                     map.put("number",(String)redisUtil.hget("USER_"+principalName,"phonenumber"));
                     map.put("username",principalName);
                     phonenumber.add(map);
@@ -85,7 +86,7 @@ public class sendWarningThreeTask{
                         }
                     }
                 }
-                String principalName = (String)redisUtil.hget(USER+"username", USER+id);
+                String principalName = (String)redisUtil.hget(USER_ID, USER+id);
                 Map map = new HashMap();
                 map.put("number",(String)redisUtil.hget("USER_"+principalName,"phonenumber"));
                 map.put("username",principalName);
