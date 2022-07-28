@@ -65,7 +65,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = true,dataType = "String"),
             @ApiImplicitParam(name = "detail", value = "任务详情",required = true,dataType = "String"),
-            @ApiImplicitParam(name = "pushWay", value = "推送方式,短信:M,App:A",required = true,dataType = "String")
+            @ApiImplicitParam(name = "pushWay", value = "推送方式,短信:M,App:A,全部:Q",required = true,dataType = "String")
     })
     public Result addTask(@ApiIgnore TaskDto taskDto){
         if (ToolUtil.isEmpty(taskDto.getType())){
@@ -89,7 +89,7 @@ public class TaskManagementController {
         if (ToolUtil.isEmpty(taskDto.getPushWay())){
             return new Result(false, StatusCode.ERROR, "推送方式不能为空");
         }
-        if (!("M".equals(taskDto.getPushWay()) || "A".equals(taskDto.getPushWay()))){
+        if (!("M".equals(taskDto.getPushWay()) || "A".equals(taskDto.getPushWay()) || "Q".equals(taskDto.getPushWay()))){
             return new Result(false, StatusCode.ERROR, "推送方式参数错误");
         }
         if (ToolUtil.isEmpty(taskDto.getDetail())){
@@ -127,7 +127,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
-            @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期,3:处理中",required = false,dataType = "String"),
             @ApiImplicitParam(name = "page", value = "分页开始页",required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "分页每页显示",required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "principal", value = "负责人",required = false,dataType = "String")
@@ -151,7 +151,7 @@ public class TaskManagementController {
     @PostMapping("/delTask")
     public Result delTask(@ApiIgnore Long[] ids){
         if (ToolUtil.isEmpty(ids)){
-            return new Result(false, StatusCode.ERROR, "请选择一个设备");
+            return new Result(false, StatusCode.ERROR, "请选择一个任务");
         }
         int delFlag = taskManagementService.delTask(ids);
         return new Result(true, StatusCode.OK, "删除成功");
