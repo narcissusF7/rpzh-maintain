@@ -67,8 +67,6 @@ public interface AlarmSettingTemplateDao {
 
     int insertAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findTemplateId(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
-
     int updateAlarmSettingTemplateStage(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
     Integer findCountByName(@Param("earlyWarningRuleName")String earlyWarningRuleName);

@@ -202,6 +202,9 @@ public class GetBetweenDayUtils {
         return map;
     }
 
+    /*
+    * 判断填写的预警值是否有少写
+    */
     public static boolean getFlag(AlarmValueSettingDto alarmValueSettingDto){
         return alarmValueSettingDto.getStackOxygenUpperOne() == null ||
                 alarmValueSettingDto.getStackOxygenUpperThree() == null ||

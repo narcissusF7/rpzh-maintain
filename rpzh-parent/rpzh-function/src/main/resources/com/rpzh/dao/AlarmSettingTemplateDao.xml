@@ -88,10 +88,6 @@
         #{alarmValueSettingDto.createdTime},#{alarmValueSettingDto.createUser}
         )
     </insert>
-    <select id="findTemplateId" resultType="java.lang.Integer">
-        select id from tb_alarm_setting_template where
-        early_warning_rule_name = #{alarmValueSettingDto.earlyWarningRuleName} and material_code = #{alarmValueSettingDto.materialCode} and  maintence_style = #{alarmValueSettingDto.maintenceStyle}
-    </select>
     <insert id="insertAlarmSettingTemplateStage">
         insert into tb_alarm_setting_template_stage
         (
