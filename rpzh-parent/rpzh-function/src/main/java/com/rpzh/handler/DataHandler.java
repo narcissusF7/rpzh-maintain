@@ -143,23 +143,23 @@ public class DataHandler {
         //通过设备id找到对应的设备
         Object o = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
 
-        NodeVo nodeVo;
+        NodeVo nodeVo = getNodeVo(o,parseData.getNodeId());
 
-        if (ToolUtil.isEmpty(o)){
-            nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
-            if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
-                //查询对应的养护计划 养护计划阶段
-                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
-                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
-                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
-                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
-                //设置该预警id
-                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
-            }
-            redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + parseData.getNodeId(),JSON.toJSONString(nodeVo));
-        }else {
-            nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
-        }
+//        if (ToolUtil.isEmpty(o)){
+//            nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+//            if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
+//                //查询对应的养护计划 养护计划阶段
+//                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+//                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
+//                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+//                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
+//                //设置该预警id
+//                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+//            }
+//            redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + parseData.getNodeId(),JSON.toJSONString(nodeVo));
+//        }else {
+//            nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
+//        }
         //如果设备处于是解垛状态  数据不做任何处理
         if (nodeVo.getStatus().equals("0")){
             return;
@@ -680,5 +680,25 @@ public class DataHandler {
                 }
             }
         }
+    }
+
+    public NodeVo getNodeVo(Object o ,String nodeId){
+        NodeVo nodeVo;
+        if (ToolUtil.isEmpty(o)){
+            nodeVo = nodeDao.findByNodeId(nodeId);
+            if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
+                //查询对应的养护计划 养护计划阶段
+                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
+                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
+                //设置该预警id
+                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+            }
+            redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + nodeId,JSON.toJSONString(nodeVo));
+        }else {
+            nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
+        }
+        return nodeVo;
     }
 }

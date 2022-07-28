@@ -382,4 +382,6 @@ public interface WarehouseDao {
     List<Map<String,String>> findWareAreaInfos(@Param("areaIds") List<Integer> areaIds);
 
     List<Map<String,String>> findStackInfos(@Param("stackIds") List<Integer> stackIds);
+
+    Integer findStackBySiteNo(@Param("siteNo") String siteNo,@Param("level") Integer level);
 }

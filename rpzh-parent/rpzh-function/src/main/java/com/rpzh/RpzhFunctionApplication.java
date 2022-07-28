@@ -47,14 +47,14 @@ public class RpzhFunctionApplication {
     }
 
 //    @Bean(name="redisTemplate")
-//    public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
-//        RedisTemplate<String, String> template = new RedisTemplate<>();
-//        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
-//        template.setConnectionFactory(factory);
-//        //key序列化方式
-//        template.setKeySerializer(redisSerializer);
-//        //value序列化
-//        template.setValueSerializer(redisSerializer);
-//        return template;
-//    }
+////    public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
+////        RedisTemplate<String, String> template = new RedisTemplate<>();
+////        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+////        template.setConnectionFactory(factory);
+////        //key序列化方式
+////        template.setKeySerializer(redisSerializer);
+////        //value序列化
+////        template.setValueSerializer(redisSerializer);
+////        return template;
+////    }
 }

@@ -125,6 +125,10 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
+        Integer count = warehouseService.findStackBySiteNo(buildingNo,2);
+        if (count>0) {
+            return new Result(false, StatusCode.ERROR, "楼栋编号已存在");
+        }
         //获取仓库类型
         String wareType = warehouseService.findWareType(warehouseId);
         buildingDto.setBuildingType(wareType);
@@ -147,6 +151,13 @@ public class WarehouseController {
         Integer warehouseId = buildingDto.getWarehouseId();
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
+        }
+        String buildingNo = buildingDto.getBuildingNo();
+        if (!ToolUtil.isEmpty(buildingNo)){
+            Integer count = warehouseService.findStackBySiteNo(buildingNo,2);
+            if (count>0) {
+                return new Result(false, StatusCode.ERROR, "楼栋编号已存在");
+            }
         }
         //String wareType = warehouseService.findWareType(warehouseId);
         //buildingDto.setBuildingType(wareType);
@@ -176,6 +187,10 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingId)) {
             return new Result(false, StatusCode.ERROR, "楼号id不能为空");
         }
+        Integer count = warehouseService.findStackBySiteNo(floorNo,3);
+        if (count>0) {
+            return new Result(false, StatusCode.ERROR, "楼号编号已存在");
+        }
         //获取楼栋类型
         String buildType = warehouseService.findBuildType(buildingId);
         floorDto.setFloorType(buildType);
@@ -198,6 +213,14 @@ public class WarehouseController {
         String buildingId = floorDto.getBuildingId();
         if (ToolUtil.isEmpty(buildingId)) {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
+        }
+
+        String floorNo = floorDto.getFloorNo();
+        if (!ToolUtil.isEmpty(floorNo)){
+            Integer count = warehouseService.findStackBySiteNo(floorNo,3);
+            if (count>0) {
+                return new Result(false, StatusCode.ERROR, "楼层编号已存在");
+            }
         }
         //获取楼栋类型
         //String buildType = warehouseService.findBuildType(buildingId);
@@ -222,6 +245,10 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(floorId)) {
             return new Result(false, StatusCode.ERROR, "楼层id不能为空");
         }
+        Integer count = warehouseService.findStackBySiteNo(areaNo,4);
+        if (count>0) {
+            return new Result(false, StatusCode.ERROR, "分区编号已存在");
+        }
         //查询楼层类型
         String floorType = warehouseService.findFloorType(floorId);
         wareAreaDto.setWareAreaType(floorType);
@@ -244,6 +271,13 @@ public class WarehouseController {
         Integer floorId = wareAreaDto.getFloorId();
         if (ToolUtil.isEmpty(floorId)) {
             return new Result(false, StatusCode.ERROR, "楼层id不能为空");
+        }
+        String areaNo = wareAreaDto.getAreaNo();
+        if (!ToolUtil.isEmpty(areaNo)){
+            Integer count = warehouseService.findStackBySiteNo(areaNo,4);
+            if (count>0) {
+                return new Result(false, StatusCode.ERROR, "分区编号已存在");
+            }
         }
         //查询楼层类型
         //String floorType = warehouseService.findFloorType(floorId);
@@ -273,6 +307,10 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(areaId)) {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
+        Integer count = warehouseService.findStackBySiteNo(stackNo,5);
+        if (count>0) {
+            return new Result(false, StatusCode.ERROR, "垛位编号已存在");
+        }
         //查看分区类型
         String wareAreaType = warehouseService.findWareAreaType(areaId);
         stackDto.setStackType(wareAreaType);
@@ -297,6 +335,14 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(areaId)) {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
+        String stackNo = stackDto.getStackNo();
+        if (!ToolUtil.isEmpty(stackNo)){
+            Integer count = warehouseService.findStackBySiteNo(stackNo,5);
+            if (count>0) {
+                return new Result(false, StatusCode.ERROR, "垛位编号已存在");
+            }
+        }
+
         //查看分区类型
         //String wareAreaType = warehouseService.findWareAreaType(areaId);
         //stackDto.setStackType(wareAreaType);
@@ -471,4 +517,5 @@ public class WarehouseController {
     public Result<T> locatingMaintain(){
         return warehouseService.locatingMaintain();
     }
+
 }

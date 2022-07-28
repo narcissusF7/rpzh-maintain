@@ -445,4 +445,60 @@ public class DataReportController {
         }
         return "aaaa";
     }
+
+    @ApiOperation(
+            value = "导出垛位的数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "gatherSiteRoute",
+            value = "位置类型id 示例：[00:0],[01:1],[02:1],[03:1],[04:1],[05:2]",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "type",
+            value = "类型 (1 => 温度 | 2 => 湿度 | 3 => 氧气)",
+            dataType = "Integer",
+            required = true
+    ), @ApiImplicitParam(
+            name = "dateType",
+            value = "数据类型 (1 => 当前 | 2 => 最大 | 3 => 最小 | 4 = 平均)",
+            dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "valOne",
+            value = "数值范围1",
+            dataType = "BigDecimal"
+    ), @ApiImplicitParam(
+            name = "valTwo",
+            value = "数值范围2",
+            dataType = "BigDecimal"
+    ), @ApiImplicitParam(
+            name = "acquisitionTimeOne",
+            value = "采集时间1",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "acquisitionTimeTwo",
+            value = "采集时间2",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "warehouseId",
+            value = "仓库id",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "exportType",
+            value = "导出类型 1 日统计 2 周统计",
+            dataType = "Integer",
+            defaultValue = "1"
+    )})
+    @PostMapping("/exportStackComparisonData")
+    public Result exportStackComparisonData(@ApiIgnore DataReportDto dataReportDto){
+        if (dataReportDto.getType() == null || (dataReportDto.getType() != null &&
+                (dataReportDto.getType() < 1 || dataReportDto.getType() > 3))) {
+            return new Result<>(false, StatusCode.ERROR, "未知类型!");
+        }
+        if (dataReportDto.getDateType() != null &&
+                (dataReportDto.getDateType() < 1 || dataReportDto.getDateType() > 4)) {
+            return new Result<>(false, StatusCode.ERROR, "未知数据类型!");
+        }
+        dataReportService.exportStackComparisonData(dataReportDto);
+        return new Result<>(true, StatusCode.OK, "导出成功!");
+    }
 }

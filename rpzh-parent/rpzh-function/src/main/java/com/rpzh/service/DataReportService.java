@@ -65,4 +65,6 @@ public interface DataReportService {
      * @return
      */
     Result<DataReportVo> findSummaryReportDetails(DataReportDto dataReportDto);
+
+    void exportStackComparisonData(DataReportDto dataReportDto);
 }

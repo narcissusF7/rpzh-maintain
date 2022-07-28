@@ -82,6 +82,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
             //查询 温湿度设备
             nodeVos = nodeDao.findHumitureDevice(monitorCondition);
+            //TODO 空调
             //查询空调设备
             nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
             //再排序
@@ -266,6 +267,10 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 }
 
                 nodeDataVos.add(nodeDataVo);
+
+            }else {
+                //如果设备不在缓存中
+                NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
 
             }
         }

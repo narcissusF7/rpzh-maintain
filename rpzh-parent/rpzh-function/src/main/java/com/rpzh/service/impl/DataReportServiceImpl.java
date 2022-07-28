@@ -516,4 +516,38 @@ public class DataReportServiceImpl implements DataReportService {
         }
         return new Result<>(true, StatusCode.OK, "查询成功!", PageDtoUtil.getPageDto(listTemp, dataReportDto.getPage(), dataReportDto.getSize()));
     }
+
+
+    @Override
+    public void exportStackComparisonData(DataReportDto dataReportDto) {
+        if (dataReportDto.getAcquisitionTimeOne() != null) {
+            dataReportDto.setAcquisitionTimeOne(DateUtil.beginOfDay(DateUtil.parse(dataReportDto.getAcquisitionTimeOne())).toString());
+        }
+        if (dataReportDto.getAcquisitionTimeTwo() != null) {
+            dataReportDto.setAcquisitionTimeTwo(DateUtil.endOfDay(DateUtil.parse(dataReportDto.getAcquisitionTimeTwo())).toString());
+        }
+        dataReportDto.setGatherSiteRoute(SiteRouteUtil.route(dataReportDto.getGatherSiteRoute(), dataReportDto.getWarehouseId()));
+
+
+        //查询当前数据
+        List<DataReportVo> dataReportNowVos = dataReportDao.findStackComparisonNow(dataReportDto);
+
+        //查询范围内数据
+        List<DataReportVo> dataReportVos = dataReportDao.findStackData(dataReportDto);
+
+//        dataReportVos.stream().map()
+
+//        Iterator<DataReportVo> iterator = dataReportNowVos.iterator();
+//        for (DataReportVo dataReportVo : dataReportVos) {
+//            while (iterator.hasNext()) {
+//                DataReportVo next = iterator.next();
+//                // 如果地址相同就赋值nowData数据
+//                if (next.getGatherSite().equals(dataReportVo.getGatherSite())) {
+//                    dataReportVo.setNowData(next.getNowData());
+//                    iterator.remove();
+//                    break;
+//                }
+//            }
+//        }
+    }
 }

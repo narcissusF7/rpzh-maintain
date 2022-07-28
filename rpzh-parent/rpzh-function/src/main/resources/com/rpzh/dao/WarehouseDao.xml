@@ -837,4 +837,39 @@
       #{id}
     </foreach>
   </select>
+    <select id="findStackBySiteNo" resultType="int">
+      select count(id) from
+      <if test="level == 1">
+        tb_warehouse
+      </if>
+      <if test="level == 2">
+        tb_building
+      </if>
+      <if test="level == 3">
+        tb_floor
+      </if>
+      <if test="level == 4">
+        tb_ware_area
+      </if>
+      <if test="level == 5">
+        tb_stack
+      </if>
+       where
+      <if test="level == 1">
+        code =
+      </if>
+      <if test="level == 2">
+        building_no
+      </if>
+      <if test="level == 3">
+        floor_no
+      </if>
+      <if test="level == 4">
+        area_no
+      </if>
+      <if test="level == 5">
+        stack_no =
+      </if>
+      #{siteNo}
+    </select>
 </mapper>

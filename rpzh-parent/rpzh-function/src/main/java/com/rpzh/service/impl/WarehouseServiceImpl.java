@@ -112,7 +112,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         //创建仓库账号
         warehouseDto.setUsername(username);
         int updateFlag = warehouseDao.updateWarehouse(warehouseDto);
-        updatePrincipal(warehouseDto.getPrincipalName(),warehouseDto.getId(),warehouseDto.getPidRoute());
+
+        updatePrincipal(warehouseDto.getPrincipalName(),warehouseDto.getId(),warehouseDto.getPidRoute(),1);
         return updateFlag;
     }
 
@@ -196,7 +197,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String username = userInfo.get("username");
         buildingDto.setUpdateUser(username);
         int updateFlag = warehouseDao.updateBuilding(buildingDto);
-        updatePrincipal(buildingDto.getPrincipalName(),buildingDto.getId(),buildingDto.getPidRoute());
+        updatePrincipal(buildingDto.getPrincipalName(),buildingDto.getId(),buildingDto.getPidRoute(),2);
         return updateFlag;
     }
 
@@ -253,7 +254,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         floorDto.setPidRoute(buildingVo.getPidRoute() + ",[" + WarehouseNodeType.BUILDING_NODE.getType() + ":" + buildingVo.getId() + "]");
         floorDto.setSiteName(buildingVo.getSiteName() + floorDto.getFloorName());
         int updateFlag = warehouseDao.updateFloor(floorDto);
-        updatePrincipal(floorDto.getPrincipalName(),floorDto.getId(),floorDto.getPidRoute());
+        updatePrincipal(floorDto.getPrincipalName(),floorDto.getId(),floorDto.getPidRoute(),3);
         return updateFlag;
     }
 
@@ -308,7 +309,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         String username = userInfo.get("username");
         wareAreaDto.setUpdateUser(username);
         int updateFlag = warehouseDao.updateWarearea(wareAreaDto);
-        updatePrincipal(wareAreaDto.getPrincipalName(),wareAreaDto.getId(),wareAreaDto.getPidRoute());
+        updatePrincipal(wareAreaDto.getPrincipalName(),wareAreaDto.getId(),wareAreaDto.getPidRoute(),4);
         return updateFlag;
     }
 
@@ -362,11 +363,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
         String username = userInfo.get("username");
-        Integer userId = Integer.valueOf(userInfo.get("userId"));
         stackDto.setLastUpdatedUser(username);
-        stackDto.setLastUpdatedUserId(userId);
         int updateFlag = warehouseDao.updateStack(stackDto);
-        updatePrincipal(stackDto.getPrincipalName(),stackDto.getStackId(),stackDto.getPidRoute());
+        updatePrincipal(stackDto.getPrincipalName(),stackDto.getStackId(),stackDto.getPidRoute(),5);
         return updateFlag;
     }
 
@@ -801,6 +800,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         return new Result(true, StatusCode.OK, "垛位都有新建养护计划",warehouseVos);
     }
 
+    @Override
+    public Integer findStackBySiteNo(String siteNo,Integer level) {
+        return warehouseDao.findStackBySiteNo(siteNo,level);
+    }
+
     /**
      * 将负责人放入缓存中
      * @param pidRoute
@@ -845,7 +849,32 @@ public class WarehouseServiceImpl implements WarehouseService {
      * @param siteId 位置id
      * @param pidRoute 位置路由
      */
-    public void updatePrincipal(String principalName,Integer siteId,String pidRoute){
+    public void updatePrincipal(String principalName,Integer siteId,String pidRoute,Integer level){
+        if (ToolUtil.isEmpty(pidRoute)){
+            switch (level){
+                case 1:
+                    WarehouseVo warehouse = findWarehouseById(siteId);
+                    pidRoute =warehouse.getPidRoute();
+                    break;
+                case 2:
+                    BuildingVo buildingVo = findBuildById(siteId);
+                    pidRoute =buildingVo.getPidRoute();
+                    break;
+                case 3:
+                    FloorVo floorVos = findOneFloor(siteId);
+                    pidRoute =floorVos.getPidRoute();
+                    break;
+                case 4:
+                    WareAreaVo wareAreaByOne = findWareAreaByOne(siteId);
+                    pidRoute =wareAreaByOne.getPidRoute();
+                    break;
+                case 5:
+                    StackVo stackVo = findStackById(siteId);
+                    pidRoute =stackVo.getPidRoute();
+                    break;
+                default:
+            }
+        }
         if (!ToolUtil.isEmpty(principalName)){
             String[] strs =  pidRoute.split(",");
             Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, strs.length+"_" + siteId);

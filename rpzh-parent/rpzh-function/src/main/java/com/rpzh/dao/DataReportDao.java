@@ -90,4 +90,6 @@ public interface DataReportDao {
     List<DataReportVo> findO2SummaryReportDetails(DataReportDto dataReportDto);
     @DS("clickhouse")
     List<DataReportVo> findTempSummaryReportDetails(DataReportDto dataReportDto);
+    @DS("clickhouse")
+    List<DataReportVo> findStackData(DataReportDto dataReportDto);
 }

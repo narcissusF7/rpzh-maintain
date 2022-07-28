@@ -103,4 +103,9 @@ public class DataReportDto {
      */
     private String paging;
 
+    /**
+     * 导出类型  1 日统计 2 周统计
+     */
+    private Integer exportType;
+
 }

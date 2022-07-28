@@ -286,4 +286,6 @@ public interface WarehouseService {
     List<WarehouseVo> locating();
 
     Result locatingMaintain();
+
+    Integer findStackBySiteNo(String siteNo,Integer level);
 }

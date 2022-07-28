@@ -592,4 +592,33 @@
         group by createTime,gatherSite
         ORDER BY createTime desc
     </select>
+    <select id="findStackData" resultType="com.rpzh.vo.DataReportVo">
+        select gather_site as gatherSite,
+        pid_route as pidRoute,
+        node_id nodeId
+        <if test="type==1">
+            temp temp
+        </if>
+        <if test="type==2">
+            humiture humiture
+        </if>
+        <if test="type==3">
+            oxygen oxygen
+        </if>
+        from
+        <if test="type==1 or type==2 ">tb_node_env_history</if>
+        <if test="type==3">tb_node_o2_history</if>
+        <where>
+            site_type = '05'
+            <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
+                and pid_route like concat(#{gatherSiteRoute},'%')
+            </if>
+            <if test="acquisitionTimeOne!=null">
+                and createdTime >=#{acquisitionTimeOne}
+            </if>
+            <if test="acquisitionTimeTwo!=null">
+                and createdTime &lt;=#{acquisitionTimeTwo}
+            </if>
+        </where>
+    </select>
 </mapper>
