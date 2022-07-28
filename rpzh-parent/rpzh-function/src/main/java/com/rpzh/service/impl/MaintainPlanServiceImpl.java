@@ -265,7 +265,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public MaintainPlanVo beforeUpdateMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
-        if(ToolUtil.isNotEmpty(maintainPlanVo)){
+        if(ToolUtil.isEmpty(maintainPlanVo)){
             return new MaintainPlanVo();
         }
         List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
@@ -284,7 +284,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         String createUser = TokenDecode.getUserInfo().get("username");
-        System.out.println(maintainPlanVo.getPhases());
         redisTemplate.opsForValue().set(createUser+"phases",maintainPlanVo.getPhases());
         return maintainPlanVo;
     }

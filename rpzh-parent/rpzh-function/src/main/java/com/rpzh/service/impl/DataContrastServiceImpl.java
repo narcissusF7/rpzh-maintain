@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * @Author: zyq
  * @Date: 2022/06/23/13:46
- * @Description: 功能
+ * @Description: 数据对比
  */
 @Service
 public class DataContrastServiceImpl implements DataContrastService {
@@ -33,6 +33,9 @@ public class DataContrastServiceImpl implements DataContrastService {
     @Resource
     private WarehouseDao warehouseDao;
 
+    /*
+    * 数据对比中的条件选择设备
+    */
     @Override
     public Result getNodeData(NodeDto nodeDto) {
         //获取设备类型
@@ -52,12 +55,13 @@ public class DataContrastServiceImpl implements DataContrastService {
         }
         //获取物料等级
         String materialCode = nodeDto.getMaterialCode();
+        //设备名称
         String nodeName = "";
         //满足条件的所有位置路由
         List<String> siteRoutes = null;
         //物料代码不为空
         if(ToolUtil.isNotEmpty(materialCode)) {
-            //根据物料代码查询位置路由
+            //根据物料代码查询位置路由(完整路由)
             siteRoutes = maintainPlanDao.findSite(materialCode);
         }
         //前端传入的位置路由和满足条件的所有位置路由都不为空
@@ -75,15 +79,19 @@ public class DataContrastServiceImpl implements DataContrastService {
         if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isEmpty(siteRoutes)) {
             int size = siteRoute.split(",").length;
             if(size<5){
+                //位置最多选择到层那一级
                 siteRoutes.addAll(warehouseDao.findWareAreaSiteRoute(siteRoute));
                 siteRoutes.addAll(warehouseDao.findStackSiteRoute(siteRoute));
             }else if(size==5){
+                //位置选择到仓间那一级
                 siteRoutes.addAll(warehouseDao.findStackSiteRoute(siteRoute));
             }else if(size==6){
+                //位置选择到垛位那一级
                 siteRoutes.add(siteRoute);
             }
         }
         List<NodeData> data = new ArrayList<>();
+        //contrastType: 01:设备  02:位置
         if("01".equals(nodeType) && "01".equals(contrastType)){
             nodeName = "氧气设备";
             data = nodeDao.findDataOxygen(siteRoutes);
@@ -111,38 +119,51 @@ public class DataContrastServiceImpl implements DataContrastService {
         }else {
             return new Result(false, StatusCode.ERROR, "设备类型出错了!");
         }
-
+        //查询出来的数据为空
         if(ToolUtil.isEmpty(data)){
             return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",new HashMap<>());
         }
+        //获取有关的仓间id
         List<Integer> areaIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==5).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("04:")[1].split("]")[0])).distinct().collect(Collectors.toList());
         Map<String, String> mapInfos = new HashMap<>();
         if(ToolUtil.isNotEmpty(areaIds)) {
-            warehouseDao.findWareAreaInfos(areaIds).forEach(wareAreaInfo -> {
-                mapInfos.put(wareAreaInfo.get("siteRoute"), wareAreaInfo.get("siteName") + "--" + "04");
+            //获取有关的仓间名称
+            List<Map<String, String>> wareAreaInfos = warehouseDao.findWareAreaInfos(areaIds);
+            //将仓间类型、名称设置到mapInfos中
+            wareAreaInfos.forEach(wareAreaInfo -> {
+                mapInfos.put(wareAreaInfo.get("siteRoute"), wareAreaInfo.get("siteName"));
+                mapInfos.put(wareAreaInfo.get("siteRoute")+"_siteType","04");
             });
         }
+        //获取有关的垛位id
         List<Integer> stackIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==6).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("05:")[1].split("]")[0])).distinct().collect(Collectors.toList());
         if(ToolUtil.isNotEmpty(stackIds)) {
-            warehouseDao.findStackInfos(stackIds).forEach(stackInfo -> {
-                mapInfos.put(stackInfo.get("siteRoute"), stackInfo.get("siteName") + "--" + "05");
+            //获取有关的垛位名称
+            List<Map<String, String>> stackInfos = warehouseDao.findStackInfos(stackIds);
+            //将垛位类型、名称设置到mapInfos中
+            stackInfos.forEach(stackInfo -> {
+                mapInfos.put(stackInfo.get("siteRoute"), stackInfo.get("siteName"));
+                mapInfos.put(stackInfo.get("siteRoute")+"_siteType","05");
             });
         }
-        String node = nodeName;
-        data.forEach(dataInfo -> {
-            String[] mapVo = mapInfos.get(dataInfo.getPidRoute()).split("--");
-            dataInfo.setSiteName(mapVo[0]);
-            if("01".equals(nodeType) && "04".equals(mapVo[1])){
-                dataInfo.setNodeName("仓间"+node);
-            }else if("01".equals(nodeType) && "05".equals(mapVo[1])){
-                dataInfo.setNodeName("垛内"+node);
+        for (NodeData dataInfo : data) {
+            //设置位置名称
+            dataInfo.setSiteName(mapInfos.get(dataInfo.getPidRoute()));
+            //设置曲线名称
+            if("01".equals(nodeType) && "04".equals(mapInfos.get(dataInfo.getPidRoute()+"_siteType"))){
+                dataInfo.setNodeName("仓间"+nodeName);
+            }else if("01".equals(nodeType) && "05".equals(mapInfos.get(dataInfo.getPidRoute()+"_siteType"))){
+                dataInfo.setNodeName("垛内"+nodeName);
             }else{
-                dataInfo.setNodeName(node);
+                dataInfo.setNodeName(nodeName);
             }
-        });
+        }
         return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",data);
     }
 
+    /*
+    * 数据对比
+    */
     @Override
     public Result getNodeDateList(DataContrastDto dataContrastDto) {
         String siteRoute = dataContrastDto.getSiteRoute();
@@ -154,6 +175,9 @@ public class DataContrastServiceImpl implements DataContrastService {
         }
         //时间类型
         String gatherType= dataContrastDto.getGatherType();
+        if(!("1".equals(gatherType)) && !("2".equals(gatherType)) && !("3".equals(gatherType)) && !("4".equals(gatherType))){
+            return new Result(false, StatusCode.ERROR, "时间类型错误!");
+        }
         //采集的开始时间startTime、结束时间endTime
         Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
         dataContrastDto.setStartTime(setTime.get("startTime"));
@@ -161,16 +185,20 @@ public class DataContrastServiceImpl implements DataContrastService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String startTime = sdf.format(dataContrastDto.getStartTime());
         String endTime = sdf.format(dataContrastDto.getEndTime());
-        String beginTime = null;
-        String finishTime = null;
+        //对比的开始时间beginTime、结束时间finishTime
+        String beginTime="";
+        String finishTime="";
         if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
             beginTime = sdf.format(dataContrastDto.getBeginTime());
             finishTime = sdf.format(dataContrastDto.getFinishTime());
         }
+        //获取采集的所有时间
         List<String> timeDays = new ArrayList<>();
+        //获取对比的所有时间
         List<String> contrastDays = new ArrayList<>();
         switch (gatherType){
             case "1":
+                //按天统计
                 gatherType = "formatDateTime(transfer_time,'%Y-%m-%d')";
                 timeDays = GetBetweenDayUtils.getBetweenDays(startTime, endTime);
                 if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
@@ -178,6 +206,7 @@ public class DataContrastServiceImpl implements DataContrastService {
                 }
                 break;
             case "2":
+                //按周统计
                 gatherType = "toMonday(transfer_time)";
                 timeDays = GetBetweenDayUtils.getBetweenWeek(startTime, endTime);
                 if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
@@ -185,6 +214,7 @@ public class DataContrastServiceImpl implements DataContrastService {
                 }
                 break;
             case "3":
+                //按月统计
                 gatherType = "formatDateTime(transfer_time,'%Y-%m')";
                 timeDays = GetBetweenDayUtils.getMonthBetweenDate(startTime, endTime);
                 if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
@@ -199,8 +229,11 @@ public class DataContrastServiceImpl implements DataContrastService {
                 }
                 break;
         }
+        //曲线数据
         String nodeName = "";
+        //采集的数据
         List<Map<String,Object>> data = new ArrayList<>();
+        //对比的数据
         List<Map<String,Object>> contrastData = new ArrayList<>();
         if("01".equals(nodeType)){
             if(siteRoute.split(",").length==5) {
@@ -260,6 +293,7 @@ public class DataContrastServiceImpl implements DataContrastService {
         }
         nodeName = nodeId + siteName + "、" + nodeName;
         List<String> days = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
+        //将没有的采集日期补0
         for (String timeDay : timeDays) {
             if(!days.contains(timeDay)){
                 Map<String,Object> map = new HashMap<>();
@@ -268,12 +302,14 @@ public class DataContrastServiceImpl implements DataContrastService {
                 data.add(map);
             }
         }
+        //按日期排序
         data.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
         Map<String,Object> mapInfo = new HashMap<>();
         mapInfo.put("data",data);
         mapInfo.put("nodeName",nodeName);
         if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
             List<String> contrastDates = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
+            //将没有的对比日期补0
             for (String contrastDay : contrastDays) {
                 if(!contrastDays.contains(contrastDay)){
                     Map<String,Object> map = new HashMap<>();
@@ -282,10 +318,10 @@ public class DataContrastServiceImpl implements DataContrastService {
                     contrastData.add(map);
                 }
             }
+            //按日期排序
             contrastData.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
             mapInfo.put("contrastData",contrastData);
         }
-
         return new Result<>(true, StatusCode.OK, "数据对比成功!",mapInfo);
     }
 }
