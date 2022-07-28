@@ -175,4 +175,19 @@ public interface TaskManagementService {
      * @return
      */
     Map taskCountByTypeMap(TaskDto taskDto);
+
+    /**
+     * 查询是否存在指定位置指定类型的任务
+     * @param siteRoute
+     * @param type
+     * @return
+     */
+    Integer findTaskBySiteRoute(String siteRoute, String type);
+
+    /**
+     * 添加数据处理发送过来的任务
+     * @param taskDto
+     * @return
+     */
+    int addDataHandTask(TaskDto taskDto);
 }

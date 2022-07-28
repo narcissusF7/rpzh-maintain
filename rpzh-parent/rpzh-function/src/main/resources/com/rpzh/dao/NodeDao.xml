@@ -274,9 +274,9 @@
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
 
         <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            SELECT t.id , t.nodeId ,t.stackId from (
+            SELECT t.id , t.nodeId ,t.stackId t.nodeType from (
         </if>
-        select id id,node_id nodeId,stack_id stackId from tb_node tnode
+        select id id,node_id nodeId,stack_id stackId ,node_type nodeType from tb_node tnode
         <where>
             <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
                 and site_route like  concat('%', #{monitorCondition.pidRoute},'%')
@@ -317,7 +317,17 @@
         <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
     </select>
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
-        select id ,`type` , temp, node_id nodeId, frequency , voltage , signal_strength signalStrength ,
+        select id ,`type` ,
+        <if test="tableName == 'tb_node_o2_history'">
+            oxygen ,
+        </if>
+        <if test="tableName == 'tb_node_env_history'">
+            temp ,humiture,
+        </if>
+        <if test="tableName == 'tb_node_temp_core_chip_history'">
+            temp ,
+        </if>
+         node_id nodeId, frequency , voltage , signal_strength signalStrength ,
                stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
                site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route pidRoute,site_x siteX,site_y siteY,site_z siteZ
         from ${tableName}

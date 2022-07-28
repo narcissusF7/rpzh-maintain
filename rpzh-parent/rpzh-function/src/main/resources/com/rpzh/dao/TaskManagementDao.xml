@@ -556,4 +556,7 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
         select deal_method as dealMethod,deal_result as remark from tb_task
         where 1=1 <if test="id != null and id != ''">and id = #{id}</if>
     </select>
+    <select id="findTaskBySiteRoute" resultType="java.lang.Integer">
+        select count(*) from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
+    </select>
 </mapper>

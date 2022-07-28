@@ -244,7 +244,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             Object o = redisTemplate.opsForValue().get(DataHandler.MAINTAIN_CACHE_NODE+nodeVo.getNodeId());
             if (!ToolUtil.isEmpty(data)){
                 NodeDataVo nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
-                NodeData nodeData =JSON.parseObject(o.toString(), NodeData.class);
+                NodeData nodeData =JSON.parseObject(data.toString(), NodeData.class);
                 try {
                     //传输时间的时间戳
                     long time = DateFormat.getDateInstance().parse(nodeDataVo.getTransferTime()).getTime();
@@ -269,7 +269,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 nodeDataVos.add(nodeDataVo);
 
             }else {
-                //如果设备不在缓存中
+                //TODO 如果设备不在缓存中
                 NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
 
             }

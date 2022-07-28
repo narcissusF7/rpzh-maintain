@@ -820,7 +820,7 @@ public class WarehouseServiceImpl implements WarehouseService {
             Integer id = Integer.parseInt(str.substring(4,str.length()-1));
             Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
             if (!ToolUtil.isEmpty(o)){
-                map = JSONObject.parseObject(o+"",HashMap.class);
+                map = (Map)o;
                 break;
             }
         }

@@ -397,4 +397,6 @@ public interface TaskManagementDao {
     List<Map> pestCountDetail(@Param("id") String id);
 
     Map findInfo(@Param("id") String id);
+
+    Integer findTaskBySiteRoute(@Param("siteRoute")String siteRoute, @Param("type")String type);
 }

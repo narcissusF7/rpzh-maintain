@@ -1,16 +1,20 @@
 package com.rpzh.handler;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
+import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
+import com.rpzh.service.TaskManagementService;
+import com.rpzh.service.impl.WarehouseServiceImpl;
 import com.rpzh.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +55,12 @@ public class DataHandler {
 
     @Autowired
     MaintainPlanDao maintainPlanDao;
+
+    @Autowired
+    WarehouseServiceImpl warehouseService;
+
+    @Autowired
+    TaskManagementService taskManagementService;
 
     @Value("${node.voltage}")
     Double voltage;
@@ -100,6 +110,7 @@ public class DataHandler {
         Double data = parseData.getData().get(0);
         //判断当前数据所属等级
         int level = decideValue(data, list);
+        level = level==-1 ? 1:level;
         //siteRoute 例[00:0],[01:2],[02:1],[03:1],[04:1]
         Integer areaId = Integer.parseInt(hashKeys.get(4).substring(2));
         //温度处理
@@ -111,7 +122,7 @@ public class DataHandler {
 
         //湿度数据等级
         level = decideValue(data, list.subList(4, 8));
-
+        level = level==-1 ? 1:level;
         //湿度处理
         level = earlyWarningHandle(level, parseData, "humidity", areaId);
         if (nodeData.getAlertLevel()<level){
@@ -145,21 +156,6 @@ public class DataHandler {
 
         NodeVo nodeVo = getNodeVo(o,parseData.getNodeId());
 
-//        if (ToolUtil.isEmpty(o)){
-//            nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
-//            if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
-//                //查询对应的养护计划 养护计划阶段
-//                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
-//                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
-//                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
-//                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
-//                //设置该预警id
-//                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
-//            }
-//            redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + parseData.getNodeId(),JSON.toJSONString(nodeVo));
-//        }else {
-//            nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
-//        }
         //如果设备处于是解垛状态  数据不做任何处理
         if (nodeVo.getStatus().equals("0")){
             return;
@@ -170,20 +166,8 @@ public class DataHandler {
         //判断电量
         decideFault(parseData.getVoltage(),voltage,WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN,parseData);
 
-        //判断缓存中是否存在该设备的预警 且预警包含电量预警
-//        if (parseData.getVoltage() < voltage) {
-//            warningType= warningType +","+WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN;
-//            //判断数据库中该设备是否存在未处理的低电量预警
-//            nodeMalfunction(parseData, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData.getVoltage());
-//        }
         //判断信号强度
         decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
-
-        //判断丢包个数  丢包预警在监控那边判断
-//        if (parseData.getPacketLossNum() > 0) {
-//            warningType= warningType +","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN;
-//            nodeMalfunction(parseData, WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN, parseData.getPacketLossNum().doubleValue());
-//        }
 
 
         //该设备需要预警的字段
@@ -225,7 +209,7 @@ public class DataHandler {
                 data = parseData.getData().get(i);
                 //判断当前数据所属等级
                 int tempLevel = decideValue(data, list);
-
+                tempLevel = tempLevel==-1 ? 1:tempLevel;
                 //温度处理
                 earlyWarningHandle(nodeVo, tempLevel, parseData, data, "temp");
                 //设置温度预警等级
@@ -235,7 +219,7 @@ public class DataHandler {
 
                 //湿度数据等级
                 int humidityLevel = decideValue(data, list.subList(4, 8));
-
+                humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
                 //湿度处理
                 earlyWarningHandle(nodeVo, humidityLevel, parseData, data, "humidity");
                 //设置湿度预警等
@@ -248,6 +232,7 @@ public class DataHandler {
                 data = parseData.getData().get(0);
                 //判断当前数据所属等级
                 int level = decideValue(data, list);
+                level = level==-1 ? 1:level;
                 //处理该设备数据
                 earlyWarningHandle(nodeVo, level, parseData, data);
             }
@@ -385,7 +370,7 @@ public class DataHandler {
         } else if (value > list.get(2)) {
             level = 1;
         } else if (list.size() > 3 && value < list.get(3)) {
-            level = 1;
+            level = -1;
         }
         return level;
     }
@@ -479,7 +464,8 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
-        String siteRoute = nodeDao.findByNodeId(nodeVo.getNodeId()).getSiteRoute();
+        NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
+        String siteRoute = nodeVo1.getSiteRoute();
         earlyWarning.setSiteRoute(siteRoute);
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
@@ -491,8 +477,15 @@ public class DataHandler {
         } else if (level > 0) {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
-            setLevel(earlyWarning, level, data);
+            if (level==-1){
+                addTask(nodeVo1,"19");
+                setLevel(earlyWarning, 1, data);
+            }else {
+                addTask(nodeVo1,"13");
+                setLevel(earlyWarning, level, data);
+            }
             earlyWarningDao.insertWarning(earlyWarning);
+
         }
 
     }
@@ -595,8 +588,11 @@ public class DataHandler {
                 setLevel(earlyWarning, level, data);
                 //设置主键id
                 earlyWarning.setId(earlyWarningVo.getId());
+
                 //更新数据
                 earlyWarningDao.updateWarning(earlyWarning);
+                NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+                addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
             }
             if (level==3){
                 //达到3级 不用连续预警
@@ -608,33 +604,13 @@ public class DataHandler {
         } else {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             if (level > 0) {
-                //判断是否是仓间设备
-                boolean isNodeStack =  NodeConstant.NODE_STACK.equals(siteType);
-                //如果不为空即该设备为温湿度设备
-                String type="";
-                if (!ToolUtil.isEmpty(evnType)) {
-                    //温湿度 温度预警
-                    if ("temp".equals(evnType)) {
-                        type = isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING;
-                        //温湿度 湿度预警
-                    } else if ("humidity".equals(evnType)) {
-                        type = isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING;
-                    }
-                } else {
-                    switch (parseData.getNodeType()) {
-                        //氧气设备
-                        case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
-                            type = isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING;
-                            break;
-                        //包芯温度设备
-                        case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
-                            type = WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING;
-                            break;
-                    }
-                }
+                String[] dexxx = dexxx(siteType, evnType, parseData.getNodeType());
+                String type=dexxx[0];
+                String taskType =dexxx[1];
                 earlyWarning.setWarningType(type);
                 warningType = warningType +","+type;
-                String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
+                NodeVo nodeVo1 =nodeDao.findByNodeId(parseData.getNodeId());
+                String siteRoute = nodeVo1.getSiteRoute();
                 earlyWarning.setSiteRoute(siteRoute);
                 //设置设备id
                 earlyWarning.setNodeId(parseData.getNodeId());
@@ -642,6 +618,7 @@ public class DataHandler {
                 earlyWarning.setNodeType(parseData.getNodeType());
                 setLevel(earlyWarning, level, data);
                 earlyWarningDao.insertWarning(earlyWarning);
+                addTask(nodeVo1,taskType);
                 //往redis中设置连续预警次数为1
                 if (level < 3) {
                     redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, 1);
@@ -675,7 +652,8 @@ public class DataHandler {
                 //获取预警类ing
                 String warningType = nodeDataVo.getWarningType();
                 //如果包含当前校验的类型
-                if (warningType.contains(type)){
+
+                if (!ToolUtil.isEmpty(warningType)&&warningType.contains(type)){
                     earlyWarningDao.updateWarningType(parseData.getNodeId(),type);
                 }
             }
@@ -700,5 +678,57 @@ public class DataHandler {
             nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
         }
         return nodeVo;
+    }
+
+    //添加任务
+    public void addTask(NodeVo nodeVo ,String type){
+        //查询该垛位、仓间下该类型任务是否存在
+        Integer count = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
+        if (count<1){
+            Map<String, Object> map = warehouseService.getSitePrincipal(nodeVo.getSiteRoute().split(",").length-1, nodeVo.getSiteId());
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            taskManagementService.addDataHandTask(taskDto);
+        }
+    }
+
+    /**
+     * 判断 设备预警类型 任务类型
+     * @param siteType
+     * @param evnType
+     * @param nodeType
+     * @return
+     */
+    public String[] dexxx(String siteType,String evnType,String nodeType ){
+        String type="";
+        String taskType ="";
+        //判断是否是仓间设备
+        boolean isNodeStack =  NodeConstant.NODE_STACK.equals(siteType);
+        //如果不为空即该设备为温湿度设备
+
+        if (!ToolUtil.isEmpty(evnType)) {
+            //温湿度 温度预警
+            if ("temp".equals(evnType)) {
+                type = isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING;
+                taskType = isNodeStack ? "08":"09";
+                //温湿度 湿度预警
+            } else if ("humidity".equals(evnType)) {
+                type = isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING;
+                taskType = isNodeStack ? "10":"11";
+            }
+        } else {
+            switch (nodeType) {
+                //氧气设备
+                case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
+                    type = isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING;
+                    taskType = isNodeStack ? "06":"07";
+                    break;
+                //包芯温度设备
+                case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
+                    type = WarningTypeConstant.CORE_TEMP_OVERRUN_WARNING;
+                    taskType = "12";
+                    break;
+            }
+        }
+        return new String[]{type,taskType};
     }
 }

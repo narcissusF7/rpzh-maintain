@@ -257,7 +257,9 @@ public class TestContrller{
 
     @PostMapping("six")
     public Result six(){
-        Object data = redisTemplate.opsForValue().get("MAINTAIN_83DD43E8");
+        Map<String, Object> map = new HashMap<>();
+        map.put("username","ljj");
+        redisTemplate.opsForHash().put("WAREHOUSE_PRINCIPAL","1_1",map);
         return new Result<>(true, StatusCode.OK, "测试方法4");
     }
 }

@@ -1063,6 +1063,11 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         return mapAll;
     }
 
+    @Override
+    public Integer findTaskBySiteRoute(String siteRoute, String type) {
+        return taskManagementDao.findTaskBySiteRoute(siteRoute,type);
+    }
+
 
     /**
      * 获取两个日期之间的所有日期 (年月日)
@@ -1163,5 +1168,40 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             e.printStackTrace();
         }
         return list;
+    }
+
+    /**
+     * 新建数据处理发送过来的任务
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public int addDataHandTask(TaskDto taskDto) {
+        //获取当前时间
+        String nowDayTime = DateUtil.dateNew(new Date()).toString();
+        taskDto.setCreatedTime(nowDayTime);
+        //获取结束时间,用于计算时间差
+        String endTime = taskDto.getEndTime();
+        Date date1 = DateUtil.parse(endTime);
+        //设置当前时间,用于计算时间差
+        Date date2 = DateUtil.parse(nowDayTime);
+        //当前时间与结束时间相差的毫秒数
+        long betweenMs = DateUtil.between(date1, date2, DateUnit.MS);
+        //当前时间与结束时间相差的毫秒字符串
+        String betweenMsStr = String.valueOf(betweenMs);
+        //  todo:任务过期
+        //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
+        /*rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws AmqpException {
+                //消息过期设置
+                message.getMessageProperties().setExpiration(betweenMsStr);
+                return message;
+            }
+        });*/
+        log.info("新建任务发送消息成功:" + taskDto.getTaskNum() + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
+        int addFlag = taskManagementDao.addTask(taskDto);
+        return addFlag;
     }
 }
