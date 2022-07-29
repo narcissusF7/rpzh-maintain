@@ -936,6 +936,45 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     /**
+     * 判断楼层编号是否存在
+     *
+     * @param floorNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findFloorNo(String floorNo, Integer id) {
+        int count = warehouseDao.findFloorNo(floorNo,id);
+        return count;
+    }
+
+    /**
+     * 判断分区编号是否存在
+     *
+     * @param areaNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findWareAreaNo(String areaNo, Integer id) {
+        int count = warehouseDao.findWareAreaNo(areaNo,id);
+        return count;
+    }
+
+    /**
+     * 判断垛位编号是否存在
+     *
+     * @param stackNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findStackNo(String stackNo, Integer id) {
+        int count = warehouseDao.findStackNo(stackNo,id);
+        return count;
+    }
+
+    /**
      * 将负责人放入缓存中
      * @param pidRoute
      * @param map
@@ -948,9 +987,10 @@ public class WarehouseServiceImpl implements WarehouseService {
             Integer level = strs.length-i-1;
             String str = strs[level];
             Integer id = Integer.parseInt(str.substring(4,str.length()-1));
-            Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
-            if (!ToolUtil.isEmpty(o)){
-                map = (Map)o;
+            //获取负责人信息
+            Object warehouseprincipal = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
+            if (!ToolUtil.isEmpty(warehouseprincipal)){
+                map = JSONObject.parseObject(warehouseprincipal.toString(),Map.class);
                 break;
             }
         }

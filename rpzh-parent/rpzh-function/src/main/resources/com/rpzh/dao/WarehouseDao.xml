@@ -859,13 +859,13 @@
         code =
       </if>
       <if test="level == 2">
-        building_no
+        building_no =
       </if>
       <if test="level == 3">
-        floor_no
+        floor_no =
       </if>
       <if test="level == 4">
-        area_no
+        area_no =
       </if>
       <if test="level == 5">
         stack_no =
@@ -921,5 +921,20 @@
   SELECT count(1)
   FROM tb_stack
   WHERE name_cn = #{nameCn} and area_id = #{areaId} and id != #{id}
+</select>
+<select id="findFloorNo" resultType="int">
+  SELECT count(*)
+  FROM tb_floor
+  WHERE floor_no = #{floorNo} and id != #{id}
+</select>
+<select id="findWareAreaNo" resultType="int">
+ SELECT count(1)
+ FROM tb_ware_area
+ WHERE area_no = #{areaNo} and id != #{id}
+</select>
+<select id="findStackNo" resultType="int">
+ SELECT count(*)
+ FROM tb_stack
+ WHERE stack_no = #{stackNo} and id != #{id}
 </select>
 </mapper>
