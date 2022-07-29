@@ -25,9 +25,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @Author liubc
@@ -244,6 +243,12 @@ public class TestContrller{
     )})
     @PostMapping("testParseData")
     public Result testParseData(@ApiIgnore ParseData parseData){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            list.add(sdf.format(new Date()));
+        }
+        parseData.setDateTime(list);
         dataHandler.handlerData(parseData);
         return new Result<>(true, StatusCode.OK, "测试方法4");
     }
