@@ -948,9 +948,10 @@ public class WarehouseServiceImpl implements WarehouseService {
             Integer level = strs.length-i-1;
             String str = strs[level];
             Integer id = Integer.parseInt(str.substring(4,str.length()-1));
-            Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
-            if (!ToolUtil.isEmpty(o)){
-                map = (Map)o;
+            //获取负责人信息
+            Object warehouseprincipal = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + id);
+            if (!ToolUtil.isEmpty(warehouseprincipal)){
+                map = JSONObject.parseObject(warehouseprincipal.toString(),Map.class);
                 break;
             }
         }

@@ -859,13 +859,13 @@
         code =
       </if>
       <if test="level == 2">
-        building_no
+        building_no =
       </if>
       <if test="level == 3">
-        floor_no
+        floor_no =
       </if>
       <if test="level == 4">
-        area_no
+        area_no =
       </if>
       <if test="level == 5">
         stack_no =
