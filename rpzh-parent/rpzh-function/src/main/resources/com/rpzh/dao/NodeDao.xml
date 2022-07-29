@@ -37,6 +37,17 @@
             limit 1
     </select>
 
+    <select id="findCountByNodeID" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tb_node
+        WHERE node_id = #{nodeId}
+    </select>
+    <select id="findCountByCaseNo" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tb_node
+        WHERE case_no = #{caseNo}
+    </select>
+
     <update id="updateNode">
         UPDATE tb_node
         <set>

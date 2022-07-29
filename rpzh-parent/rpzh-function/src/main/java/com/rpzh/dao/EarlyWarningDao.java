@@ -71,17 +71,9 @@ public interface EarlyWarningDao {
     int updateRepairId(@Param("affirm") String affirm, @Param("deviceId") String deviceId, @Param("id") String id,
                        @Param("principal") String principal, @Param("dealTime") String dealTime);
 
-    List<String> findBySiteRoute();
-
-    Integer findCountEarly(@Param("siteRoute") String siteRoute);
-
-    List<String> findEarlyData(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade, @Param("warningType") String warningType);
-
-    Integer findCountWarningGrade(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade);
-
     List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
 
     Integer findThreeWarningGradeCount(@Param("siteRoute") String siteRoute);
 
-    List<String> findThreeBySiteRoute();
+    List<String> findSiteRoute(@Param("warningGrade")String warningGrade);
 }

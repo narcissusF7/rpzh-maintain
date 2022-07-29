@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 @Component
@@ -23,7 +24,10 @@ public class RfIdNettyServer {
 
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
-    ChannelFuture channelFuture;
+    /**
+     * 启动netty服务
+     * @throws InterruptedException
+     */
     @PostConstruct
     public void init () throws Exception{
             //创建服务端的启动对象，设置参数
@@ -37,25 +41,21 @@ public class RfIdNettyServer {
                     //设置保持活动连接状态
 //                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     //使用匿名内部类的形式初始化通道对象
-                    .childHandler(/*new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            //给pipeline管道设置处理器
-                            socketChannel.pipeline().addLast(new MyServerHandler());
-                        }
-                    }*/ rfIdNettyServerFilter);//给workerGroup的EventLoop对应的管道设置处理器
-            log.info("java技术爱好者的服务端已经准备就绪...");
+                    .childHandler(rfIdNettyServerFilter);//给workerGroup的EventLoop对应的管道设置处理器
             //绑定端口号，启动服务端
-            channelFuture = bootstrap.bind(6666).sync();
+        ChannelFuture channelFuture = bootstrap.bind(6666).sync(); //硬件上的端口
+        if (channelFuture.isSuccess()) {
+            log.info("启动 Netty 端口号为:6666 成功");
+        }
     }
 
-    public void exitNetty() throws Exception{
-        try{
-            //对关闭通道进行监听
-            channelFuture.channel().closeFuture().sync();
-        }finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+    /**
+     * 销毁
+     */
+    @PreDestroy
+    public void destroy() {
+        bossGroup.shutdownGracefully().syncUninterruptibly();
+        workerGroup.shutdownGracefully().syncUninterruptibly();
+        log.info("关闭 Netty 成功");
     }
 }

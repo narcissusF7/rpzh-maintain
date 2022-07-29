@@ -650,6 +650,7 @@
   <select id = "findWareAreaPrincipalName" resultType="com.rpzh.vo.WareAreaVo">
     select
       principal_id as principalId,
+      site_name as siteName,
       principal_name as principalName,
       floor_id as floorId
     from tb_ware_area
@@ -805,7 +806,7 @@
 
   <select id="findStackPrincipalName" resultType="com.rpzh.vo.StackVo">
     select
-      principal_id as principalId,
+      principal_name as principalName,
       area_id as areaId
     from tb_stack
     where id = #{stackId}

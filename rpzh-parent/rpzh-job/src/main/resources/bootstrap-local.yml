@@ -51,4 +51,10 @@ hystrix:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
 
+rocketmq:
+  name-server: 192.168.3.36:9876
+  topic: messageTopic # mq主题
+  producer:
+    group: MessageGroup
+
 

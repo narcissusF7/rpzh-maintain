@@ -131,4 +131,16 @@ public class EarlyWarningController {
                                @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime) {
         earlyWarningService.updateRepairId(affirm, deviceId, id, principal,dealTime);
     }
+
+    @PostMapping("/warningSend")
+    @ApiOperation(value = "发送预警短信")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "number", value = "手机号", dataType = "String",required = true),
+            @ApiImplicitParam(name = "username", value = "用户名", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String",required = true)
+    })
+    public Result warningSend(String number,String username,String siteRoute){
+        earlyWarningService.warningSend(number,username,siteRoute);
+        return new Result<>(true, StatusCode.OK, "发送预警短信成功");
+    }
 }

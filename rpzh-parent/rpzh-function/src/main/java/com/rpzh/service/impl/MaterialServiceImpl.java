@@ -3,6 +3,7 @@ package com.rpzh.service.impl;
 import com.rpzh.dao.*;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaterialService;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.*;
 import org.springframework.stereotype.Service;
@@ -43,24 +44,26 @@ public class MaterialServiceImpl implements MaterialService {
         return materialDao.findAllMaterialCodes();
     }
 
+    @Resource
+    private RedisUtil redisUtil;
     public Integer getPrincipalName(Integer stackId){
         StackVo stackVo = warehouseDao.findStackPrincipalName(stackId);
-        if (!ToolUtil.isEmpty(stackVo.getPrincipalId())) {
-            return stackVo.getPrincipalId();
+        if (!ToolUtil.isEmpty(stackVo.getPrincipalName())) {
+            return Integer.parseInt(redisUtil.hget("USER_"+stackVo.getPrincipalName(),"userId").toString());
         }
         WareAreaVo wareAreaVo = warehouseDao.findWareAreaPrincipalName(stackVo.getAreaId());
-        if (ToolUtil.isNotEmpty(wareAreaVo.getPrincipalId())) {
-            return wareAreaVo.getPrincipalId();
+        if (ToolUtil.isNotEmpty(wareAreaVo.getPrincipalName())) {
+            return Integer.parseInt(redisUtil.hget("USER_"+wareAreaVo.getPrincipalName(),"userId").toString());
         }
         FloorVo floorVo = warehouseDao.findFloorPrincipalName(wareAreaVo.getFloorId());
-        if (ToolUtil.isEmpty(wareAreaVo.getPrincipalId()) && ToolUtil.isNotEmpty(floorVo.getPrincipalId())) {
-            return floorVo.getPrincipalId();
+        if (ToolUtil.isEmpty(wareAreaVo.getPrincipalName()) && ToolUtil.isNotEmpty(floorVo.getPrincipalName())) {
+            return Integer.parseInt(redisUtil.hget("USER_"+floorVo.getPrincipalName(),"userId").toString());
         }
         BuildingVo buildingVo = warehouseDao.findBuildingPrincipalName(floorVo.getBuildingId());
-        if (ToolUtil.isEmpty(wareAreaVo.getPrincipalId()) && ToolUtil.isEmpty(floorVo.getPrincipalId()) && ToolUtil.isNotEmpty(buildingVo.getPrincipalId())) {
-            return  buildingVo.getPrincipalId();
+        if (ToolUtil.isEmpty(wareAreaVo.getPrincipalName()) && ToolUtil.isEmpty(floorVo.getPrincipalName()) && ToolUtil.isNotEmpty(buildingVo.getPrincipalName())) {
+            return Integer.parseInt(redisUtil.hget("USER_"+buildingVo.getPrincipalName(),"userId").toString());
         }
         WarehouseVo warehouseVo = warehouseDao.findWarehousePrincipalName(buildingVo.getWarehouseId());
-        return warehouseVo.getPrincipalId();
+        return Integer.parseInt(redisUtil.hget("USER_"+warehouseVo.getPrincipalName(),"userId").toString());
     }
 }

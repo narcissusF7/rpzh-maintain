@@ -1,7 +1,6 @@
 package com.rpzh.netty;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.rpzh.dao.NodeDao;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -9,44 +8,86 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Component
 @ChannelHandler.Sharable
 @Slf4j
 public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
-    public static Map<String, Integer> map = new LinkedHashMap<>();
-    //  该部分功能需要设备采集后确定数据解析规则后完善
+
+    @Resource
+    private NodeDao nodeDao;
+    /**
+     * 获取数据
+     *
+     * @param ctx 上下文
+     * @param msg 获取的数据
+     * @throws UnsupportedEncodingException
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        // TODO msg为接收到的客户端传递的数据
+        //msg为接收到的客户端传递的数据   个人这边直接传的json 数据
         String str = msg.toString();
-        JSONObject jsonObject = JSONObject.parseObject(str);
-
         log.info("原始数据" + str);
-
-
-        log.info("长度" + str.length());
-        Map map=new HashMap();
-        if (jsonObject!=null&&!jsonObject.equals("")){
-            map.put("status",400);
-
-        }else{
-            map.put("status",500);
-
+        String DEVSN = "";
+        int tagNum = 0;
+        if(str.indexOf("435400") != -1){
+            String strMeg = str.replaceFirst("435400","");
+            if(strMeg.length() > 24){
+                //获取RFID读卡器SN识别码
+                DEVSN = strMeg.substring(8, 22);
+                //获取当前数据中所含标签数量
+                tagNum = Integer.parseInt(strMeg.substring(22,24),16);
+                int site = 24;
+                for (int i = 0; i < tagNum; i++) {
+                    //获取当前标签数据的长度
+                    int count = Integer.parseInt(strMeg.substring(site, site+2), 16);
+                    //获取当前标签的设备id
+                    String nodeId = strMeg.substring(site + 6, site + 14);
+                    Integer nodeCount = findNodeId(nodeId);
+                    if(nodeCount>0){
+                        String rmsg = "53 57 00 03 FF 86 CE";
+                        byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
+                        ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
+                        ctx.writeAndFlush(message);//返回信息
+                        ctx.writeAndFlush(message);//返回信息
+                        break;
+                    }else{
+                        site = site + count * 2 + 2;
+                    }
+                }
+            }
         }
-        String rmsg = JSONObject.toJSONString(map,
-                SerializerFeature.DisableCircularReferenceDetect,
-                SerializerFeature.WriteNullStringAsEmpty);
-
-        log.info(rmsg);
-        ByteBuf message = Unpooled.copiedBuffer(rmsg.getBytes());//处理返回的信息
-        //ctx.write(in2);//返回信息
-        ctx.writeAndFlush(message);//返回信息
         //刷新缓存区
         ctx.flush();
     }
+
+    public static byte[] hexStrToBinaryStr(String hexString) {
+        hexString = hexString.replaceAll(" ", "");
+        int len = hexString.length();
+        int index = 0;
+        byte[] bytes = new byte[len / 2];
+        while (index < len) {
+            String sub = hexString.substring(index, index + 2);
+            bytes[index / 2] = (byte) Integer.parseInt(sub, 16);
+            index += 2;
+        }
+        return bytes;
+    }
+
+
+    /*
+    * 判断设备id是否存在
+    * */
+    public Integer findNodeId(String nodeId){
+        Integer nodeType = nodeDao.findCountByNodeID(nodeId);
+        if(nodeType==0){
+            nodeType = nodeDao.findCountByCaseNo(nodeId);
+        }
+        return nodeType;
+    }
+
+
 }

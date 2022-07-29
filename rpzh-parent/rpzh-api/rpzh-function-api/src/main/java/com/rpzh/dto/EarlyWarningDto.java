@@ -67,7 +67,7 @@ public class EarlyWarningDto implements Serializable {
     private Integer count;
 
     // 时间类型,1:日,2:周,3:月,4:年
-    private Integer dayType=0;
+    private Integer dayType;
 
     //分页开始页面
     private int page=1;

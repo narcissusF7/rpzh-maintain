@@ -224,5 +224,9 @@ public interface NodeDao {
     Double findO2StackData(@Param("id") Integer id);
 
     @DS("clickhouse")
-    Double findO2AreaData(@Param("pidRoute")String pidRoute);
+    Double findO2AreaData(@Param("pidRoute") String pidRoute);
+
+    Integer findCountByNodeID(@Param("nodeId") String nodeId);
+
+    Integer findCountByCaseNo(@Param("caseNo")String caseNo);
 }
