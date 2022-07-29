@@ -856,6 +856,86 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     /**
+     * 判断楼层是否存在
+     *
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    @Override
+    public int findFloorName(String floorName, String buildingId) {
+        int countFloorName = warehouseDao.findFloorName(floorName,buildingId);
+        return countFloorName;
+    }
+
+    /**
+     * 判断楼层是否已经存在
+     *
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    @Override
+    public int findFloorNameCount(String floorName, String buildingId,Integer id) {
+        int countFloorName = warehouseDao.findFloorNameCount(floorName, buildingId,id);
+        return countFloorName;
+    }
+
+    /**
+     * 判断分区名称是否存在
+     *
+     * @param areaName
+     * @param floorId
+     * @return
+     */
+    @Override
+    public int findAreaName(String areaName, Integer floorId) {
+        int countAreaName = warehouseDao.findAreaName(areaName,floorId);
+        return countAreaName;
+    }
+
+    /**
+     * 判断分区名称是否存在
+     *
+     * @param areaName
+     * @param floorId
+     * @param id
+     * @return
+     */
+    @Override
+    public int findAreaNameCount(String areaName, Integer floorId, Integer id) {
+        int count = warehouseDao.findAreaNameCount(areaName,floorId,id);
+        return count;
+    }
+
+    /**
+     * 添加时判断垛位名称是否存在
+     *
+     * @param nameCn
+     * @param areaId
+     * @return
+     */
+    @Override
+    public int findStackName(String nameCn, Integer areaId) {
+        int count = warehouseDao.findStackName(nameCn,areaId);
+        return count;
+    }
+
+    /**
+     * 修改时判断垛位是否存在
+     *
+     * @param nameCn
+     * @param areaId
+     * @param id
+     * @return
+     */
+    @Override
+    public int findStackNameCount(String nameCn, Integer areaId, Integer id) {
+        int countStackName = warehouseDao.findStackNameCount(nameCn,areaId,id);
+        return countStackName;
+    }
+
+    /**
      * 将负责人放入缓存中
      * @param pidRoute
      * @param map

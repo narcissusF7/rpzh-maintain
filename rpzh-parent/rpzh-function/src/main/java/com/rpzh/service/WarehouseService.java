@@ -318,4 +318,54 @@ public interface WarehouseService {
      * @return
      */
     int findBuildingNameCount(String buildingName, Integer id,Integer warehouseId);
+
+    /**
+     * 判断楼层是否存在
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    int findFloorName(String floorName, String buildingId);
+
+    /**
+     * 判断楼层是否已经存在
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    int findFloorNameCount(String floorName, String buildingId,Integer id);
+
+    /**
+     * 判断分区名称是否存在
+     * @param areaName
+     * @param floorId
+     * @return
+     */
+    int findAreaName(String areaName, Integer floorId);
+
+    /**
+     * 判断分区名称是否存在
+     * @param areaName
+     * @param floorId
+     * @param id
+     * @return
+     */
+    int findAreaNameCount(String areaName, Integer floorId, Integer id);
+
+    /**
+     * 添加时判断垛位名称是否存在
+     * @param nameCn
+     * @param areaId
+     * @return
+     */
+    int findStackName(String nameCn, Integer areaId);
+
+    /**
+     * 修改时判断垛位是否存在
+     * @param nameCn
+     * @param areaId
+     * @param id
+     * @return
+     */
+    int findStackNameCount(String nameCn, Integer areaId, Integer id);
 }

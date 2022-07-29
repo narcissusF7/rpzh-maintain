@@ -414,4 +414,54 @@ public interface WarehouseDao {
      * @return
      */
     int findBuildingNameCount(@Param("buildingName") String buildingName, @Param("id") Integer id,@Param("warehouseId")Integer warehouseId);
+
+    /**
+     * 判断楼层是否存在
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    int findFloorName(@Param("floorName") String floorName,@Param("buildingId") String buildingId);
+
+    /**
+     * 判断楼层是否存在
+     * @param floorName
+     * @param buildingId
+     * @return
+     */
+    int findFloorNameCount(@Param("floorName")String floorName, @Param("buildingId")String buildingId,@Param("id")Integer id);
+
+    /**
+     * 判断分区名称是否存在
+     * @param areaName
+     * @param floorId
+     * @return
+     */
+    int findAreaName(@Param("areaName")String areaName,@Param("floorId") Integer floorId);
+
+    /**
+     * 修改时判断分区是否存在
+     * @param areaName
+     * @param floorId
+     * @param id
+     * @return
+     */
+    int findAreaNameCount(@Param("areaName")String areaName, @Param("floorId")Integer floorId, @Param("id")Integer id);
+
+    /**
+     * 添加时判断垛位是否存在
+     * @param nameCn
+     * @param areaId
+     * @return
+     */
+    int findStackName(@Param("nameCn")String nameCn, @Param("areaId")Integer areaId);
+
+    /**
+     * 修改时判断垛位是否存在
+     * @param nameCn
+     * @param areaId
+     * @param id
+     * @return
+     */
+    int findStackNameCount(@Param("nameCn")String nameCn, @Param("areaId")Integer areaId,@Param("id") Integer id);
 }

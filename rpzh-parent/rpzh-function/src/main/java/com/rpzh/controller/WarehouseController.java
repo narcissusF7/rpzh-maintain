@@ -216,11 +216,16 @@ public class WarehouseController {
         }
         String buildingId = floorDto.getBuildingId();
         if (ToolUtil.isEmpty(buildingId)) {
-            return new Result(false, StatusCode.ERROR, "楼号id不能为空");
+            return new Result(false, StatusCode.ERROR, "楼栋id不能为空");
         }
         Integer count = warehouseService.findStackBySiteNo(floorNo,3);
         if (count>0) {
-            return new Result(false, StatusCode.ERROR, "楼号编号已存在");
+            return new Result(false, StatusCode.ERROR, "楼栋编号已存在");
+        }
+        //判断楼层是否已经存在
+        int countFloorName = warehouseService.findFloorName(floorName,buildingId);
+        if (countFloorName > 0){
+            return new Result(false, StatusCode.ERROR, "楼层已经存在,禁止添加");
         }
         //获取楼栋类型
         String buildType = warehouseService.findBuildType(buildingId);
@@ -245,7 +250,15 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingId)) {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
         }
-
+        String floorName = floorDto.getFloorName();
+        if (ToolUtil.isEmpty(floorName)){
+            return new Result(false, StatusCode.ERROR, "楼层名称不能为空");
+        }
+        //判断楼层名称是否已经存在
+        int countName = warehouseService.findFloorNameCount(floorName,buildingId,id);
+        if (countName > 0){
+            return new Result(false, StatusCode.ERROR, "楼层已经存在,禁止修改");
+        }
         String floorNo = floorDto.getFloorNo();
         if (!ToolUtil.isEmpty(floorNo)){
             Integer count = warehouseService.findStackBySiteNo(floorNo,3);
@@ -280,6 +293,16 @@ public class WarehouseController {
         if (count>0) {
             return new Result(false, StatusCode.ERROR, "分区编号已存在");
         }
+        //分区名称
+        String areaName = wareAreaDto.getAreaName();
+        if (ToolUtil.isEmpty(areaName)){
+            return new Result(false, StatusCode.ERROR, "分区名称不能为空");
+        }
+        //判断分区名称是否存在
+        int countAreaName = warehouseService.findAreaName(areaName,floorId);
+        if (ToolUtil.isEmpty(countAreaName)){
+            return new Result(false, StatusCode.ERROR, "分区名称已经存在,禁止添加");
+        }
         //查询楼层类型
         String floorType = warehouseService.findFloorType(floorId);
         wareAreaDto.setWareAreaType(floorType);
@@ -309,6 +332,15 @@ public class WarehouseController {
             if (count>0) {
                 return new Result(false, StatusCode.ERROR, "分区编号已存在");
             }
+        }
+        String areaName = wareAreaDto.getAreaName();
+        if (ToolUtil.isEmpty(areaName)){
+            return new Result(false, StatusCode.ERROR, "分区名称不能为空");
+        }
+        //判断分区名称是否存在
+        int areaNameCount = warehouseService.findAreaNameCount(areaName,floorId,id);
+        if (areaNameCount > 0){
+            return new Result(false, StatusCode.ERROR, "分区名称已经存在,禁止修改");
         }
         //查询楼层类型
         //String floorType = warehouseService.findFloorType(floorId);
@@ -342,6 +374,10 @@ public class WarehouseController {
         if (count>0) {
             return new Result(false, StatusCode.ERROR, "垛位编号已存在");
         }
+        int countName = warehouseService.findStackName(nameCn,areaId);
+        if (countName > 0){
+            return new Result(false, StatusCode.ERROR, "垛位名称已经存在,禁止添加");
+        }
         //查看分区类型
         String wareAreaType = warehouseService.findWareAreaType(areaId);
         stackDto.setStackType(wareAreaType);
@@ -373,7 +409,15 @@ public class WarehouseController {
                 return new Result(false, StatusCode.ERROR, "垛位编号已存在");
             }
         }
-
+        //垛位名称
+        String nameCn = stackDto.getNameCn();
+        if (ToolUtil.isEmpty(nameCn)){
+            return new Result(false, StatusCode.ERROR, "垛位名称不能为空");
+        }
+        int countStackName = warehouseService.findStackNameCount(nameCn,areaId,id);
+        if (countStackName > 0){
+            return new Result(false, StatusCode.ERROR, "垛位已经存在,禁止修改");
+        }
         //查看分区类型
         //String wareAreaType = warehouseService.findWareAreaType(areaId);
         //stackDto.setStackType(wareAreaType);
