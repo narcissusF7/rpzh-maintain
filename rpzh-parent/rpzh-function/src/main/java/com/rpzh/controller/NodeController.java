@@ -437,7 +437,7 @@ public class NodeController {
         //读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
         List<Map<Integer, String>> nodeDate;
         try {
-            nodeDate = ExcelUtils.importExcel(file, 2, 0, 0);
+            nodeDate = ExcelUtils.importExcel(file, 1, 0, 0);
         } catch (IOException e) {
             e.printStackTrace();
             return new Result<>(false, StatusCode.ERROR, "导入失败");
