@@ -536,7 +536,7 @@ public class DataHandler {
             return nodeData.getTemp();
         });
         //取平均值
-        return stream.mapToDouble(Double::doubleValue).sum();
+        return stream.mapToDouble(Double::doubleValue).average().orElse(0D);
     }
 
     /**
@@ -592,7 +592,9 @@ public class DataHandler {
                 //更新数据
                 earlyWarningDao.updateWarning(earlyWarning);
                 NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
-                addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
+                if (level>0){
+                    addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
+                }
             }
             if (level==3){
                 //达到3级 不用连续预警

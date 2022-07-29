@@ -329,7 +329,7 @@
         </if>
          node_id nodeId, frequency , voltage , signal_strength signalStrength ,
                stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
-               site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route pidRoute,site_x siteX,site_y siteY,site_z siteZ
+               site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y siteY,site_z siteZ
         from ${tableName}
         where node_id = #{nodeId} limit 1
     </select>

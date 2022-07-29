@@ -103,6 +103,8 @@ public class NodeDataVo {
     private String siteZ;
     @ApiModelProperty(notes = "位置路由")
     private String siteRoute;
+    @ApiModelProperty(notes = "垛位Id")
+    private String stackId;
     @ApiModelProperty(notes = "垛位名称")
     private String stack;
     @ApiModelProperty(notes = "预警等级 0 正常 >0 预警")

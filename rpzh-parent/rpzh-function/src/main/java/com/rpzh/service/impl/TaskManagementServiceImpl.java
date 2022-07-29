@@ -1180,6 +1180,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     public int addDataHandTask(TaskDto taskDto) {
         //获取当前时间
         String nowDayTime = DateUtil.dateNew(new Date()).toString();
+        taskDto.setPushWay("A");
         taskDto.setCreatedTime(nowDayTime);
         //获取结束时间,用于计算时间差
         String endTime = taskDto.getEndTime();

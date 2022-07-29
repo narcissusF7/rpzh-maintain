@@ -11,6 +11,7 @@ import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
 
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.pojo.GeneralSetting;
@@ -112,6 +113,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             NodeServiceImpl.setWarningColor(collect.get(i),entries);
             //温湿度设备额外对添加温度湿度预警颜色
             if(NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(collect.get(i).getType())){
+                if (ToolUtil.isEmpty(collect.get(i).getTempLevel())){
+                    collect.get(i).setTempLevel(0);
+                }
                 if (collect.get(i).getTempLevel()==1){
                     collect.get(i).setTempColor(entries.get("one").toString());
                 }else if (collect.get(i).getTempLevel()==2){
@@ -120,6 +124,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                     collect.get(i).setTempColor(entries.get("three").toString());
                 }else {
                     collect.get(i).setTempColor("");
+                }
+                if (ToolUtil.isEmpty(collect.get(i).getHumidityLevel())){
+                    collect.get(i).setHumidityLevel(0);
                 }
                 if (collect.get(i).getHumidityLevel()==1){
                     collect.get(i).setHumidityColor(entries.get("one").toString());
@@ -240,39 +247,47 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         for (NodeVo nodeVo : nodeVos) {
             //TODO 获取缓存中该设备的数据 空调数据暂时没有 sql暂用只找仓间温湿度的数据
             Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
-            //获取缓存中该设备的基础数据
-            Object o = redisTemplate.opsForValue().get(DataHandler.MAINTAIN_CACHE_NODE+nodeVo.getNodeId());
+
+            NodeDataVo nodeDataVo;
             if (!ToolUtil.isEmpty(data)){
-                NodeDataVo nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
+                nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
                 NodeData nodeData =JSON.parseObject(data.toString(), NodeData.class);
-                try {
-                    //传输时间的时间戳
-                    long time = DateFormat.getDateInstance().parse(nodeDataVo.getTransferTime()).getTime();
-                    //当前时间和传输时间的差值
-                    long intervalTime = System.currentTimeMillis() -time;
-                    //TODO 如果需要根据丢包个数判断设备是否故障 需要在这边添加判断条件
-                    //根据频率求出丢包个数
-                    if (intervalTime/(nodeData.getFrequency()*1000)>0){
-                        if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
-                            nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
-                        }else {
-                            if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
-                                nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
+                if (!ToolUtil.isEmpty(nodeData.getFrequency())){
+                    try {
+                        //传输时间的时间戳
+                        long time = DateFormat.getDateInstance().parse(nodeDataVo.getTransferTime()).getTime();
+                        //当前时间和传输时间的差值
+                        long intervalTime = System.currentTimeMillis() -time;
+                        //根据频率求出丢包个数
+                        if (intervalTime/(nodeData.getFrequency()*1000)>0){
+                            if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
+                                nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
+                            }else {
+                                if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
+                                    nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
+                                }
                             }
                         }
-                    }
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                nodeDataVos.add(nodeDataVo);
+            }else {
+                //如果设备数据不在缓存中
+                nodeDataVo = nodeDao.findNodeNowData(nodeVo.getNodeId(), NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
+                if (!ToolUtil.isEmpty(nodeDataVo)){
+                    //将该数据存放到缓存中
+                    redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId(),JSONObject.toJSONString(nodeDataVo));
+                    nodeDataVos.add(nodeDataVo);
+                }else {
+                    continue;
                 }
 
-                nodeDataVos.add(nodeDataVo);
-
-            }else {
-                //TODO 如果设备不在缓存中
-                NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
-
             }
+
+
         }
         //监控状态筛选 1.预警  2.正常
         if (status==2){
