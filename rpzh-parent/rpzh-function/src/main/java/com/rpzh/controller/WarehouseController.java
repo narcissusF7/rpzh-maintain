@@ -260,12 +260,20 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "楼层已经存在,禁止修改");
         }
         String floorNo = floorDto.getFloorNo();
-        if (!ToolUtil.isEmpty(floorNo)){
+        if (ToolUtil.isEmpty(floorNo)){
+            return new Result(false, StatusCode.ERROR, "楼层编号不能为空");
+        }
+        //判断楼层编号
+        int countNo = warehouseService.findFloorNo(floorNo,id);
+        if (countNo > 0){
+            return new Result(false, StatusCode.ERROR, "楼层编号已经存在,禁止修改");
+        }
+        /*if (!ToolUtil.isEmpty(floorNo)){
             Integer count = warehouseService.findStackBySiteNo(floorNo,3);
             if (count>0) {
                 return new Result(false, StatusCode.ERROR, "楼层编号已存在");
             }
-        }
+        }*/
         //获取楼栋类型
         //String buildType = warehouseService.findBuildType(buildingId);
         //floorDto.setFloorType(buildType);
@@ -300,7 +308,7 @@ public class WarehouseController {
         }
         //判断分区名称是否存在
         int countAreaName = warehouseService.findAreaName(areaName,floorId);
-        if (ToolUtil.isEmpty(countAreaName)){
+        if (countAreaName > 0){
             return new Result(false, StatusCode.ERROR, "分区名称已经存在,禁止添加");
         }
         //查询楼层类型

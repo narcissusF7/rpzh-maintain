@@ -464,4 +464,12 @@ public interface WarehouseDao {
      * @return
      */
     int findStackNameCount(@Param("nameCn")String nameCn, @Param("areaId")Integer areaId,@Param("id") Integer id);
+
+    /**
+     * 判断楼层编号是否存在
+     * @param floorNo
+     * @param id
+     * @return
+     */
+    int findFloorNo(@Param("floorNo")String floorNo, @Param("id")Integer id);
 }

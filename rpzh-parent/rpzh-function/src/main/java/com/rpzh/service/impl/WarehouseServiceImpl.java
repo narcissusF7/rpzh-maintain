@@ -936,6 +936,19 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     /**
+     * 判断楼层编号是否存在
+     *
+     * @param floorNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findFloorNo(String floorNo, Integer id) {
+        int count = warehouseDao.findFloorNo(floorNo,id);
+        return count;
+    }
+
+    /**
      * 将负责人放入缓存中
      * @param pidRoute
      * @param map

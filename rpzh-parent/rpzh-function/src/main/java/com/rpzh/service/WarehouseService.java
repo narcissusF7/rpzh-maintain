@@ -368,4 +368,12 @@ public interface WarehouseService {
      * @return
      */
     int findStackNameCount(String nameCn, Integer areaId, Integer id);
+
+    /**
+     * 判断楼层编号是否存在
+     * @param floorNo
+     * @param id
+     * @return
+     */
+    int findFloorNo(String floorNo, Integer id);
 }

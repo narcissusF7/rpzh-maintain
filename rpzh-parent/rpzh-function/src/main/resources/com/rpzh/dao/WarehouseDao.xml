@@ -922,4 +922,9 @@
   FROM tb_stack
   WHERE name_cn = #{nameCn} and area_id = #{areaId} and id != #{id}
 </select>
+<select id="findFloorNo" resultType="int">
+  SELECT count(*)
+  FROM tb_floor
+  WHERE floor_no = #{floorNo} and id != #{id}
+</select>
 </mapper>
