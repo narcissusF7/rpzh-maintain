@@ -335,12 +335,17 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "楼层id不能为空");
         }
         String areaNo = wareAreaDto.getAreaNo();
-        if (!ToolUtil.isEmpty(areaNo)){
+        //判断分区编号是否可以修改
+        int count = warehouseService.findWareAreaNo(areaNo,id);
+        if (count > 0){
+            return new Result(false, StatusCode.ERROR, "分区编号已经存在,禁止修改");
+        }
+        /*if (!ToolUtil.isEmpty(areaNo)){
             Integer count = warehouseService.findStackBySiteNo(areaNo,4);
             if (count>0) {
                 return new Result(false, StatusCode.ERROR, "分区编号已存在");
             }
-        }
+        }*/
         String areaName = wareAreaDto.getAreaName();
         if (ToolUtil.isEmpty(areaName)){
             return new Result(false, StatusCode.ERROR, "分区名称不能为空");
@@ -411,12 +416,19 @@ public class WarehouseController {
             return new Result(false, StatusCode.ERROR, "分区id不能为空");
         }
         String stackNo = stackDto.getStackNo();
-        if (!ToolUtil.isEmpty(stackNo)){
+        if (ToolUtil.isEmpty(stackNo)){
+            return new Result(false, StatusCode.ERROR, "垛位编号不能为空");
+        }
+        int countStackCount = warehouseService.findStackNo(stackNo,id);
+        if (countStackCount > 0){
+            return new Result(false, StatusCode.ERROR, "垛位编号已经存在,禁止修改");
+        }
+        /*if (!ToolUtil.isEmpty(stackNo)){
             Integer count = warehouseService.findStackBySiteNo(stackNo,5);
             if (count>0) {
                 return new Result(false, StatusCode.ERROR, "垛位编号已存在");
             }
-        }
+        }*/
         //垛位名称
         String nameCn = stackDto.getNameCn();
         if (ToolUtil.isEmpty(nameCn)){

@@ -472,4 +472,20 @@ public interface WarehouseDao {
      * @return
      */
     int findFloorNo(@Param("floorNo")String floorNo, @Param("id")Integer id);
+
+    /**
+     * 判断分区编号是否存在
+     * @param areaNo
+     * @param id
+     * @return
+     */
+    int findWareAreaNo(@Param("areaNo") String areaNo, @Param("id") Integer id);
+
+    /**
+     * 判断垛位编号是否存在
+     * @param stackNo
+     * @param id
+     * @return
+     */
+    int findStackNo(@Param("stackNo")String stackNo, @Param("id")Integer id);
 }

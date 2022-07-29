@@ -949,6 +949,32 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     /**
+     * 判断分区编号是否存在
+     *
+     * @param areaNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findWareAreaNo(String areaNo, Integer id) {
+        int count = warehouseDao.findWareAreaNo(areaNo,id);
+        return count;
+    }
+
+    /**
+     * 判断垛位编号是否存在
+     *
+     * @param stackNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findStackNo(String stackNo, Integer id) {
+        int count = warehouseDao.findStackNo(stackNo,id);
+        return count;
+    }
+
+    /**
      * 将负责人放入缓存中
      * @param pidRoute
      * @param map

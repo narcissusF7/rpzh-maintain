@@ -376,4 +376,20 @@ public interface WarehouseService {
      * @return
      */
     int findFloorNo(String floorNo, Integer id);
+
+    /**
+     * 判断分区编号是否存在
+     * @param areaNo
+     * @param id
+     * @return
+     */
+    int findWareAreaNo(String areaNo, Integer id);
+
+    /**
+     * 判断垛位编号是否存在
+     * @param stackNo
+     * @param id
+     * @return
+     */
+    int findStackNo(String stackNo, Integer id);
 }
