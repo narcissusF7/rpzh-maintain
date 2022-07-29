@@ -115,7 +115,7 @@ public class SchedulerController {
             return new Result(false, StatusCode.ERROR, "命令错误,0:停止,1:启动");
         }
         schedulerService.changeJobStatus(jobId,cmd);
-        return new Result(true, StatusCode.OK, "修改任务状态成功");
+        return new Result(true, StatusCode.OK, "修改状态成功");
     }
 
     /**

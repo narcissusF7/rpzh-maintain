@@ -610,6 +610,10 @@ public class TaskManagementController {
         Map typeCount = taskManagementService.taskCountByTypeMap(taskDto);
         //获取所有的和,所有的任务和
         int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
+        //防止出现0/0情况
+        if (sum == 0){
+            sum = 1;
+        }
         //保留两位小数
         DecimalFormat df = new DecimalFormat("######0.00");
         //Map<String,String> map = new HashMap<>();
@@ -696,8 +700,10 @@ public class TaskManagementController {
         map16.put("percent",percent16*100);
         mapList.add(map16);
         Map mapCount = new HashMap();
+        //重新计算总任务
+        int sum1 = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
         mapCount.put("type", "总任务");
-        mapCount.put("count", sum);
+        mapCount.put("count", sum1);
         List allData = new ArrayList();
         allData.add(mapList);
         allData.add(mapCount);
@@ -727,6 +733,10 @@ public class TaskManagementController {
         Map typeCount = taskManagementService.taskCountByTypeMap(taskDto);
         //获取所有的和,所有的任务和
         int sum = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
+        //防止出现0/0情况
+        if (sum == 0){
+            sum = 1;
+        }
         //保留两位小数
         DecimalFormat df = new DecimalFormat("######0.00");
         Map<String,String> map = new HashMap<>();
@@ -813,8 +823,10 @@ public class TaskManagementController {
         map16.put("percent",percent16*100);
         mapList.add(map16);
         Map mapCount = new HashMap();
+        //重新计算任务
+        int sum1 = typeCount.values().stream().mapToInt(s -> Integer.parseInt(s.toString())).sum();
         mapCount.put("type", "总任务");
-        mapCount.put("count", sum);
+        mapCount.put("count", sum1);
         List allData = new ArrayList();
         allData.add(mapList);
         allData.add(mapCount);

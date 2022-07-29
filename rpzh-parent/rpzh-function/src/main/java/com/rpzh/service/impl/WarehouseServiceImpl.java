@@ -806,6 +806,56 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     /**
+     * 判断楼栋名称是否存在
+     *
+     * @param buildingName
+     * @return
+     */
+    @Override
+    public int findBuildingName(String buildingName,Integer warehouseId) {
+        int count = warehouseDao.findBuildingName(buildingName,warehouseId);
+        return count;
+    }
+
+    /**
+     * 判断楼栋编号是否存在
+     *
+     * @param buildingNo
+     * @return
+     */
+    @Override
+    public int findBuildingCode(String buildingNo) {
+        int count = warehouseDao.findBuildingCode(buildingNo);
+        return count;
+    }
+
+    /**
+     * 判断楼栋编号是否可以修改
+     *
+     * @param buildingNo
+     * @param id
+     * @return
+     */
+    @Override
+    public int findBuildingNo(String buildingNo, Integer id) {
+        int count = warehouseDao.findBuildingNo(buildingNo,id);
+        return count;
+    }
+
+    /**
+     * 判断楼栋名称是否存在
+     *
+     * @param buildingName
+     * @param id
+     * @return
+     */
+    @Override
+    public int findBuildingNameCount(String buildingName, Integer id,Integer warehouseId) {
+        int count = warehouseDao.findBuildingNameCount(buildingName,id,warehouseId);
+        return count;
+    }
+
+    /**
      * 将负责人放入缓存中
      * @param pidRoute
      * @param map

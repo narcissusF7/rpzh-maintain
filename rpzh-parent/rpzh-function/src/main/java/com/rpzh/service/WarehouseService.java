@@ -288,4 +288,34 @@ public interface WarehouseService {
     Result locatingMaintain();
 
     Integer findStackBySiteNo(String siteNo,Integer level);
+
+    /**
+     * 判断楼栋名称是否存在
+     * @param buildingName
+     * @return
+     */
+    int findBuildingName(String buildingName,Integer warehouseId );
+
+    /**
+     * 判断楼栋编号是否存在
+     * @param buildingNo
+     * @return
+     */
+    int findBuildingCode(String buildingNo);
+
+    /**
+     * 判断楼栋编号是否可以修改
+     * @param buildingNo
+     * @param id
+     * @return
+     */
+    int findBuildingNo(String buildingNo, Integer id);
+
+    /**
+     * 判断楼栋名称是否存在
+     * @param buildingName
+     * @param id
+     * @return
+     */
+    int findBuildingNameCount(String buildingName, Integer id,Integer warehouseId);
 }

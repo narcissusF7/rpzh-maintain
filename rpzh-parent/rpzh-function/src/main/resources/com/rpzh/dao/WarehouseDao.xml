@@ -872,4 +872,24 @@
       </if>
       #{siteNo}
     </select>
+<select id="findBuildingName" resultType="int">
+    SELECT count(1)
+    FROM tb_building
+    WHERE building_name = #{buildingName} and warehouse_id = #{warehouseId}
+</select>
+<select id="findBuildingCode" resultType="int">
+  SELECT count(1)
+  FROM tb_building
+  WHERE building_no = #{buildingNo}
+</select>
+<select id="findBuildingNo" resultType="int">
+  SELECT count(1)
+  FROM tb_building
+  WHERE building_no = #{buildingNo} and id != #{id}
+</select>
+<select id="findBuildingNameCount" resultType="int">
+  SELECT count(1)
+  FROM tb_building
+  WHERE building_name = #{buildingName} and warehouse_id = #{warehouseId} and id != #{id}
+</select>
 </mapper>

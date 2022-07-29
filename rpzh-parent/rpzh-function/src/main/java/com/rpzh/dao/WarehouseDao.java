@@ -384,4 +384,34 @@ public interface WarehouseDao {
     List<Map<String,String>> findStackInfos(@Param("stackIds") List<Integer> stackIds);
 
     Integer findStackBySiteNo(@Param("siteNo") String siteNo,@Param("level") Integer level);
+
+    /**
+     * 判断楼栋名称是否存在
+     * @param buildingName
+     * @return
+     */
+    int findBuildingName(@Param("buildingName") String buildingName,@Param("warehouseId")Integer warehouseId);
+
+    /**
+     * 判断楼号是否存在
+     * @param buildingNo
+     * @return
+     */
+    int findBuildingCode(@Param("buildingNo") String buildingNo);
+
+    /**
+     * 判断楼栋编号是否可以修改
+     * @param buildingNo
+     * @param id
+     * @return
+     */
+    int findBuildingNo(@Param("buildingNo")String buildingNo, @Param("id")Integer id);
+
+    /**
+     * 判断楼栋名称是否存在
+     * @param buildingName
+     * @param id
+     * @return
+     */
+    int findBuildingNameCount(@Param("buildingName") String buildingName, @Param("id") Integer id,@Param("warehouseId")Integer warehouseId);
 }

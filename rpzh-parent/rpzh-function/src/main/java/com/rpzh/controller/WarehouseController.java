@@ -125,9 +125,16 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
-        Integer count = warehouseService.findStackBySiteNo(buildingNo,2);
+        //判断楼栋名称是否存在
+        int countName = warehouseService.findBuildingName(buildingName,warehouseId);
+        if (countName > 0){
+            return new Result(false, StatusCode.ERROR, "楼栋名称已经存在,禁止添加");
+        }
+        //Integer count = warehouseService.findStackBySiteNo(buildingNo,2);
+        //判断楼栋编号是否存在
+        int count = warehouseService.findBuildingCode(buildingNo);
         if (count>0) {
-            return new Result(false, StatusCode.ERROR, "楼栋编号已存在");
+            return new Result(false, StatusCode.ERROR, "楼栋编号已存在,禁止添加");
         }
         //获取仓库类型
         String wareType = warehouseService.findWareType(warehouseId);
@@ -147,18 +154,37 @@ public class WarehouseController {
         if (ToolUtil.isEmpty(buildingDto.getId())) {
             return new Result(false, StatusCode.ERROR, "请选择一个楼栋");
         }
-        //获取仓库类型
+        //获取仓库id
         Integer warehouseId = buildingDto.getWarehouseId();
         if (ToolUtil.isEmpty(warehouseId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
+        //获取楼栋编号
         String buildingNo = buildingDto.getBuildingNo();
-        if (!ToolUtil.isEmpty(buildingNo)){
+        if (ToolUtil.isEmpty(buildingNo)){
+            return new Result(false, StatusCode.ERROR, "楼栋编号不能为空");
+        }
+        //判断楼栋编号是否可以修改
+        int buildingNoCount = warehouseService.findBuildingNo(buildingNo,buildingDto.getId());
+        if (buildingNoCount > 0){
+            return new Result(false, StatusCode.ERROR, "楼栋编号已经存在,禁止修改");
+        }
+        //获取楼栋名称
+        String buildingName = buildingDto.getBuildingName();
+        if (ToolUtil.isEmpty(buildingName)){
+            return new Result(false, StatusCode.ERROR, "楼栋名称不能名称");
+        }
+        //判断楼栋名称是否可以修改
+        int buildingNameCount = warehouseService.findBuildingNameCount(buildingName,buildingDto.getId(),warehouseId);
+        if (buildingNameCount > 0){
+            return new Result(false, StatusCode.ERROR, "楼栋名称已经存在,禁止修改");
+        }
+        /*if (!ToolUtil.isEmpty(buildingNo)){
             Integer count = warehouseService.findStackBySiteNo(buildingNo,2);
             if (count>0) {
                 return new Result(false, StatusCode.ERROR, "楼栋编号已存在");
             }
-        }
+        }*/
         //String wareType = warehouseService.findWareType(warehouseId);
         //buildingDto.setBuildingType(wareType);
         int updateFlag = warehouseService.updateBuilding(buildingDto);
@@ -177,6 +203,11 @@ public class WarehouseController {
         String floorNo = floorDto.getFloorNo();
         if (ToolUtil.isEmpty(floorNo)) {
             return new Result(false, StatusCode.ERROR, "楼层编号不能为空");
+        }
+        //获取楼层名称不能为空
+        String floorName = floorDto.getFloorName();
+        if (ToolUtil.isEmpty(floorName)){
+            return new Result(false, StatusCode.ERROR, "楼层名称不能为空");
         }
         //是否分区
         Integer isPartition = floorDto.getIsPartition();
