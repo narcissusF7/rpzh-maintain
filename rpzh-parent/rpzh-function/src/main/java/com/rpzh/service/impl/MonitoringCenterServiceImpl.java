@@ -4,7 +4,6 @@ package com.rpzh.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
@@ -13,7 +12,6 @@ import com.rpzh.dao.*;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.handler.DataHandler;
-import com.rpzh.dto.WareAreaAlarmSettingDto;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -255,7 +254,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 if (!ToolUtil.isEmpty(nodeData.getFrequency())){
                     try {
                         //传输时间的时间戳
-                        long time = DateFormat.getDateInstance().parse(nodeDataVo.getTransferTime()).getTime();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                        long time = sdf.parse(nodeDataVo.getTransferTime()).getTime();
                         //当前时间和传输时间的差值
                         long intervalTime = System.currentTimeMillis() -time;
                         //根据频率求出丢包个数
