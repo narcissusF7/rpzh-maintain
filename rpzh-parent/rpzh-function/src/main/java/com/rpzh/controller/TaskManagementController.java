@@ -684,6 +684,11 @@ public class TaskManagementController {
         map13.put("type", "平均包芯高于环境预警任务");
         map13.put("percent",percent13*100);
         mapList.add(map13);
+        double percent19 = Double.parseDouble(typeCount.get("19").toString())/sum;
+        Map map19 = new HashMap();
+        map19.put("type", "平均包芯低于环境预警任务");
+        map19.put("percent",percent19*100);
+        mapList.add(map19);
         double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
         Map map14 = new HashMap();
         map14.put("type", "仓间粉螟预警任务");
@@ -807,6 +812,11 @@ public class TaskManagementController {
         map13.put("type", "平均包芯高于环境预警任务");
         map13.put("percent",percent13*100);
         mapList.add(map13);
+        double percent19 = Double.parseDouble(typeCount.get("19").toString())/sum;
+        Map map19 = new HashMap();
+        map19.put("type", "平均包芯低于环境预警任务");
+        map19.put("percent",percent19*100);
+        mapList.add(map19);
         double percent14 = Double.parseDouble(typeCount.get("14").toString())/sum;
         Map map14 = new HashMap();
         map14.put("type", "仓间粉螟预警任务");

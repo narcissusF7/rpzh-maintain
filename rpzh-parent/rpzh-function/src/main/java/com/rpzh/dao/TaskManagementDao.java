@@ -399,4 +399,14 @@ public interface TaskManagementDao {
     Map findInfo(@Param("id") String id);
 
     Integer findTaskBySiteRoute(@Param("siteRoute")String siteRoute, @Param("type")String type);
+
+    /**
+     * 平均包芯低于环境预警任务
+     * @param startTime
+     * @param endTime
+     * @param principal
+     * @param taskSiteRoute
+     * @return
+     */
+    int findMinAveTemp(@Param("startTime")String startTime, @Param("endTime")String endTime, @Param("principal")String principal, @Param("taskSiteRoute")String taskSiteRoute);
 }

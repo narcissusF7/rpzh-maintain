@@ -152,6 +152,9 @@ public class WarehouseServiceImpl implements WarehouseService {
     public int addBuilding(BuildingDto buildingDto) {
         //查询仓库信息
         WarehouseVo warehouseVo = warehouseDao.findWarehouse(buildingDto.getWarehouseId());
+        if (ToolUtil.isEmpty(warehouseVo)){
+            throw new RuntimeException("该仓库不存在,禁止添加");
+        }
         buildingDto.setPidRoute(warehouseVo.getPidRoute() + ",[" + WarehouseNodeType.WAREHOUSE_NODE.getType() + ":" + warehouseVo.getId() + "]");
         buildingDto.setSiteName(warehouseVo.getSiteName() + buildingDto.getBuildingName());
         //获取用户信息

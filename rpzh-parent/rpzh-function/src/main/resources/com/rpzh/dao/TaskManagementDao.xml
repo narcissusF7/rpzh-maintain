@@ -203,7 +203,8 @@
   UPDATE tb_task
   SET
   status =#{status},
-  deal_result = #{dealResult}
+  deal_result = #{dealResult},
+  finish_time = sysdate()
   WHERE id = #{id}
 </update>
 <insert id="insertPest">
@@ -559,4 +560,16 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
     <select id="findTaskBySiteRoute" resultType="java.lang.Integer">
         select count(*) from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
     </select>
+<select id="findMinAveTemp" resultType="int">
+  SELECT count(*)
+  FROM tb_task
+  WHERE create_time BETWEEN #{startTime} AND #{endTime}
+  AND type = '19'
+  <if test="taskSiteRoute != null and taskSiteRoute != ''">
+    AND site_route like concat(#{taskSiteRoute}, '%')
+  </if>
+  <if test="principal != null and principal != ''">
+    AND principal = #{principal}
+  </if>
+</select>
 </mapper>

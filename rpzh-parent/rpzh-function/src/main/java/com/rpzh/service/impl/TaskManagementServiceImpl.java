@@ -398,6 +398,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             //有处理效果,任务状态为完成
             taskDto.setStatus("1");
         }
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
         int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult());
         //获取移垛路径,传入的是移垛后路径
         String siteRoute = taskDto.getSiteRoute();
@@ -836,6 +838,12 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         map13.put("type","平均包芯高于环境预警任务");
         map13.put("count",type13);
         mapList.add(map13);
+        //查询19:平均包芯低于环境预警任务
+        int type19 = taskManagementDao.findMinAveTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
+        Map map19 = new HashMap();
+        map19.put("type","平均包芯低于环境预警任务");
+        map19.put("count",type19);
+        mapList.add(map19);
         //查询14:仓间粉螟预警任务
         int type14 = taskManagementDao.findHouseMealworm(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         Map map14 = new HashMap();
@@ -1051,6 +1059,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //查询13:平均包芯高于环境预警任务
         int type13 = taskManagementDao.findMoreAveTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("13", type13);
+        //查询19:平均包芯低于环境预警任务
+        int type19 = taskManagementDao.findMinAveTemp(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
+        mapAll.put("19", type19);
         //查询14:仓间粉螟预警任务
         int type14 = taskManagementDao.findHouseMealworm(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
         mapAll.put("14", type14);
