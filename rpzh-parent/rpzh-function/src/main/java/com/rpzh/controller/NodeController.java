@@ -331,18 +331,25 @@ public class NodeController {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
         List<Map> list = JSONObject.parseObject(data, List.class);
+
         for (int i = 0; i < list.size(); i++) {
             Map map = list.get(i);
             NodeDto nodeDto = new NodeDto();
             //设置主键id
             nodeDto.setId(Integer.parseInt(map.get("id").toString()));
+
             //如果是垛内设备
             Object pidRoute = map.get("pidRoute");
             if (ToolUtil.isEmpty(pidRoute)){
                 return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的入垛位置为空");
             }
             String[] split = pidRoute.toString().split(",");
-
+            //查询该设备的设备类型
+            String nodeType = nodeService.findNodeType(nodeDto);
+            //如果时包芯设备
+            if (nodeType.equals("04")&&split.length==4){
+                return new Result<>(false, StatusCode.ERROR, "包芯设备不能放置到垛位外");
+            }
             if (split.length==5) {
                 //设置设备所在垛位的id
                 if (ToolUtil.isEmpty(map.get("stackId"))){
