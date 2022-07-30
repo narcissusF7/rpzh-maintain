@@ -108,7 +108,7 @@ public interface TaskManagementDao {
      * @param status
      * @return
      */
-    int updateTaskStatus(@Param("id") String id, @Param("status") String status, @Param("dealResult") String dealResult);
+    int updateTaskStatus(@Param("id") String id, @Param("status") String status, @Param("dealResult") String dealResult,@Param("nowTime") String nowTime);
 
     /**
      * 虫情数据插入虫情板
@@ -163,7 +163,8 @@ public interface TaskManagementDao {
      */
     int updateNodeAddress(@Param("nodeId") String nodeId, @Param("x") int x, @Param("y") int y,
                           @Param("z") int z, @Param("siteRoute") String siteRoute,
-                          @Param("siteId") String siteId, @Param("siteName") String siteName, @Param("stackId") String stackId);
+                          @Param("siteId") String siteId, @Param("siteName") String siteName,
+                          @Param("stackId") String stackId,@Param("caseNo") String caseNo);
 
     /**
      * 翻垛后,修改设备位置
@@ -234,7 +235,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findPestCount(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findPestCount(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal,@Param("taskSiteRoute") String taskSiteRoute);
 
     /**
      * 查询翻垛数量
@@ -243,7 +244,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findRollStack(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findRollStack(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 查询移垛数量
@@ -252,7 +253,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findMoveStack(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findMoveStack(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 垛内甲虫预警
@@ -261,7 +262,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findBeetle(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findBeetle(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 仓间甲虫预警
@@ -270,7 +271,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseBeetle(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findHouseBeetle(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 氧气预警
@@ -279,7 +280,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findO2(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findO2(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 仓间氧气预警
@@ -288,7 +289,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseO2(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findHouseO2(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 垛内温度预警
@@ -297,7 +298,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findStackTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findStackTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 仓间温度预警
@@ -306,7 +307,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findHouseTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 垛内湿度预警
@@ -315,7 +316,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findStackMoist(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findStackMoist(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 仓间湿度预警
@@ -324,7 +325,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseMoist(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findHouseMoist(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 包芯温度
@@ -333,7 +334,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findCoreTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findCoreTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 平均包芯高于环境预警任务
@@ -342,7 +343,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findMoreAveTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findMoreAveTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 仓间粉螟预警任务
@@ -351,7 +352,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findHouseMealworm(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findHouseMealworm(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 检查任务
@@ -360,7 +361,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findCheck(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findCheck(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 其他任务
@@ -369,7 +370,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findOther(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("siteRoute") String siteRoute, @Param("principal") String principal);
+    int findOther(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("siteRoute") String siteRoute);
 
     /**
      * 查询任务平均完成时间

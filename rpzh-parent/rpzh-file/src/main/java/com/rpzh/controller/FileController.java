@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 任务中心图片管理
@@ -57,7 +59,7 @@ public class FileController {
         if (ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "请选择一个任务");
         }
-        //todo 文件格式控制
+        //todo 文件格式控制,前端已做
         //封装一个FastDFSFile
         FastDFSFile fastDFSFile = new FastDFSFile(
                 file.getOriginalFilename(), //文件名字
@@ -76,8 +78,12 @@ public class FileController {
         String group = uploads[0];
         //图片文件名
         String fileName = uploads[1];
+        //用于返回前端数据
+        Map<String,String> mapPic = new HashMap<>();
+        mapPic.put("group", group);
+        mapPic.put("fileName", fileName);
         int insertFlag = fileService.insertFilePictureUrl(path,group,fileName,id);
-        return new Result(true, StatusCode.OK, "文件上传成功");
+        return new Result(true, StatusCode.OK, "文件上传成功",mapPic);
     }
 
     /**

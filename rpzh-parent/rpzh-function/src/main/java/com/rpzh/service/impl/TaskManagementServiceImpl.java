@@ -342,10 +342,10 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             //不为空,状态为完成
             status = "1";
         }
-        //修改任务状态
-        int updateFlag = taskManagementDao.updateTaskStatus(id, status, dealResult);
         //当前时间
         String nowTime = DateUtil.dateNew(new Date()).toString();
+        //修改任务状态
+        int updateFlag = taskManagementDao.updateTaskStatus(id, status, dealResult,nowTime);
         //解析虫情数据
         try {
             List<Map> list = JSONObject.parseObject(pestData, List.class);
@@ -420,7 +420,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         }
         //当前时间
         String nowTime = DateUtil.dateNew(new Date()).toString();
-        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult());
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult(),nowTime);
         //获取移垛路径,传入的是移垛后路径
         String siteRoute = taskDto.getSiteRoute();
         //获取移垛垛位名称
@@ -445,7 +445,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
                 int x = Integer.parseInt(map.get("x").toString());
                 int y = Integer.parseInt(map.get("y").toString());
                 int z = Integer.parseInt(map.get("z").toString());
-                int updateFlag = taskManagementDao.updateNodeAddress(nodeId, x, y, z, siteRoute, siteId, siteName, stackId);
+                String caseNo = map.get("caseNo")+"";
+                int updateFlag = taskManagementDao.updateNodeAddress(nodeId, x, y, z, siteRoute, siteId, siteName, stackId,caseNo);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -472,7 +473,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             //有处理效果,任务状态为完成
             taskDto.setStatus("1");
         }
-        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult());
+        //当前时间
+        String nowTime = DateUtil.dateNew(new Date()).toString();
+        int updateStatus = taskManagementDao.updateTaskStatus(taskDto.getId(), taskDto.getStatus(), taskDto.getDealResult(),nowTime);
         //获取翻垛数据
         String siteDate = taskDto.getSiteDate();
         try {
