@@ -308,8 +308,9 @@ public class MonitoringCenterController {
             return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
         }
 
+        //如果数据类型为空 设成0
         if (ToolUtil.isEmpty(nodeDto.getDataType())){
-            return new Result<>(false, StatusCode.ERROR, "数据类型不能为空");
+            nodeDto.setDataType(0);
         }
 
 

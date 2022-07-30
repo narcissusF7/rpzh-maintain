@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.handler.DataHandler;
@@ -23,8 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -266,5 +269,29 @@ public class TestContrller{
         map.put("username","ljj");
         redisTemplate.opsForHash().put("WAREHOUSE_PRINCIPAL","1_1",map);
         return new Result<>(true, StatusCode.OK, "测试方法4");
+    }
+
+    @PostMapping("seven")
+    public Result seven(MultipartFile file){
+//读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
+        List<Map<Integer, String>> nodeDate;
+        try {
+            nodeDate = ExcelUtils.importExcel(file, 1 , 0, 7);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result<>(false, StatusCode.ERROR, "导入失败");
+        }
+        for (int i = 0; i < nodeDate.size(); i++) {
+            ParseData parseData = new ParseData(nodeDate.get(i));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            List<String> list = new ArrayList<>();
+            for (int j = 0; j < 6; j++) {
+                list.add(sdf.format(new Date()));
+            }
+            parseData.setDateTime(list);
+            dataHandler.handlerData(parseData);
+        }
+
+        return new Result<>(true, StatusCode.OK, "测试方法7");
     }
 }

@@ -2,7 +2,9 @@ package com.rpzh.parse;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class ParseData{
@@ -49,4 +51,24 @@ public class ParseData{
      * 丢包个数
      */
     private Integer packetLossNum;
+
+    public ParseData() {
+    }
+    public ParseData(Map<Integer,String> map) {
+
+        this.nodeId = map.get(0);
+        this.nodeType = "0"+(int)Double.parseDouble(map.get(1));
+        String str = map.get(2);
+        String[] split = str.split(",");
+        List<Double> data = new ArrayList<>();
+        for (int i = 0; i < split.length; i++) {
+            data.add(Double.parseDouble(split[i]));
+        }
+        this.Data = data;
+        this.frequency = (int)Double.parseDouble(map.get(3));
+        this.voltage = (int)Double.parseDouble(map.get(4));
+        this.signalStrength = (int)Double.parseDouble(map.get(5));
+        this.packetLossNum = (int)Double.parseDouble(map.get(6));
+
+    }
 }

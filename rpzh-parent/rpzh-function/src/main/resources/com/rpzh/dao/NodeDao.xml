@@ -99,7 +99,7 @@
                 and node_type = #{nodeDto.nodeType}
             </if>
             <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">
-                and site_route = #{nodeDto.siteRoute}
+                and site_route like concat(#{nodeDto.siteRoute}, '%')
             </if>
             <if test="nodeDto.status != null and nodeDto.status != ''">
                 and status = #{nodeDto.status}
@@ -110,10 +110,8 @@
             <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
                 and into_stack_time &lt;= #{nodeDto.endTime}
             </if>
-            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">
-                and gather_site like concat(#{nodeDto.gatherSite}, '%')
-            </if>
         </where>
+        order by created_time desc
     </select>
     <select id="findNodeCountById" resultType="int">
         SELECT count(1)
@@ -464,7 +462,8 @@
     <select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">
         SELECT
         node_id AS nodeId,
-        site_route siteRoute
+        site_route siteRoute,
+        node_type nodeType
         FROM
         tb_node
         WHERE

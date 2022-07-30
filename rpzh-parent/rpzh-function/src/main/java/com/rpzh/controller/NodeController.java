@@ -175,8 +175,12 @@ public class NodeController {
             value = "状态,0:解垛,1:入垛,2:未使用 3:故障",
             dataType = "String"
     ),@ApiImplicitParam(
-            name = "gatherSite",
-            value = "采集位置",
+            name = "siteRoute",
+            value = "位置路由",
+            dataType = "String"
+    ),@ApiImplicitParam(
+            name = "siteId",
+            value = "位置Id",
             dataType = "String"
     ), @ApiImplicitParam(
             name = "startTime",

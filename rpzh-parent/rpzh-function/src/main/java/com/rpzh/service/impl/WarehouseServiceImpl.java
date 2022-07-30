@@ -541,6 +541,21 @@ public class WarehouseServiceImpl implements WarehouseService {
         //静态分页
         PageHelper.startPage(page, size);
         List<StackVo> stackVoList = warehouseDao.getStackPage(stackDto);
+        stackVoList.forEach(stackVo->{
+            //如果负责人名称为空
+            if (ToolUtil.isEmpty(stackVo.getPrincipalName())){
+                Map<String,Object> map = new HashMap<>();
+                //通过位置路由获取上级负责人
+                map = sitePrincipalMap(stackVo.getPidRoute(), map);
+                //如果负责人不为空
+                if (ToolUtil.isNotEmpty(map)){
+                    stackVo.setPrincipalName(map.get("nickname")+"("+map.get("username")+")");
+                }
+            }else {
+                Object nickname = redisTemplate.opsForHash().get("USER_" + stackVo.getPrincipalName(), "nickname");
+                stackVo.setPrincipalName(nickname+"("+stackVo.getPrincipalName()+")");
+            }
+        });
         return new PageInfo<StackVo>(stackVoList);
     }
 

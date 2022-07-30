@@ -13,7 +13,9 @@ import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +68,6 @@ public class NodeOperateAspect {
 
             Object[] args = pjp.getArgs();
 
-            NodeOperationDto nodeOperationDto = new NodeOperationDto();
-
-            nodeOperationDto.setOperationType(NodeOperationEnum.getTypeNum(type));
 
             //获取用户信息
             Map<String, String> userInfo = TokenDecode.getUserInfo();
@@ -94,22 +93,22 @@ public class NodeOperateAspect {
 
                 case NodeConstant.ADD_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    setValue(nodeOperationDto,nodeDto,"设备"+nodeDto.getNodeId() +"添加成功",username,nodeOperationDtos);
+                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"添加成功",username,nodeOperationDtos);
                     break;
                 case NodeConstant.DELETE_NODE_OPERATE_NUMBER:
                     String[] nodeIds =(String[]) args[0];
                     StringBuffer detail =new StringBuffer("设备");
                     Arrays.stream(nodeIds).forEach(nodeId-> detail.append(nodeId).append("  "));
                     detail.append("被删除");
-                    setValue(nodeOperationDto,new NodeDto(),detail.toString(),username,nodeOperationDtos);
+                    setValue(type,new NodeDto(),detail.toString(),username,nodeOperationDtos);
                     break;
                 case NodeConstant.UPDATE_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    setValue(nodeOperationDto,nodeDto,"设备"+nodeDto.getNodeId() +"被修改",username,nodeOperationDtos);
+                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"被修改",username,nodeOperationDtos);
                     break;
                 case NodeConstant.REPLACE_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    setValue(nodeOperationDto,nodeDto,"设备"+nodeDto.getNodeId() +"被设备"+nodeDto.getAfterNodeId()+"替换",username,nodeOperationDtos);
+                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"被设备"+nodeDto.getAfterNodeId()+"替换",username,nodeOperationDtos);
                     break;
                 case NodeConstant.ENTER_STACK_NODE_OPERATE_NUMBER:
 
@@ -122,19 +121,19 @@ public class NodeOperateAspect {
 
                     nodeDtos =mapList;
                     nodeDtos.forEach(nodeDto1 ->
-                            setValue(nodeOperationDto,nodeDto1,"设备"+nodeDto1.getNodeId() +"入垛至"+nodeDto1.getStack(),username,nodeOperationDtos)
+                            setValue(type,nodeDto1,"设备"+nodeDto1.getNodeId() +"入垛至"+nodeDto1.getStack(),username,nodeOperationDtos)
                     );
                     break;
                 case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    setValue(nodeOperationDto,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
+                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
                     break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
                     nodeDtoList = maintainPlanDto.getNodeDtoList();
                     nodeDtoList.forEach(nodeDtostr ->{
                         NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
-                        setValue(nodeOperationDto,nodeDto1,
+                        setValue(type,nodeDto1,
                                 "垛位"+nodeDto1.getStack() +"翻垛，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
                     });
 
@@ -144,7 +143,7 @@ public class NodeOperateAspect {
                     nodeDtoList = maintainPlanDto.getNodeDtoList();
                     nodeDtoList.forEach(nodeDtostr ->{
                         NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
-                        setValue(nodeOperationDto,nodeDto1,
+                        setValue(type,nodeDto1,
                                 "养护计划"+maintainPlanDto.getId() +"移垛至垛位"+maintainPlanDto.getStackId()+"，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
                     });
                 default:
@@ -163,13 +162,14 @@ public class NodeOperateAspect {
 
     /**
      *  给nodeOperationDto赋值
-     * @param nodeOperationDto 该操作信息
+     * @param type 该操作类型
      * @param nodeDto 当前这个设备信息
      * @param username 操作人员
      * @param detail  操作详情
      */
-    private void setValue(NodeOperationDto nodeOperationDto,NodeDto nodeDto,String detail,String username,List<NodeOperationDto>nodeOperationDtos){
-
+    private void setValue(String type,NodeDto nodeDto,String detail,String username,List<NodeOperationDto>nodeOperationDtos){
+        NodeOperationDto nodeOperationDto = new NodeOperationDto();
+        nodeOperationDto.setOperationType(NodeOperationEnum.getTypeNum(type));
         if (!StringUtils.isEmpty(nodeDto.getNodeId())){
             nodeOperationDto.setNodeId(nodeDto.getNodeId());
             redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeDto.getNodeId());
@@ -203,4 +203,15 @@ public class NodeOperateAspect {
         nodeOperationDtos.add(nodeOperationDto);
 
     }
+
+//    @Around("")
+//    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+//        //执行后置通知
+//        Object proceed = joinPoint.proceed();
+//        Object[] args = joinPoint.getArgs();
+//
+//
+//
+//        return proceed;
+//    }
 }

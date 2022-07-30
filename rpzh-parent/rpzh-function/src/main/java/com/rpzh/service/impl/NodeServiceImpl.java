@@ -111,6 +111,12 @@ public class NodeServiceImpl implements NodeService {
             //静态分页
             PageHelper.startPage(page, size);
         }
+        String siteRoute = nodeDto.getSiteRoute();
+        Integer siteId = nodeDto.getSiteId();
+        if (ToolUtil.isNotEmpty(siteRoute)&&ToolUtil.isNotEmpty(siteId)){
+            int level = siteRoute.split(",").length;
+            nodeDto.setSiteRoute(siteRoute+",[0"+level+":"+siteId+"]");
+        }
         if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
             nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
         }

@@ -84,7 +84,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeDao.findHumitureDevice(monitorCondition);
             //TODO 空调
             //查询空调设备
-            nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
+//            nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
             //再排序
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
         }else{
