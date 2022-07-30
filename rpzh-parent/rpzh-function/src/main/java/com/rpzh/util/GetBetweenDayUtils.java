@@ -178,23 +178,17 @@ public class GetBetweenDayUtils {
     }
 
     public static Map<String,Date> getMonth(Date startTime,Date endTime){
-
         //结束时间不为空
         if(ToolUtil.isNotEmpty(endTime)){
             endTime = new Date(endTime.getTime() + 24 * 60 * 60 * 1000 - 1);
         }
-        //开始时间和结束时间为空时，开始时间为当月1号 00:00:00,结束时间为当月最后一天 23:59:59
+        //开始时间和结束时间为空时，开始时间为今天,结束时间为上个月的今天
         if(ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)){
             Calendar calendar = Calendar.getInstance();
-            /*calendar.add(Calendar.MONTH, 0);*/
+            startTime = new Date();
+            calendar.setTime(startTime);
             calendar.add(Calendar.MONTH, -1);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);// 设置为1号,当前日期既为本月第一天
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            startTime = calendar.getTime();
-            calendar.add(Calendar.MONTH, 1);
-            endTime = new Date(calendar.getTime().getTime() - 1000);
+            endTime = new Date(calendar.getTime().getTime());
         }
         Map<String,Date> map = new HashMap<>();
         map.put("startTime",startTime);
@@ -203,8 +197,8 @@ public class GetBetweenDayUtils {
     }
 
     /*
-    * 判断填写的预警值是否有少写
-    */
+     * 判断填写的预警值是否有少写
+     */
     public static boolean getFlag(AlarmValueSettingDto alarmValueSettingDto){
         return alarmValueSettingDto.getStackOxygenUpperOne() == null ||
                 alarmValueSettingDto.getStackOxygenUpperThree() == null ||

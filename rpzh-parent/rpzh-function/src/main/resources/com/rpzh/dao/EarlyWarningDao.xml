@@ -97,14 +97,14 @@
         site_route as siteRoute,
         warning_time AS warningTime
         FROM tb_early_warning where (id,warning_grade) in (
-       SELECT substring_index(group_concat(id),',',1) id,MAX(warning_grade) AS warning_grade FROM tb_early_warning
+        SELECT substring_index(group_concat(id),',',1) id,MAX(warning_grade) AS warning_grade FROM tb_early_warning
         where warning_type = #{earlyWarningDto.warningType}
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         GROUP BY is_affirm,site_route) ORDER BY is_affirm DESC,warning_grade DESC,site_route desc
     </select>
-<select id="findNewTime" resultType="java.lang.String">
+    <select id="findNewTime" resultType="java.lang.String">
     select warning_time from tb_early_warning where is_affirm = #{affirm} and
     warning_grade = #{warningGrade} and warning_type = #{warningType} and site_route = #{siteRoute} LIMIT 1
 </select>
@@ -228,12 +228,12 @@
         ORDER BY day
     </select>
     <select id="findWarningTypeCount" resultType="java.util.Map">
-    SELECT count(1) as sum,warning_type AS warningType
-    FROM tb_early_warning
-    WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
-    GROUP BY warning_type
-    ORDER BY warning_type
-</select>
+        SELECT count(1) as sum,warning_type AS warningType
+        FROM tb_early_warning
+        WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
+        GROUP BY warning_type
+        ORDER BY warning_type
+    </select>
     <select id="findIsDeal" resultType="java.util.Map">
         SELECT count(1) as sumDeal,round(COUNT(1)/#{count},2) * 100 as ratioDeal
         FROM tb_early_warning
@@ -253,7 +253,7 @@
         update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} ORDER BY id DESC LIMIT 1
     </update>
     <select id="findMaxTime" resultType="java.lang.String">
-        select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId}
+        select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId} limit 1
     </select>
     <select id="findColor" resultType="java.util.Map">
         select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as oneColor,
@@ -275,8 +275,8 @@
         warning_grade = '3' and warning_type not in ('01','02','03') union select count(1) as countRow from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type in ('01','02','03')) t
     </select>
     <select id="findSiteRoute" resultType="java.lang.String">
-      select t.site_route from (select site_route from tb_early_warning where is_affirm = '2'
-      <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>
-      union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
+        select t.site_route from (select site_route from tb_early_warning where is_affirm = '2'
+        <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>
+        union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
 </mapper>

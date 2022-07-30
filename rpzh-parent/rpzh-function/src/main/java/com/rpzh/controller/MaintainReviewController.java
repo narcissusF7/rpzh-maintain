@@ -44,18 +44,30 @@ public class MaintainReviewController {
     }
 
     @PostMapping("/findMaintainPlanReview")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
+    })
+    @ApiOperation(value = "养护计划追溯列表")
     public Result<MaintainPlanVo> findMaintainPlanReview(Integer id) {
         List<MaintainPlanVo> maintainPlanVos = maintainReviewService.findMaintainPlanReview(id);
         return new Result(true, StatusCode.OK, "养护计划追溯查询成功!", maintainPlanVos);
     }
 
     @PostMapping("/findEarlyWarningReview")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
+    })
+    @ApiOperation(value = "养护预警追溯列表")
     public Result<EarlyWarningVo> findEarlyWarningReview(Integer id) {
         List<EarlyWarningVo> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
         return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", maintainPlanVos);
     }
 
     @PostMapping("/findDataReview")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
+    })
+    @ApiOperation(value = "养护数据追溯列表")
     public Result findDataReview(String tableType, Integer id, String startTime, String endTime) {
         if(ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "养护计划id不能为空!");

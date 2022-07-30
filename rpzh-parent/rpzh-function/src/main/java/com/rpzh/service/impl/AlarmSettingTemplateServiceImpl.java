@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * @Author: zyq
  * @Date: 2022/06/07/10:20
- * @Description: 功能
+ * @Description: 预警模板
  */
 @Service
 public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateService {
@@ -40,20 +40,21 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     private static final String CACHE_KEY_REDIS_MAINTAIN = "MAINTAIN_";
 
     /*
-    * 查询预警列表
-    */
+     * 查询预警列表
+     */
     @Override
     public PageInfo<AlarmValueSettingVo> findAlarmSettingTemplateTable(AlarmValueSettingDto alarmValueSettingDto) {
         Integer size = alarmValueSettingDto.getSize();
         Integer page = alarmValueSettingDto.getPage();
         PageHelper.startPage(page, size);
+        //分页查询预警信息
         List<AlarmValueSettingVo> alarmValueSettingVos = alarmSettingTemplateDao.findAlarmSettingTemplateTable(alarmValueSettingDto);
         return new PageInfo(alarmValueSettingVos);
     }
 
     /*
-    * 删除预警模板设置
-    */
+     * 删除预警模板设置
+     */
     @Override
     public Result deleteAlarmSettingTemplate(List<Integer> ids) {
         if(ToolUtil.isEmpty(ids)){
@@ -67,8 +68,8 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     }
 
     /*
-    * 添加预警设置模板
-    */
+     * 添加预警设置模板
+     */
     @Override
     public Result insertAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto) {
         String materialCode = alarmValueSettingDto.getMaterialCode();
@@ -86,11 +87,12 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         alarmValueSettingDto.setUpdateUser(createUser);
         //判断新建时点击下一阶段后再点击上一阶段最后再点击下一阶段
         if(ToolUtil.isNotEmpty(alarmValueSettingDto.getAlarmValueSettingId())){
-            //更新
+            //根据预警id更新预警表数据
             alarmSettingTemplateDao.updateAlarmSettingTemplate(alarmValueSettingDto);
+            //根据预警id和阶段更新预警阶段表数据
             alarmSettingTemplateDao.updateAlarmSettingTemplateStage(alarmValueSettingDto);
         }else {
-            //判断该预警规则名称该阶段是否存在
+            //根据预警规则名称和阶段判断该预警规则名称该阶段是否存在
             Integer count = alarmSettingTemplateDao.findCountByNameAndPhases(alarmValueSettingDto.getEarlyWarningRuleName(),alarmValueSettingDto.getPhases());
             if(count>0){
                 return new Result(false, StatusCode.ERROR, "已存在!");
@@ -100,9 +102,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
             //根据预警规则名称获取预警规则id
             Integer aid = alarmSettingTemplateDao.findCountByName(alarmValueSettingDto.getEarlyWarningRuleName());
             if(ToolUtil.isEmpty(aid)) {
-                //这是该预警规则名称的第一阶段,将数据插入预警表中
+                //这是该预警规则名称存在,但该阶段不存在,将数据插入预警表中
                 alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingDto);
-                //根据预警规则名称获取预警规则id
+                //新增后,再次根据预警规则名称获取预警规则id
                 aid = alarmSettingTemplateDao.findCountByName(alarmValueSettingDto.getEarlyWarningRuleName());
             }
             alarmValueSettingDto.setAlarmValueSettingId(aid);
@@ -122,65 +124,76 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     }
 
     /*
-    * 修改升级规则前回显
-    */
+     * 修改升级规则前回显
+     */
     @Override
     public SettingColorAndDayVo findColorAndAlertUpgradeDay(){
+        //查询升级规则
         SettingColorAndDayVo settingColorAndDayVo = alarmSettingTemplateDao.findColorAndAlertUpgradeDay();
         if(ToolUtil.isNotEmpty(settingColorAndDayVo)){
             return settingColorAndDayVo;
         }
+        //不存在则new一个
         return new SettingColorAndDayVo();
     }
 
     /*
-    * 修改或添加升级规则
-    */
+     * 修改或添加升级规则
+     */
     @Override
     public Result updateOrInsertColorAndAlertUpgradeDay(SettingColorAndDayDto settingColorAndDayDto) {
         //查询是否已存在升级规则
         Integer count = alarmSettingTemplateDao.findCount();
         //删除掉缓存中的预警升级阈值
         redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
-        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"TwoToThree");
+        redisTemplate.delete(CACHE_KEY_REDIS_MAINTAIN+"twoToThree");
+        //存在则更新
         if(count>0){
+            //更新一级颜色
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getColorOne(),"color","one");
+            //更新二级颜色
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getColorTwo(),"color","two");
+            //更新三级颜色
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getColorThree(),"color","three");
+            //更新一级升二级的天数
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getOneToTwoDay(),"warningThreshold","oneToTwo");
+            //更新二级升三级的天数
             alarmSettingTemplateDao.updateColorAndAlertUpgradeDay(settingColorAndDayDto.getTwoToThreeDay(),"warningThreshold","twoToThree");
             return new Result<>(true, StatusCode.OK, "修改升级规则成功!");
         }
+        //新增一级颜色
         alarmSettingTemplateDao.insertColorAndAlertUpgradeDay("color",settingColorAndDayDto.getColorOne(),"one");
+        //新增二级颜色
         alarmSettingTemplateDao.insertColorAndAlertUpgradeDay("color",settingColorAndDayDto.getColorTwo(),"two");
+        //新增三级颜色
         alarmSettingTemplateDao.insertColorAndAlertUpgradeDay("color",settingColorAndDayDto.getColorThree(),"three");
+        //新增一级升二级的天数
         alarmSettingTemplateDao.insertColorAndAlertUpgradeDay("warningThreshold",settingColorAndDayDto.getOneToTwoDay(),"oneToTwo");
+        //新增二级升三级的天数
         alarmSettingTemplateDao.insertColorAndAlertUpgradeDay("warningThreshold",settingColorAndDayDto.getTwoToThreeDay(),"twoToThree");
         return new Result<>(true, StatusCode.OK, "添加升级规则成功!");
     }
 
     /*
-    * 新建时在点击下一阶段后再点上一步时回显或者修改时预警设置各个阶段回显
-    */
+     * 新建时在点击下一阶段后再点上一步时回显或者修改时预警设置各个阶段回显
+     */
     @Override
     public Result findAlarmSettingTemplateByMaterialCode(String materialCode, String earlyWarningRuleName,String phases) {
-        AlarmValueSettingVo alarmValueSettingVo;
-        if(ToolUtil.isEmpty(phases)) {
-            alarmValueSettingVo = alarmSettingTemplateDao.findNameByMaintenceStyle(materialCode, earlyWarningRuleName);
-        }else{
-            alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(materialCode, earlyWarningRuleName,phases);
-        }
+        //根据物料代码、预警规则、阶段查询预警信息
+        AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(materialCode, earlyWarningRuleName,phases);
         if(ToolUtil.isEmpty(alarmValueSettingVo)){
+            //new一个alarmValueSettingVo对象
             alarmValueSettingVo = new AlarmValueSettingVo("1");
         }else{
+            //不为空,将物料代码转成数组,返回给前端
             alarmValueSettingVo.setMaterialCodes(Arrays.asList(alarmValueSettingVo.getMaterialCode()));
         }
         return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
     }
 
     /*
-    * 更改预警设置模板
-    */
+     * 更改预警设置模板
+     */
     @Override
     public Result updateAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto) {
         //判断填写的预警值是否有少写
@@ -218,29 +231,33 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         logAlarmSettingDto.setPhases(alarmValueSettingDto.getPhases());
         logAlarmSettingDto.setLogIp(ipAddr);
         logAlarmSettingDto.setMaterialCode(materialCode);
+        //插入操作日志
         alarmSettingTemplateDao.insertLogAlarmSetting(logAlarmSettingDto);
         return new Result<>(true, StatusCode.OK, "更改预警设置模板成功!");
     }
 
     /*
-    * 查询操作日志
-    */
+     * 查询操作日志
+     */
     @Override
     public Result findLogData(LogAlarmSettingDto logAlarmSettingDto) {
         if(StringUtils.isEmpty(logAlarmSettingDto.getMaterialCode()) || StringUtils.isEmpty(logAlarmSettingDto.getEarlyWarningRuleName())){
             return new Result<>(false, StatusCode.ERROR, "物料代码或预警规则名称不能为空!");
         }
         PageHelper.startPage(logAlarmSettingDto.getPage(), logAlarmSettingDto.getSize());
+        //分页查询操作日志
         List<LogAlarmSettingVo> logData = alarmSettingTemplateDao.findLogData(logAlarmSettingDto);
         return new Result<>(true, StatusCode.OK, "查询操作日志成功!",new PageInfo(logData));
     }
 
     /*
-    * 预警设置修改前回显
-    */
+     * 预警设置修改前回显
+     */
     @Override
     public AlarmValueSettingVo findAlarmSettingTemplate(Integer id) {
+        //根据id查询预警设置值
         AlarmValueSettingVo alarmValueSetting = alarmSettingTemplateDao.findAlarmSettingTemplateById(id);
+        //只需预警id、预警规则名称、物料代码(数组类型)返回给前端
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
         alarmValueSettingVo.setAlarmValueSettingId(alarmValueSetting.getAlarmValueSettingId());
         alarmValueSettingVo.setEarlyWarningRuleName(alarmValueSetting.getEarlyWarningRuleName());
