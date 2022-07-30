@@ -14,6 +14,7 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.service.TaskManagementService;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TimeUtils;
 import com.rpzh.util.TokenDecode;
@@ -63,6 +64,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
     @Autowired
     private PestMonitoringService pestMonitoringService;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * 新建任务
@@ -124,14 +128,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String betweenMsStr = String.valueOf(betweenMs);
         //  todo:任务过期
         //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
-        /*rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
+        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
                 //消息过期设置
                 message.getMessageProperties().setExpiration(betweenMsStr);
                 return message;
             }
-        });*/
+        });
         log.info("新建任务发送消息成功:" + uuid + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
@@ -150,6 +154,13 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //静态分页
         PageHelper.startPage(page, size);
         List<TaskVo> taskVoList = taskManagementDao.findTask(taskDto);
+        for (TaskVo taskVo : taskVoList) {
+            //获取负责人账号
+            String principal = taskVo.getPrincipal();
+            //获取负责人名字
+            String nickname = (String) redisUtil.hget("USER_"+principal, "nickname");
+            taskVo.setPrincipal(principal+"("+nickname+")");
+        }
         return new PageInfo<TaskVo>(taskVoList);
     }
 
@@ -230,6 +241,13 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //静态分页
         PageHelper.startPage(page, size);
         List<TaskVo> taskVoList = taskManagementDao.findTaskByUser(taskDto);
+        for (TaskVo taskVo : taskVoList) {
+            //获取负责人账号
+            String principal = taskVo.getPrincipal();
+            //获取负责人名字
+            String nickname = (String) redisUtil.hget("USER_"+principal, "nickname");
+            taskVo.setPrincipal(principal+"("+nickname+")");
+        }
         return new PageInfo<TaskVo>(taskVoList);
     }
 
@@ -761,6 +779,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             Date date = DateUtil.parse(endTime);
             startTime = DateUtil.offsetDay(date, -7).toString();
         }
+        //结束时间
+        endTime = endTime.substring(0,10)+ " 23:59:59";
         List<Map> mapList = new ArrayList<>();
         //查询虫情监控任务01:虫情巡查任务
         int type01 = taskManagementDao.findPestCount(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());
@@ -1021,6 +1041,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             Date date = DateUtil.parse(endTime);
             startTime = DateUtil.offsetDay(date, -7).toString();
         }
+        endTime = endTime.substring(0, 10) + " 23:59:59";
         Map mapAll = new HashMap();
         //查询虫情监控任务01:虫情巡查任务
         int type01 = taskManagementDao.findPestCount(startTime, endTime,taskDto.getPrincipal(),taskDto.getTaskSiteRoute());

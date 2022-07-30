@@ -1,5 +1,6 @@
 package com.rpzh.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.Result;
@@ -85,6 +86,14 @@ public class TaskManagementController {
         }
         if (ToolUtil.isEmpty(taskDto.getEndTime())){
             return new Result(false, StatusCode.ERROR, "结束时间不能为空");
+        }
+        //获取结束时间
+        String endTime = taskDto.getEndTime();
+        //当前时间
+        String nowDayTime = DateUtil.dateNew(new Date()).toString();
+        int i = endTime.compareTo(nowDayTime);
+        if (i < 0){
+            return new Result(false, StatusCode.ERROR, "结束时间不能小于当前时间");
         }
         if (ToolUtil.isEmpty(taskDto.getPushWay())){
             return new Result(false, StatusCode.ERROR, "推送方式不能为空");
