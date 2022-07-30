@@ -138,4 +138,6 @@ public interface NodeService {
     Integer findNodeStatus(Integer id);
 
     Result flipStack(MaintainPlanDto maintainPlanDto);
+
+    String findNodeTypeByNodeId(NodeDto nodeDto);
 }

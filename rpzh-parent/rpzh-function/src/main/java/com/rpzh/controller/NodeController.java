@@ -345,9 +345,9 @@ public class NodeController {
             }
             String[] split = pidRoute.toString().split(",");
             //查询该设备的设备类型
-            String nodeType = nodeService.findNodeType(nodeDto);
+            String nodeType = nodeService.findNodeTypeByNodeId(nodeDto);
             //如果时包芯设备
-            if (nodeType.equals("04")&&split.length==4){
+            if ("04".equals(nodeType)&&split.length==4){
                 return new Result<>(false, StatusCode.ERROR, "包芯设备不能放置到垛位外");
             }
             if (split.length==5) {

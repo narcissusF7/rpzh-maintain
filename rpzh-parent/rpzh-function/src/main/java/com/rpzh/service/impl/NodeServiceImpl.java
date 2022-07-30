@@ -365,6 +365,11 @@ public class NodeServiceImpl implements NodeService {
         return new Result(true,StatusCode.OK,"翻垛成功");
     }
 
+    @Override
+    public String findNodeTypeByNodeId(NodeDto nodeDto) {
+
+        return nodeDao.findNodeTypeByNodeId(nodeDto.getId());
+    }
 
 
     /**

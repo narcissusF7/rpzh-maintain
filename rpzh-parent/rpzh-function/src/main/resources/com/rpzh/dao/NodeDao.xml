@@ -576,4 +576,7 @@
         where pid_route = #{pidRoute} and site_type = '04'
         group by node_id)
     </select>
+    <select id="findNodeTypeByNodeId" resultType="java.lang.String">
+        select node_type nodeType from tb_node where id = #{id};
+    </select>
 </mapper>
