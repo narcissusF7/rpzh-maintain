@@ -144,7 +144,6 @@
   deal_method,deal_result,evaluate,move_stack_target_siteroute,move_stack_target_name,target_siteid
   FROM tb_task
   where id = #{id}
-  ORDER BY create_time DESC
 </select>
 <select id="findTaskByUser" resultMap="findTask">
  SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,deal_result,
@@ -170,6 +169,7 @@
      AND end_time &gt;= #{taskDto.endStartTime}
   </if>
   </where>
+   ORDER BY create_time DESC
 </select>
 <update id="taskDispose">
   UPDATE tb_task
