@@ -7,6 +7,7 @@ import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.NodeService;
@@ -18,6 +19,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -282,6 +284,9 @@ public class TestContrller{
             return new Result<>(false, StatusCode.ERROR, "导入失败");
         }
         for (int i = 0; i < nodeDate.size(); i++) {
+            if (ToolUtil.isEmpty(nodeDate.get(i).get(1))){
+                continue;
+            }
             ParseData parseData = new ParseData(nodeDate.get(i));
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             List<String> list = new ArrayList<>();

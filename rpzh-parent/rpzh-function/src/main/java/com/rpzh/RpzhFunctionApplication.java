@@ -1,14 +1,25 @@
 package com.rpzh;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.dialect.helper.MySqlDialect;
 import com.github.pagehelper.page.PageAutoDialect;
+import com.rpzh.dao.WarehouseDao;
 import com.rpzh.entity.IdWorker;
+
+import com.rpzh.entity.ToolUtil;
+import com.rpzh.util.RedisUtil;
+import com.rpzh.util.SpringContextHolder;
+import com.rpzh.vo.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author liubc
@@ -46,6 +57,22 @@ public class RpzhFunctionApplication {
                         "               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" +
                         "                         佛祖保佑 永不宕机 永无BUG \n" +
                         "养护微服务启动成功");
+
+        //获取 WarehouseDao  RedisUtil 的bean对象
+        WarehouseDao warehouseDao = SpringContextHolder.getBean(WarehouseDao.class);
+        RedisUtil redisUtil = SpringContextHolder.getBean(RedisUtil.class);
+
+        //分别查出 所有位置的信息 并且将负责人存入缓存中
+        List<WarehouseVo> allWarehouses = warehouseDao.findAllWarehouses(null);
+        setPrincipalToCache(allWarehouses,1,redisUtil);
+        List<BuildingVo> allBulid = warehouseDao.findAllBulid(null);
+        setPrincipalToCache(allBulid,2,redisUtil);
+        List<FloorVo> allFloor = warehouseDao.findAllFloor(null);
+        setPrincipalToCache(allFloor,3,redisUtil);
+        List<WareAreaVo> allWareArea = warehouseDao.findAllWareArea(null);
+        setPrincipalToCache(allWareArea,4,redisUtil);
+        List<StackVo> allStack = warehouseDao.findAllStack();
+        setPrincipalToCache(allStack,5,redisUtil);
     }
 
     @Bean
@@ -54,6 +81,34 @@ public class RpzhFunctionApplication {
         return new IdWorker(7, 12);
     }
 
+    /**
+     * 将负责人存入缓存中
+     * @param list
+     * @param level
+     * @param redisUtil
+     * @param <T>
+     */
+    public static  <T> void  setPrincipalToCache(List<T> list,int level,RedisUtil redisUtil){
+        //遍历
+        list.forEach(obj->{
+            String string = JSONObject.toJSONString(obj);
+            Map map = JSONObject.parseObject(string, Map.class);
+            String userName = map.get("principalName")+"";
+            //判断负责人是否为空
+            if (ToolUtil.isNotEmpty(userName)){
+                //缓存中获取负责人信息
+                Object nickname = redisUtil.hget("USER_" + userName, "nickname");
+                Object phonenumber = redisUtil.hget("USER_" + userName, "phonenumber");
+                Map<String,Object> map1 = new HashMap<>();
+                map1.put("nickname", nickname);
+                map1.put("phonenumber", phonenumber);
+                map1.put("username", userName);
+
+                //存到缓存中
+                redisUtil.hset("WAREHOUSE_PRINCIPAL",level+"_"+map.get("id"),JSONObject.toJSONString(map1));
+            }
+        });
+    }
 //    @Bean(name="redisTemplate")
 ////    public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
 ////        RedisTemplate<String, String> template = new RedisTemplate<>();
@@ -65,4 +120,5 @@ public class RpzhFunctionApplication {
 ////        template.setValueSerializer(redisSerializer);
 ////        return template;
 ////    }
+
 }

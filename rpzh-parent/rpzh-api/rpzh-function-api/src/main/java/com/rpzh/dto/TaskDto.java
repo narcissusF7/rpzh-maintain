@@ -117,8 +117,37 @@ public class TaskDto {
         this.taskNum = taskNum;
         this.type = type;
         this.taskAddress = taskAddress;
-        this.siteRoute = siteRoute;
+        this.taskSiteRoute = siteRoute;
         this.principal = principal;
         this.endTime = endTime;
+        switch (type){
+            case "06":
+                this.detail = "垛内氧气";
+                break;
+            case "07":
+                this.detail = "仓间氧气";
+                break;
+            case "08":
+                this.detail = "垛内温度";
+                break;
+            case "09":
+                this.detail = "仓间温度";
+                break;
+            case "10":
+                this.detail = "垛内湿度";
+                break;
+            case "11":
+                this.detail = "仓间湿度";
+                break;
+            case "12":
+                this.detail = "包芯温度";
+                break;
+            case "13":
+                this.detail = "平均包芯高于环境";
+                break;
+            case "19":
+                this.detail = "平均包芯低于环境";
+                break;
+        }
     }
 }
