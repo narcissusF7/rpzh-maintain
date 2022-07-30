@@ -2,10 +2,12 @@ package com.rpzh;
 
 import com.github.pagehelper.dialect.helper.MySqlDialect;
 import com.github.pagehelper.page.PageAutoDialect;
+import com.rpzh.entity.IdWorker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -44,6 +46,12 @@ public class RpzhFunctionApplication {
                         "               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" +
                         "                         佛祖保佑 永不宕机 永无BUG \n" +
                         "养护微服务启动成功");
+    }
+
+    @Bean
+    public IdWorker idWorker() {
+        //0,机器的编号,集群的编号
+        return new IdWorker(7, 12);
     }
 
 //    @Bean(name="redisTemplate")

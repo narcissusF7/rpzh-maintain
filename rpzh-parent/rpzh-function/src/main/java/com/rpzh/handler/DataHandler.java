@@ -7,6 +7,7 @@ import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
 import com.rpzh.dto.TaskDto;
+import com.rpzh.entity.IdWorker;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
@@ -61,6 +62,9 @@ public class DataHandler {
 
     @Autowired
     TaskManagementService taskManagementService;
+
+    @Autowired
+    IdWorker idWorker;
 
     @Value("${node.voltage}")
     Double voltage;
@@ -137,8 +141,9 @@ public class DataHandler {
         nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
         nodeData.setPidRoute(siteRoute);
         nodeData.setWarningType(warningType.substring(1));
+
         //向数据库插入当前数据
-        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history");
+        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",idWorker.nextId());
 
         //将该数据放入到缓存中
         redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
@@ -242,7 +247,7 @@ public class DataHandler {
                 nodeData.setWarningType(warningType.substring(1));
             }
             //向数据库插入当前数据
-            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
+            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),idWorker.nextId());
 
             //最后一条数据需要存放到redis中
             if (i==0){
