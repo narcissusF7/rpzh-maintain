@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Mapper
 public interface MaintainPlanDao {
-
     int deleteMaintainPlanById(@Param("ids") List<Integer> ids);
 
     int deleteMaintainPlanStageById(@Param("ids") List<Integer> ids);

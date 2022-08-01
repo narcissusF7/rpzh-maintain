@@ -56,7 +56,7 @@ public class MaintainPlanController {
     }
 
     @PostMapping("/findAlarmSettingTemplate")
-    @ApiOperation(value = "查询预警规则名称")
+    @ApiOperation(value = "根据预警规则名称预警信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String")
     })

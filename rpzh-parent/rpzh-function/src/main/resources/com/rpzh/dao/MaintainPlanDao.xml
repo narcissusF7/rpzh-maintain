@@ -12,13 +12,10 @@
         t2.created_time as createdTime
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
-        inner join
-        (select id,site_name from tb_stack where 1=1
+        inner join (select id,site_name from tb_stack where 1=1
         <if test="maintainPlanDto.pidRoute!=null and maintainPlanDto.pidRoute!=''">and pid_route like concat('%',#{maintainPlanDto.pidRoute},'%')</if>
-        <if test="maintainPlanDto.stackId!=null and maintainPlanDto.stackId!=''">and id = #{maintainPlanDto.stackId}</if>
-        ) t3 on t3.id = t1.stack_id
-        <where>
-            t1.is_end = '0' and t2.aftercare_date_end >= #{maintainPlanDto.nowDate} and t2.is_change = '0'
+        <if test="maintainPlanDto.stackId!=null and maintainPlanDto.stackId!=''">and id = #{maintainPlanDto.stackId}</if> ) t3 on t3.id = t1.stack_id
+        where t1.is_end = '0' and t2.aftercare_date_end >= #{maintainPlanDto.nowDate} and t2.is_change = '0'
             <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">
                 and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')
             </if>
@@ -34,7 +31,6 @@
             <if test="maintainPlanDto.maintenceStyle !=null and maintainPlanDto.maintenceStyle != ''">
                 and t1.maintence_style = #{maintainPlanDto.maintenceStyle}
             </if>
-        </where>
         order by created_time desc
     </select>
     <select id="findMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">

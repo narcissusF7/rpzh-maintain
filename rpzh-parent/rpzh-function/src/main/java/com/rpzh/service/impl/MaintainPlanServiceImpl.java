@@ -73,8 +73,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
         //获取垛位id
         Integer stackId = maintainPlanDto.getStackId();
+        //获取负责人ids
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        //负责人可以多选
         String username = "";
+        //从redis中获取账号,并拼接负责人账号
         for (int i = 0; i < principalIds.size(); i++) {
             if(i==0){
                 username = (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
@@ -88,53 +91,73 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setMaterialCode(String.join(",",maintainPlanDto.getMaterialCodes()));
         //养护计划创建的时间
         Date nowDate = new Date();
-        //创建养护计划的用户
         String createUser = TokenDecode.getUserInfo().get("username");
+        //设置创建人
         maintainPlanDto.setCreateUser(createUser);
+        //设置创建时间
         maintainPlanDto.setCreatedTime(nowDate);
-        //结束当前阶段的时间
+        //时间格式化
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
+            //设置养护到期时间
             Date date = new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l);
             maintainPlanDto.setAftercareDateEnd(date);
         }catch (Exception e){
             e.printStackTrace();
         }
-        //新建养护计划
+        //创建养护计划
         maintainPlanDao.insertMaintainPlan(maintainPlanDto);
-        //获取当前养护计划的id
+        //根据垛位id获取当前养护计划的id
         Integer id =maintainPlanDao.findIdByStackId(stackId);
         //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
+        //获取养护阶段名称
         String phases = maintainPlanDto.getPhases();
+        //获取位置路由
         String pidRoute = maintainPlanDto.getPidRoute();
+        //存储物料代码、养护数量、养护计划id、垛位id、仓间id、层id、楼栋id、仓库id的集合
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
+        //根据垛位id和物料代码查询各个物料代码的数量
         List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
         for (MaterialVo materialVo : materialVos) {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
+            //物料代码
             maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
+            //养护数量
             maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
+            //养护计划id
             maintainPlanDto1.setMaintainPlanId(id);
+            //垛位id
             maintainPlanDto1.setStackId(stackId);
+            //仓间id
             maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
+            //层id
             maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
+            //楼栋id
             maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
+            //仓库id
             maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
+            //养护方式
             maintainPlanDto1.setMaintenceStyle(maintenceStyle);
+            //养护阶段
             maintainPlanDto1.setPhases(phases);
-            maintainPlanDto1.setNowDate(nowDate);
+            //创建时间
             maintainPlanDto1.setNowDate(nowDate);
             maintainPlanDtos.add(maintainPlanDto1);
         }
         if(ToolUtil.isNotEmpty(maintainPlanDtos)) {
+            //养护数量信息批次插入养护数量表中
             maintainPlanDao.insertMaintainCount(maintainPlanDtos);
         }
-        //将数值插入到预警规则表中
+        //设置养护计划id
         maintainPlanDto.setId(id);
+        //将养护计划Dto中的预警数值转为预警规则Dto中的预警数值
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
+        //将预警数值插入到预警表中
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
         //获取新创建的预警规则id
         Integer alarmValueSettingId = alarmValueSettingDao.findIdByEarlyWarningRuleName(alarmValueSettingDto.getEarlyWarningRuleName());
+        //设置预警规则id
         maintainPlanDto.setAlarmValueSettingId(alarmValueSettingId);
         //插入到养护阶段表中
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
@@ -144,22 +167,32 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return maintainPlanDao.updateMaintainPlanStageId(stageId,id);
     }
 
+    /*
+    * 查询所有的预警规则名称
+    * */
     @Override
     public List<String> findAlarmSettingTemplateList(){
         return alarmSettingTemplateDao.findAlarmSettingTemplateList();
     }
 
+    /*
+    * 判断预警名称是否已存在
+    * */
     @Override
     public Result findCountByName(String earlyWarningRuleName) {
         Integer id = alarmSettingTemplateDao.findCountByName(earlyWarningRuleName);
         if(ToolUtil.isNotEmpty(id)){
             return new Result(false, StatusCode.ERROR, "该预警名称已存在!");
         }
-        return new Result(true, StatusCode.OK, "");
+        return new Result(true, StatusCode.OK, "该预警名称不存在");
     }
 
+    /*
+    * 根据预警规则名称预警信息
+    * */
     @Override
     public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName) {
+        //获取养护阶段
         String user = TokenDecode.getUserInfo().get("username");
         String phases = redisTemplate.opsForValue().get(user + "phases").toString();
         //根据预警规则名称获取预警模板数值
@@ -170,9 +203,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return alarmSettingTemplate;
     }
 
+    /*
+    * 判断该垛位存在存在养护计划
+    * */
     @Override
     public Integer isExistStackId(Integer stackId) {
-        //判断该垛位存在存在养护计划
         return maintainPlanDao.isExistStackId(stackId);
     }
 
@@ -184,14 +219,21 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
+        //分页查询
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
+        //获取当前时间,与转段时间相比   当前时间大则不显示
         maintainPlanDto.setNowDate(new Date());
+        //获取位置路由
         String pidRoute = maintainPlanDto.getPidRoute();
         if(StringUtil.isNotEmpty(pidRoute)) {
             int length = pidRoute.split(",").length;
+            //选择的位置是非垛位
             if (!pidRoute.contains("04")) {
                 maintainPlanDto.setPidRoute(SiteRouteUtil.route(pidRoute,maintainPlanDto.getStackId()+""));
                 maintainPlanDto.setStackId(null);
+            }else{
+                //选择的位置是垛位
+                maintainPlanDto.setPidRoute(null);
             }
         }
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto);
@@ -206,24 +248,34 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public Result deleteMaintainPlanInfo(List<Integer> ids) {
+        //查询所有阶段ids
         List<Integer> stageIds = maintainPlanDao.findId(ids);
         for (Integer stageId : stageIds) {
+            //删除redis中的养护信息
             if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + stageId))){
                 redisTemplate.delete(MAINTAIN + stageId);
             }
         }
+        //查询所有预警ids
         List<Integer> alarmValueSettingIds = maintainPlanDao.findAlarmValueSettingId(ids);
         for (Integer id : ids) {
+            //删除养护数量表数据
             maintainPlanDao.deleteMaintainCount(id);
         }
+        //删除养护计划表信息
         maintainPlanDao.deleteMaintainPlanById(ids);
         if(ToolUtil.isNotEmpty(alarmValueSettingIds)) {
+            //删除预警表信息
             alarmValueSettingDao.deleteIds(alarmValueSettingIds);
         }
+        //删除养护阶段表信息
         maintainPlanDao.deleteMaintainPlanStageById(ids);
         return new Result(true, StatusCode.OK, "删除成功!");
     }
 
+    /*
+    * 根据养护id查询养护详情
+    * */
     @Override
     public MaintainPlanVo findMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);

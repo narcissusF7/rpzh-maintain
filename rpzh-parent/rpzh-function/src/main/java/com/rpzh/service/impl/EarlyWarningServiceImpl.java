@@ -517,7 +517,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         List<Map<String,String>> user = new ArrayList<>();
         List<Map> warningDatas = new ArrayList<>();
         List<Map> warningInfos = new ArrayList<>();
-        Long taskId = 0l;
+        Long taskId = 0L;
         if (warningType.equals("01")){
             warningDatas = earlyWarningDao.findWarningDataWarningTypeIsOne(isAffirm,pidRoute);
         }else{
