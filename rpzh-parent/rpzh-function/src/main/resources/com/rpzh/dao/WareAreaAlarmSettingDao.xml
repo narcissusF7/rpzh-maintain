@@ -88,7 +88,7 @@
         tb_ware_area_alarm_setting t1
         where 1=1
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat('%', #{wareAreaAlarmSettingDto.pidRoute}, '%')</if>
-        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user like concat('%', #{wareAreaAlarmSettingDto.createUser}, '%')</if>
+        <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user = #{wareAreaAlarmSettingDto.createUser}</if>
         <if test="wareAreaAlarmSettingDto.startTime != null">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
         <if test="wareAreaAlarmSettingDto.endTime != null">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
     </select>

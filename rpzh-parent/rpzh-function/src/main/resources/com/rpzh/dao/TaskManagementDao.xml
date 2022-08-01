@@ -575,4 +575,7 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
     AND principal = #{principal}
   </if>
 </select>
+    <select id="findTaskId" resultType="java.lang.Long">
+        select id from tb_task where site_route = #{siteRoute} and type = #{warningType} and status &lt;> 1 limit 1
+    </select>
 </mapper>

@@ -13,14 +13,17 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.util.IpUtils;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -95,6 +98,8 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         return new Result(true, StatusCode.OK, "删除仓间预警规则模板成功!");
     }
 
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         String endTime = wareAreaAlarmSettingDto.getEndTime();
@@ -108,6 +113,10 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         }
         PageHelper.startPage(wareAreaAlarmSettingDto.getPage(), wareAreaAlarmSettingDto.getSize());
         List<WareAreaAlarmSettingVo> wareAreaAlarmSettingInfos = wareAreaAlarmSettingDao.findWareAreaAlarmSettingInfo(wareAreaAlarmSettingDto);
+        for (WareAreaAlarmSettingVo wareAreaAlarmSetting : wareAreaAlarmSettingInfos) {
+            String createUser = wareAreaAlarmSetting.getCreateUser();
+            wareAreaAlarmSetting.setCreateUser((String)redisUtil.hget("USER_"+createUser,"nickname") + "(" + createUser + ")");
+        }
         return new PageInfo<>(wareAreaAlarmSettingInfos);
     }
 

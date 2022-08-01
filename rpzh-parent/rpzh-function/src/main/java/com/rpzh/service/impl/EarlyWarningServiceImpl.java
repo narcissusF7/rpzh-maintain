@@ -46,7 +46,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Resource
     private PestMonitoringDao pestMonitoringDao;
     //redis中用户key前缀
-    private static final String USER = "USER_";
+    private static final String USER = "USER_ID_";
     private static final String USER_ID = "MAINTIAN_USER_ID_USERNAME";
     @Autowired
     private RedisUtil redisUtil;
@@ -95,6 +95,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             //设置备注、处理措施
             earlyWarningInfo.setDealSuggestion(info.get("dealMethod"));
             earlyWarningInfo.setRemark(info.get("remark"));
+            String principalName = earlyWarningInfo.getPrincipalName();
+            earlyWarningInfo.setPrincipalName((String)redisUtil.hget("USER_"+principalName,"nickname") + "(" + principalName + ")");
         }
         return new PageInfo<>(earlyWarningInfos);
     }
@@ -369,16 +371,35 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             node.add(map1);
         }
         String siteType = nodeData.get(0).getSiteType();
-        Integer id = nodeData.get(0).getMaintainPlanId();
+        Integer id = nodeData.get(0).getMaintainStageId();
         if("05".equals(siteType)){
-            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(id, time);
-            List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-            String principalName = "";
-            for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
+            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(id);
+            List<String> usernames = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+            String userNames = "";
+            for (int i = 0; i < usernames.size(); i++) {
+                if(i==0){
+                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }else{
+                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }
             }
-            maintainPlanVo.setPrincipalName(principalName);
+            maintainPlanVo.setPrincipalName(userNames);
             map.put("maintainPlanVo", maintainPlanVo);
+        }
+
+        switch (nodeType){
+            case "01":
+                map.put("type", "无线氧气传感器");
+                break;
+            case "03":
+                map.put("type", "无线温湿度传感器");
+                break;
+            case "04":
+                map.put("type", "无线包芯温度传感器");
+                break;
+            default:
+                map.put("type", "");
+                break;
         }
         map.put("nodeData", node);
         map.put("time", time);
@@ -440,7 +461,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         String warningType = earlyWarningDto.getWarningType();
         List<EarlyWarningVo> earlyWarningVos = new ArrayList<>();
         if(ToolUtil.isEmpty(warningType)){
-            return new Result<>(true, StatusCode.OK, "当前无数据",earlyWarningVos);
+            return new Result<>(true, StatusCode.OK, "",earlyWarningVos);
         }
         //设置开始时间和结束时间
         Map<String, Date> month = GetBetweenDayUtils.getMonth(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime());
@@ -483,6 +504,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Integer stackId = earlyWarningDto.getStackId();
         Integer areaId = earlyWarningDto.getAreaId();
         List<EarlyWarningVo> earlyWarningVos = new ArrayList<>();
+        Map<String,Object> map1 = new HashMap<>();
         if(ToolUtil.isEmpty(warningType) || ToolUtil.isEmpty(isAffirm)){
             return new Result<>(false, StatusCode.ERROR, "预警类型或处理状态不能为空",earlyWarningVos);
         }
@@ -493,14 +515,16 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         //最新报警时间
         String newTime = earlyWarningDao.findNewTime(isAffirm, warningGrade, warningType, pidRoute);
         List<Map<String,String>> user = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
         List<Map> warningDatas = new ArrayList<>();
         List<Map> warningInfos = new ArrayList<>();
+        Long taskId = 0l;
         if (warningType.equals("01")){
             warningDatas = earlyWarningDao.findWarningDataWarningTypeIsOne(isAffirm,pidRoute);
         }else{
             warningDatas = earlyWarningDao.findWarningDataWarningTypeIsNotOne(isAffirm,warningType, pidRoute);
+            taskId = taskManagementDao.findTaskId(pidRoute, warningType);
         }
+        Map<String,Object> map = new HashMap<>();
         if(ToolUtil.isNotEmpty(warningDatas)) {
             String siteName = "";
             String materialCode = "";
@@ -513,15 +537,19 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
             Map<String, String> typeMap = getWarningType(warningType);
             map = getMap(Arrays.asList("warningTime","materialCode","siteName","warningName"),Arrays.asList(newTime,materialCode,siteName, typeMap.get("warningType")));
+            if (!warningType.equals("01")) {
+                map.put("taskId", taskId);
+                map.put("warningType", warningType);
+            }
             String name = typeMap.get("name");
             List<Integer> ids = new ArrayList<>();
             warningDatas.forEach(warningData -> {
                 ids.add(Integer.parseInt(warningData.get("id").toString()));
                 String route = warningData.get("pidRoute").toString();
-                if(route.contains("05")){
-                    warningData.put("stackId",SiteRouteUtil.getSiteId(route,"05"));
+                if(warningData.get("pidRoute").toString().contains("05")){
+                    warningData.put("stackId",stackId);
                 }else{
-                    warningData.put("stackId",SiteRouteUtil.getSiteId(route,"04"));
+                    warningData.put("stackId",areaId);
                 }
                 warningData.put("warningName", getWarningType("0"+warningData.get("warningType").toString()).get("warningType"));
                 warningData.put("deal", getWarningType("0"+warningData.get("warningType").toString()).get("deal"));
@@ -562,21 +590,46 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     Map warningInfo = new HashMap();
                     warningInfo.put("warningTime", warningVo.getWarningTime());
                     warningInfo.put("warningType", "故障报警");
-                    warningInfo.put("warningNews", "01");
+                    warningInfo.put("warningNews", "故障");
                     warningInfos.add(warningInfo);
                 });
             }
-            List<String> usernames = Arrays.asList(earlyWarningDao.findPrincipal(earlyWarningDto).split(","));
-            usernames.forEach(username -> {
-                Map<String,String> userName = new HashMap<>();
-                String phonenumber = (String)redisUtil.hget("USER_"+username, "phonenumber");
-                userName.put("siteRoute",pidRoute);
-                userName.put("username",username);
-                userName.put("number",phonenumber);
-                user.add(userName);
-            });
+            List<String> usernames = new ArrayList<>();
+            if(ToolUtil.isNotEmpty(areaId)){
+                WareAreaVo wareAreaVo = warehouseDao.findWareAreaPrincipalName(areaId);
+                String principalName = wareAreaVo.getPrincipalName();
+                if (ToolUtil.isEmpty(principalName)) {
+                    FloorVo floorVo = warehouseDao.findFloorPrincipalName(wareAreaVo.getFloorId());
+                    principalName = floorVo.getPrincipalName();
+                    if (ToolUtil.isNotEmpty(principalName)) {
+                        BuildingVo buildingVo = warehouseDao.findBuildingPrincipalName(floorVo.getBuildingId());
+                        principalName = buildingVo.getPrincipalName();
+                        if (ToolUtil.isNotEmpty(principalName)) {
+                            principalName = warehouseDao.findWarehousePrincipalName(buildingVo.getWarehouseId()).getPrincipalName();
+                        }
+                    }
+                }
+                usernames.add(principalName);
+                usernames.forEach(username -> {
+                    Map<String,String> userName = new HashMap<>();
+                    String phonenumber = (String)redisUtil.hget("USER_"+username, "phonenumber");
+                    userName.put("siteRoute",pidRoute);
+                    userName.put("username",username);
+                    userName.put("number",phonenumber);
+                    user.add(userName);
+                });
+            }else{
+                usernames.addAll(Arrays.asList(maintainPlanDao.findCurrentMaintainPlan(stackId).split(",")));
+                usernames.forEach(username -> {
+                    Map<String,String> userName = new HashMap<>();
+                    String phonenumber = (String)redisUtil.hget("USER_"+username, "phonenumber");
+                    userName.put("siteRoute",pidRoute);
+                    userName.put("username",username);
+                    userName.put("number",phonenumber);
+                    user.add(userName);
+                });
+            }
         }
-        Map<String,Object> map1 = new HashMap<>();
         map1.put("warningInfo",warningInfos);
         map1.put("earlyWarningVo",map);
         map1.put("warningDatas",warningDatas);
@@ -694,7 +747,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     public List<RepairDataVo> getRepairData(Integer stackId,Integer areaId){
         List<RepairDataVo> repairDataInfos = earlyWarningDao.findRepairData(stackId, areaId);
         for (RepairDataVo repairDataInfo : repairDataInfos) {
-            repairDataInfo.setDeviceType(getNodeType(repairDataInfo.getDeviceType()));
             repairDataInfo.setRepairReason(getWarningType("0"+repairDataInfo.getRepairReason()).get("warningType"));
         }
         return repairDataInfos;
@@ -706,7 +758,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Override
     public void warningSend(String number,String username,String siteRoute){
         //earlyWarningDao.findThreeBySiteRoute()
-        String message = "";
+        String message = "123434";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Map map = new HashMap();
         map.put("username",username);

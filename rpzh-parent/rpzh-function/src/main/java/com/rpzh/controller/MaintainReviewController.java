@@ -11,6 +11,7 @@ import com.rpzh.vo.EarlyWarningVo;
 import com.rpzh.vo.MaintainPlanVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -38,7 +39,7 @@ public class MaintainReviewController {
             @ApiImplicitParam(name = "stackId", value = "养护阶段", required = false,dataType = "String")
     })
     @ApiOperation(value = "养护追溯列表")
-    public Result<MaintainPlanVo> findReviewTable(MaintainPlanDto maintainPlanDto) {
+    public Result<MaintainPlanVo> findReviewTable(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         PageInfo<MaintainPlanVo> maintainPlanVos = maintainReviewService.findReviewTable(maintainPlanDto);
         return new Result(true, StatusCode.OK, "查询成功!", maintainPlanVos);
     }
