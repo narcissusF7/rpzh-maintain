@@ -13,13 +13,25 @@ import java.util.List;
  */
 public interface EarlyWarningService {
     Result findEarlyWarningInfo(EarlyWarningDto earlyWarningDto);
+
     Result findEarlyWarningByWarningType(EarlyWarningDto earlyWarningDto);
+
     Result findEarlyWarningBySiteId(EarlyWarningDto earlyWarningDto);
+
     PageInfo<EarlyWarningVo> findHistoryWarning(EarlyWarningDto earlyWarningDto);
+
     Result findWarningCount(EarlyWarningDto earlyWarningDto);
+
     Integer misreport(Integer id);
+
+
     List<RepairDataVo> getRepairData(Integer stackId, Integer areaId);
+
+
     Result findNodeData(EarlyWarningDto earlyWarningDto);
+
     int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime);
+
     void warningSend(String number,String username,String siteRoute);
+
 }

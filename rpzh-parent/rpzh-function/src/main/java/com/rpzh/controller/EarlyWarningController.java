@@ -126,7 +126,7 @@ public class EarlyWarningController {
     }
 
     @PostMapping("/updateRepairId")
-    @ApiOperation(value = "设备维修")
+    @ApiOperation(value = "去处理（故障），设备维修")
     public void updateRepairId(@RequestParam("affirm") String affirm, @RequestParam("deviceId") String deviceId, @RequestParam(name="id",required = false) String id,
                                @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime) {
         earlyWarningService.updateRepairId(affirm, deviceId, id, principal,dealTime);
@@ -137,7 +137,7 @@ public class EarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "number", value = "手机号", dataType = "String",required = true),
             @ApiImplicitParam(name = "username", value = "用户名", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String",required = true)
+            @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String",required = true)
     })
     public Result warningSend(String number,String username,String siteRoute){
         earlyWarningService.warningSend(number,username,siteRoute);

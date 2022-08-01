@@ -7,10 +7,15 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.service.AlarmSettingTemplateService;
 import com.rpzh.vo.*;
 import io.swagger.annotations.*;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,6 +30,13 @@ import java.util.List;
 public class AlarmSettingTemplateController {
     @Resource
     private AlarmSettingTemplateService alarmSettingTemplateService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(true);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+    }
 
     @PostMapping(value = "/findAlarmSettingTemplateTable")
     @ApiImplicitParams({

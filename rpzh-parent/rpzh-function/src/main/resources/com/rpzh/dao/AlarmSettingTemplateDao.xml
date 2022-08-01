@@ -268,6 +268,7 @@ FROM tb_general_setting limit 1
     </update>
     <select id="findAlarmSettingTemplateById" resultType="com.rpzh.vo.AlarmValueSettingVo">
        select
+       maintence_style as maintenceStyle,
        material_code as materialCode,
        early_warning_rule_name as earlyWarningRuleName
        from tb_alarm_setting_template

@@ -85,10 +85,6 @@ public interface MaintainPlanDao {
 
     List<String> findPhases(@Param("stackId") Integer stackId, @Param("maintenceStyle") String maintenceStyle);
 
-    String findPrincipalId(@Param("stackId") Integer stackId);
-
-    MaintainPlanVo findMaintainPlanByStack(@Param("stackId") Integer stackId);
-
     int updateMaintainCount(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
     List<MaintainCountVo> findTwo(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
@@ -111,7 +107,7 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findMaintainHistoryById(@Param("id") Integer id);
 
-    MaintainPlanVo findMaintainPlanNow(@Param("id") Integer id, @Param("time") String time);
+    MaintainPlanVo findMaintainPlanNow(@Param("id") Integer id);
 
     String findCurrentMaintainPlan(@Param("stackId")Integer stackId);
 }

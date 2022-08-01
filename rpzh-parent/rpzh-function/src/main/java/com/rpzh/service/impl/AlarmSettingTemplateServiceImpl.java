@@ -38,6 +38,8 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     @Autowired
     RedisTemplate redisTemplate;
     private static final String CACHE_KEY_REDIS_MAINTAIN = "MAINTAIN_";
+    @Autowired
+    private RedisUtil redisUtil;
 
     /*
      * 查询预警列表
@@ -49,6 +51,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         PageHelper.startPage(page, size);
         //分页查询预警信息
         List<AlarmValueSettingVo> alarmValueSettingVos = alarmSettingTemplateDao.findAlarmSettingTemplateTable(alarmValueSettingDto);
+        for (AlarmValueSettingVo alarmValueSettingVo : alarmValueSettingVos) {
+            alarmValueSettingVo.setCreateUser((String)redisUtil.hget("USER_"+alarmValueSettingVo.getCreateUser(),"nickname") + "(" + alarmValueSettingVo.getCreateUser() + ")");
+        }
         return new PageInfo(alarmValueSettingVos);
     }
 
@@ -262,6 +267,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         alarmValueSettingVo.setAlarmValueSettingId(alarmValueSetting.getAlarmValueSettingId());
         alarmValueSettingVo.setEarlyWarningRuleName(alarmValueSetting.getEarlyWarningRuleName());
         alarmValueSettingVo.setMaterialCodes(Arrays.asList(alarmValueSetting.getMaterialCode().split(",")));
+        alarmValueSettingVo.setMaintenceStyle(alarmValueSetting.getMaintenceStyle());
         return alarmValueSettingVo;
     }
 }

@@ -46,12 +46,16 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         List<MaintainPlanVo> maintainPlanVos = maintainReviewDao.findReviewTable(maintainPlanDto, column);
         maintainPlanVos.forEach(maintainPlanVo -> {
-            List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-            String principalName = "";
-            for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER+"username", USER+pid);
+            List<String> names = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+            String userName = "";
+            for (int i = 0; i < names.size(); i++) {
+                if(i==0){
+                    userName = (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+                }else{
+                    userName = userName + ","+ (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+                }
             }
-            maintainPlanVo.setPrincipalName(principalName);
+            maintainPlanVo.setPrincipalName(userName);
         });
         return new PageInfo<>(maintainPlanVos);
     }
@@ -118,12 +122,16 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
     @Override
     public MaintainPlanVo findMaintainBaseInfo(Integer id) {
         MaintainPlanVo maintainBaseInfo = maintainReviewDao.findMaintainBaseInfo(id);
-        List<String> principalIds = Arrays.asList(maintainBaseInfo.getPrincipalId().split(","));
-        String principalName = "";
-        for (String pid : principalIds) {
-            principalName = principalName + (String)redisUtil.hget(USER+"_username", USER+pid);
+        List<String> names = Arrays.asList(maintainBaseInfo.getPrincipalName().split(","));
+        String userName = "";
+        for (int i = 0; i < names.size(); i++) {
+            if(i==0){
+                userName = (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+            }else{
+                userName = userName + ","+ (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+            }
         }
-        maintainBaseInfo.setPrincipalName(principalName);
+        maintainBaseInfo.setPrincipalName(userName);
         return maintainBaseInfo;
     }
 }

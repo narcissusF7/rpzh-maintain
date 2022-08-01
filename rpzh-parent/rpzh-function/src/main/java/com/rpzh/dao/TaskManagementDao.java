@@ -108,7 +108,7 @@ public interface TaskManagementDao {
      * @param status
      * @return
      */
-    int updateTaskStatus(@Param("id") String id, @Param("status") String status, @Param("dealResult") String dealResult,@Param("nowTime") String nowTime);
+    int updateTaskStatus(@Param("id") String id, @Param("status") String status, @Param("dealResult") String dealResult, @Param("nowTime") String nowTime);
 
     /**
      * 虫情数据插入虫情板
@@ -164,7 +164,7 @@ public interface TaskManagementDao {
     int updateNodeAddress(@Param("nodeId") String nodeId, @Param("x") int x, @Param("y") int y,
                           @Param("z") int z, @Param("siteRoute") String siteRoute,
                           @Param("siteId") String siteId, @Param("siteName") String siteName,
-                          @Param("stackId") String stackId,@Param("caseNo") String caseNo);
+                          @Param("stackId") String stackId, @Param("caseNo") String caseNo);
 
     /**
      * 翻垛后,修改设备位置
@@ -235,7 +235,7 @@ public interface TaskManagementDao {
      * @param endTime
      * @return
      */
-    int findPestCount(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal,@Param("taskSiteRoute") String taskSiteRoute);
+    int findPestCount(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("taskSiteRoute") String taskSiteRoute);
 
     /**
      * 查询翻垛数量
@@ -399,15 +399,18 @@ public interface TaskManagementDao {
 
     Map findInfo(@Param("id") String id);
 
-    Integer findTaskBySiteRoute(@Param("siteRoute")String siteRoute, @Param("type")String type);
+    Integer findTaskBySiteRoute(@Param("siteRoute") String siteRoute, @Param("type") String type);
 
     /**
      * 平均包芯低于环境预警任务
+     *
      * @param startTime
      * @param endTime
      * @param principal
      * @param taskSiteRoute
      * @return
      */
-    int findMinAveTemp(@Param("startTime")String startTime, @Param("endTime")String endTime, @Param("principal")String principal, @Param("taskSiteRoute")String taskSiteRoute);
+    int findMinAveTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("taskSiteRoute") String taskSiteRoute);
+
+    Long findTaskId(@Param("siteRoute") String taskSiteRoute,@Param("warningType") String warningType);
 }

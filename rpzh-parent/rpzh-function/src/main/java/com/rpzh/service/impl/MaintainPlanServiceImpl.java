@@ -73,8 +73,16 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public int insertMaintainPlan(MaintainPlanDto maintainPlanDto){
         //获取垛位id
         Integer stackId = maintainPlanDto.getStackId();
-        //负责人id
-        maintainPlanDto.setPrincipalId(StringUtils.join(maintainPlanDto.getPrincipalIds(),","));
+        List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        String username = "";
+        for (int i = 0; i < principalIds.size(); i++) {
+            if(i==0){
+                username = (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }else{
+                username = username + "," +  (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }
+        }
+        maintainPlanDto.setPrincipalName(username);
         //物料代码
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",",maintainPlanDto.getMaterialCodes()));
@@ -220,21 +228,28 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo findMaintainPlan(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         maintainPlanVo.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
-        List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-        String principalName = "";
-        for (String pid : principalIds) {
-            principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
+        List<String> names = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+        String userName = "";
+        for (int i = 0; i < names.size(); i++) {
+            if(i==0){
+                userName = (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+            }else{
+                userName = userName + ","+ (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
+            }
         }
-        maintainPlanVo.setPrincipalName(principalName);
-        maintainPlanVo.setPrincipalIds(principalIds.stream().map(Integer::parseInt).collect(Collectors.toList()));
+        maintainPlanVo.setPrincipalName(userName);
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> peopleIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
-            String peopleName = "";
-            for (String pid : peopleIds) {
-                peopleName = peopleName + (String)redisUtil.hget(USER_ID, USER+pid);
+            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
+            String userNames = "";
+            for (int i = 0; i < usernames.size(); i++) {
+                if(i==0){
+                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }else{
+                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }
             }
-            maintainPlan.setPrincipalName(peopleName);
+            maintainPlan.setPrincipalName(userNames);
         });
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
@@ -268,14 +283,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         if(ToolUtil.isEmpty(maintainPlanVo)){
             return new MaintainPlanVo();
         }
-        List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<String> names = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+        String userName = "";
+        List<Integer> principalId =new ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            principalId.add((Integer) redisUtil.hget("USER_"+names.get(i),"userId"));
+        }
         maintainPlanVo.setPrincipalIds(principalId);
-        maintainPlanVo.setPrincipalId(null);
         Integer stackId = maintainPlanVo.getStackId();
         maintainPlanVo.setMaintainCount(materialDao.getMaintainCount(stackId));
-        maintainPlanVo.setMaterialCode(null);
-        maintainPlanVo.setPrincipalName(null);
         maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(stackId));
         String pidRoute = warehouseDao.findPidRoute(stackId).getPidRoute();
         maintainPlanVo.setPidRoute(pidRoute + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + stackId + "]");
@@ -291,8 +307,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public MaintainPlanVo beforeChangeMaintainPlanStage(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
-        List<String> principalIds = Arrays.asList(maintainPlanVo.getPrincipalId().split(","));
-        List<Integer> principalId = principalIds.stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<String> names = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+        String userName = "";
+        List<Integer> principalId =new ArrayList<>();
+        for (int i = 0; i < names.size(); i++) {
+            principalId.add((Integer) redisUtil.hget("USER_"+names.get(i),"userId"));
+        }
+        maintainPlanVo.setPrincipalIds(principalId);
         Integer stackId = maintainPlanVo.getStackId();
         MaintainPlanVo maintainPlanVo1 = new MaintainPlanVo();
         String pidRoute = warehouseDao.findPidRoute(maintainPlanVo.getStackId()).getPidRoute();
@@ -333,6 +354,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             redisTemplate.opsForHash().delete(MAINTAIN + maintainPlanDto.getStageId());
         }
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        String username = "";
+        for (int i = 0; i < principalIds.size(); i++) {
+            if(i==0){
+                username = (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }else{
+                username = username + "," +  (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }
+        }
+        maintainPlanDto.setPrincipalName(username);
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         Set<Integer> pids = new HashSet<>();
         pids.addAll(principalIds);
@@ -412,6 +442,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             redisTemplate.opsForHash().delete(MAINTAIN + maintainPlanDto.getStageId());
         }
         List<Integer> principalIds = maintainPlanDto.getPrincipalIds();
+        String username = "";
+        for (int i = 0; i < principalIds.size(); i++) {
+            if(i==0){
+                username = (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }else{
+                username = username + "," +  (String) redisUtil.hget("MAINTIAN_USER_ID_USERNAME", "USER_ID_" + principalIds.get(i));
+            }
+        }
+        maintainPlanDto.setPrincipalName(username);
         Set<Integer> pids = new HashSet<>();
         pids.addAll(principalIds);
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
@@ -472,12 +511,16 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId) {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
-            String principalName = "";
-            for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
+            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
+            String userNames = "";
+            for (int i = 0; i < usernames.size(); i++) {
+                if(i==0){
+                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }else{
+                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }
             }
-            maintainPlan.setPrincipalName(principalName);
+            maintainPlan.setPrincipalName(userNames);
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
@@ -488,12 +531,16 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo findEndMaintainPlanDetails(Integer id) {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> principalIds = Arrays.asList(maintainPlan.getPrincipalId().split(","));
-            String principalName = "";
-            for (String pid : principalIds) {
-                principalName = principalName + (String)redisUtil.hget(USER_ID, USER+pid);
+            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
+            String userNames = "";
+            for (int i = 0; i < usernames.size(); i++) {
+                if(i==0){
+                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }else{
+                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+                }
             }
-            maintainPlan.setPrincipalName(principalName);
+            maintainPlan.setPrincipalName(userNames);
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);

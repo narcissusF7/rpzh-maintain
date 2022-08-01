@@ -58,12 +58,11 @@ public class sendWarningThreeTask{
             if(siteRoute.contains("05")){
                 int stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
                 siteName = warehouseDao.findStackById(stackId).getSiteName();
-                List<String> principalIds = Arrays.asList(maintainPlanDao.findCurrentMaintainPlan(stackId).split(","));
-                for (String pid : principalIds) {
+                List<String> principalNames = Arrays.asList(maintainPlanDao.findCurrentMaintainPlan(stackId).split(","));
+                for (String name : principalNames) {
                     Map map = new HashMap();
-                    String principalName = (String)redisUtil.hget(USER_ID, USER+pid);
-                    map.put("number",(String)redisUtil.hget("USER_"+principalName,"phonenumber"));
-                    map.put("username",principalName);
+                    map.put("number",(String)redisUtil.hget("USER_"+name,"phonenumber"));
+                    map.put("username",name);
                     phonenumber.add(map);
                 }
             }else{
