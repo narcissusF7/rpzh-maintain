@@ -368,7 +368,7 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public String findNodeTypeByNodeId(NodeDto nodeDto) {
 
-        return nodeDao.findNodeTypeByNodeId(nodeDto.getId());
+        return nodeDao.findNodeTypeByNodeId(nodeDto.getId(),nodeDto.getNodeId());
     }
 
 

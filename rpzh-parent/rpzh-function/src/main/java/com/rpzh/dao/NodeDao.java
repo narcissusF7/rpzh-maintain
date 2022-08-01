@@ -230,5 +230,5 @@ public interface NodeDao {
 
     Integer findCountByCaseNo(@Param("caseNo")String caseNo);
 
-    String findNodeTypeByNodeId(@Param("id")Integer id);
+    String findNodeTypeByNodeId(@Param("id")Integer id,@Param("nodeId") String nodeId);
 }

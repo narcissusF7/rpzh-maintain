@@ -341,7 +341,13 @@ public class NodeController {
             NodeDto nodeDto = new NodeDto();
             //设置主键id
             Object id = map.get("id");
-            if (ToolUtil.isEmpty(id)){
+            Object nodeId = map.get("nodeId");
+            if (ToolUtil.isEmpty(id)||ToolUtil.isEmpty(nodeId)){
+                return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备非正常添加");
+            }
+            //查询该设备的设备类型
+            String nodeType = nodeService.findNodeTypeByNodeId(nodeDto);
+            if (ToolUtil.isEmpty(nodeType)){
                 return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备非正常添加");
             }
             nodeDto.setId(Integer.parseInt(id.toString()));
@@ -352,8 +358,7 @@ public class NodeController {
                 return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备的入垛位置为空");
             }
             String[] split = pidRoute.toString().split(",");
-            //查询该设备的设备类型
-            String nodeType = nodeService.findNodeTypeByNodeId(nodeDto);
+
             //如果时包芯设备
             if ("04".equals(nodeType)&&split.length==4){
                 return new Result<>(false, StatusCode.ERROR, "包芯设备不能放置到垛位外");
