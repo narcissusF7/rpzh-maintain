@@ -157,9 +157,9 @@ public class DataHandler {
      */
     public void handlerData(ParseData parseData) {
         //通过设备id找到对应的设备
-        Object o = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
+        Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
 
-        NodeVo nodeVo = getNodeVo(o,parseData.getNodeId());
+        NodeVo nodeVo = getNodeVo(cacheNodeData,parseData.getNodeId());
 
         //如果设备处于是解垛状态  数据不做任何处理
         if (ToolUtil.isEmpty(nodeVo)||!nodeVo.getStatus().equals("1")){
@@ -667,9 +667,9 @@ public class DataHandler {
         }
     }
 
-    public NodeVo getNodeVo(Object o ,String nodeId){
+    public NodeVo getNodeVo(Object cacheNodeData ,String nodeId){
         NodeVo nodeVo;
-        if (ToolUtil.isEmpty(o)){
+        if (ToolUtil.isEmpty(cacheNodeData)){
             nodeVo = nodeDao.findByNodeId(nodeId);
             if (ToolUtil.isNotEmpty(nodeVo)&&NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
                 //查询对应的养护计划 养护计划阶段
@@ -680,12 +680,12 @@ public class DataHandler {
                 //设置该预警id
                 nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
             }
-            if ("2".equals(nodeVo.getStatus())){
+            if (ToolUtil.isEmpty(nodeVo)||"2".equals(nodeVo.getStatus())){
                 return null;
             }
             redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + nodeId,JSON.toJSONString(nodeVo));
         }else {
-            nodeVo = JSON.parseObject(o.toString(),NodeVo.class);
+            nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);
         }
         return nodeVo;
     }
