@@ -89,6 +89,7 @@
         `site_x` as siteX,
         `site_y` as siteY ,
         `site_z` as siteZ,
+        `case_no` as caseNo,
         `into_stack_time` as intoStackTime ,
         `site_route` as siteRoute
         FROM tb_node
