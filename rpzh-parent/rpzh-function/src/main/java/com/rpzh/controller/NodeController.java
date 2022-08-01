@@ -429,11 +429,14 @@ public class NodeController {
         return new Result<>(true, StatusCode.OK, "设备入垛成功");
     }
 
-
+//todo 需要前端传nodeIds
     @ApiOperation(
             value = "设备解垛"
     )
-    @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true),
+        @ApiImplicitParam(name = "nodeIds",value = "设备id集", dataType = "String",allowMultiple = true, required = true)
+    })
     @PostMapping({"/unbindStack"})
     public Result unbindStack(@ApiIgnore NodeDto nodeDto) {
         Integer[] ids = nodeDto.getIds();

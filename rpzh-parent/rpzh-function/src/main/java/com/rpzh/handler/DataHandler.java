@@ -560,7 +560,10 @@ public class DataHandler {
         }
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
-            warningType = warningType+","+earlyWarningVo.getWarningType();
+            if (!warningType.contains(earlyWarningVo.getWarningType())){
+                warningType = warningType+","+earlyWarningVo.getWarningType();
+            }
+
             //获取缓存中的连续预警次数
             Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId()+evnType);
             int i;
@@ -615,7 +618,9 @@ public class DataHandler {
                 String type=dexxx[0];
                 String taskType =dexxx[1];
                 earlyWarning.setWarningType(type);
-                warningType = warningType +","+type;
+                if (!warningType.contains(type)){
+                    warningType = warningType+","+type;
+                }
                 NodeVo nodeVo1 =nodeDao.findByNodeId(parseData.getNodeId());
                 String siteRoute = nodeVo1.getSiteRoute();
                 earlyWarning.setSiteRoute(siteRoute);
@@ -646,7 +651,9 @@ public class DataHandler {
      */
     public void decideFault(Double v1,Double v2,String type,ParseData parseData){
         if (v1 < v2) {
-            warningType= warningType +","+type;
+            if (!warningType.contains(type)){
+                warningType = warningType+","+type;
+            }
             //判断数据库中该设备是否存在未处理的预警
             nodeMalfunction(parseData, type, v1);
 
