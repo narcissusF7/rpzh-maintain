@@ -353,6 +353,8 @@ public class NodeController {
                 return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备非正常添加");
             }
             //查询该设备的设备类型
+            nodeDto.setId((int)id);
+            nodeDto.setNodeId((String) nodeId);
             String nodeType = nodeService.findNodeTypeByNodeId(nodeDto);
             if (ToolUtil.isEmpty(nodeType)){
                 return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备非正常添加");

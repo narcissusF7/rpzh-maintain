@@ -19,6 +19,7 @@ import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.NodeService;
+import com.rpzh.util.RedisUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
@@ -44,6 +45,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     private MonitoringCenterService monitoringCenterService;
+
+    @Autowired
+    RedisUtil redisUtil;
     /**
      * 添加节点
      *
@@ -393,7 +397,9 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
                 nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
             }
-            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn());
+            Object cacheNodeData = redisUtil.get("MAINTAIN_" + nodeDto.getNodeId());
+            Map map1 = JSONObject.parseObject(cacheNodeData.toString(), Map.class);
+            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),map.get("siteRoute").toString());
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
             }

@@ -170,7 +170,7 @@ public interface NodeDao {
     List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     @DS("clickhouse")
-    List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+    List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn,@Param("pidRoute")String pidRoute);
 
     @DS("clickhouse")
     NodeDataVo findNodeNowData(@Param("nodeId") String nodeId, @Param("tableName") String tableName);
