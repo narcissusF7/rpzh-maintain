@@ -113,6 +113,7 @@ public class TaskDto {
     //日期数据
     List<String> days;
 
+    public TaskDto (){};
     public TaskDto(String taskNum, String type, String taskAddress, String siteRoute, String principal,String endTime) {
         this.taskNum = taskNum;
         this.type = type;
