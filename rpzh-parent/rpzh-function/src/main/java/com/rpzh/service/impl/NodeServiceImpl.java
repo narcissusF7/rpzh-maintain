@@ -399,7 +399,7 @@ public class NodeServiceImpl implements NodeService {
             }
             Object cacheNodeData = redisUtil.get("MAINTAIN_" + nodeDto.getNodeId());
             Map map1 = JSONObject.parseObject(cacheNodeData.toString(), Map.class);
-            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),map.get("siteRoute").toString());
+            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),map1.get("pidRoute").toString());
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
             }
