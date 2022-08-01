@@ -83,7 +83,15 @@ public class NodeServiceImpl implements NodeService {
         String siteType = nodeDto.getSiteRoute().split(",").length ==4? "04":"05";
         nodeDto.setSiteType(siteType);
         nodeDto.setSiteRoute(nodeDto.getSiteRoute()+",["+siteType+":"+nodeDto.getSiteId()+"]");
-
+        if ("".equals(nodeDto.getSiteX())){
+            nodeDto.setSiteX("-");
+        }
+        if ("".equals(nodeDto.getSiteZ())){
+            nodeDto.setSiteZ("-");
+        }
+        if ("".equals(nodeDto.getSiteY())){
+            nodeDto.setSiteY("-");
+        }
         int updateFlag = nodeDao.updateNode(nodeDto);
         return updateFlag;
     }

@@ -11,6 +11,7 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.service.NodeService;
 import com.rpzh.vo.NodeOperationVo;
@@ -158,6 +159,12 @@ public class NodeController {
         if (status ==0){
             return new Result<>(false, StatusCode.ERROR, "解垛设备不允许修改");
         }
+        if (NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getCode().equals(nodeDto.getNodeType())){
+            if (nodeDto.getSiteRoute().split(",").length<5){
+                return new Result<>(false, StatusCode.ERROR, "包芯设备不能放置到垛位外");
+            }
+        }
+
         int updateFlag = nodeService.updateNode(nodeDto);
         return new Result<>(true, StatusCode.OK, "修改设备成功");
     }
