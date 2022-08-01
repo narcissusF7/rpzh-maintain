@@ -325,7 +325,7 @@
         site_z siteZ
         from ${tableName} where node_id in #{nodeDto.nodeId}
         <if test="nodeDto.startTime!=null and nodeDto.startTime!=''">and transfer_time >=#{nodeDto.startTime}</if>
-        <if test="nodeDto.pidRoute!=null and nodeDto.pidRoute!=''">and pid_route =#{pidRoute}</if>
+        <if test="pidRoute!=null and pidRoute!=''">and pid_route =#{pidRoute}</if>
         <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
     </select>
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
