@@ -340,7 +340,11 @@ public class NodeController {
             Map map = list.get(i);
             NodeDto nodeDto = new NodeDto();
             //设置主键id
-            nodeDto.setId(Integer.parseInt(map.get("id").toString()));
+            Object id = map.get("id");
+            if (ToolUtil.isEmpty(id)){
+                return new Result<>(false, StatusCode.ERROR, "第"+(i+1)+"个设备非正常添加");
+            }
+            nodeDto.setId(Integer.parseInt(id.toString()));
 
             //如果是垛内设备
             Object pidRoute = map.get("pidRoute");
