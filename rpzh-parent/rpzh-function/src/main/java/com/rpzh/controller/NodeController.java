@@ -135,6 +135,10 @@ public class NodeController {
             name = "siteZ",
             value = "采集位置-Z坐标",
             dataType = "Integer"
+    ), @ApiImplicitParam(
+            name = "caseNo",
+            value = "箱号",
+            dataType = "String"
     )})
     @PostMapping("/updateNode")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {

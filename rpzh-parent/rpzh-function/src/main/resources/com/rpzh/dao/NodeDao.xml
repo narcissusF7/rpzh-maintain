@@ -53,7 +53,7 @@
         <set>
             <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id = #{nodeDto.nodeId},</if>
             <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type = #{nodeDto.nodeType},</if>
-            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},stack = #{nodeDto.stack},</if>
             <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''">last_updated_user =#{nodeDto.lastUpdatedUser},</if>
             <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type = #{nodeDto.siteType},</if>
             <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
@@ -61,6 +61,7 @@
             <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
             <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
             <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
+            <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
             <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
             last_updated_time = sysdate()
         </set>
