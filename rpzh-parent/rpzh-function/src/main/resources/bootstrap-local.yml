@@ -91,14 +91,14 @@ ribbon:
   ConnectTimeout: 30000
 # mqtt 连接配置
 mqtt:
-  host: tcp://183.250.89.188
-  port: 7426
+  host: tcp://192.168.3.99
+  port: 1883
   qos: 0
   timeout: 2000
   keepalive: 20
-  rx-topic: carbon/#
+  rx-topic: maintain/#
   tx-topic: applicationserver/#
-  client-id: rpiot-client-co2
+  client-id: rpiot-client-${random.uuid}
   username: admin
   password: admin1234.
 rocketmq:

@@ -158,6 +158,11 @@
             <artifactId>annotations</artifactId>
             <version>16.0.1</version>
         </dependency>
+        <!--MQTT依赖包-->
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mqtt</artifactId>
+        </dependency>
 
     </dependencies>
 
