@@ -65,7 +65,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
                 redisUtil.set(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"),map.get("fCnt"));
                 parseData.setPacketLossNum(0);
             }
-//           // dataHandler.handlerData(parseData);
+            dataHandler.handlerData(parseData);
         }
     }
 }

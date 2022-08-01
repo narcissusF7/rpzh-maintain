@@ -397,9 +397,20 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
                 nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
             }
+            String pidRoute = null;
+
+            //缓存中获取设备数据
             Object cacheNodeData = redisUtil.get("MAINTAIN_" + nodeDto.getNodeId());
-            Map map1 = JSONObject.parseObject(cacheNodeData.toString(), Map.class);
-            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),map1.get("pidRoute").toString());
+
+            if (ToolUtil.isNotEmpty(cacheNodeData)){
+                Map map1 = JSONObject.parseObject(cacheNodeData.toString(), Map.class);
+                //位置路由  用来判断设备当前的位置
+
+                if (ToolUtil.isNotEmpty(map1.get("pidRoute"))){
+                    pidRoute = map1.get("pidRoute").toString();
+                }
+            }
+            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),pidRoute);
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
             }

@@ -580,9 +580,9 @@ public class DataHandler {
                 //通过频率计算升级所需的连续预警次数
                 Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
                 if (level == 1) {
-                    flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - i <= 1;
+                    flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - i >= 1;
                 } else if (level == 2) {
-                    flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - i <= 1;
+                    flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - i >= 1;
                 }
                 if (flag) {
                     level += 1;
