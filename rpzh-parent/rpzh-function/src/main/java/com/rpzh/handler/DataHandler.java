@@ -266,7 +266,7 @@ public class DataHandler {
 
             //过滤 选择环境温湿度设备 取温度
             double evnTemp = getAvg(nodeVos,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
-            //计算插值
+            //计算差值
             double v = avg - evnTemp;
 
             //获取缓存中的对应字段的值
@@ -415,7 +415,6 @@ public class DataHandler {
 
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setId(areaId);
-
         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
 
         return level;
@@ -481,11 +480,13 @@ public class DataHandler {
             }
         } else if (level > 0) {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
-            earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
+
             if (level==-1){
+                earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
                 addTask(nodeVo1,"19");
                 setLevel(earlyWarning, 1, data);
             }else {
+                earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
                 addTask(nodeVo1,"13");
                 setLevel(earlyWarning, level, data);
             }
@@ -560,6 +561,11 @@ public class DataHandler {
         }
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
+            //如果这条预警处于处理中状态的话
+            if ("1".equals(earlyWarningVo.getAffirm())){
+                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
+                return level;
+            }
             if (!warningType.contains(earlyWarningVo.getWarningType())){
                 warningType = warningType+","+earlyWarningVo.getWarningType();
             }
@@ -645,7 +651,7 @@ public class DataHandler {
     /**
      * 故障预警信息处理
      * @param v1 传入值
-     * @param v2 预警阈值  如果是丢包统计v1和v2代表的意思相反
+     * @param v2 预警阈值
      * @param type 类型
      * @param parseData
      */
@@ -663,10 +669,9 @@ public class DataHandler {
             if (!ToolUtil.isEmpty(cacheNodeData)){
                 //转成NodeDataVo
                 NodeDataVo nodeDataVo = JSONObject.parseObject(cacheNodeData + "", NodeDataVo.class);
-                //获取预警类ing
+                //获取预警类型
                 String warningType = nodeDataVo.getWarningType();
                 //如果包含当前校验的类型
-
                 if (!ToolUtil.isEmpty(warningType)&&warningType.contains(type)){
                     earlyWarningDao.updateWarningType(parseData.getNodeId(),type);
                 }

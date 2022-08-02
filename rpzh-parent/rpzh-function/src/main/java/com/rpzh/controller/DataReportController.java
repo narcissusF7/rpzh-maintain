@@ -498,7 +498,7 @@ public class DataReportController {
                 (dataReportDto.getDateType() < 1 || dataReportDto.getDateType() > 4)) {
             return new Result<>(false, StatusCode.ERROR, "未知数据类型!");
         }
-        dataReportService.exportStackComparisonData(dataReportDto);
+//        dataReportService.exportStackComparisonData(dataReportDto);
         return new Result<>(true, StatusCode.OK, "导出成功!");
     }
 }

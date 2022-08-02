@@ -4,6 +4,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.util.MonitorCondition;
+import com.rpzh.vo.DataReportVo;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.WeatherDataVo;
@@ -231,4 +232,6 @@ public interface NodeDao {
     Integer findCountByCaseNo(@Param("caseNo")String caseNo);
 
     String findNodeTypeByNodeId(@Param("id")Integer id,@Param("nodeId") String nodeId);
+
+    List<Map> findStatistics(@Param("pidRoutes") String[] pidRoutes, @Param("tableName") String tableName,@Param("dateType")String dateType);
 }

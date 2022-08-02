@@ -4,9 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.DataReportDao;
+import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.DataReportDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.DataReportService;
 import com.rpzh.util.PageDtoUtil;
 import com.rpzh.util.SiteRouteUtil;
@@ -27,6 +29,9 @@ public class DataReportServiceImpl implements DataReportService {
 
     @Resource
     private DataReportDao dataReportDao;
+
+    @Resource
+    NodeDao nodeDao;
 
     /**
      * 查询每个垛的设备信息
@@ -519,35 +524,46 @@ public class DataReportServiceImpl implements DataReportService {
 
 
     @Override
-    public void exportStackComparisonData(DataReportDto dataReportDto) {
-        if (dataReportDto.getAcquisitionTimeOne() != null) {
-            dataReportDto.setAcquisitionTimeOne(DateUtil.beginOfDay(DateUtil.parse(dataReportDto.getAcquisitionTimeOne())).toString());
+    public Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType) {
+        //包芯温度数据
+        List<Map> coreTimeData;
+        //垛位温湿度数据
+        List<Map> starckHumitureData;
+        //垛位氧气数据
+        List<Map> starckOxygenData;
+        //垛位温湿度数据
+        List<Map> wareHumitureData;
+        //垛位氧气数据
+        List<Map> wareOxygenData;
+
+        switch (comparisonType){
+            case "1":
+                //垛内  包芯对比
+                //包芯温度数据
+                coreTimeData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getTableName(),dateType);
+                //垛位温湿度数据
+                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
+                break;
+            case "2":
+                //垛位氧气数据
+                starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
+                //垛位温湿度数据
+                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
+                break;
+            case "3":
+
+                //垛位氧气数据
+                starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
+                //垛位温湿度数据
+                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
+
+                //仓间氧气数据
+                wareOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
+                //仓间温湿度数据
+                wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
+                break;
+            default:
         }
-        if (dataReportDto.getAcquisitionTimeTwo() != null) {
-            dataReportDto.setAcquisitionTimeTwo(DateUtil.endOfDay(DateUtil.parse(dataReportDto.getAcquisitionTimeTwo())).toString());
-        }
-        dataReportDto.setGatherSiteRoute(SiteRouteUtil.route(dataReportDto.getGatherSiteRoute(), dataReportDto.getWarehouseId()));
-
-
-        //查询当前数据
-        List<DataReportVo> dataReportNowVos = dataReportDao.findStackComparisonNow(dataReportDto);
-
-        //查询范围内数据
-        List<DataReportVo> dataReportVos = dataReportDao.findStackData(dataReportDto);
-
-//        dataReportVos.stream().map()
-
-//        Iterator<DataReportVo> iterator = dataReportNowVos.iterator();
-//        for (DataReportVo dataReportVo : dataReportVos) {
-//            while (iterator.hasNext()) {
-//                DataReportVo next = iterator.next();
-//                // 如果地址相同就赋值nowData数据
-//                if (next.getGatherSite().equals(dataReportVo.getGatherSite())) {
-//                    dataReportVo.setNowData(next.getNowData());
-//                    iterator.remove();
-//                    break;
-//                }
-//            }
-//        }
+        return null;
     }
 }

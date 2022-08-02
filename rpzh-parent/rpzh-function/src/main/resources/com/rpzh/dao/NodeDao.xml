@@ -582,4 +582,18 @@
     <select id="findNodeTypeByNodeId" resultType="java.lang.String">
         select node_type nodeType from tb_node where id = #{id} and node_id = #{nodeId};
     </select>
+    <select id="findStatistics" resultType="java.util.Map">
+        select pid_route pidRoute
+        <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
+        <if test="dateType=='week'">,TOSTARTOFWEEK(createdTime)</if> as dateTime
+        <if test="tableName=='tb_node_o2_history'">, AVG(oxygen),MAX(oxygen),MIN(oxygen) </if>
+        <if test="tableName=='tb_node_env_history'"></if>
+        <if test="tableName=='tb_node_o2_history'"></if>
+        from ${tableName}
+        group by pid_route
+        <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
+        <if test="dateType=='week'">,TOSTARTOFWEEK(createdTime)</if>
+        order by dateTime
+    </select>
+
 </mapper>

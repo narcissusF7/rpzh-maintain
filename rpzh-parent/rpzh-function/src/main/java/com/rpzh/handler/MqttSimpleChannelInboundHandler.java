@@ -24,7 +24,7 @@ import java.util.*;
  * @create 2021-06-29 16:17
  * @description mqtt入站
  */
-@Component
+//@Component
 @Slf4j
 public class MqttSimpleChannelInboundHandler implements MessageHandler {
     private static final String RPZH_MAINTAIN_FCNT = "RPZH_MAINTAIN_FCNT_";
