@@ -33,7 +33,7 @@
         t1.core_temp_low_env_temp as coreTempLowEnvTemp,
         t1.id as alarmValueSettingId,
         t2.early_warning_rule_name as earlyWarningRuleName
-        from tb_alarm_setting_template_stage t1
+        from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where 1=1
         <if test="earlyWarningRuleName != null and earlyWarningRuleName != ''">and t2.early_warning_rule_name = #{earlyWarningRuleName}</if>
@@ -47,7 +47,7 @@
         substring_index(group_concat(t2.maintence_style),',',1) as maintenceStyle,
         substring_index(group_concat(t2.create_user),',',1) as createUser,
         substring_index(group_concat(t1.updated_time),',',1) as updatedTime
-        from tb_alarm_setting_template_stage t1
+        from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where 1=1
         <if test = "alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">and t2.early_warning_rule_name like concat('%', #{alarmValueSettingDto.earlyWarningRuleName}, '%')</if>
@@ -59,7 +59,7 @@
         group by early_warning_rule_name order by updatedTime
     </select>
     <delete id="deleteStage">
-        delete from tb_alarm_setting_template_stage where
+        delete from tb_setting_template_stage where
         alarm_template_stage_id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -89,7 +89,7 @@
         )
     </insert>
     <insert id="insertAlarmSettingTemplateStage">
-        insert into tb_alarm_setting_template_stage
+        insert into tb_setting_template_stage
         (
         <if test="alarmValueSettingDto.stackOxygenUpperOne != null and alarmValueSettingDto.stackOxygenUpperOne != ''">stack_oxygen_upper_one,</if>
         <if test="alarmValueSettingDto.stackOxygenUpperTwo != null and alarmValueSettingDto.stackOxygenUpperTwo != ''">stack_oxygen_upper_two,</if>
@@ -187,12 +187,12 @@ FROM tb_general_setting limit 1
        t2.maintence_style as maintenceStyle,
        t2.material_code as materialCode,
        t1.phases as phases
-       from tb_alarm_setting_template_stage t1
+       from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
        where t2.material_code = #{materialCode}  and t2.early_warning_rule_name= #{earlyWarningRuleName} and t1.phases = #{phases}
    </select>
     <select id="findSum" resultType="java.lang.Integer">
-        select count(*) from tb_alarm_setting_template_stage t1
+        select count(*) from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where t2.material_code = #{alarmValueSettingDto.materialCode} and t2.maintence_style= #{alarmValueSettingDto.maintenceStyle}
         and t1.phases = #{alarmValueSettingDto.phases}
@@ -223,7 +223,7 @@ FROM tb_general_setting limit 1
        t2.early_warning_rule_name as earlyWarningRuleName,
        t2.maintence_style as maintenceStyle,
        t1.phases as phases
-       from tb_alarm_setting_template_stage t1
+       from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
        where t2.material_code = #{materialCode} and t2.early_warning_rule_name= #{earlyWarningRuleName} order by id limit 1
 </select>
@@ -238,7 +238,7 @@ FROM tb_general_setting limit 1
         where id = #{alarmValueSettingDto.alarmValueSettingId}
     </update>
     <update id="updateAlarmSettingTemplateStage">
-        update tb_alarm_setting_template_stage
+        update tb_setting_template_stage
         <set>
             <if test="alarmValueSettingDto.stackOxygenUpperOne != null and alarmValueSettingDto.stackOxygenUpperOne != ''">stack_oxygen_upper_one=#{alarmValueSettingDto.stackOxygenUpperOne},</if>
             <if test="alarmValueSettingDto.stackOxygenUpperTwo != null and alarmValueSettingDto.stackOxygenUpperTwo != ''">stack_oxygen_upper_two=#{alarmValueSettingDto.stackOxygenUpperTwo},</if>
@@ -311,7 +311,7 @@ FROM tb_general_setting limit 1
     </select>
 
     <select id="findCountByNameAndPhases" resultType="java.lang.Integer">
-        select count(*) from tb_alarm_setting_template_stage t1
+        select count(*) from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where t2.early_warning_rule_name = #{earlyWarningRuleName} and t1.phases = #{phases}
     </select>
