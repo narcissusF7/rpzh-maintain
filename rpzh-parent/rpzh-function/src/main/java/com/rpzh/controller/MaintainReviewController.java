@@ -66,7 +66,10 @@ public class MaintainReviewController {
 
     @PostMapping("/findDataReview")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
+            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "tableType", value = "设备类型 01:垛内氧气,02:包芯温度,03:垛内温度,04:垛内湿度,05:仓间温度,06:仓间温度", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true,dataType = "String")
     })
     @ApiOperation(value = "养护数据追溯列表")
     public Result findDataReview(String tableType, Integer id, String startTime, String endTime) {

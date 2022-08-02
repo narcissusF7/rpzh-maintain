@@ -87,9 +87,14 @@
     </select>
     <select id="findDataReview" resultType="java.util.Map">
         select round(avg(${columnName}),1) as avgData,round(min(${columnName}),1) minData,round(max(${columnName}),1) maxData,formatDateTime(transfer_time,'%Y-%m') day from ${tableName}
-    where maintain_plan_id = #{id}
+    where ${columnOne}
      <if test="startTime != '' and startTime != null">and transfer_time >= #{startTime}</if>
      <if test="endTime != '' and endTime != null">and transfer_time &lt;= #{endTime}</if>
      group by day;
+    </select>
+    <select id="findAreaId" resultType="java.lang.Integer">
+        select area_id from tb_maintain_plan t1
+        left join tb_stack t2 on t1.stack_id = t2.id
+        where t1.id = #{id}
     </select>
 </mapper>

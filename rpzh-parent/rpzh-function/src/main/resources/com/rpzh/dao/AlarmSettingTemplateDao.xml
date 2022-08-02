@@ -53,7 +53,7 @@
         <if test = "alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">and t2.early_warning_rule_name like concat('%', #{alarmValueSettingDto.earlyWarningRuleName}, '%')</if>
         <if test = "alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">and t2.material_code like concat('%', #{alarmValueSettingDto.materialCode}, '%')</if>
         <if test = "alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">and t2.maintence_style = #{alarmValueSettingDto.maintenceStyle}</if>
-        <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and t2.create_user like concat('%',#{alarmValueSettingDto.createUser}, '%')</if>
+        <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and t2.create_user = #{alarmValueSettingDto.createUser}</if>
         <if test = "alarmValueSettingDto.startTime != null">and t1.updated_time >= #{alarmValueSettingDto.startTime}</if>
         <if test = "alarmValueSettingDto.endTime != null">and t1.updated_time &lt;= #{alarmValueSettingDto.endTime}</if>
         group by early_warning_rule_name order by updatedTime

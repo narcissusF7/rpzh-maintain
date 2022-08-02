@@ -43,7 +43,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = false,dataType = "String"),
             @ApiImplicitParam(name = "materialCode", value = "物料代码", required = false,dataType = "String"),
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = false,dataType = "String"),
-            @ApiImplicitParam(name = "creatrUser", value = "创建人", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "createUser", value = "创建人", required = false,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = false,dataType = "String"),
             @ApiImplicitParam(name = "size", value = "每页数量,默认为10", required = false,dataType = "Integer"),

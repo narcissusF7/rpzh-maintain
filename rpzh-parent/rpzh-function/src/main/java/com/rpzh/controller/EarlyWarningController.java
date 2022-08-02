@@ -50,7 +50,8 @@ public class EarlyWarningController {
     @ApiOperation(value = "预警信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
-            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警," +
+                    "10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = false,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false)
     })
@@ -63,7 +64,7 @@ public class EarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
             @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
-                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
+                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = true,dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String",required = false),
             @ApiImplicitParam(name = "endTime", value = "结束时间",dataType = "String",required = false)
     })
@@ -76,7 +77,7 @@ public class EarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String",required = false),
             @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
-                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警", required = true,dataType = "String"),
+                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = true,dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
             @ApiImplicitParam(name = "areaId", value = "仓间Id", required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由", required = true,dataType = "String"),

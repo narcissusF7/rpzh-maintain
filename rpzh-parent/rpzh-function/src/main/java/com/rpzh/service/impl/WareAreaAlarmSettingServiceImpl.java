@@ -59,6 +59,9 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     }
     @Override
     public Result insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+        if(ToolUtil.isEmpty(wareAreaAlarmSettingDto.getPidRoute()) || ToolUtil.isEmpty(wareAreaAlarmSettingDto.getStackId())){
+            return new Result(false, StatusCode.ERROR, "位置不能为空!");
+        }
         if(getFlag(wareAreaAlarmSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }

@@ -138,7 +138,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         //报警类型统计 各种类型所占总数
         Map isDeal = new HashMap();
         //所有的预警类型
-        List<String> types = Arrays.asList("设备故障", "垛内虫数预警", "仓间粉螟预警", "平均包芯高于环境预警", "包芯温度预警", "仓间湿度预警", "垛内湿度预警", "仓间温度预警", "垛内温度预警", "仓间氧气预警", "垛内氧气预警", "仓间虫数预警");
+        List<String> types = Arrays.asList("设备故障", "垛内虫数预警", "仓间粉螟预警", "平均包芯高于环境预警","平均包芯低于环境预警", "包芯温度预警", "仓间湿度预警", "垛内湿度预警", "仓间温度预警", "垛内温度预警", "仓间氧气预警", "垛内氧气预警", "仓间虫数预警");
         //查询出来无数据时处理
         if(ToolUtil.isEmpty(ids)){
             //初始化预警类型统计   百分比
@@ -728,6 +728,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 return map;
             case "14":
                 map.put("warningType","仓间粉螟预警");
+                return map;
+            case "19":
+                map.put("warningType","平均包芯低于环境预警");
                 return map;
             default:
                 map.put("warningType","设备故障");

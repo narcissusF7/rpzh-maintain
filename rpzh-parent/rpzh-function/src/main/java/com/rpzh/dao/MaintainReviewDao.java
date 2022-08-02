@@ -37,5 +37,7 @@ public interface MaintainReviewDao {
     List<EarlyWarningVo> findEarlyWarningReview(@Param("maintainPlanVo") MaintainPlanVo maintainPlanVo);
 
     @DS("clickhouse")
-    List<Map> findDataReview(@Param("tableName")String tableName,@Param("columnName") String columnName,@Param("id")Integer id,@Param("startTime")String startTime,@Param("endTime")String endTime);
+    List<Map> findDataReview(@Param("tableName")String tableName,@Param("columnName") String columnName,@Param("columnOne")String columnOne,@Param("startTime")String startTime,@Param("endTime")String endTime);
+
+    Integer findAreaId(@Param("id")Integer id);
 }

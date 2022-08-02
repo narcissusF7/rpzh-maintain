@@ -87,20 +87,22 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
     public List<Map> findDataReview(String tableType,Integer id,String startTime,String endTime) {
         String tableName = "";
         String columnName = "";
+        List<Map> dataReviews = new ArrayList<>();
         if("01".equals(tableType)){
-            tableName = "tb_node_o2_history";
-            columnName = "oxygen";
+            maintainReviewDao.findDataReview("tb_node_o2_history","oxygen", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("02".equals(tableType)){
-            tableName = "tb_node_temp_core_chip_history";
-            columnName = "temp";
+            maintainReviewDao.findDataReview("tb_node_temp_core_chip_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("03".equals(tableType)){
-            tableName = "tb_node_env_history";
-            columnName = "temp";
+            maintainReviewDao.findDataReview("tb_node_env_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
+        }else if("04".equals(tableType)){
+            maintainReviewDao.findDataReview("tb_node_env_history","humiture", "maintain_plan_id = '"+id +"'", startTime, endTime);
+        }else if("05".equals(tableType)){
+            Integer areaId = maintainReviewDao.findAreaId(id);
+            maintainReviewDao.findDataReview("tb_air_conditioner_history","humiture", "stack_id = '"+areaId +"'", startTime, endTime);
         }else{
-            tableName = "tb_node_env_history";
-            columnName = "humiture";
+            Integer areaId = maintainReviewDao.findAreaId(id);
+            maintainReviewDao.findDataReview("tb_air_conditioner_history","temp", "stack_id = '"+areaId +"'", startTime, endTime);
         }
-        List<Map> dataReviews = maintainReviewDao.findDataReview(tableName, columnName, id, startTime, endTime);
         List<String> day = dataReviews.stream().map((Map map) -> map.get("day").toString()).collect(Collectors.toList());
         if(StringUtil.isNotEmpty(startTime) || StringUtil.isNotEmpty(endTime)){
             List<String> months = GetBetweenDayUtils.getMonthBetweenDate(startTime, endTime);

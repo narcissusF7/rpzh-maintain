@@ -17,14 +17,14 @@
     <select id="findStackById" resultType="java.util.Map">
     SELECT
       ts.site_name as siteName,
-      tm.principal_ids as ids
+      tm.principal_name as name
     FROM tb_stack ts
     inner join tb_maintain_plan tm on tm.stack_id = ts.id and tm.is_end = '0'
     where ts.id = #{stackId}
   </select>
     <select id = "findWareAreaPrincipalName" resultType="java.util.Map">
     select
-      principal_name as pName,
+      principal_name as principalName,
       site_name as siteName,
       floor_id as floorId
     from tb_ware_area
@@ -32,14 +32,14 @@
   </select>
     <select id = "findFloorPrincipalName" resultType="java.util.Map">
     select
-      principal_name as pName,
+      principal_name as principalName,
       building_id as buildingId
     from tb_floor
     where id = #{floorId}
   </select>
     <select id = "findBuildingPrincipalName" resultType="java.util.Map">
     select
-      principal_name as pName,
+      principal_name as principalName,
       warehouse_id as warehouseId
     from tb_building
     where id = #{buildingId}
