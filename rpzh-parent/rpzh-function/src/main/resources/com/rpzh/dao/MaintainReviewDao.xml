@@ -43,7 +43,7 @@
         t2.maintain_days as maintainDays,
         t2.created_time as createdTime,
         t2.updated_time as updatedTime,
-        t2.oxygen_reduction_day as oxygenReductionDay
+        t2.oxygen_reduction_day as oxygenReductionTime
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on  t1.id = t2.maintain_plan_id
         where t1.id = #{id} order by t2.id
@@ -78,10 +78,11 @@
         t1.warning_time as warningTime,
         t1.warning_type as warningType,
         t1.warning_val as warningVal,
+        t2.task_detail as warningNews,
         t2.deal_method as dealSuggestion,
         t2.finish_time as dealTime
         from (select warning_val,id,warning_type,stack_id,task_id,case when warning_time_one is not null then warning_time_one when (warning_time_one is null and warning_time_two is not null) then
-        warning_time_two else warning_time_three end as warning_time from tb_early_warning where stack_id =#{maintainPlanVo.stackId} and warning_type IN ('04','06','08','10','12','13')) t1
+        warning_time_two else warning_time_three end as warning_time from tb_early_warning where stack_id =#{maintainPlanVo.stackId} and warning_type IN ('04','06','08','10','12','13','19')) t1
         inner join tb_task t2 on t1.task_id = t2.id
         where warning_time >= #{maintainPlanVo.createdTime} and warning_time &lt;= #{maintainPlanVo.updatedTime}
     </select>

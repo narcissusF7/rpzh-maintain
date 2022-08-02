@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.MaintainReviewDao;
@@ -85,28 +86,32 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
 
     @Override
     public List<Map> findDataReview(String tableType,Integer id,String startTime,String endTime) {
+        if(ToolUtil.isEmpty(startTime) || ToolUtil.isEmpty(endTime)){
+            startTime = DateUtil.offsetMonth(new Date(), -4).toString();
+            endTime = DateUtil.offsetMonth(new Date(), -1).toString();
+        }
         String tableName = "";
         String columnName = "";
         List<Map> dataReviews = new ArrayList<>();
         if("01".equals(tableType)){
-            maintainReviewDao.findDataReview("tb_node_o2_history","oxygen", "maintain_plan_id = '"+id +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_node_o2_history","oxygen", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("02".equals(tableType)){
-            maintainReviewDao.findDataReview("tb_node_temp_core_chip_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_node_temp_core_chip_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("03".equals(tableType)){
-            maintainReviewDao.findDataReview("tb_node_env_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_node_env_history","temp", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("04".equals(tableType)){
-            maintainReviewDao.findDataReview("tb_node_env_history","humiture", "maintain_plan_id = '"+id +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_node_env_history","humiture", "maintain_plan_id = '"+id +"'", startTime, endTime);
         }else if("05".equals(tableType)){
             Integer areaId = maintainReviewDao.findAreaId(id);
-            maintainReviewDao.findDataReview("tb_air_conditioner_history","humiture", "stack_id = '"+areaId +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_air_conditioner_history","humiture", "stack_id = '"+areaId +"'", startTime, endTime);
         }else{
             Integer areaId = maintainReviewDao.findAreaId(id);
-            maintainReviewDao.findDataReview("tb_air_conditioner_history","temp", "stack_id = '"+areaId +"'", startTime, endTime);
+            dataReviews = maintainReviewDao.findDataReview("tb_air_conditioner_history","temp", "stack_id = '"+areaId +"'", startTime, endTime);
         }
         List<String> day = dataReviews.stream().map((Map map) -> map.get("day").toString()).collect(Collectors.toList());
         if(StringUtil.isNotEmpty(startTime) || StringUtil.isNotEmpty(endTime)){
             List<String> months = GetBetweenDayUtils.getMonthBetweenDate(startTime, endTime);
-            months.forEach(month -> {
+            for (String month : months) {
                 if(!day.contains(month)){
                     Map map = new HashMap();
                     map.put("avgData",0);
@@ -115,7 +120,7 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
                     map.put("day",month);
                     dataReviews.add(map);
                 }
-            });
+            }
         }
         dataReviews.sort((v1, v2) -> v1.get("day").toString().compareTo(v2.get("day").toString()));
         return dataReviews;

@@ -1,5 +1,6 @@
 package com.rpzh.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.entity.Result;
@@ -56,12 +57,15 @@ public class MaintainReviewController {
 
     @PostMapping("/findEarlyWarningReview")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
+            @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "int"),
+            @ApiImplicitParam(name = "page", value = "当前页", required = true,dataType = "int"),
+            @ApiImplicitParam(name = "size", value = "每页几页", required = true,dataType = "int")
     })
     @ApiOperation(value = "养护预警追溯列表")
-    public Result<EarlyWarningVo> findEarlyWarningReview(Integer id) {
+    public Result<EarlyWarningVo> findEarlyWarningReview(Integer id,Integer page,Integer size) {
+        PageHelper.startPage(page, size);
         List<EarlyWarningVo> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
-        return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", maintainPlanVos);
+        return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", new PageInfo<>(maintainPlanVos));
     }
 
     @PostMapping("/findDataReview")

@@ -244,6 +244,7 @@
         inner join
         (select id,site_name from tb_stack where 1=1
         <if test="maintainPlanDto.pidRoute!=null and maintainPlanDto.pidRoute!=''">and pid_route like concat('%',#{maintainPlanDto.pidRoute},'%')</if>
+        <if test="maintainPlanDto.stackId!=null and maintainPlanDto.stackId!=''">and id = #{maintainPlanDto.stackId}</if>
         ) t3 on t3.id = t1.stack_id
         where t1.is_end = '1'
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>

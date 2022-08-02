@@ -214,6 +214,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     /**
      * 查询所有养护计划
      *
+     *
      * @param maintainPlanDto
      * @return success or failure
      */
@@ -647,8 +648,14 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     @Override
     public PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
-        if(ToolUtil.isNotEmpty(maintainPlanDto.getPidRoute())) {
-            maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0" + maintainPlanDto.getPidRoute().split(",").length + ":" + maintainPlanDto.getStackId() + "]");
+        String pidRoute = maintainPlanDto.getPidRoute();
+        if(ToolUtil.isNotEmpty(pidRoute)) {
+            if(!pidRoute.contains("04")) {
+                maintainPlanDto.setPidRoute(pidRoute + ",[0" + pidRoute.split(",").length + ":" + maintainPlanDto.getStackId() + "]");
+                maintainPlanDto.setStackId(null);
+            }else{
+                maintainPlanDto.setPidRoute(null);
+            }
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainHistoryCollect(maintainPlanDto);

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-// 43 54 00 2C 00 45 01 C4 DD 93 8E 17 01 23 02 0F 01 02 E2 00 20 75 33 0F 01 03 E3 00 20 75 34 07
 /**
  * @author zyq
  * @create 2022/8/1 10:30
@@ -21,7 +20,7 @@ public class InsectController {
     @RequestMapping(value = "/issue")
     @ResponseBody
     public String asd( String ip) {
-        String rmsg = "53 57 00 03 FF 85 CF";
+        String rmsg = "53 57 00 03 FF 86 CE";
         byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
         ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
         //ctx.write(in2);//返回信息
