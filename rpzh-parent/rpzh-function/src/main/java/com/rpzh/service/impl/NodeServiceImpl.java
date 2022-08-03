@@ -9,8 +9,10 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.TaskManagementDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -23,6 +25,7 @@ import com.rpzh.util.RedisUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.NodeVo;
+import com.rpzh.vo.TaskVo;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    TaskManagementDao taskManagementDao;
     /**
      * 添加节点
      *
@@ -382,6 +388,41 @@ public class NodeServiceImpl implements NodeService {
     public String findNodeTypeByNodeId(NodeDto nodeDto) {
 
         return nodeDao.findNodeTypeByNodeId(nodeDto.getId(),nodeDto.getNodeId());
+    }
+
+    /**
+     * 查询任务
+     * @param siteRoute
+     * @param nodeType
+     * @return
+     */
+    @Override
+    public Result<TaskVo> findTask(String siteRoute, String nodeType) {
+        String[] split = siteRoute.split(",");
+        String taskType = "0";
+        //根据设备类型判断任务类型
+        if (split.length==6){
+            switch (nodeType){
+                case "01":
+                    taskType = "('06')";
+                    break;
+                case "03":
+                    taskType = "('08','10')";
+                case "04":
+                    taskType = "('12')";
+            }
+        }else if (split.length==5){
+            switch (nodeType){
+                case "01":
+                    taskType = "('07')";
+                    break;
+                case "03":
+                    taskType = "('09','11')";
+
+            }
+        }
+        TaskVo taskVo = taskManagementDao.findTaskFromMonitored(siteRoute,taskType);
+        return new Result<>(true,StatusCode.OK,"查询成功",taskVo);
     }
 
 

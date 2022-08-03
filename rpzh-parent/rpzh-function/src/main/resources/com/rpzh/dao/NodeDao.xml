@@ -583,7 +583,7 @@
         select node_type nodeType from tb_node where id = #{id} and node_id = #{nodeId};
     </select>
     <select id="findStatistics" resultType="java.util.Map">
-        select pid_route pidRoute
+        select pid_route pidRoute,gather_site gatherSite
         <if test="dateType=='day'">,toStartOfDay(createdTime) </if>
         <if test="dateType=='week'">,toStartOfWeek(createdTime) </if> as dateTime
         <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) avgOxygen,MAX(oxygen) maxOxygen,MIN(oxygen) minOxygen </if>
@@ -591,16 +591,21 @@
         <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) avgCoreTemp,MAX(temp) maxCoreTemp,MIN(temp) minCoreTemp </if>
         from ${tableName}
         <where>
+        <if test="array!='' and array!=null">
+
+              and pid_route in
+            <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
             <if test="beginTime!='' and beginTime!=null">
               and  createdTime >= #{beginTime}
             </if>
-        </where>
-        <where>
             <if test="endTime!='' and endTime!=null">
                 and  createdTime &lt;= #{endTime}
             </if>
         </where>
-        group by pid_route
+        group by pid_route,gather_site
         <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
         <if test="dateType=='week'">,toStartOfWeek(createdTime)</if>
         order by dateTime

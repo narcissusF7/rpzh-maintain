@@ -8,6 +8,7 @@ import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.DataReportDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.service.DataReportService;
 import com.rpzh.util.PageDtoUtil;
@@ -19,6 +20,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author wbl
@@ -536,38 +539,53 @@ public class DataReportServiceImpl implements DataReportService {
         List<Map> wareHumitureData;
         //垛位氧气数据
         List<Map> wareOxygenData;
-        String[] s = (acquisitionTimeOne.split(" ")[0]).split(",");
-        String[] s1 = (acquisitionTimeOne.split(" ")[0]).split(",");
 
-        LocalDate beginDate = LocalDate.of(Integer.parseInt(s[0]),Integer.parseInt(s[1]),Integer.parseInt(s[2]));
-        LocalDate endDate = LocalDate.of(Integer.parseInt(s1[0]),Integer.parseInt(s1[1]),Integer.parseInt(s1[2]));
-        long reduceDate = endDate.toEpochDay() - beginDate.toEpochDay();
+        long beginDate = localDateUtil(acquisitionTimeOne).toEpochDay();
+        long endDate = localDateUtil(acquisitionTimeTwo).toEpochDay();
 
-        for (long i = 0; i < reduceDate; i++) {
+        List<Map> list = new ArrayList<>();
 
-        }
-
+        pidRoutes = new String[1];
+        pidRoutes[0] = "[00:0],[01:13],[02:14],[03:9],[04:11],[05:65]";
         switch (comparisonType){
             case "1":
                 //垛内  包芯对比
                 //包芯温度数据
                 coreTimeData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+                //将list转成map key dateTime
+                Map<Object, Map> coreTimeData1 = coreTimeData.stream().collect(Collectors.toMap(map ->localDateUtil(map.get("dateTime").toString()), map->map));
+
                 //垛位温湿度数据
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                coreTimeData.forEach(map->{
-                    starckHumitureData.forEach(map1 -> {
-                        //如果是同一个垛内的同一时间段数据
-                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
-                            map.putAll(map1);
-                            BigDecimal avgCoreTemp = new BigDecimal(Double.parseDouble(map.get("avgCoreTemp").toString()));
-                            BigDecimal avgTemp = new BigDecimal(Double.parseDouble(map1.get("avgTemp").toString()));
-                            map.put("dateTime",map1.get("dateTime").toString().split(",")[0]);
-                            map.put("tempReduce",avgCoreTemp.subtract(avgTemp).doubleValue());
-                        }
-                    });
-                });
-                return new Result(true,StatusCode.OK,"查询成功",coreTimeData);
+                Map<Object, Map> starckHumitureData1 = starckHumitureData.stream().collect(Collectors.toMap(map ->
+                        localDateUtil(map.get("dateTime").toString()), map->map));
+
+                for (long i = beginDate; i < endDate; i++) {
+                    Map<Object, Object> hashMap = new HashMap<>();
+
+                    hashMap.put("dateTime",i);
+                    if (ToolUtil.isNotEmpty(coreTimeData1.get(LocalDate.ofEpochDay(i)))){
+                        hashMap.putAll(coreTimeData1.get(LocalDate.ofEpochDay(i)));
+                    }
+                    if (ToolUtil.isNotEmpty(starckHumitureData1.get(LocalDate.ofEpochDay(i)))){
+                        hashMap.putAll(starckHumitureData1.get(LocalDate.ofEpochDay(i)));
+                    }
+                    list.add(hashMap);
+                }
+//                coreTimeData.forEach(map->{
+//                    starckHumitureData.forEach(map1 -> {
+//                        //如果是同一个垛内的同一时间段数据
+//                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
+//                            map.putAll(map1);
+//                            BigDecimal avgCoreTemp = new BigDecimal(Double.parseDouble(map.get("avgCoreTemp").toString()));
+//                            BigDecimal avgTemp = new BigDecimal(Double.parseDouble(map1.get("avgTemp").toString()));
+//                            map.put("dateTime",map1.get("dateTime").toString().split(",")[0]);
+//                            map.put("tempReduce",avgCoreTemp.subtract(avgTemp).doubleValue());
+//                        }
+//                    });
+//                });
+                return new Result(true,StatusCode.OK,"查询成功",list);
 
             case "2":
                 //垛位氧气数据
@@ -604,4 +622,10 @@ public class DataReportServiceImpl implements DataReportService {
         }
         return new Result(false,StatusCode.ERROR,"查询成功");
     }
+
+    public LocalDate localDateUtil(String str){
+        String[] s = (str.split(" ")[0]).split("-");
+        return LocalDate.of(Integer.parseInt(s[0]),Integer.parseInt(s[1]),Integer.parseInt(s[2]));
+    }
+
 }
