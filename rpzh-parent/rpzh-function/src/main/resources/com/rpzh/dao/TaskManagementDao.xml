@@ -593,4 +593,11 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
     <select id="findCount" resultType="java.lang.Integer">
         select count(*) from tb_task where site_route = #{siteRoute} and type = '03' and status &lt;> 1
     </select>
+<update id="updateMaintainPlanStackId">
+  UPDATE tb_maintain_plan
+  SET
+  stack_id = #{siteId}
+  WHERE
+  stack_id = #{beforeStackId}
+</update>
 </mapper>

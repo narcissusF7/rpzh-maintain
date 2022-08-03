@@ -427,6 +427,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteName = taskDto.getSiteName();
         //获取目标地址id
         String siteId = taskDto.getSiteId();
+        //移垛之前的位置路径,截取之后获取垛位id
+        String siteRouteBefore = taskDto.getSiteRouteBefore();
+        //最后的:后面的数字就是移垛之前的垛位id
+        int i = siteRouteBefore.lastIndexOf(":");
+        //移垛之前的垛位id
+        String beforeStackId = siteRouteBefore.substring(i + 1, siteRouteBefore.length() - 1);
+        //移垛之后,养护计划也要修改
+        int updateMainPlan = taskManagementDao.updateMaintainPlanStackId(beforeStackId,siteId);
         //拼接获取当前地址
         //siteRoute = SiteRouteUtil.route(siteRoute, siteId);
         //含有05,说明是垛位

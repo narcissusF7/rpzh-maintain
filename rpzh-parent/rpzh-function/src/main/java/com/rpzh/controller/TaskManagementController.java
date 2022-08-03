@@ -89,9 +89,9 @@ public class TaskManagementController {
         }
         //获取结束时间
         String endTime = taskDto.getEndTime();
-        //当前时间
-        String nowDayTime = DateUtil.dateNew(new Date()).toString();
-        int i = endTime.compareTo(nowDayTime);
+        //昨天的时间,任务日期只能选择今天之后的日期
+        String yesterday = DateUtil.yesterday().toString();
+        int i = endTime.compareTo(yesterday);
         if (i < 0){
             return new Result(false, StatusCode.ERROR, "结束时间不能小于当前时间");
         }
@@ -341,6 +341,7 @@ public class TaskManagementController {
     @ApiOperation(value = "工作任务菜单移垛任务处理", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteRoute", value = "任务目标地址父路径,移垛之后的位置路径", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "siteRouteBefore", value = "移垛之前的位置路径", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteName", value = "任务目标地址名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String"),
             @ApiImplicitParam(name = "id", value = "任务id", required = true,dataType = "String"),
@@ -361,6 +362,9 @@ public class TaskManagementController {
         }
         if (ToolUtil.isEmpty(taskDto.getId())){
             return new Result(false, StatusCode.ERROR, "任务id不能为空");
+        }
+        if (ToolUtil.isEmpty(taskDto.getSiteRouteBefore())){
+            return new Result(false, StatusCode.ERROR, "移垛之前的路径不能为空");
         }
         int updateFlag = taskManagementService.moveStackDeal(taskDto);
         return new Result(true,StatusCode.OK,"移垛成功");

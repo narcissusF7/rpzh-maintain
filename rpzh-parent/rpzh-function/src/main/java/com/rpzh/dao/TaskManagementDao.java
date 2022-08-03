@@ -426,4 +426,12 @@ public interface TaskManagementDao {
     * 根据位置路由查询是否存在未处理或正在处理的移垛任务
     * */
     Integer findCount(@Param("siteRoute")String siteRoute);
+
+    /**
+     * 移垛后养护计划同时需要修改
+     * @param beforeStackId
+     * @param siteId
+     * @return
+     */
+    int updateMaintainPlanStackId(@Param("beforeStackId")String beforeStackId, @Param("siteId")String siteId);
 }

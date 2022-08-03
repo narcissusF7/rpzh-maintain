@@ -41,6 +41,9 @@ public class TaskDto {
     //移垛任务目标位置名称
     private String targetSiteName;
 
+    //移垛之前的路径
+    private String siteRouteBefore;
+
     //移垛目标位置id
     private String targetSiteId;
 
