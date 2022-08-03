@@ -33,15 +33,15 @@ spring:
   datasource:
     dynamic:
       #默认这里选择默认数据
-      primary: mysql
+      primary: oracle
       strict: false
       datasource:
         #可以配置多个
-        mysql:
-          url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
-          username: root
+        oracle:
+          url: jdbc:oracle:thin:@192.168.3.36:1521:helowin
+          username: RPZH_FUNCTION
           password: root
-          driver-class-name: com.mysql.jdbc.Driver
+          driver-class-name: oracle.jdbc.driver.OracleDriver
         clickhouse:
           url: jdbc:clickhouse://183.250.89.188:8123/default
           username: default

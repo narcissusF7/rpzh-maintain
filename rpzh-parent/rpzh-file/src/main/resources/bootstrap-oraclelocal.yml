@@ -29,7 +29,7 @@ spring:
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@192.168.3.36:1521:helowin
-    username: RPZH-SYSTEM
+    username: RPZH_FUNCTION
     password: root
 
 logging:

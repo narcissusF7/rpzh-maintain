@@ -94,6 +94,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!--oracle数据库-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+        </dependency>
+
         <!--文档api-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
