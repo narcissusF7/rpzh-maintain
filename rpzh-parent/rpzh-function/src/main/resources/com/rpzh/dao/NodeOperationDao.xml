@@ -5,16 +5,16 @@
     <insert id="bulkInsert">
 
         INSERT INTO tb_node_operation_history (
-        `node_id`,
-        `node_type`,
-        `site_id`,
-        `site_x`,
-        `site_y`,
-        `site_z`,
-        `operation_type`,
-        `operation_details`,
-        `created_user`,
-        `created_time`
+        node_id,
+        node_type,
+        site_id,
+        site_x,
+        site_y,
+        site_z,
+        operation_type,
+        operation_details,
+        created_user,
+        created_time
         )
         VALUES
         <foreach collection="nodeOperationDtos" item="nodeOperationDto"  separator=",">(

@@ -89,7 +89,7 @@
   </update>
   <select id="findCodeCount" resultType="int">
     SELECT count(*)
-    FROM `tb_warehouse`
+    FROM tb_warehouse
     WHERE code = #{code}
   </select>
   <select id="findWareCode" resultType="java.lang.String">
@@ -177,22 +177,22 @@
   </update>
   <select id="findBuilding" resultType="com.rpzh.vo.BuildingVo">
     SELECT
-      `id` as id,
-      `building_no` as buildingNo,
-      `use_volume` as useVolume,
-      `use_volume_unit` as useVolumeUnit,
-      `use_area` as useArea,
-      `use_area_unit` as useAreaUnit,
-      `building_orientation` as buildingOrientation,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `warehouse_id` as warehouseId,
-      `pid_route` as pidRoute,
-      `building_name` as buildingName,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+      id as id,
+      building_no as buildingNo,
+      use_volume as useVolume,
+      use_volume_unit as useVolumeUnit,
+      use_area as useArea,
+      use_area_unit as useAreaUnit,
+      building_orientation as buildingOrientation,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      warehouse_id as warehouseId,
+      pid_route as pidRoute,
+      building_name as buildingName,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_building
     WHERE id = #{buildingId}
   </select>
@@ -253,15 +253,15 @@
   </update>
   <select id="findFloor" resultType="com.rpzh.vo.FloorVo">
     SELECT
-      `id` as id,
-      `floor_no` as floorNo,
-      `is_partition` as isPartition,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `pid_route` as pidRoute,
-      `floor_name` as floorName,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
-    FROM `tb_floor`
+      id as id,
+      floor_no as floorNo,
+      is_partition as isPartition,
+      remark as remark,
+      created_time as createdTime,
+      pid_route as pidRoute,
+      floor_name as floorName,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_floor
     WHERE id = #{floorId}
   </select>
   <insert id="addWarearea">
@@ -318,16 +318,16 @@
   </update>
   <select id="findWareArea" resultType="com.rpzh.vo.WareAreaVo">
     SELECT
-      `id` as id,
-      `area_no` as areaNo,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `floor_id` as floorId,
-      `pid_route` as pidRoute,
-      `area_name` as areaName,
-      `site_name` as siteName,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_ware_area`
+      id as id,
+      area_no as areaNo,
+      created_time as createdTime,
+      created_user as createdUser,
+      floor_id as floorId,
+      pid_route as pidRoute,
+      area_name as areaName,
+      site_name as siteName,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_ware_area
     WHERE id = #{areaId}
   </select>
   <insert id="addStack">
@@ -433,25 +433,25 @@
   </delete>
   <select id="findAllWarehouse" resultType="com.rpzh.vo.WarehouseVo">
     SELECT
-    `id` as id,
-    `name` as name,
-    `build_time` as buildTime,
-    `code` as code,
-    `use_volume` as useVolume,
-    `use_volume_unit` as useVolumeUnit,
-    `use_area` as useArea,
-    `use_area_unit` as useAreaUnit,
-    `is_automation` as isAutomation,
-    `is_statistics` as isStatistics,
-    `is_using` as isUsing,
-    `remark` as remark,
-    `created_time` as createdTime,
-    `created_user` as createdUser,
-    `last_updated_time` as lastUpdatedTime,
-    `last_updated_user` as lastUpdatedUser,
-    `pid_route` as pidRoute,
-    `ware_type` as wareType,
-    `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    id as id,
+    name as name,
+    build_time as buildTime,
+    code as code,
+    use_volume as useVolume,
+    use_volume_unit as useVolumeUnit,
+    use_area as useArea,
+    use_area_unit as useAreaUnit,
+    is_automation as isAutomation,
+    is_statistics as isStatistics,
+    is_using as isUsing,
+    remark as remark,
+    created_time as createdTime,
+    created_user as createdUser,
+    last_updated_time as lastUpdatedTime,
+    last_updated_user as lastUpdatedUser,
+    pid_route as pidRoute,
+    ware_type as wareType,
+    site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_warehouse
     <where>
       <if test="warehouseNodeId != null and warehouseNodeId != ''">
@@ -461,170 +461,170 @@
   </select>
   <select id="findBuildingById" resultType="com.rpzh.vo.BuildingVo">
     SELECT
-      `id` as id,
-      `building_no` as buildingNo,
-      `use_volume` as useVolume,
-      `use_volume_unit` as useVolumeUnit,
-      `use_area` as useArea,
-      `use_area_unit` as useAreaUnit,
-      `building_orientation` as buildingOrientation,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `warehouse_id` as warehouseId,
-      `pid_route` as pidRoute,
-      `building_name` as buildingName,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
-    FROM `tb_building`
+      id as id,
+      building_no as buildingNo,
+      use_volume as useVolume,
+      use_volume_unit as useVolumeUnit,
+      use_area as useArea,
+      use_area_unit as useAreaUnit,
+      building_orientation as buildingOrientation,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      warehouse_id as warehouseId,
+      pid_route as pidRoute,
+      building_name as buildingName,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_building
     WHERE warehouse_id = #{warehouseNodeId}
   </select>
   <select id="findFloorById" resultType="com.rpzh.vo.FloorVo">
     SELECT
-      `id` as id,
-      `floor_no` as floorNo,
-      `is_partition` as isPartition,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `building_id` as buildingId,
-      `pid_route` as pidRoute,
-      `floor_name` as floorName,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+      id as id,
+      floor_no as floorNo,
+      is_partition as isPartition,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      building_id as buildingId,
+      pid_route as pidRoute,
+      floor_name as floorName,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_floor
     WHERE building_id = #{warehouseNodeId}
   </select>
   <select id="findWareAreaById" resultType="com.rpzh.vo.WareAreaVo">
     SELECT
-      `id` as id,
-      `area_no` as areaNo,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `floor_id` as floorId,
-      `pid_route` as pidRoute,
-      `area_name` as areaName,
-      `site_name` as siteName,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_ware_area`
+      id as id,
+      area_no as areaNo,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      floor_id as floorId,
+      pid_route as pidRoute,
+      area_name as areaName,
+      site_name as siteName,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_ware_area
     WHERE floor_id = #{warehouseNodeId}
   </select>
   <select id="getStackPage" resultType="com.rpzh.vo.StackVo">
     SELECT
-      `id` as id,
-      `stack_no` as stackNo,
-      `name_cn` as nameCn,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `area_id` as areaId,
-      `pid_route` as pidRoute,
-      `site_name` as siteName,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_stack`
+      id as id,
+      stack_no as stackNo,
+      name_cn as nameCn,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      area_id as areaId,
+      pid_route as pidRoute,
+      site_name as siteName,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_stack
     WHERE area_id = #{stackDto.wareAreaId}
   </select>
   <select id="findWarehouseById" resultType="com.rpzh.vo.WarehouseVo">
     SELECT
-      `id` as id,
-      `name` as name,
-      `build_time` as buildTime,
-      `code` as code,
-      `use_volume` as useVolume,
-      `use_volume_unit` as useVolumeUnit,
-      `use_area` as useArea,
-      `use_area_unit` as useAreaUnit,
-      `is_automation` as isAutomation,
-      `is_statistics` as isStatistics,
-      `is_using` as isUsing,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `pid_route` as pidRoute,
-      `ware_type` as wareType,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+      id as id,
+      name as name,
+      build_time as buildTime,
+      code as code,
+      use_volume as useVolume,
+      use_volume_unit as useVolumeUnit,
+      use_area as useArea,
+      use_area_unit as useAreaUnit,
+      is_automation as isAutomation,
+      is_statistics as isStatistics,
+      is_using as isUsing,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      pid_route as pidRoute,
+      ware_type as wareType,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_warehouse
     where id = #{warehouseNodeId}
   </select>
   <select id="findBuildById" resultType="com.rpzh.vo.BuildingVo">
     SELECT
-      `id` as id,
-      `building_no` as buildingNo,
-      `use_volume` as useVolume,
-      `use_volume_unit` as useVolumeUnit,
-      `use_area` as useArea,
-      `use_area_unit` as useAreaUnit,
-      `building_orientation` as buildingOrientation,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `warehouse_id` as warehouseId,
-      `pid_route` as pidRoute,
-      `building_name` as buildingName,
-      `building_type` as buildingType,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
-    FROM `tb_building`
+      id as id,
+      building_no as buildingNo,
+      use_volume as useVolume,
+      use_volume_unit as useVolumeUnit,
+      use_area as useArea,
+      use_area_unit as useAreaUnit,
+      building_orientation as buildingOrientation,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      warehouse_id as warehouseId,
+      pid_route as pidRoute,
+      building_name as buildingName,
+      building_type as buildingType,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_building
     where id = #{warehouseNodeId}
   </select>
   <select id="findOneFloor" resultType="com.rpzh.vo.FloorVo">
     SELECT
-      `id` as id,
-      `floor_no` as floorNo,
-      `is_partition` as isPartition,
-      `remark` as remark,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `building_id` as buildingId,
-      `pid_route` as pidRoute,
-      `floor_type` as floorType,
-      `floor_name` as floorName,
-      `site_name` as siteName,principal_id as principalId , principal_name as principalName
+      id as id,
+      floor_no as floorNo,
+      is_partition as isPartition,
+      remark as remark,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      building_id as buildingId,
+      pid_route as pidRoute,
+      floor_type as floorType,
+      floor_name as floorName,
+      site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_floor
     where id = #{warehouseNodeId}
   </select>
   <select id="findWareAreaByOne" resultType="com.rpzh.vo.WareAreaVo">
     SELECT
-      `id` as id,
-      `area_no` as areaNo,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `floor_id` as floorId,
-      `pid_route` as pidRoute,
-      `area_name` as areaName,
-      `site_name` as siteName,
-      `ware_area_type` as wareAreaType,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_ware_area`
+      id as id,
+      area_no as areaNo,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      floor_id as floorId,
+      pid_route as pidRoute,
+      area_name as areaName,
+      site_name as siteName,
+      ware_area_type as wareAreaType,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_ware_area
     where id = #{warehouseNodeId}
   </select>
   <select id="findStackById" resultType="com.rpzh.vo.StackVo">
     SELECT
-      `id` as id,
-      `stack_no` as stackNo,
-      `name_cn` as nameCn,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `area_id` as areaId,
-      `pid_route` as pidRoute,
-      `site_name` as siteName,
-      `stack_type` as stackType,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_stack`
+      id as id,
+      stack_no as stackNo,
+      name_cn as nameCn,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      area_id as areaId,
+      pid_route as pidRoute,
+      site_name as siteName,
+      stack_type as stackType,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_stack
     where id = #{stackId}
   </select>
   <select id="findWareType" resultType="java.lang.String">
@@ -634,7 +634,7 @@
   </select>
   <select id="findBuildType" resultType="java.lang.String">
     SELECT building_type
-    FROM `tb_building`
+    FROM tb_building
     WHERE id = #{buildingId}
   </select>
   <select id="findFloorType" resultType="java.lang.String">
@@ -666,25 +666,25 @@
   </select>
   <select id="findAllWarehouses" resultType="com.rpzh.vo.WarehouseVo">
     SELECT
-    `id` as id,
-    `name` as name,
-    `build_time` as buildTime,
-    `code` as code,
-    `use_volume` as useVolume,
-    `use_volume_unit` as useVolumeUnit,
-    `use_area` as useArea,
-    `use_area_unit` as useAreaUnit,
-    `is_automation` as isAutomation,
-    `is_statistics` as isStatistics,
-    `is_using` as isUsing,
-    `remark` as remark,
-    `created_time` as createdTime,
-    `created_user` as createdUser,
-    `last_updated_time` as lastUpdatedTime,
-    `last_updated_user` as lastUpdatedUser,
-    `pid_route` as pidRoute,
-    `ware_type` as wareType,
-    `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    id as id,
+    name as name,
+    build_time as buildTime,
+    code as code,
+    use_volume as useVolume,
+    use_volume_unit as useVolumeUnit,
+    use_area as useArea,
+    use_area_unit as useAreaUnit,
+    is_automation as isAutomation,
+    is_statistics as isStatistics,
+    is_using as isUsing,
+    remark as remark,
+    created_time as createdTime,
+    created_user as createdUser,
+    last_updated_time as lastUpdatedTime,
+    last_updated_user as lastUpdatedUser,
+    pid_route as pidRoute,
+    ware_type as wareType,
+    site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_warehouse
     where 1=1
     <if test="warehouseIds != null"> and id in  <foreach collection="warehouseIds" item="id" open="(" separator="," close=")">
@@ -693,24 +693,24 @@
   </select>
   <select id="findAllBulid" resultType="com.rpzh.vo.BuildingVo">
     SELECT
-    `id` as id,
-    `building_no` as buildingNo,
-    `use_volume` as useVolume,
-    `use_volume_unit` as useVolumeUnit,
-    `use_area` as useArea,
-    `use_area_unit` as useAreaUnit,
-    `building_orientation` as buildingOrientation,
-    `remark` as remark,
-    `created_time` as createdTime,
-    `created_user` as createdUser,
-    `last_updated_time` as lastUpdatedTime,
-    `last_updated_user` as lastUpdatedUser,
-    `warehouse_id` as warehouseId,
-    `pid_route` as pidRoute,
-    `building_name` as buildingName,
-    `building_type` as buildingType,
-    `site_name` as siteName,principal_id as principalId , principal_name as principalName
-    FROM `tb_building`
+    id as id,
+    building_no as buildingNo,
+    use_volume as useVolume,
+    use_volume_unit as useVolumeUnit,
+    use_area as useArea,
+    use_area_unit as useAreaUnit,
+    building_orientation as buildingOrientation,
+    remark as remark,
+    created_time as createdTime,
+    created_user as createdUser,
+    last_updated_time as lastUpdatedTime,
+    last_updated_user as lastUpdatedUser,
+    warehouse_id as warehouseId,
+    pid_route as pidRoute,
+    building_name as buildingName,
+    building_type as buildingType,
+    site_name as siteName,principal_id as principalId , principal_name as principalName
+    FROM tb_building
     where 1=1
     <if test="buildingIds != null"> and id in  <foreach collection="buildingIds" item="id" open="(" separator="," close=")">
       #{id}
@@ -718,18 +718,18 @@
   </select>
   <select id="findAllFloor" resultType="com.rpzh.vo.FloorVo">
     SELECT
-    `id` as id,
-    `floor_no` as floorNo,
-    `is_partition` as isPartition,
-    `remark` as remark,
-    `created_time` as createdTime,
-    `created_user` as createdUser,
-    `last_updated_time` as lastUpdatedTime,
-    `last_updated_user` as lastUpdatedUser,
-    `building_id` as buildingId,
-    `pid_route` as pidRoute,
-    `floor_name` as floorName,
-    `site_name` as siteName,principal_id as principalId , principal_name as principalName
+    id as id,
+    floor_no as floorNo,
+    is_partition as isPartition,
+    remark as remark,
+    created_time as createdTime,
+    created_user as createdUser,
+    last_updated_time as lastUpdatedTime,
+    last_updated_user as lastUpdatedUser,
+    building_id as buildingId,
+    pid_route as pidRoute,
+    floor_name as floorName,
+    site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_floor
     where 1=1
     <if test="floorIds != null"> and id in  <foreach collection="floorIds" item="id" open="(" separator="," close=")">
@@ -755,35 +755,35 @@
   </select>
   <select id="findAllStack" resultType="com.rpzh.vo.StackVo">
     SELECT
-      `id` as id,
-      `stack_no` as stackNo,
-      `name_cn` as nameCn,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `area_id` as areaId,
-      `pid_route` as pidRoute,
-      `site_name` as siteName,
-      `stack_type` as stackType,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_stack`
+      id as id,
+      stack_no as stackNo,
+      name_cn as nameCn,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      area_id as areaId,
+      pid_route as pidRoute,
+      site_name as siteName,
+      stack_type as stackType,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_stack
   </select>
   <select id="findStackNotInMaintainPlan" resultType="com.rpzh.vo.StackVo">
     SELECT
-      `id` as id,
-      `stack_no` as stackNo,
-      `name_cn` as nameCn,
-      `created_time` as createdTime,
-      `created_user` as createdUser,
-      `last_updated_time` as lastUpdatedTime,
-      `last_updated_user` as lastUpdatedUser,
-      `area_id` as areaId,
-      `pid_route` as pidRoute,
-      `site_name` as siteName,
-      `stack_type` as stackType,
-      `remark` as remark,principal_id as principalId , principal_name as principalName
-    FROM `tb_stack` where id not in (select stack_id from tb_maintain_plan where is_end = '0')
+      id as id,
+      stack_no as stackNo,
+      name_cn as nameCn,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      area_id as areaId,
+      pid_route as pidRoute,
+      site_name as siteName,
+      stack_type as stackType,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_stack where id not in (select stack_id from tb_maintain_plan where is_end = '0')
   </select>
   <select id = "findBuildingPrincipalName" resultType="com.rpzh.vo.BuildingVo">
     select
@@ -838,102 +838,102 @@
       #{id}
     </foreach>
   </select>
-    <select id="findStackBySiteNo" resultType="int">
-      select count(id) from
-      <if test="level == 1">
-        tb_warehouse
-      </if>
-      <if test="level == 2">
-        tb_building
-      </if>
-      <if test="level == 3">
-        tb_floor
-      </if>
-      <if test="level == 4">
-        tb_ware_area
-      </if>
-      <if test="level == 5">
-        tb_stack
-      </if>
-       where
-      <if test="level == 1">
-        code =
-      </if>
-      <if test="level == 2">
-        building_no =
-      </if>
-      <if test="level == 3">
-        floor_no =
-      </if>
-      <if test="level == 4">
-        area_no =
-      </if>
-      <if test="level == 5">
-        stack_no =
-      </if>
-      #{siteNo}
-    </select>
-<select id="findBuildingName" resultType="int">
+  <select id="findStackBySiteNo" resultType="int">
+    select count(id) from
+    <if test="level == 1">
+      tb_warehouse
+    </if>
+    <if test="level == 2">
+      tb_building
+    </if>
+    <if test="level == 3">
+      tb_floor
+    </if>
+    <if test="level == 4">
+      tb_ware_area
+    </if>
+    <if test="level == 5">
+      tb_stack
+    </if>
+    where
+    <if test="level == 1">
+      code =
+    </if>
+    <if test="level == 2">
+      building_no =
+    </if>
+    <if test="level == 3">
+      floor_no =
+    </if>
+    <if test="level == 4">
+      area_no =
+    </if>
+    <if test="level == 5">
+      stack_no =
+    </if>
+    #{siteNo}
+  </select>
+  <select id="findBuildingName" resultType="int">
     SELECT count(1)
     FROM tb_building
     WHERE building_name = #{buildingName} and warehouse_id = #{warehouseId}
 </select>
-<select id="findBuildingCode" resultType="int">
+  <select id="findBuildingCode" resultType="int">
   SELECT count(1)
   FROM tb_building
   WHERE building_no = #{buildingNo}
 </select>
-<select id="findBuildingNo" resultType="int">
+  <select id="findBuildingNo" resultType="int">
   SELECT count(1)
   FROM tb_building
   WHERE building_no = #{buildingNo} and id != #{id}
 </select>
-<select id="findBuildingNameCount" resultType="int">
+  <select id="findBuildingNameCount" resultType="int">
   SELECT count(1)
   FROM tb_building
   WHERE building_name = #{buildingName} and warehouse_id = #{warehouseId} and id != #{id}
 </select>
-<select id="findFloorName" resultType="int">
+  <select id="findFloorName" resultType="int">
   SELECT count(*)
   FROM tb_floor
   WHERE floor_name = #{floorName} and building_id = #{buildingId}
 </select>
-<select id="findFloorNameCount" resultType="int">
+  <select id="findFloorNameCount" resultType="int">
   SELECT count(*)
   FROM tb_floor
   WHERE floor_name = #{floorName} and building_id = #{buildingId} and id != #{id}
 </select>
-<select id="findAreaName" resultType="int">
+  <select id="findAreaName" resultType="int">
   SELECT count(*)
   FROM tb_ware_area
   WHERE area_name = #{areaName} and floor_id = #{floorId}
 </select>
-<select id="findAreaNameCount" resultType="int">
+  <select id="findAreaNameCount" resultType="int">
   SELECT count(*)
   FROM tb_ware_area
   WHERE area_name = #{areaName} and floor_id = #{floorId} and id != #{id}
 </select>
-<select id="findStackName" resultType="int">
+  <select id="findStackName" resultType="int">
   SELECT count(1)
   FROM tb_stack
   WHERE name_cn = #{nameCn} and area_id = #{areaId}
 </select>
-<select id="findStackNameCount" resultType="int">
+  <select id="findStackNameCount" resultType="int">
   SELECT count(1)
   FROM tb_stack
   WHERE name_cn = #{nameCn} and area_id = #{areaId} and id != #{id}
 </select>
-<select id="findFloorNo" resultType="int">
+  <select id="findFloorNo" resultType="int">
   SELECT count(*)
   FROM tb_floor
   WHERE floor_no = #{floorNo} and id != #{id}
 </select>
-<select id="findWareAreaNo" resultType="int">
+  <select id="findWareAreaNo" resultType="int">
  SELECT count(1)
  FROM tb_ware_area
  WHERE area_no = #{areaNo} and id != #{id}
 </select>
-<select id="findStackNo" resultType="int">
+  <select id="findStackNo" resultType="int">
  SELECT count(*)
  FROM tb_stack
  WHERE stack_no = #{stackNo} and id != #{id}

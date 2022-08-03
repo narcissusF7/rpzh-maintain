@@ -4,7 +4,7 @@
     <insert id="insertData">
         INSERT INTO tb_node_o2_history
         (id,
-         `type`,
+         type,
          oxygen,
          node_id,
          frequency,

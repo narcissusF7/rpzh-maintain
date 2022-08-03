@@ -79,21 +79,21 @@
     </delete>
     <select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
         SELECT
-        `id` as id,
-        `node_id` as nodeId,
-        `node_type` as nodeType,
-        `created_time` as createTime ,
-        `status` as status ,
-        `gather_site` as gatherSite,
-        `stack` as stack ,
-        `site_type` as siteType ,
-        `site_id` as siteId ,
-        `site_x` as siteX,
-        `site_y` as siteY ,
-        `site_z` as siteZ,
-        `case_no` as caseNo,
-        `into_stack_time` as intoStackTime ,
-        `site_route` as siteRoute
+        id as id,
+        node_id as nodeId,
+        node_type as nodeType,
+        created_time as createTime ,
+        status as status ,
+        gather_site as gatherSite,
+        stack as stack ,
+        site_type as siteType ,
+        site_id as siteId ,
+        site_x as siteX,
+        site_y as siteY ,
+        site_z as siteZ,
+        case_no as caseNo,
+        into_stack_time as intoStackTime ,
+        site_route as siteRoute
         FROM tb_node
         <where>
             <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
@@ -154,13 +154,13 @@
     </select>
     <update id="unbindStack">
         UPDATE tb_node
-        SET `status` = '0',
-        `stack`  = '--',
+        SET status = '0',
+        stack  = '--',
         stack_id =null ,
         site_id =null ,
-        `site_x` = '-',
-        `site_y` = '-',
-        `site_z` = '-',
+        site_x = '-',
+        site_y = '-',
+        site_z = '-',
         gather_site = '--',
         site_route = '',
         case_no = ""
@@ -227,20 +227,20 @@
     </select>
     <select id="testFindNode" resultType="com.rpzh.vo.NodeVo">
         SELECT
-        `id` as id,
-        `node_id` as nodeId,
-        `node_type` as nodeType,
-        `created_time` as createTime ,
-        `status` as status ,
-        `gather_site` as gatherSite,
-        `stack` as stack ,
-        `site_type` as siteType ,
-        `site_id` as siteId ,
-        `site_x` as siteX,
-        `site_y` as siteY ,
-        `site_z` as siteZ,
-        `into_stack_time` as intoStackTime ,
-        `site_route` as siteRoute
+        id as id,
+        node_id as nodeId,
+        node_type as nodeType,
+        created_time as createTime ,
+        status as status ,
+        gather_site as gatherSite,
+        stack as stack ,
+        site_type as siteType ,
+        site_id as siteId ,
+        site_x as siteX,
+        site_y as siteY ,
+        site_z as siteZ,
+        into_stack_time as intoStackTime ,
+        site_route as siteRoute
         FROM tb_node
         <where>
             <if test="nodeId != null and nodeId != ''">
@@ -261,21 +261,21 @@
         </where>
     </select>
     <select id="findNodeByStackId" resultType="com.rpzh.vo.NodeVo">
-        SELECT `id`              as id,
-               `node_id`         as nodeId,
-               `node_type`       as nodeType,
-               `created_time`    as createdTime,
-               `status`          as status,
-               `gather_site`     as gatherSite,
-               `stack`           as stack,
-               `stack_id`        as stackId,
-               `site_type`       as siteType,
-               `site_id`         as siteId,
-               `site_x`          as siteX,
-               `site_y`          as siteY,
-               `site_z`          as siteZ,
-               `into_stack_time` as intoStackTime,
-               `site_route`      as siteRoute
+        SELECT id              as id,
+               node_id         as nodeId,
+               node_type       as nodeType,
+               created_time    as createdTime,
+               status          as status,
+               gather_site     as gatherSite,
+               stack           as stack,
+               stack_id        as stackId,
+               site_type       as siteType,
+               site_id         as siteId,
+               site_x          as siteX,
+               site_y          as siteY,
+               site_z          as siteZ,
+               into_stack_time as intoStackTime,
+               site_route      as siteRoute
         FROM tb_node
         where stack_id = #{stackId};
     </select>
@@ -331,7 +331,7 @@
         <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
     </select>
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
-        select id ,`type` ,
+        select id ,type ,
         <if test="tableName == 'tb_node_o2_history'">
             oxygen ,
         </if>
@@ -341,9 +341,9 @@
         <if test="tableName == 'tb_node_temp_core_chip_history'">
             temp ,
         </if>
-         node_id nodeId, frequency , voltage , signal_strength signalStrength ,material_code materialCode,
-               stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
-               site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y siteY,site_z siteZ
+        node_id nodeId, frequency , voltage , signal_strength signalStrength ,material_code materialCode,
+        stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
+        site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y siteY,site_z siteZ
         from ${tableName}
         where node_id = #{nodeId} limit 1
     </select>
@@ -593,15 +593,15 @@
         <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) avgCoreTemp,MAX(temp) maxCoreTemp,MIN(temp) minCoreTemp </if>
         from ${tableName}
         <where>
-        <if test="array!='' and array!=null">
+            <if test="array!='' and array!=null">
 
-              and pid_route in
-            <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
+                and pid_route in
+                <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="beginTime!='' and beginTime!=null">
-              and  createdTime >= #{beginTime}
+                and  createdTime >= #{beginTime}
             </if>
             <if test="endTime!='' and endTime!=null">
                 and  createdTime &lt;= #{endTime}
