@@ -397,5 +397,24 @@ public class MonitoringCenterController {
 
         return new Result(true,StatusCode.OK,"导出成功");
     }
+
+    @ApiOperation(
+            value = "查询任务"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "siteRoute",
+            value = "位置路由",
+            dataType = "String",
+            required = true
+    ), @ApiImplicitParam(
+            name = "nodeType",
+            value = "设备类型  01氧气 03温湿度 04 包芯氧气",
+            dataType = "String",
+            required = true
+    )})
+    @PostMapping("findTaskFromMonitored")
+    public Result findTask(String siteRoute,String nodeType){
+        return nodeService.findTask(siteRoute,nodeType);
+    }
 }
 

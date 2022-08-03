@@ -233,5 +233,6 @@ public interface NodeDao {
 
     String findNodeTypeByNodeId(@Param("id")Integer id,@Param("nodeId") String nodeId);
 
-    List<Map> findStatistics(@Param("pidRoutes") String[] pidRoutes, @Param("tableName") String tableName,@Param("dateType")String dateType);
+    @DS("clickhouse")
+    List<Map> findStatistics(@Param("array") String[] pidRoutes, @Param("tableName") String tableName,@Param("dateType")String dateType,@Param("beginTime")String beginTime,@Param("endTime")String endTime);
 }

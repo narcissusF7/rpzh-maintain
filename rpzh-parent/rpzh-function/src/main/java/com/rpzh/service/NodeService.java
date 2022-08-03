@@ -140,4 +140,6 @@ public interface NodeService {
     Result flipStack(MaintainPlanDto maintainPlanDto);
 
     String findNodeTypeByNodeId(NodeDto nodeDto);
+
+    Result findTask(String siteRoute, String nodeType);
 }

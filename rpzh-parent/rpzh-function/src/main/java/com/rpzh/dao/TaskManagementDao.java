@@ -413,4 +413,12 @@ public interface TaskManagementDao {
     int findMinAveTemp(@Param("startTime") String startTime, @Param("endTime") String endTime, @Param("principal") String principal, @Param("taskSiteRoute") String taskSiteRoute);
 
     Long findTaskId(@Param("siteRoute") String taskSiteRoute,@Param("warningType") String warningType);
+
+    /**
+     * 从监测中心查询任务信息
+     * @param siteRoute
+     * @param taskType
+     * @return
+     */
+    TaskVo findTaskFromMonitored(@Param("siteRoute") String siteRoute, @Param("taskType") String taskType);
 }

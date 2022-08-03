@@ -66,5 +66,5 @@ public interface DataReportService {
      */
     Result<DataReportVo> findSummaryReportDetails(DataReportDto dataReportDto);
 
-    Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType);
+    Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType,String acquisitionTimeOne,String acquisitionTimeTwo);
 }

@@ -21,7 +21,7 @@ public class PestBoardVo {
     @ApiModelProperty(notes = "虫情板类型")
     private String boardType;
     @ApiModelProperty(notes = "负责人id")
-    private String principalId;
+    private String principalUser;
     @ApiModelProperty(notes = "负责人名称")
     private String principalName;
     @ApiModelProperty(notes = "位置id")

@@ -3,13 +3,16 @@ package com.rpzh.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.PestMonitoringDao;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.dto.PestBoardDto;
 import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.parse.ParseData;
+import com.rpzh.service.DataReportService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SendMessageUtil;
@@ -63,6 +66,12 @@ public class TestContrller{
 
     @Autowired
     private DataHandler dataHandler;
+
+    @Autowired
+    private PestMonitoringDao pestMonitoringDao;
+
+    @Autowired
+    DataReportService dataReportService;
 
     @ApiOperation(value = "测试用例方法", tags = "测试用例方法")
     @PostMapping("/one")
@@ -298,5 +307,43 @@ public class TestContrller{
         }
 
         return new Result<>(true, StatusCode.OK, "测试方法7");
+    }
+    @PostMapping("addPestBoard")
+    public Result addPestBoard(MultipartFile file){
+        List<Map<Integer, String>> pestBoards;
+        try {
+            pestBoards = ExcelUtils.importExcel(file, 1 , 0, 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result<>(false, StatusCode.ERROR, "导入失败");
+        }
+        for (int i = 0; i < pestBoards.size(); i++) {
+            if (ToolUtil.isEmpty(pestBoards.get(i).get(0))){
+                continue;
+            }
+
+            PestBoardDto pestBoardDto = new PestBoardDto();
+            pestBoardDto.setPrincipalUser("ljj");
+            pestBoardDto.setPrincipalName("刘疆疆");
+            pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9]");
+            pestBoardDto.setSiteId(9);
+            pestBoardDto.setPestBoardId(pestBoards.get(i).get(0));
+
+            pestMonitoringDao.addPestBoard(pestBoardDto);
+//            ParseData parseData = new ParseData(pestBoards.get(i));
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            List<String> list = new ArrayList<>();
+//            for (int j = 0; j < 6; j++) {
+//                list.add(sdf.format(new Date()));
+//            }
+//            parseData.setDateTime(list);
+//            dataHandler.handlerData(parseData);
+        }
+        return new Result<>(true, StatusCode.OK, "addPestBoard");
+    }
+
+    @PostMapping("export")
+    public Result export(String[] pidRoutes,String comparisonType ,String dateType,String acquisitionTimeOne,String acquisitionTimeTwo){
+        return dataReportService.exportComparisonData(pidRoutes,comparisonType,dateType,acquisitionTimeOne,acquisitionTimeTwo);
     }
 }

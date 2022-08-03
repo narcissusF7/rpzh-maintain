@@ -6,7 +6,7 @@
         INSERT INTO tb_pest_board (
         <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">pest_board_id,</if>
         <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">board_type,</if>
-        <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">principal_id,</if>
+        <if test="pestBoardDto.principalUser!='' and pestBoardDto.principalUser!=null">principal_user,</if>
         <if test="pestBoardDto.principalName!='' and pestBoardDto.principalName!=null">principal_name,</if>
         <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">site_id,</if>
         <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">site_type,</if>
@@ -26,7 +26,7 @@
         (
         <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">#{pestBoardDto.pestBoardId},</if>
         <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">#{pestBoardDto.boardType},</if>
-        <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">#{pestBoardDto.principalId},</if>
+        <if test="pestBoardDto.principalUser!='' and pestBoardDto.principalUser!=null">#{pestBoardDto.principalUser},</if>
         <if test="pestBoardDto.principalName!='' and pestBoardDto.principalName!=null">#{pestBoardDto.principalName},</if>
         <if test="pestBoardDto.siteId!='' and pestBoardDto.siteId!=null">#{pestBoardDto.siteId},</if>
         <if test="pestBoardDto.siteType!='' and pestBoardDto.siteType!=null">#{pestBoardDto.siteType},</if>
@@ -104,17 +104,17 @@
         from tb_pest_stack_monitor
     </select>
     <select id="findByPrincipalName" resultType="java.util.Map">
-        select pest_board_id pestBoardId , site_type siteType,site_name siteName from tb_pest_board where principal_name = #{principalName}
+        select pest_board_id pestBoardId , site_type siteType,site_name siteName from tb_pest_board where principal_user = #{principalUser}
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
-        select pest_board_id pestBoardId, site_route siteRoute  from tb_pest_board where pest_board_id =#{pestBoardId}
+        select pest_board_id pestBoardId, site_route siteRoute,site_name siteName,site_id siteId  from tb_pest_board where pest_board_id =#{pestBoardId}
     </select>
     <select id="findPestBoard" resultType="com.rpzh.vo.PestBoardVo">
         SELECT
         id  as id,
         pest_board_id  as pestBoardId,
         board_type  as boardType,
-        principal_id  as principalId,
+        principal_user  as principalUser,
         principal_name  as principalName,
         site_id  as siteId,
         site_type  as siteType,
@@ -138,11 +138,11 @@
             <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">
                 and site_route like concat('',#{pestBoardDto.siteRoute}, '%')
             </if>
-            <if test="pestBoardDto.principalId!='' and pestBoardDto.principalId!=null">
-                and principal_id = #{pestBoardDto.principalId}
+            <if test="pestBoardDto.principalUser!='' and pestBoardDto.principalUser!=null">
+                and principal_user = #{pestBoardDto.principalUser}
             </if>
         </where>
-        order by principal_id
+        order by principal_user
     </select>
     <select id="findPestBoardId" resultType="java.lang.String">
         select pest_board_id from tb_pest_board
@@ -213,7 +213,7 @@
             tboard.id  as id,
             tboard.pest_board_id  as pestBoardId,
             tboard.board_type  as boardType,
-            tboard.principal_id  as principalId,
+            tboard.principal_user  as principalUser,
             tboard.principal_name  as principalName,
             tboard.site_id  as siteId,
             tboard.site_type  as siteType,

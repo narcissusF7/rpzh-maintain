@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -9,10 +10,11 @@ import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.PestMonitoringDao;
-import com.rpzh.dao.RfidRelationshipDao;
+import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.PestBoardDto;
 import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
+import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -21,13 +23,12 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.PestData;
 import com.rpzh.service.PestMonitoringService;
+import com.rpzh.service.TaskManagementService;
+import com.rpzh.service.WarehouseService;
 import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.EarlyWarningVo;
-import com.rpzh.vo.PestBoardVo;
-import com.rpzh.vo.PestDataVo;
-import com.rpzh.vo.PestMonitoringRuleVo;
+import com.rpzh.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -61,7 +62,10 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
     EarlyWarningDao earlyWarningDao;
 
     @Autowired
-    RfidRelationshipDao rfidRelationshipDao;
+    TaskManagementService taskManagementService;
+
+    @Autowired
+    WarehouseServiceImpl warehouseService;
 
     @Autowired
     DataHandler dataHandler;
@@ -80,30 +84,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     @Override
     public Result addPestBoard(PestBoardDto pestBoardDto) {
-        if (ToolUtil.isEmpty(pestBoardDto.getPestBoardId())) {
-            return new Result(false, StatusCode.ERROR, "虫情点位id不能为空");
-        }
-        if (ToolUtil.isEmpty(pestBoardDto.getSiteRoute())) {
-            return new Result(false, StatusCode.ERROR, "位置路由不能为空");
-        }
-        if (ToolUtil.isEmpty(pestBoardDto.getRfid())) {
-            return new Result(false, StatusCode.ERROR, "rfid不能为空");
-        }
-        if (ToolUtil.isEmpty(pestBoardDto.getSiteId())) {
-            return new Result(false, StatusCode.ERROR, "位置id不能为空");
-        }
-
-        Integer pestBoardCount = pestMonitoringDao.findPestBoardCount(pestBoardDto.getPestBoardId());
-
-        if (pestBoardCount > 0) {
-            return new Result(false, StatusCode.ERROR, "虫情点位id已存在");
-        }
-        Integer rfidCount = rfidRelationshipDao.findRfidCount(pestBoardDto.getRfid());
-
-        if (rfidCount > 0) {
-            return new Result(false, StatusCode.ERROR, "该rfid已存在");
-        }
-
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -120,7 +100,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
 //            redisTemplate.opsForValue().set(PEST_BOARD+pestBoardDto.getId(),JSONObject.toJSONString(pestBoardDto));
             //向rfid关系表插入数据
-            rfidRelationshipDao.addRfidRelationship(pestBoardDto.getRfid(), "02", pestBoardDto.getId());
         }
 
         return new Result(true, StatusCode.OK, "添加成功");
@@ -136,12 +115,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
     public Integer deletePestBoard(Integer[] ids) {
         //删除虫情板
         Integer delFalg = pestMonitoringDao.deletePestBoard(Arrays.asList(ids));
-        //删除rfid与虫情板的绑定关系
-        rfidRelationshipDao.deleteRfidRelationship(Arrays.asList(ids), "02");
-//        for (int i = 0; i <ids.length ; i++) {
-//            redisTemplate.delete(PEST_BOARD+ids[i]);
-//        }
-
         return delFalg;
     }
 
@@ -366,7 +339,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             String siteRoute = pestBoardDto.getSiteRoute() + ",[0" + pestBoardDto.getSiteRoute().split(",").length + ":" + pestBoardDto.getSiteId() + "]";
             pestBoardDto.setSiteRoute(siteRoute);
         }
-        return pestMonitoringDao.findPestBoard(pestBoardDto);
+        List<PestBoardVo> pestBoards = pestMonitoringDao.findPestBoard(pestBoardDto);
+        pestBoards.forEach(pestBoardVo -> pestBoardVo.setPrincipalName(pestBoardVo.getPrincipalName()+"("+pestBoardVo.getPrincipalUser()+")"));
+        return pestBoards;
     }
 
 
@@ -432,6 +407,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 if (splits.length == 5) {
                     //设置仓间id
                     earlyWarning.setAreaId(Integer.parseInt(strip.split(":")[1]));
+
                 } else {
                     //设置垛位id
                     earlyWarning.setStackId(Integer.parseInt(strip.split(":")[1]));
@@ -445,7 +421,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 earlyWarning.setNodeType("07");
                 //将该预警记录插入到数据库中
                 earlyWarningDao.insertWarning(earlyWarning);
-
+                //添加任务
+                addTask(pestBoardVo,warningType);
             }else {
                 earlyWarning.setWarningGrade(0);
             }
@@ -592,7 +569,11 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //求出对应的预警等级
         Integer beetleLevel = decideValue(beetleCount, split);
         //通过甲虫预警等级和数据库该虫情
-        level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
+        if (pestBoardVo.getSiteRoute().split(",").length==5){
+            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
+        }else {
+            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING);
+        }
         map.put("beetleLevel",level);
         if (!ToolUtil.isEmpty(mealwormCount)) {
             //仓间粉螟
@@ -731,6 +712,16 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 return pestMonitorValue.get("colorThree");
             default:
                 return pestMonitorValue.get("");
+        }
+    }
+
+    public void addTask(PestBoardVo pestBoardVo , String type){
+        //查询该垛位、仓间下该类型任务是否存在
+        Integer count = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
+        if (count<1){
+            Map<String, Object> map = warehouseService.getSitePrincipal(pestBoardVo.getSiteRoute().split(",").length-1, Integer.parseInt(pestBoardVo.getSiteId()));
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),map.get("username")+"", DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            taskManagementService.addDataHandTask(taskDto);
         }
     }
 }

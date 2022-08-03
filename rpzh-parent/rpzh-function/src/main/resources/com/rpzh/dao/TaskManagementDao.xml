@@ -578,4 +578,16 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
     <select id="findTaskId" resultType="java.lang.Long">
         select id from tb_task where site_route = #{siteRoute} and type = #{warningType} and status &lt;> 1 limit 1
     </select>
+    <select id="findTaskFromMonitored" resultMap="findTask">
+        SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,deal_result,
+          move_stack_target_siteroute,move_stack_target_name,target_siteid
+        FROM tb_task
+        <where>
+            and site_route = #{siteRoute}
+            <if test="taskType!='' and taskType!=null">
+                and type in ${taskType}
+            </if>
+        </where>
+        order by create_time limit 1
+    </select>
 </mapper>

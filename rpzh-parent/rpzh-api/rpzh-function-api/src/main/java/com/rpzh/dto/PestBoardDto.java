@@ -16,7 +16,7 @@ public class PestBoardDto {
     //虫情板类型
     private String boardType;
     //负责人id
-    private Integer principalId;
+    private String principalUser;
     //负责人
     private String principalName;
     //位置id

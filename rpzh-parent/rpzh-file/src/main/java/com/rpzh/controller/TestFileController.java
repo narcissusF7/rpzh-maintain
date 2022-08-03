@@ -1,8 +1,9 @@
 package com.rpzh.controller;
 
+import com.rpzh.dao.DbTest;
 import com.rpzh.entity.Result;
+import com.rpzh.entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,9 @@ public class TestFileController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private DbTest dbTest;
 
 
     @RequestMapping("/test")
@@ -42,5 +46,17 @@ public class TestFileController {
         System.out.println("---------------------");
         return "成功";
     }
+
+    /**
+     * http://localhost:15888/file/testOracle
+     * @return
+     */
+    @RequestMapping("/testOracle")
+    public Result testOracle(){
+        String name = dbTest.findName();
+        return new Result(false, StatusCode.OK,"发送成功",name);
+    }
+
+
 
 }
