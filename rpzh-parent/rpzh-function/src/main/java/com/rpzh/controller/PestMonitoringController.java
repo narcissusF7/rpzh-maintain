@@ -67,7 +67,7 @@ public class PestMonitoringController {
         if (ToolUtil.isEmpty(pestBoardDto.getSiteId())) {
             return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
         }
-        if (ToolUtil.isEmpty(pestBoardDto.getPrincipalId())) {
+        if (ToolUtil.isEmpty(pestBoardDto.getPrincipalUser())) {
             return new Result<>(false, StatusCode.ERROR, "负责人id不能为空");
         }
         if (ToolUtil.isEmpty(pestBoardDto.getPrincipalName())) {
@@ -204,7 +204,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String"),
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String"),
             @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer"),
-            @ApiImplicitParam(name = "principalId", value = "负责人id", dataType = "Integer"),
+            @ApiImplicitParam(name = "principalUser", value = "负责人账号", dataType = "String"),
             @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer")
     })
@@ -292,5 +292,7 @@ public class PestMonitoringController {
         Map<String,Object> map = pestMonitoringService.findPestWarningValue(pestBoardId);
         return new Result(true,StatusCode.OK,"查询成功",map);
     }
+
+
 
 }

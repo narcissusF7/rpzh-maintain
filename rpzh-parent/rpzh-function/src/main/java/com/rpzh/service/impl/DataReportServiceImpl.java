@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -524,7 +525,7 @@ public class DataReportServiceImpl implements DataReportService {
 
 
     @Override
-    public Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType) {
+    public Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType,String acquisitionTimeOne,String acquisitionTimeTwo) {
         //包芯温度数据
         List<Map> coreTimeData;
         //垛位温湿度数据
@@ -535,35 +536,72 @@ public class DataReportServiceImpl implements DataReportService {
         List<Map> wareHumitureData;
         //垛位氧气数据
         List<Map> wareOxygenData;
+        String[] s = (acquisitionTimeOne.split(" ")[0]).split(",");
+        String[] s1 = (acquisitionTimeOne.split(" ")[0]).split(",");
+
+        LocalDate beginDate = LocalDate.of(Integer.parseInt(s[0]),Integer.parseInt(s[1]),Integer.parseInt(s[2]));
+        LocalDate endDate = LocalDate.of(Integer.parseInt(s1[0]),Integer.parseInt(s1[1]),Integer.parseInt(s1[2]));
+        long reduceDate = endDate.toEpochDay() - beginDate.toEpochDay();
+
+        for (long i = 0; i < reduceDate; i++) {
+
+        }
 
         switch (comparisonType){
             case "1":
                 //垛内  包芯对比
                 //包芯温度数据
-                coreTimeData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getTableName(),dateType);
+                coreTimeData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
                 //垛位温湿度数据
-                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
-                break;
+                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+
+                coreTimeData.forEach(map->{
+                    starckHumitureData.forEach(map1 -> {
+                        //如果是同一个垛内的同一时间段数据
+                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
+                            map.putAll(map1);
+                            BigDecimal avgCoreTemp = new BigDecimal(Double.parseDouble(map.get("avgCoreTemp").toString()));
+                            BigDecimal avgTemp = new BigDecimal(Double.parseDouble(map1.get("avgTemp").toString()));
+                            map.put("dateTime",map1.get("dateTime").toString().split(",")[0]);
+                            map.put("tempReduce",avgCoreTemp.subtract(avgTemp).doubleValue());
+                        }
+                    });
+                });
+                return new Result(true,StatusCode.OK,"查询成功",coreTimeData);
+
             case "2":
                 //垛位氧气数据
-                starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
+                starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
                 //垛位温湿度数据
-                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
-                break;
+                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+
+                starckOxygenData.forEach(map->{
+                    starckHumitureData.forEach(map1 -> {
+                        //如果是同一个垛内的同一时间段数据
+                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
+                            map.putAll(map1);
+                        }
+                    });
+                });
+                return new Result(true,StatusCode.OK,"查询成功",starckOxygenData);
             case "3":
-
-                //垛位氧气数据
-                starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
-                //垛位温湿度数据
-                starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
-
                 //仓间氧气数据
-                wareOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType);
+                wareOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
                 //仓间温湿度数据
-                wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType);
-                break;
+                wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+
+                wareOxygenData.forEach(map->{
+                    wareHumitureData.forEach(map1 -> {
+                        //如果是同一个垛内的同一时间段数据
+                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
+                            map.putAll(map1);
+                        }
+                    });
+                });
+                return new Result(true,StatusCode.OK,"查询成功",wareOxygenData);
+
             default:
         }
-        return null;
+        return new Result(false,StatusCode.ERROR,"查询成功");
     }
 }
