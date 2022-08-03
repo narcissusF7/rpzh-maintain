@@ -167,7 +167,7 @@
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
             sysdate(),sysdate(),</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
-            #{earlyWarning.warningValThree},#{earlyWarning.warningValTwo},</if>
+            #{earlyWarning.warningValThree},#{earlyWarning.warningValThree},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
             sysdate(),sysdate(),</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
