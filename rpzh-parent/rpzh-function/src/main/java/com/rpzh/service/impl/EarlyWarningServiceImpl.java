@@ -356,18 +356,34 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         earlyWarning.put("earlyWarningLow",earlyWarningVo.getLower());
         map.put("earlyWarningVo", earlyWarning);
         String nodeType = earlyWarningDto.getNodeType();
-        NodeTypeEnum nodeTypes = NodeTypeEnum.getNodeType(nodeType);
-        List<NodeData> nodeData = nodeDao.findNodeData(nodeId, nodeTypes.getTableName(), nodeTypes.getTableColumn());
+        List<NodeData> nodeData;
+        if("01".equals(nodeType)){
+            nodeData = nodeDao.findNodeData(nodeId, "tb_node_o2_history", "oxygen");
+        }else if("03".equals(nodeType)){
+            switch (warningType){
+                case "08":
+                    nodeData = nodeDao.findNodeData(nodeId, "tb_node_env_history", "temp");
+                    break;
+                case "10":
+                    nodeData = nodeDao.findNodeData(nodeId, "tb_node_env_history", "humiture");
+                    break;
+                case "09":
+                    nodeData = nodeDao.findNodeData(nodeId, "tb_air_conditioner_history", "temp");
+                    break;
+                case "11":
+                    nodeData = nodeDao.findNodeData(nodeId, "tb_air_conditioner_history", "humiture");
+                    break;
+                default:
+                    nodeData = new ArrayList<>();
+                    break;
+            }
+        }else{
+            nodeData = nodeDao.findNodeData(nodeId, "tb_node_temp_core_chip_history", "temp");
+        }
+
         List<Map> node = new ArrayList<>();
         for (NodeData nodeDatum : nodeData) {
-            Map map1 = new HashMap();
-            if("01".equals(nodeType)){
-                map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getOxygen(),nodeDatum.getTransferTime()));
-            }else if("02".equals(nodeType) || "03".equals(nodeType)){
-                map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getTemp(),nodeDatum.getTransferTime()));
-            }else{
-                map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getHumiture(),nodeDatum.getTransferTime()));
-            }
+            Map map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getNode(),nodeDatum.getTransferTime()));
             node.add(map1);
         }
         String siteType = nodeData.get(0).getSiteType();

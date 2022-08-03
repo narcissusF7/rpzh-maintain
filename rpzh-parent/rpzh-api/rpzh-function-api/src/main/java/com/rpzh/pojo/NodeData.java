@@ -29,6 +29,7 @@ public class NodeData{
     private Integer maintainPlanId;
     //养护阶段id
     private Integer maintainStageId;
+    private Double node=0d;
     //温度
     private Double temp=0d;
     //湿度

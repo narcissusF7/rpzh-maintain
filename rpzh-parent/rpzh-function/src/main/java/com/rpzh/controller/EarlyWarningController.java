@@ -107,7 +107,7 @@ public class EarlyWarningController {
     @ApiOperation(value = "查看传感器实时数据")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "nodeType", value = "设备类型 01:无线氧气传感器,03:无线温湿度传感器,04:无线包芯温度传感器)", dataType = "String",required = true),
-            @ApiImplicitParam(name = "warningType", value = "预警类型)", dataType = "String",required = true),
+            @ApiImplicitParam(name = "warningType", value = "预警类型", dataType = "String",required = true),
             @ApiImplicitParam(name = "nodeId", value = "设备Id", required = true,dataType = "String"),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String",required = true),
             @ApiImplicitParam(name = "stackId", value = "位置id", dataType = "Integer",required = true)
