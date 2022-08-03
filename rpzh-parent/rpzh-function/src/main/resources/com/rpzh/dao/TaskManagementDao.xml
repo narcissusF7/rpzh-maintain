@@ -590,4 +590,7 @@ WHERE DATE_FORMAT( create_time, '%Y-%m-%d' ) = #{day} and status = '1'
         </where>
         order by create_time limit 1
     </select>
+    <select id="findCount" resultType="java.lang.Integer">
+        select count(*) from tb_task where site_route = #{siteRoute} and type = '03' and status &lt;> 1
+    </select>
 </mapper>

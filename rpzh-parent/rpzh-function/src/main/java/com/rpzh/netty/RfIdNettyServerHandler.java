@@ -1,6 +1,7 @@
 package com.rpzh.netty;
 
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.TaskManagementDao;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -12,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Component
@@ -23,6 +22,8 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Resource
     private NodeDao nodeDao;
+    @Resource
+    private TaskManagementDao taskManagementDao;
     /**
      * 获取数据
      *
@@ -37,41 +38,45 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
         log.info("原始数据" + str);
         String DEVSN = "";
         int tagNum = 0;
-        if(str.indexOf("435400") != -1) {
-            List<String> strMegs = Arrays.asList(str.split("435400"));
-            for (int j = 0; j < strMegs.size(); j++) {
-                String strMeg = strMegs.get(j);
-                if(strMeg.length() > 24){
-                    //获取RFID读卡器SN识别码
-                    DEVSN = strMeg.substring(8, 22);
-                    log.info("DEVSN{}",DEVSN);
-                    //获取当前数据中所含标签数量
-                    tagNum = Integer.parseInt(strMeg.substring(22,24),16);
-                    log.info("tagNum{}",tagNum);
-                    int site = 24;
-                    for (int i = 0; i < tagNum; i++) {
-                        //获取当前标签数据的长度
-                        int count = Integer.parseInt(strMeg.substring(site, site+2), 16);
-                        log.info("count{}",count);
-                        //获取当前标签的设备id
-                        String nodeId = strMeg.substring(site + 6, site + 14);
-                        log.info("nodeId{}",nodeId);
-                        Integer nodeCount = findNodeId(nodeId);
-                        if(nodeCount>0){
-                            String rmsg = "53 57 00 03 FF 85 CF";
-                            byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
-                            ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
-                            ctx.writeAndFlush(message);//返回信息
-                            break;
-                        }else{
-                            site = site + count * 2 + 2;
+        if(str.indexOf("435400") != -1){
+            String strMeg = str.replaceFirst("435400","");
+            if(strMeg.length() > 24){
+                //获取RFID读卡器SN识别码
+                DEVSN = strMeg.substring(8, 22);
+                //获取当前数据中所含标签数量
+                tagNum = Integer.parseInt(strMeg.substring(22,24),16);
+                int site = 24;
+                for (int i = 0; i < tagNum; i++) {
+                    log.info("strMeg:{}",strMeg);
+                    //获取当前标签数据的长度
+                    int length = Integer.parseInt(strMeg.substring(site, site+2), 16);
+                    log.info("length:{}",length);
+                    //获取当前标签的设备id
+                    String nodeId = strMeg.substring(site + 6, site + length*2);
+                    //查询该设备是否运维中
+                    Integer countRepair = nodeDao.findCountByNodeID(nodeId);
+                    if(countRepair==0){
+                        //根据设备id查询位置路由
+                        String siteRoute = nodeDao.findSiteRouteByNodeId(nodeId);
+                        Integer count1 = taskManagementDao.findCount(siteRoute);
+                        if(count1==0) {
+                            //判断nodeId和箱号是否绑定
+                            Integer countByCaseNo = nodeDao.findCountByCaseNo(nodeId);
+                            if (countByCaseNo > 0) {
+                                String rmsg = "53 57 00 03 FF 85 CF";
+                                byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
+                                ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
+                                ctx.writeAndFlush(message);//返回信息
+                                break;
+                            }
                         }
                     }
+                    site = site + length * 2 + 2;
                 }
             }
-            //刷新缓存区
-            ctx.flush();
         }
+        //刷新缓存区
+        ctx.flush();
     }
 
     public static byte[] hexStrToBinaryStr(String hexString) {
@@ -89,8 +94,8 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
 
 
     /*
-     * 判断设备id是否存在
-     * */
+    * 判断设备id是否存在
+    * */
     public Integer findNodeId(String nodeId){
         Integer nodeType = nodeDao.findCountByNodeID(nodeId);
         if(nodeType==0){

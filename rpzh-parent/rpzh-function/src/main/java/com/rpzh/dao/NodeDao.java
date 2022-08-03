@@ -229,6 +229,8 @@ public interface NodeDao {
 
     Integer findCountByNodeID(@Param("nodeId") String nodeId);
 
+    String findSiteRouteByNodeId(@Param("nodeId")String nodeId);
+
     Integer findCountByCaseNo(@Param("caseNo")String caseNo);
 
     String findNodeTypeByNodeId(@Param("id")Integer id,@Param("nodeId") String nodeId);

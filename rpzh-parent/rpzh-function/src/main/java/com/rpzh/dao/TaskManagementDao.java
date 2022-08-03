@@ -421,4 +421,9 @@ public interface TaskManagementDao {
      * @return
      */
     TaskVo findTaskFromMonitored(@Param("siteRoute") String siteRoute, @Param("taskType") String taskType);
+
+    /*
+    * 根据位置路由查询是否存在未处理或正在处理的移垛任务
+    * */
+    Integer findCount(@Param("siteRoute")String siteRoute);
 }

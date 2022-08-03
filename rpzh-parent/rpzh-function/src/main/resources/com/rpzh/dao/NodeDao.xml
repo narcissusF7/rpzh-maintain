@@ -40,14 +40,16 @@
     <select id="findCountByNodeID" resultType="java.lang.Integer">
         SELECT count(*)
         FROM tb_node
-        WHERE node_id = #{nodeId} and status = '1'
+        WHERE node_id = #{nodeId} and status = '4'
     </select>
     <select id="findCountByCaseNo" resultType="java.lang.Integer">
         SELECT count(*)
         FROM tb_node
-        WHERE case_no = #{caseNo} and status = '1'
+        WHERE case_no = #{caseNo}
     </select>
-
+    <select id="findSiteRouteByNodeId" resultType="java.lang.String">
+        select site_route from tb_node where node_id = #{nodeId}
+    </select>
     <update id="updateNode">
         UPDATE tb_node
         <set>
