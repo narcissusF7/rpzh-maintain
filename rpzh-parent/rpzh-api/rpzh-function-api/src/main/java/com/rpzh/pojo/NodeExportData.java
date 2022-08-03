@@ -8,32 +8,32 @@ public class NodeExportData {
     @Excel(name = "采集位置", orderNum = "1")
     String gatherSite;
     @Excel(name = "平均氧气浓度", orderNum = "1")
-    double avgOxygen;
+    Double avgOxygen;
     @Excel(name = "最高氧气浓度", orderNum = "1")
-    double maxOxygen;
+    Double maxOxygen;
     @Excel(name = "最低氧气浓度", orderNum = "1")
-    double minOxygen;
+    Double minOxygen;
     @Excel(name = "平均包芯温度", orderNum = "1")
-    double avgCoreTemp;
+    Double avgCoreTemp;
     @Excel(name = "最高包芯温度", orderNum = "1")
-    double maxCoreTemp;
+    Double maxCoreTemp;
     @Excel(name = "最低包芯温度", orderNum = "1")
-    double minCoreTemp;
+    Double minCoreTemp;
     @Excel(name = "平均包芯与环境温度差值", orderNum = "1")
-    double tempReduce;
+    Double tempReduce;
     @Excel(name = "平均温度", orderNum = "1")
-    double avgTemp;
+    Double avgTemp;
     @Excel(name = "最高温度", orderNum = "1")
-    double maxTemp;
+    Double maxTemp;
     @Excel(name = "最低温度", orderNum = "1")
-    double minTemp;
+    Double minTemp;
     @Excel(name = "平均湿度", orderNum = "1")
-    double avgHumiture;
+    Double avgHumiture;
     @Excel(name = "最高湿度", orderNum = "1")
-    double maxHumiture;
+    Double maxHumiture;
     @Excel(name = "最低湿度", orderNum = "1")
-    double minHumiture;
-    @Excel(name = "最低湿度", orderNum = "1")
+    Double minHumiture;
+    @Excel(name = "日期", orderNum = "1")
     String dateTime;
 
 }

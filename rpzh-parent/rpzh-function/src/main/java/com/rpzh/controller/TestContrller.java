@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -342,8 +343,8 @@ public class TestContrller{
         return new Result<>(true, StatusCode.OK, "addPestBoard");
     }
 
-    @PostMapping("export")
-    public Result export(String[] pidRoutes,String comparisonType ,String dateType,String acquisitionTimeOne,String acquisitionTimeTwo){
-        return dataReportService.exportComparisonData(pidRoutes,comparisonType,dateType,acquisitionTimeOne,acquisitionTimeTwo);
+    @GetMapping("export")
+    public Result export(String[] pidRoutes, String comparisonType , String dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
+        return dataReportService.exportComparisonData(pidRoutes,comparisonType,dateType,acquisitionTimeOne,acquisitionTimeTwo, response);
     }
 }

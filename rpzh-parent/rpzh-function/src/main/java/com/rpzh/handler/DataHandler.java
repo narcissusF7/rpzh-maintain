@@ -683,18 +683,23 @@ public class DataHandler {
         NodeVo nodeVo;
         if (ToolUtil.isEmpty(cacheNodeData)){
             nodeVo = nodeDao.findByNodeId(nodeId);
+            if (ToolUtil.isEmpty(nodeVo)||!"1".equals(nodeVo.getStatus())){
+                return null;
+            }
             if (ToolUtil.isNotEmpty(nodeVo)&&NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){
                 //查询对应的养护计划 养护计划阶段
                 MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+                //垛内设备没有养护计划 不接收数据
+                if (ToolUtil.isEmpty(maintainPlanVo)){
+                    return null;
+                }
                 nodeVo.setMaintainPlanId(maintainPlanVo.getId());
                 nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
                 nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
                 //设置该预警id
                 nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
             }
-            if (ToolUtil.isEmpty(nodeVo)||"2".equals(nodeVo.getStatus())){
-                return null;
-            }
+
             redisTemplate.opsForValue().set(MAINTAIN_CACHE_NODE + nodeId,JSON.toJSONString(nodeVo));
         }else {
             nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);

@@ -1,6 +1,7 @@
 package com.rpzh.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.DataReportDao;
@@ -10,13 +11,16 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
+import com.rpzh.pojo.NodeExportData;
 import com.rpzh.service.DataReportService;
+import com.rpzh.util.EasyPoiUtil;
 import com.rpzh.util.PageDtoUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.DataReportVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -528,7 +532,7 @@ public class DataReportServiceImpl implements DataReportService {
 
 
     @Override
-    public Result exportComparisonData(String[] pidRoutes,String comparisonType ,String dateType,String acquisitionTimeOne,String acquisitionTimeTwo) {
+    public Result exportComparisonData(String[] pidRoutes, String comparisonType , String dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response) {
         //包芯温度数据
         List<Map> coreTimeData;
         //垛位温湿度数据
@@ -539,93 +543,149 @@ public class DataReportServiceImpl implements DataReportService {
         List<Map> wareHumitureData;
         //垛位氧气数据
         List<Map> wareOxygenData;
-
+        comparisonType ="1";
+        dateType ="day";
+        acquisitionTimeOne= "2022-08-01 00:00:00";
+        acquisitionTimeTwo= "2022-08-05 00:00:00";
         long beginDate = localDateUtil(acquisitionTimeOne).toEpochDay();
         long endDate = localDateUtil(acquisitionTimeTwo).toEpochDay();
 
-        List<Map> list = new ArrayList<>();
+        List<NodeExportData> list = new ArrayList<>();
 
-        pidRoutes = new String[1];
-        pidRoutes[0] = "[00:0],[01:13],[02:14],[03:9],[04:11],[05:65]";
         switch (comparisonType){
             case "1":
                 //垛内  包芯对比
                 //包芯温度数据
                 coreTimeData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
-                //将list转成map key dateTime
-                Map<Object, Map> coreTimeData1 = coreTimeData.stream().collect(Collectors.toMap(map ->localDateUtil(map.get("dateTime").toString()), map->map));
 
                 //垛位温湿度数据
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                Map<Object, Map> starckHumitureData1 = starckHumitureData.stream().collect(Collectors.toMap(map ->
-                        localDateUtil(map.get("dateTime").toString()), map->map));
+                comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData);
 
-                for (long i = beginDate; i < endDate; i++) {
-                    Map<Object, Object> hashMap = new HashMap<>();
-
-                    hashMap.put("dateTime",i);
-                    if (ToolUtil.isNotEmpty(coreTimeData1.get(LocalDate.ofEpochDay(i)))){
-                        hashMap.putAll(coreTimeData1.get(LocalDate.ofEpochDay(i)));
-                    }
-                    if (ToolUtil.isNotEmpty(starckHumitureData1.get(LocalDate.ofEpochDay(i)))){
-                        hashMap.putAll(starckHumitureData1.get(LocalDate.ofEpochDay(i)));
-                    }
-                    list.add(hashMap);
-                }
-//                coreTimeData.forEach(map->{
-//                    starckHumitureData.forEach(map1 -> {
-//                        //如果是同一个垛内的同一时间段数据
-//                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
-//                            map.putAll(map1);
-//                            BigDecimal avgCoreTemp = new BigDecimal(Double.parseDouble(map.get("avgCoreTemp").toString()));
-//                            BigDecimal avgTemp = new BigDecimal(Double.parseDouble(map1.get("avgTemp").toString()));
-//                            map.put("dateTime",map1.get("dateTime").toString().split(",")[0]);
-//                            map.put("tempReduce",avgCoreTemp.subtract(avgTemp).doubleValue());
-//                        }
-//                    });
-//                });
-                return new Result(true,StatusCode.OK,"查询成功",list);
+                break;
 
             case "2":
                 //垛位氧气数据
                 starckOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+
                 //垛位温湿度数据
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                starckOxygenData.forEach(map->{
-                    starckHumitureData.forEach(map1 -> {
-                        //如果是同一个垛内的同一时间段数据
-                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
-                            map.putAll(map1);
-                        }
-                    });
-                });
-                return new Result(true,StatusCode.OK,"查询成功",starckOxygenData);
+                comparsionData(beginDate,endDate,list,starckOxygenData,starckHumitureData);
+                break;
             case "3":
                 //仓间氧气数据
                 wareOxygenData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.OXYGEN_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
+
                 //仓间温湿度数据
                 wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                wareOxygenData.forEach(map->{
-                    wareHumitureData.forEach(map1 -> {
-                        //如果是同一个垛内的同一时间段数据
-                        if (map1.get("pidRoute").equals(map.get("pidRoute"))&&map.get("dateTime").equals(map1.get("dateTime"))){
-                            map.putAll(map1);
-                        }
-                    });
-                });
-                return new Result(true,StatusCode.OK,"查询成功",wareOxygenData);
+                comparsionData(beginDate,endDate,list,wareOxygenData,wareHumitureData);
+                break;
 
             default:
         }
+        EasyPoiUtil easyPoiUtil = new EasyPoiUtil();
+        list.forEach(item->{
+            easyPoiUtil.t = item;
+            try {
+                easyPoiUtil.hihdColumn("avgOxygen", true);
+            } catch (Exception e) {
+                System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        EasyPoiUtil.exportExcel(list,"xx","xx.xls",NodeExportData.class,"xx.xls",response);
         return new Result(false,StatusCode.ERROR,"查询成功");
     }
 
     public LocalDate localDateUtil(String str){
         String[] s = (str.split(" ")[0]).split("-");
         return LocalDate.of(Integer.parseInt(s[0]),Integer.parseInt(s[1]),Integer.parseInt(s[2]));
+    }
+
+    public void comparsionData(long beginDate,long endDate ,List list ,List<Map> list1,List<Map> list2){
+
+
+        //key  时间  value 那个时间的map1里面数据的下标
+        Map<String, List<Map>> dateTimeList1 = getDateTimeList(list1);
+        Map<String, List<Map>> dateTimeList2 = getDateTimeList(list2);
+
+        List<Map>  dataList  = new ArrayList<>();
+
+        for (long i = beginDate; i < endDate; i++) {
+            //获取这一天每个位置产生的数据
+            List<Map> list3 = dateTimeList1.get(LocalDate.ofEpochDay(i)+" 00:00:00.0");
+
+            List<Map> list4 = dateTimeList2.get(LocalDate.ofEpochDay(i)+" 00:00:00.0");
+            //如果当天没有数据
+            if (ToolUtil.isEmpty(list3)&&ToolUtil.isEmpty(list4)){
+                Map map = new HashMap<>();
+                map.put("dateTime", LocalDate.ofEpochDay(i));
+                list.add(JSONObject.parseObject(JSONObject.toJSONString(map),NodeExportData.class));
+            }
+            //同一时间不同位置
+            Map<String,Map> map = new HashMap<>();
+            if (ToolUtil.isNotEmpty(list3)){
+                for (int j = 0; j < list3.size(); j++) {
+                    Map map1 = new HashMap<>();
+                    map1.put("dateTime", i);
+                    //数据
+                    map1.putAll(list3.get(j));
+
+                    map.put(map1.get("pidRoute").toString(),map1);
+
+                }
+            }
+            if (ToolUtil.isNotEmpty(list4)){
+                for (int j = 0; j < list4.size(); j++) {
+
+                    String pidRoute = list4.get(j).get("pidRoute").toString();
+                    if (ToolUtil.isNotEmpty(map.get(pidRoute))){
+                        //上面有同样的位置路由  即同一天  同一个位置的数据存到一起
+                        Map data = list4.get(j);
+                        data.putAll(map.get(pidRoute));
+                        dataList.add(data);
+                        map.remove(pidRoute);
+                    }else {
+                        //如果 同一天不同位置
+                        Map map1 = list4.get(j);
+                        dataList.add(list4.get(j));
+                    }
+                }
+            }
+
+            //把剩下的都放到dataList
+            if (map.size()>0){
+                map.forEach((k,v)->{
+                    dataList.add(v);
+                });
+            }
+            dataList.forEach(map1 -> map1.put("dateTime",map1.get("dateTime").toString().split(" ")[0]));
+        }
+        dataList.forEach(map -> list.add(JSONObject.parseObject(JSONObject.toJSONString(map),NodeExportData.class)));
+
+    }
+    //key  时间  value 那个时间的map1里面数据的下标
+    public Map<String,List<Map>> getDateTimeList(List<Map> list){
+        Map<String,List<Map>> map = new HashMap<>();
+        Set set1 = new HashSet();
+        for (int i = 0; i < list.size(); i++) {
+            //获取时间
+            String dateTime = list.get(i).get("dateTime").toString();
+            List<Map> list1;
+            //如果set中存在重复元素
+            if (set1.contains(dateTime)){
+                list1 = map.get(dateTime);
+            }else {
+                list1 = new ArrayList<>();
+            }
+            set1.add(dateTime);
+            list1.add(list.get(i));
+            map.put(dateTime,list1);
+        }
+        return map;
     }
 
 }
