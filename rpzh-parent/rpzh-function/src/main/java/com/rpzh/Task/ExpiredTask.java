@@ -2,6 +2,7 @@ package com.rpzh.Task;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SendMessageUtil;
@@ -48,74 +49,77 @@ public class ExpiredTask {
     public void sendExpiredTask(){
         //查询所有逾期的任务
         List<Map> overdueTaskList = taskManagementService.findAllOverdueTask();
-        //key:用户账号,value:任务编号
-        Map<String,List<String>> mapList = new HashMap<>();
-        for (Map map : overdueTaskList) {
-            //任务负责人
-            String principal = map.get("principal").toString();
-            //任务编号
-            List<String> stringList = new ArrayList<>();
-            //去重后的,key:负责人,val:空
-            mapList.put(principal,stringList);
-        }
-        for (Map map : overdueTaskList) {
-            //任务编号
-            String taskNum = map.get("taskNum").toString();
-            //任务负责人
-            String principal = map.get("principal").toString();
-            List<String> list = mapList.get(principal);
-            list.add(taskNum);
-        }
-        //所有的负责人账号
-        Set<String> usernameSet = mapList.keySet();
-        Iterator<String> iterator = usernameSet.iterator();
-        while (iterator.hasNext()){
-            //用户账号
-            String username = iterator.next();
-            //当前用户手机号
-            String phonenumber = (String)redisUtil.hget(USER + username, "phonenumber");
-            //当前用户所有的任务编号
-            List<String> list = mapList.get(username);
-            //所有的任务编号拼写字符串
-            StringBuilder sb = new StringBuilder("智慧养护系统:你有过期的任务未处理,过期任务编号,");
-            for (String taskNum : list) {
-                sb.append(taskNum).append(",");
+        //没有过期的任务不推送
+        if (ToolUtil.isNotEmpty(overdueTaskList)){
+            //key:用户账号,value:任务编号
+            Map<String,List<String>> mapList = new HashMap<>();
+            for (Map map : overdueTaskList) {
+                //任务负责人
+                String principal = map.get("principal").toString();
+                //任务编号
+                List<String> stringList = new ArrayList<>();
+                //去重后的,key:负责人,val:空
+                mapList.put(principal,stringList);
             }
-            sb.append("请及时处理");
-            System.out.println(sb.toString());
-            MessageVo messageVo = SendMessageUtil.sendSms(phonenumber, sb.toString(), "h1");
-            log.info("发送结果:"+messageVo.getResult());
-            Map map = new HashMap();
-            map.put("username", username);
-            //短信类型,过期任务提醒
-            map.put("type", "18");
-            //发送内容
-            map.put("content", sb.toString());
-            //发送短信时间
-            String nowTime = DateUtil.dateNew(new Date()).toString();
-            map.put("createTime",nowTime);
-            //发送短信手机号
-            map.put("phone",phonenumber);
-            rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
-            try {
-                //防止短信频繁发送失败
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            for (Map map : overdueTaskList) {
+                //任务编号
+                String taskNum = map.get("taskNum").toString();
+                //任务负责人
+                String principal = map.get("principal").toString();
+                List<String> list = mapList.get(principal);
+                list.add(taskNum);
             }
-            log.info("定时任务发送短信:"+"账号:"+username+",手机号:"+phonenumber);
+            //所有的负责人账号
+            Set<String> usernameSet = mapList.keySet();
+            Iterator<String> iterator = usernameSet.iterator();
+            while (iterator.hasNext()){
+                //用户账号
+                String username = iterator.next();
+                //当前用户手机号
+                String phonenumber = (String)redisUtil.hget(USER + username, "phonenumber");
+                //当前用户所有的任务编号
+                List<String> list = mapList.get(username);
+                //所有的任务编号拼写字符串
+                StringBuilder sb = new StringBuilder("智慧养护系统:你有过期的任务未处理,过期任务编号,");
+                for (String taskNum : list) {
+                    sb.append(taskNum).append(",");
+                }
+                sb.append("请及时处理");
+                System.out.println(sb.toString());
+                MessageVo messageVo = SendMessageUtil.sendSms(phonenumber, sb.toString(), "h1");
+                log.info("发送结果:"+messageVo.getResult());
+                Map map = new HashMap();
+                map.put("username", username);
+                //短信类型,过期任务提醒
+                map.put("type", "18");
+                //发送内容
+                map.put("content", sb.toString());
+                //发送短信时间
+                String nowTime = DateUtil.dateNew(new Date()).toString();
+                map.put("createTime",nowTime);
+                //发送短信手机号
+                map.put("phone",phonenumber);
+                rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
+                try {
+                    //防止短信频繁发送失败
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                log.info("定时任务发送短信:"+"账号:"+username+",手机号:"+phonenumber);
+            }
+            /**
+             * 01:虫情巡查  10:垛内湿度
+             * 02:翻垛任务  11:仓间湿度
+             * 03:移垛任务  12:包芯温度
+             * 04:垛内甲虫  13:平均包芯高于环境
+             * 05:仓间甲虫  14:仓间粉螟
+             * 06:垛内氧气  15:仓库检查
+             * 07:仓间氧气  16:其他
+             * 08:垛内温度  17:找回密码
+             * 09:仓间温度  18:任务逾期提醒
+             */
         }
-        /**
-         * 01:虫情巡查  10:垛内湿度
-         * 02:翻垛任务  11:仓间湿度
-         * 03:移垛任务  12:包芯温度
-         * 04:垛内甲虫  13:平均包芯高于环境
-         * 05:仓间甲虫  14:仓间粉螟
-         * 06:垛内氧气  15:仓库检查
-         * 07:仓间氧气  16:其他
-         * 08:垛内温度  17:找回密码
-         * 09:仓间温度  18:任务逾期提醒
-         */
     }
 
 }
