@@ -3,7 +3,7 @@
 <mapper namespace="com.rpzh.dao.FileDao">
 <insert id="insertFilePictureUrl">
 INSERT INTO tb_task_pic
-( `task_id`, `picture_url`, `picture_group`, `picture_filename` )
+( task_id, picture_url, picture_group, picture_filename )
 VALUES
 (#{id}, #{path}, #{group}, #{fileName} );
 </insert>
