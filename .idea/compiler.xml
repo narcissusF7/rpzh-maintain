@@ -26,6 +26,7 @@
         <module name="rpzh-file" />
         <module name="rpzh-gateway-b" />
         <module name="rpzh-gateway-c" />
+        <module name="rpzh-job-api" />
         <module name="rpzh-system-api" />
         <module name="rpzh-humiture-api" />
         <module name="rpzh-common-log" />
@@ -55,6 +56,7 @@
       <module name="rpzh-humiture" target="1.8" />
       <module name="rpzh-humiture-api" target="1.8" />
       <module name="rpzh-job" target="1.8" />
+      <module name="rpzh-job-api" target="1.8" />
       <module name="rpzh-log" target="1.8" />
       <module name="rpzh-log-api" target="1.8" />
       <module name="rpzh-moisture" target="1.8" />

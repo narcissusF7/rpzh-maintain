@@ -179,7 +179,7 @@ public interface NodeDao {
     NodeVo findByNodeId(@Param("nodeId") String nodeId);
 
     @DS("clickhouse")
-    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData, @Param("tableName") String tableName,@Param("id")long id);
+    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData, @Param("tableName") String tableName, @Param("id") long id);
 
 
     Integer findNodeStatus(@Param("id") Integer id);
@@ -231,9 +231,12 @@ public interface NodeDao {
 
     String findSiteRouteByNodeId(@Param("nodeId")String nodeId);
 
-    Integer findCountByCaseNo(@Param("caseNo")String caseNo);
+    Integer findCountByCaseNo(@Param("caseNo") String caseNo);
 
-    String findNodeTypeByNodeId(@Param("id")Integer id,@Param("nodeId") String nodeId);
+    String findNodeTypeByNodeId(@Param("id") Integer id, @Param("nodeId") String nodeId);
+
+    List<Map<String, Object>> findNodeAddress(@Param("deviceId") String deviceId,
+                                        @Param("addressRoute") String addressRoute);
 
     @DS("clickhouse")
     List<Map> findStatistics(@Param("array") String[] pidRoutes, @Param("tableName") String tableName,@Param("dateType")String dateType,@Param("beginTime")String beginTime,@Param("endTime")String endTime);
