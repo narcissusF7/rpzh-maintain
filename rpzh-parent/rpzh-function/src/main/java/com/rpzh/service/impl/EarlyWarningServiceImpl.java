@@ -493,11 +493,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         }else{
             earlyWarningVos = earlyWarningDao.findEarlyWarningByNotOne(earlyWarningDto);
         }
+        earlyWarningVos = earlyWarningVos.stream().filter((EarlyWarningVo earlyWarningVo) -> !"0".equals(earlyWarningVo.getAffirm())).collect(Collectors.toList());
         earlyWarningVos.forEach(earlyWarningVo -> {
             switch (earlyWarningVo.getAffirm()){
-                case "0":
-                    earlyWarningVo.setAffirmName("已处理");
-                    break;
                 case "1":
                     earlyWarningVo.setAffirmName("正在处理");
                     break;

@@ -219,4 +219,28 @@ public class GetBetweenDayUtils {
                 alarmValueSettingDto.getCoreTempHighEnvTempTwo() == null ||
                 alarmValueSettingDto.getCoreTempLowEnvTemp() ==null;
     }
+
+    public static boolean get(AlarmValueSettingDto alarmValueSettingDto){
+        if(alarmValueSettingDto.getStackMoistureLower() > alarmValueSettingDto.getStackMoistureUpperOne() || alarmValueSettingDto.getStackMoistureUpperOne() > alarmValueSettingDto.getStackMoistureUpperTwo() ||
+                alarmValueSettingDto.getStackMoistureUpperTwo() > alarmValueSettingDto.getStackMoistureUpperThree()){
+            return true;
+        }
+        if(alarmValueSettingDto.getStackTempLower() > alarmValueSettingDto.getStackTempUpperOne() || alarmValueSettingDto.getStackTempUpperOne() > alarmValueSettingDto.getStackTempUpperTwo() ||
+                alarmValueSettingDto.getStackTempUpperTwo() > alarmValueSettingDto.getStackTempUpperThree()){
+            return true;
+        }
+        if(alarmValueSettingDto.getStackOxygenLower() > alarmValueSettingDto.getStackOxygenUpperOne() || alarmValueSettingDto.getStackOxygenUpperOne() > alarmValueSettingDto.getStackOxygenUpperTwo() ||
+                alarmValueSettingDto.getStackOxygenUpperTwo() > alarmValueSettingDto.getStackOxygenUpperThree()){
+            return true;
+        }
+        if(alarmValueSettingDto.getTempCoreChipLower() > alarmValueSettingDto.getTempCoreChipUpperOne() || alarmValueSettingDto.getTempCoreChipUpperOne() > alarmValueSettingDto.getTempCoreChipUpperTwo() ||
+                alarmValueSettingDto.getTempCoreChipUpperTwo() > alarmValueSettingDto.getTempCoreChipUpperThree()){
+            return true;
+        }
+        if(alarmValueSettingDto.getCoreTempLowEnvTemp() > alarmValueSettingDto.getCoreTempHighEnvTempOne() || alarmValueSettingDto.getCoreTempHighEnvTempOne() > alarmValueSettingDto.getCoreTempHighEnvTempTwo() ||
+                alarmValueSettingDto.getCoreTempHighEnvTempTwo() > alarmValueSettingDto.getCoreTempHighEnvTempThree()){
+            return true;
+        }
+        return false;
+    }
 }

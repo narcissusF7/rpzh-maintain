@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.MaintainPlanDao;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @Author liubc
  * @create 2022/2/23 11:33
- * @Description: good good study,day day up
+ * @Description: good good study,day day uplocatingMaintain
  */
 @Service
 public class WarehouseServiceImpl implements WarehouseService {
@@ -756,10 +757,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseVos;
     }
 
+    @Resource
+    private MaintainPlanDao maintainPlanDao;
     @Override
     public Result locatingMaintain() {
         //查询没有养护计划的垛位
-        List<StackVo> stackVos = warehouseDao.findStackNotInMaintainPlan();
+        List<StackVo> stackVos = maintainPlanDao.findStackNotInMaintainPlan();
         if(stackVos.size()==0){
             return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
         }

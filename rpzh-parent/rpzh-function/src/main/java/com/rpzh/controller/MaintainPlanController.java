@@ -150,6 +150,9 @@ public class MaintainPlanController {
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
+        if(GetBetweenDayUtils.get(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
+        }
         int result = maintainPlanService.insertMaintainPlan(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "养护计划添加成功",result);
     }
@@ -292,6 +295,9 @@ public class MaintainPlanController {
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
+        if(GetBetweenDayUtils.get(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
+        }
         Integer i = maintainPlanService.updateMaintainPlan(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "更改养护计划成功",i);
     }
@@ -310,6 +316,9 @@ public class MaintainPlanController {
     })
     public Result endMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         Integer i = maintainPlanService.endMaintainPlan(maintainPlanDto);
+        if (i == -1) {
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
+        }
         return new Result<>(true, StatusCode.OK, "开垛成功",i);
     }
 
@@ -389,7 +398,13 @@ public class MaintainPlanController {
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
         }
+        if(GetBetweenDayUtils.get(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
+        }
         Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
+        if (result == -1) {
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
+        }
         return new Result<>(true, StatusCode.OK, "转段成功",result);
     }
 

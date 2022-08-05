@@ -25,13 +25,13 @@ public class AlarmValueSettingDto {
     private Double stackOxygenLower=0d;
 
     //仓间氧气上限一级
-    private Double warehouseOxygenUpperOne;
+    private Double warehouseOxygenUpperOne=0d;
     //仓间氧气上限二级
-    private Double warehouseOxygenUpperTwo;
+    private Double warehouseOxygenUpperTwo=0d;
     //仓间氧气上限三级
-    private Double warehouseOxygenUpperThree;
+    private Double warehouseOxygenUpperThree=0d;
     //仓间氧气下限
-    private Double warehouseOxygenLower;
+    private Double warehouseOxygenLower=0d;
 
     //包芯温度上限一级
     private Double tempCoreChipUpperOne=0d;
@@ -61,13 +61,13 @@ public class AlarmValueSettingDto {
     private Double stackMoistureLower=0d;
 
     //仓间温度上限一级
-    private Double warehouseTempUpperOne;
+    private Double warehouseTempUpperOne=0d;
     //仓间温度上限二级
-    private Double warehouseTempUpperTwo;
+    private Double warehouseTempUpperTwo=0d;
     //仓间温度上限三级
-    private Double warehouseTempUpperThree;
+    private Double warehouseTempUpperThree=0d;
     //仓间温度下限
-    private Double warehouseTempLower;
+    private Double warehouseTempLower=0d;
 
     //仓间水分上限一级
     private Double warehouseMoistureUpperOne=0d;

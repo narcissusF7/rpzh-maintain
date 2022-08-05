@@ -26,8 +26,6 @@ public interface AlarmValueSettingDao {
 
     AlarmValueSettingVo findByMaterialCode(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    int changeStatus(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
-
     MaintainPlanVo findByMaintainStackId(@Param("stackId") Integer stackId);
 
     EarlyWarningVo findAlarmValueSettingByStackId(@Param("column")String column, @Param("stackId") Integer stackId);

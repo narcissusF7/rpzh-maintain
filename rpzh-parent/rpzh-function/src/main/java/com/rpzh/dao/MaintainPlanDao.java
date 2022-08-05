@@ -3,6 +3,7 @@ package com.rpzh.dao;
 import com.rpzh.dto.MaintainCountDto;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.vo.MaintainCountVo;
+import com.rpzh.vo.StackVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import com.rpzh.vo.MaintainPlanVo;
@@ -18,7 +19,7 @@ public interface MaintainPlanDao {
 
     int deleteMaintainPlanStageById(@Param("ids") List<Integer> ids);
 
-    List<MaintainPlanVo> findMaintainPlanInfo(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+    List<MaintainPlanVo> findMaintainPlanInfo(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
 
     MaintainPlanVo findMaintainPlan(@Param("id") Integer id);
 
@@ -34,17 +35,19 @@ public interface MaintainPlanDao {
 
     Integer findIdByStackId(@Param("stackId") Integer stackId);
 
-    int updateMaintainPlanStageId(@Param("stageId") Integer stageId, @Param("id") Integer id);
+    int updateMaintainPlanStageId(@Param("id") Integer id);
 
     List<MaintainPlanVo> findMaintainCountReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
     List<MaintainPlanVo> findMaintainMonthEndReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+    List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
 
-    Integer endMaintainPlan(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId, @Param("maintainDays") long maintainDays);
+    Integer endMaintainPlan(@Param("maintainPlanId") Integer maintainPlanId);
 
-    List<Integer> findAlarmValueSettingId(@Param("ids") List<Integer> ids);
+    Integer endMaintainPlanStage(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId, @Param("maintainDays") long maintainDays);
+
+    List<Map> findAlarmValueSettingId(@Param("ids") List<Integer> ids);
 
     MaintainPlanVo findVersion(@Param("stageId") Integer stageId);
 
@@ -60,7 +63,9 @@ public interface MaintainPlanDao {
 
     int changeMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    List<MaintainPlanVo> findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+    int changeMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+
+    List<MaintainPlanVo> findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
 
     Integer isExistStackId(@Param("stackId") Integer stackId);
 
@@ -70,7 +75,7 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findMaintainStackId(@Param("stackId") Integer stackId);
 
-    List<Integer> findId(@Param("ids") List<Integer> ids);
+    List<MaintainPlanVo> findPidRoute(@Param("ids") List<Integer> ids);
 
     int insertMaintainCount(@Param("maintainPlanDtos") List<MaintainPlanDto> maintainPlanDtos);
 
@@ -109,4 +114,10 @@ public interface MaintainPlanDao {
     MaintainPlanVo findMaintainPlanNow(@Param("id") Integer id);
 
     String findCurrentMaintainPlan(@Param("stackId")Integer stackId);
+
+    Integer findCountBySiteRoute(@Param("siteRoutes")List<String> siteRoutes);
+
+    List<StackVo> findStackNotInMaintainPlan();
+
+    List<Integer> findStackIdBySiteRoute(@Param("siteRoute")String siteRoute);
 }

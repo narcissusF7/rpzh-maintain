@@ -57,6 +57,23 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
                 wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() == null ||
                 wareAreaAlarmSettingDto.getWarehouseMoistureLower() == null;
     }
+
+    public boolean get(WareAreaAlarmSettingDto wareAreaAlarmSettingDto){
+        if(wareAreaAlarmSettingDto.getWarehouseMoistureLower() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() || wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperThree()){
+            return true;
+        }
+        if(wareAreaAlarmSettingDto.getWarehouseTempLower() > wareAreaAlarmSettingDto.getWarehouseTempUpperOne() || wareAreaAlarmSettingDto.getWarehouseTempUpperOne() > wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() > wareAreaAlarmSettingDto.getWarehouseTempUpperThree()){
+            return true;
+        }
+        if(wareAreaAlarmSettingDto.getWarehouseOxygenLower() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() || wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperThree()){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Result insertWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         if(ToolUtil.isEmpty(wareAreaAlarmSettingDto.getPidRoute()) || ToolUtil.isEmpty(wareAreaAlarmSettingDto.getStackId())){
@@ -64,6 +81,9 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         }
         if(getFlag(wareAreaAlarmSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
+        if(get(wareAreaAlarmSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
         String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
         String siteType = "0" + pidRoute.split(",").length;
@@ -138,6 +158,9 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         if(getFlag(wareAreaAlarmSettingDto)){
             return new Result(false, StatusCode.ERROR, "值不能为空!");
+        }
+        if(get(wareAreaAlarmSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");

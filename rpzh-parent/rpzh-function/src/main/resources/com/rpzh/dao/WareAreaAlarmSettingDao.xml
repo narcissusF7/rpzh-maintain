@@ -20,7 +20,7 @@
             site_type as siteType
         FROM
             tb_ware_area_alarm_setting
-        where concat_ws('',site_type ,site_id ) = #{site}
+        where concat(site_type ,site_id ) = #{site}
     </select>
     <insert id="insertWareAreaAlarmSetting">
     insert into tb_ware_area_alarm_setting

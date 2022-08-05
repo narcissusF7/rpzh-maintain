@@ -82,6 +82,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "预警值不能为空!");
         }
+        if(GetBetweenDayUtils.get(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
+        }
         Date date = new Date();
         //获取用户名
         String createUser = TokenDecode.getUserInfo().get("username");
@@ -204,6 +207,9 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
         //判断填写的预警值是否有少写
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "预警值不能为空!");
+        }
+        if(GetBetweenDayUtils.get(alarmValueSettingDto)){
+            return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
         String earlyWarningRuleName = alarmValueSettingDto.getEarlyWarningRuleName();
         //根据预警名称查询预警规则id
