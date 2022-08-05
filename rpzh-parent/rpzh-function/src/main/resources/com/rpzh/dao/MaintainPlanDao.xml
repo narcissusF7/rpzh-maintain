@@ -480,14 +480,14 @@
         order by t1.warehouse_id,t1.buliding_id,t1.floor_id,t1.area_id,t1.stack_id
     </select>
     <select id="findCount" resultType="java.lang.Double">
-        select sum(maintain_count) from tb_maintain_count
+        select sum(t1.maintain_count) from tb_maintain_count t1
         WHERE 1=1
-        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!=''">and material_code like concat(concat('%',#{maintainCountDto.materialCode}),'%')</if>
-        <if test="maintainCountDto.startTime !=null">and created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainCountDto.endTime !=null">and created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainCountDto.materialCode}),'%')</if>
+        <if test="maintainCountDto.startTime !=null">and t1.created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
         <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and ${tableColumn} = #{maintainCountDto.stackId}</if>
-        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and maintence_style = #{maintainCountDto.maintenceStyle}</if>
-        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and phases = #{maintainCountDto.phases}</if>
+        <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t1.maintence_style = #{maintainCountDto.maintenceStyle}</if>
+        <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t1.phases = #{maintainCountDto.phases}</if>
     </select>
     <select id="findSite" resultType="java.lang.String">
         select  distinct

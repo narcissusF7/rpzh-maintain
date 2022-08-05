@@ -161,15 +161,15 @@
         <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
             #{earlyWarning.warningValOne},#{earlyWarning.warningValOne},</if>
         <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
-            sysdate(),sysdate(),</if>
+            sysdate,sysdate,</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
             #{earlyWarning.warningValTwo},#{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
-            sysdate(),sysdate(),</if>
+            sysdate,sysdate,</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
             #{earlyWarning.warningValThree},#{earlyWarning.warningValThree},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
-            sysdate(),sysdate(),</if>
+            sysdate,sysdate,</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
@@ -184,8 +184,8 @@
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade = #{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_val = #{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_val = #{earlyWarning.warningValThree},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate(),warning_time = sysdate()</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate(),warning_time = sysdate()</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate,warning_time = sysdate</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate,warning_time = sysdate</if>
         where id = #{earlyWarning.id}
     </update>
 
