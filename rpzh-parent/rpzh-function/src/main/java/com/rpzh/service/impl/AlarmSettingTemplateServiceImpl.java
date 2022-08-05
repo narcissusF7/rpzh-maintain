@@ -13,7 +13,6 @@ import com.rpzh.util.*;
 import com.rpzh.vo.AlarmValueSettingVo;
 import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.SettingColorAndDayVo;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.util.*;
  * @Description: 预警模板
  */
 @Service
-@Slf4j
 public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateService {
     @Resource
     private AlarmSettingTemplateDao alarmSettingTemplateDao;
@@ -79,9 +77,6 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
      */
     @Override
     public Result insertAlarmSettingTemplate(AlarmValueSettingDto alarmValueSettingDto) {
-        log.info("alarmValueSettingDto:{}",alarmValueSettingDto);
-        log.debug("alarmValueSettingDto:{}",alarmValueSettingDto);
-        System.out.println(alarmValueSettingDto);
         String materialCode = alarmValueSettingDto.getMaterialCode();
         //判断填写的预警值是否有少写
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){

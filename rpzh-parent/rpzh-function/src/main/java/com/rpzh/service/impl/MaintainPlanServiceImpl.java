@@ -840,7 +840,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 case 1: column = "t1.warehouse_id";break;
                 case 2: column = "t1.buliding_id";break;
                 case 3: column = "t1.floor_id";break;
-                case 4: column = "t1.t1.area_id";break;
+                case 4: column = "t1.area_id";break;
                 case 5: column = "t1.stack_id";break;
             }
             sum = maintainPlanDao.findCount(maintainCountDto,column);
