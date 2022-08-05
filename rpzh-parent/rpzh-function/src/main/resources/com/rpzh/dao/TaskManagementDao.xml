@@ -107,7 +107,7 @@
                 AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
             </if>
             <if test="taskDto.siteRoute != null and taskDto.siteRoute != ''">
-                AND site_route = #{taskDto.siteRoute}
+                AND site_route like concat(concat('%',#{taskDto.siteRoute}),'%')
             </if>
             <if test="taskDto.status != null and taskDto.status != ''">
                 AND status = #{taskDto.status}
@@ -157,7 +157,7 @@
                 AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
             </if>
             <if test="taskDto.siteRoute != null and taskDto.siteRoute != ''">
-                AND site_route = #{taskDto.siteRoute}
+                AND site_route like concat(concat('%',#{taskDto.siteRoute}),'%')
             </if>
             <if test="taskDto.status != null and taskDto.status != ''">
                 AND status = #{taskDto.status}

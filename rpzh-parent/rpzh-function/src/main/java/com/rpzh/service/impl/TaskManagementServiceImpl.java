@@ -159,7 +159,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             String principal = taskVo.getPrincipal();
             //获取负责人名字
             String nickname = (String) redisUtil.hget("USER_"+principal, "nickname");
-            taskVo.setPrincipal(principal+"("+nickname+")");
+            taskVo.setPrincipal(nickname+"("+principal+")");
         }
         return new PageInfo<TaskVo>(taskVoList);
     }
