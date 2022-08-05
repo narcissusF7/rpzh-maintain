@@ -22,7 +22,7 @@
         <if test="warningType!='' and warningType!=null">
             and warning_type =#{warningType}
         </if>
-        limit 1;
+        and rownum = 1
     </select>
     <select id="findWarningThreshold" resultType="java.lang.String">
         select setting_value from tb_general_setting where setting_key = #{settingKey} order by id
@@ -199,11 +199,11 @@
         stack_id as stackId,area_id as areaId,task_id as taskId,repair_id as repairId
         FROM tb_early_warning
         WHERE is_affirm = '0'
-        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat('%',#{earlyWarningDto.pidRoute},'%') </if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
-        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and node_id like concat('%',#{earlyWarningDto.nodeId},'%')</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat('%',#{earlyWarningDto.principalName},'%')</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and node_id like concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
         <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
         ORDER BY site_route

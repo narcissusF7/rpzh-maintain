@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.AlarmSettingTemplateDao;
 import com.rpzh.dao.WareAreaAlarmSettingDao;
+import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
@@ -59,16 +60,16 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     }
 
     public boolean get(WareAreaAlarmSettingDto wareAreaAlarmSettingDto){
-        if(wareAreaAlarmSettingDto.getWarehouseMoistureLower() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() || wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() ||
-                wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() > wareAreaAlarmSettingDto.getWarehouseMoistureUpperThree()){
+        if(wareAreaAlarmSettingDto.getWarehouseMoistureLower() >= wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() || wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne() >= wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo() >= wareAreaAlarmSettingDto.getWarehouseMoistureUpperThree()){
             return true;
         }
-        if(wareAreaAlarmSettingDto.getWarehouseTempLower() > wareAreaAlarmSettingDto.getWarehouseTempUpperOne() || wareAreaAlarmSettingDto.getWarehouseTempUpperOne() > wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() ||
-                wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() > wareAreaAlarmSettingDto.getWarehouseTempUpperThree()){
+        if(wareAreaAlarmSettingDto.getWarehouseTempLower() >= wareAreaAlarmSettingDto.getWarehouseTempUpperOne() || wareAreaAlarmSettingDto.getWarehouseTempUpperOne() >= wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseTempUpperTwo() >= wareAreaAlarmSettingDto.getWarehouseTempUpperThree()){
             return true;
         }
-        if(wareAreaAlarmSettingDto.getWarehouseOxygenLower() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() || wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() ||
-                wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() > wareAreaAlarmSettingDto.getWarehouseOxygenUpperThree()){
+        if(wareAreaAlarmSettingDto.getWarehouseOxygenLower() >= wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() || wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne() >= wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() ||
+                wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo() >= wareAreaAlarmSettingDto.getWarehouseOxygenUpperThree()){
             return true;
         }
         return false;
@@ -125,10 +126,6 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     private RedisUtil redisUtil;
     @Override
     public PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
-        String endTime = wareAreaAlarmSettingDto.getEndTime();
-        if(ToolUtil.isNotEmpty(endTime)){
-            wareAreaAlarmSettingDto.setEndTime(endTime.replace("00:00:00","23:59:59"));
-        }
         String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
         Integer stackId = wareAreaAlarmSettingDto.getStackId();
         if(StringUtil.isNotEmpty(pidRoute)){
@@ -137,12 +134,29 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         PageHelper.startPage(wareAreaAlarmSettingDto.getPage(), wareAreaAlarmSettingDto.getSize());
         List<WareAreaAlarmSettingVo> wareAreaAlarmSettingInfos = wareAreaAlarmSettingDao.findWareAreaAlarmSettingInfo(wareAreaAlarmSettingDto);
         for (WareAreaAlarmSettingVo wareAreaAlarmSetting : wareAreaAlarmSettingInfos) {
+            Integer siteId = wareAreaAlarmSetting.getStackId();
             String createUser = wareAreaAlarmSetting.getCreateUser();
             wareAreaAlarmSetting.setCreateUser((String)redisUtil.hget("USER_"+createUser,"nickname") + "(" + createUser + ")");
+            switch (wareAreaAlarmSetting.getSiteType()){
+                case "04":
+                    wareAreaAlarmSetting.setSiteName(warehouseDao.findWareArea(siteId).getSiteName());
+                    break;
+                case "03":
+                    wareAreaAlarmSetting.setSiteName(warehouseDao.findFloor(siteId).getSiteName());
+                    break;
+                case "02":
+                    wareAreaAlarmSetting.setSiteName(warehouseDao.findBuilding(siteId+"").getSiteName());
+                    break;
+                case "01":
+                    wareAreaAlarmSetting.setSiteName(warehouseDao.findWarehouse(siteId).getSiteName());
+                    break;
+            }
         }
         return new PageInfo<>(wareAreaAlarmSettingInfos);
     }
 
+    @Resource
+    private WarehouseDao warehouseDao;
     @Override
     public Result findWareAreaAlarmSettingById(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         Integer id = wareAreaAlarmSettingDto.getId();

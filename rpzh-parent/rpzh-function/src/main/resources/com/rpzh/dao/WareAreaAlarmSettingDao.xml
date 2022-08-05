@@ -71,26 +71,23 @@
     <select id="findWareAreaAlarmSettingInfo" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
         select
         id as id,
-        concat_ws('%,',warehouse_oxygen_upper_one,warehouse_oxygen_upper_two,concat_ws('',warehouse_oxygen_upper_three,'%')) as oxygenList,
-        concat_ws('',warehouse_oxygen_lower,'%') as warehouseOxygenLower,
-        concat_ws('℃,',warehouse_temp_upper_one,warehouse_temp_upper_two,concat_ws('',warehouse_temp_upper_three,'℃')) as tempList,
-        concat_ws('',warehouse_temp_lower,'℃') as warehouseTempLower,
-        concat_ws('%,',warehouse_moisture_upper_one,warehouse_moisture_upper_two,concat_ws('',warehouse_moisture_upper_three,'%')) as moistureList,
-        concat_ws('',warehouse_moisture_lower,'%') as warehouseMoistureLower,
+        concat(concat(concat(warehouse_oxygen_upper_one,'%,'),concat(warehouse_oxygen_upper_two,'%,')),concat(warehouse_oxygen_upper_three,'%,')) as oxygenList,
+        concat(warehouse_oxygen_lower,'%') as warehouseOxygenLower,
+        concat(concat(concat(warehouse_temp_upper_one,'℃,'),concat(warehouse_temp_upper_two,'℃,')),concat(warehouse_temp_upper_three,'℃,')) as tempList,
+        concat(warehouse_temp_lower,'℃') as warehouseTempLower,
+        concat(concat(concat(warehouse_moisture_upper_one,'%,'),concat(warehouse_moisture_upper_two,'%,')),concat(warehouse_moisture_upper_three,'%,')) AS moistureList,
+        concat(warehouse_moisture_lower,'%') as warehouseMoistureLower,
         create_user as createUser,
         updated_time as updatedTime,
-        (case site_type
-        when '01' then (select site_name from tb_warehouse t where t.id = t1.site_id)
-        when '02' then (select site_name from tb_building t where t.id = t1.site_id)
-        when '03' then (select site_name from tb_floor t where t.id = t1.site_id)
-        when '04' then (select site_name from tb_ware_area t where t.id = t1.site_id) end) as siteName
+        site_type AS siteType,
+        site_id AS stackId
         from
         tb_ware_area_alarm_setting t1
         where 1=1
-        <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat('%', #{wareAreaAlarmSettingDto.pidRoute}, '%')</if>
+        <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat(concat('%',#{wareAreaAlarmSettingDto.pidRoute}),'%')</if>
         <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user = #{wareAreaAlarmSettingDto.createUser}</if>
-        <if test="wareAreaAlarmSettingDto.startTime != null">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
-        <if test="wareAreaAlarmSettingDto.endTime != null">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
+        <if test="wareAreaAlarmSettingDto.startTime !=null and wareAreaAlarmSettingDto.startTime != ''">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
+        <if test="wareAreaAlarmSettingDto.endTime !=null and wareAreaAlarmSettingDto.endTime != ''">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
     </select>
     <select id="findWareAreaAlarmSettingById" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
         select
