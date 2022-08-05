@@ -133,6 +133,8 @@ public class TaskManagementController {
                     "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
                     "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String"),
             @ApiImplicitParam(name = "taskNum", value = "任务编号", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "位置路径父路径route", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "位置路径当前id", required = false,dataType = "String"),
             @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
@@ -143,6 +145,12 @@ public class TaskManagementController {
     })
     @PostMapping("/findTask")
     public Result<PageInfo<TaskVo>> findTask(@ApiIgnore TaskDto taskDto){
+        //如果查询位置地址不为空,查询精确位置
+        if (ToolUtil.isNotEmpty(taskDto.getSiteRoute()) && ToolUtil.isNotEmpty(taskDto.getSiteId())){
+            //拼接获取真实的路径
+            String route = SiteRouteUtil.route(taskDto.getSiteRoute(), taskDto.getSiteId());
+            taskDto.setSiteRoute(route);
+        }
         PageInfo<TaskVo> pageInfo = taskManagementService.findTask(taskDto);
         return new Result<>(true, StatusCode.OK, "查询成功", pageInfo);
     }
@@ -228,6 +236,12 @@ public class TaskManagementController {
     })
     @PostMapping("/findTaskByUser")
     public Result<PageInfo<TaskVo>> findTaskByUser(@ApiIgnore TaskDto taskDto){
+        //如果查询位置地址不为空,查询精确位置
+        if (ToolUtil.isNotEmpty(taskDto.getSiteRoute()) && ToolUtil.isNotEmpty(taskDto.getSiteId())){
+            //拼接获取真实的路径
+            String route = SiteRouteUtil.route(taskDto.getSiteRoute(), taskDto.getSiteId());
+            taskDto.setSiteRoute(route);
+        }
         PageInfo<TaskVo> pageInfo = taskManagementService.findTaskByUser(taskDto);
         return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
     }
