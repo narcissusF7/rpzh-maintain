@@ -433,6 +433,12 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int i = siteRouteBefore.lastIndexOf(":");
         //移垛之前的垛位id
         String beforeStackId = siteRouteBefore.substring(i + 1, siteRouteBefore.length() - 1);
+        //如果目标位置有养护计划,禁止移垛
+        //标注,mysql版本未修改
+        int maintainPlanCount = taskManagementDao.findMaintainPlan(siteId);
+        if (maintainPlanCount > 0){
+            throw new RuntimeException("目标位置含有养护计划,禁止移垛");
+        }
         //移垛之后,养护计划也要修改
         int updateMainPlan = taskManagementDao.updateMaintainPlanStackId(beforeStackId,siteId);
         //拼接获取当前地址

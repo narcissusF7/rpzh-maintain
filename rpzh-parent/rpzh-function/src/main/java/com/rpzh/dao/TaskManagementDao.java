@@ -434,4 +434,11 @@ public interface TaskManagementDao {
      * @return
      */
     int updateMaintainPlanStackId(@Param("beforeStackId")String beforeStackId, @Param("siteId")String siteId);
+
+    /**
+     * 移垛处理中判断目标位置是否含有养护计划
+     * @param siteId
+     * @return
+     */
+    int findMaintainPlan(@Param("siteId") String siteId);
 }
