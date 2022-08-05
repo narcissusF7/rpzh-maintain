@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import cn.afterturn.easypoi.cache.manager.IFileLoader;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -34,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -173,7 +175,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
     @Override
     public PestMonitoringRuleVo findPestRule() {
         //虫情巡查时间查询
-        Map<String, Integer> weekPatrol = pestMonitoringDao.findWeekPatrol();
+        Map<String, BigDecimal> weekPatrol = pestMonitoringDao.findWeekPatrol();
 
         //虫情板替换周期查询
         GeneralSetting generalSetting = new GeneralSetting();
@@ -182,6 +184,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
         //虫情预警值 预警颜色查询
         Map<String, Object> pestMonitorValues = pestMonitoringDao.findPestMonitorValue();
+        pestMonitorValues.put("valueOne",((BigDecimal)pestMonitorValues.get("valueOne")).intValue());
+        pestMonitorValues.put("valueTwo",((BigDecimal)pestMonitorValues.get("valueTwo")).intValue());
+        pestMonitorValues.put("valueThree",((BigDecimal)pestMonitorValues.get("valueThree")).intValue());
 
         //查询特殊垛位
         List<Map<String, Object>> specialStacks = pestMonitoringDao.findSpecialSite();
@@ -703,6 +708,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @return 颜色代码
      */
     public String getPestWarningColor(Integer level,Map<String, String> pestMonitorValue){
+        if (ToolUtil.isEmpty(level)) {
+            return pestMonitorValue.get("");
+        }
         switch (level) {
             case 1:
                 return pestMonitorValue.get("colorOne");

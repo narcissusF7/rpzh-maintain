@@ -4,13 +4,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 @Data
 @ApiModel(description = "虫情预警配置返回类")
 public class PestMonitoringRuleVo {
     @ApiModelProperty(notes = "巡查时间（周）0:1")
-    Map<String, Integer> weekPatrol;
+    Map<String, BigDecimal> weekPatrol;
     @ApiModelProperty(notes = "虫情板替换周期")
     Integer replacePeriod;
     @ApiModelProperty(notes = "预警值，预警颜色值")
@@ -27,7 +28,7 @@ public class PestMonitoringRuleVo {
     public PestMonitoringRuleVo() {
     }
 
-    public PestMonitoringRuleVo(Map<String, Integer> weekPatrol, Integer replacePeriod, Map<String, Object> pestMonitorValues, List<Map<String, Object>> specialStacks) {
+    public PestMonitoringRuleVo(Map<String, BigDecimal> weekPatrol, Integer replacePeriod, Map<String, Object> pestMonitorValues, List<Map<String, Object>> specialStacks) {
         this.weekPatrol = weekPatrol;
         this.replacePeriod = replacePeriod;
         this.pestMonitorValues = pestMonitorValues;

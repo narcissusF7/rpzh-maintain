@@ -52,7 +52,7 @@
                                    prewarning_value_three = #{pestMonitoringRuleDto.valueThree},
                                    prewarning_color_one   = #{pestMonitoringRuleDto.colorOne},
                                    prewarning_color_two   = #{pestMonitoringRuleDto.colorTwo},
-                                   prewarning_color_three = #{pestMonitoringRuleDto.colorThree} where id =1;
+                                   prewarning_color_three = #{pestMonitoringRuleDto.colorThree} where id =1
     </update>
     <update id="updateWeekPatrol">
         update tb_pest_patrol set
@@ -71,7 +71,7 @@
         </foreach>
     </delete>
     <delete id="delSpecialSite">
-        truncate tb_pest_stack_monitor
+        truncate TABLE  tb_pest_stack_monitor
     </delete>
     <select id="findSpecialSiteRoute" resultType="java.lang.String">
         select site_route "siteRoute" from tb_pest_stack_monitor where site_route in
@@ -80,7 +80,7 @@
         </foreach>
     </select>
     <select id="findWeekPatrol" resultType="java.util.Map">
-        select * from tb_pest_patrol where rownum =  1;
+        select * from tb_pest_patrol where rownum =  1
     </select>
     <select id="findPestMonitorValue" resultType="java.util.Map">
         select  prewarning_value_one   "valueOne",
@@ -124,7 +124,7 @@
         created_time  as createdTime,
         last_updated_time  as lastUpdatedTime,
         last_updated_user  as lastUpdatedUser,
-        last_updated_user_id  as "lastUpdatedUserId,
+        last_updated_user_id  as lastUpdatedUserId,
         remark  as remark
         FROM
         tb_pest_board
@@ -161,20 +161,22 @@
         insert into tb_pest_stack_monitor (site_route,prewarning_value_one,prewarning_value_two,prewarning_value_three,site_name) values (#{siteRoute},#{valueOne},#{valueTwo},#{valueThree},#{siteName})
     </insert>
     <insert id="exportPestData">
-        INSERT INTO tb_pest_data_history
+        INSERT ALL
+        <foreach collection="pestDataList" item="pestData" index="index" separator=" ">
+          INTO tb_pest_data_history
         (pest_board_id,gather_site,gather_time,beetle_count,alert_level
-        <if test="siteType!='04'">
+        <if test="siteType=='04'">
             ,mealworm_count
         </if>
         )
         VALUES
-        <foreach collection="pestDataList" item="pestData" index="index" separator=",">
             ( #{pestData.pestBoardId},#{pestData.gatherSite},to_date(#{pestData.gatherTime},'yyyy-mm-dd hh24:mi:ss'),#{pestData.beetleCount},#{pestData.alertLevel}
-            <if test="siteType!='04'">
+            <if test="siteType=='04'">
                 ,#{pestData.mealwormCount}
             </if>
             )
         </foreach>
+        select 1 from dual
     </insert>
     <insert id="addPestHistory">
         insert into tb_pest_data_history (pest_board_id,gather_site,gather_time,beetle_count,alert_level
@@ -236,7 +238,7 @@
                prewarning_value_two "valueTwo",
                prewarning_color_two "colorTwo",
                prewarning_value_three "valueThree",
-               prewarning_color_three "colorThree" from tb_pest_monitor where rownum =  1;
+               prewarning_color_three "colorThree" from tb_pest_monitor where rownum =  1
     </select>
 
     <select id="findPestStackMonitor" resultType="com.rpzh.vo.EarlyWarningVo">

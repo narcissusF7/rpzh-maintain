@@ -13,6 +13,7 @@ import com.rpzh.vo.PestMonitoringRuleVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public interface PestMonitoringDao {
 
     Integer addSpecialSiteRoute(@Param("siteRoute") String siteRoute, @Param("valueOne")String valueOne,@Param("valueTwo")String valueTwo,@Param("valueThree")String valueThree,@Param("siteName") String siteName);
 
-    Map<String,Integer> findWeekPatrol();
+    Map<String, BigDecimal> findWeekPatrol();
 
     Map<String, Object> findPestMonitorValue();
 
