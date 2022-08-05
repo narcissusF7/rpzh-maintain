@@ -9,7 +9,7 @@
     </select>
     <update id="updateTackId">
     UPDATE tb_early_warning
-    SET task_id = #{id},is_affirm = #{affirm},principal=#{principal},deal_time = #{dealTime}
+    SET task_id = #{id},is_affirm = #{affirm},principal=#{principal},deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )
     WHERE is_affirm &lt;> '0' and site_route =  #{siteRoute} AND warning_type = #{warningType}
 </update>
     <update id="updateRepairId">

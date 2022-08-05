@@ -5,7 +5,7 @@
 INSERT INTO tb_task_pic
 ( task_id, picture_url, picture_group, picture_filename )
 VALUES
-(#{id}, #{path}, #{group}, #{fileName} );
+(#{id}, #{path}, #{group}, #{fileName})
 </insert>
 <delete id="deletePic">
  DELETE

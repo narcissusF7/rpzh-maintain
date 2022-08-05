@@ -213,7 +213,7 @@
   INSERT INTO tb_pest_data_history
   (pest_board_id, gather_site, gather_time, beetle_count, mealworm_count,task_id)
   VALUES
-  ( #{pestBoardId}, #{gatherSite},TO_DATE(#{nowTime}, 'SYYYY-MM-DD HH24:MI:SS' )   , #{beetle}, #{mealworm},#{id});
+  ( #{pestBoardId}, #{gatherSite},TO_DATE(#{nowTime}, 'SYYYY-MM-DD HH24:MI:SS' )   , #{beetle}, #{mealworm},#{id})
 </insert>
     <select id="findPestBoard" resultType="java.lang.String">
   SELECT pest_board_id
