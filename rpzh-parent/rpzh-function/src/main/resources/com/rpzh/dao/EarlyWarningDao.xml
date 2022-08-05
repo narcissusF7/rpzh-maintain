@@ -211,11 +211,11 @@
 
     <select id="findIds" resultType="java.lang.Integer">
         SELECT id FROM tb_early_warning where 1=1
-        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat('%', #{earlyWarningDto.pidRoute}, '%') </if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat('%',#{earlyWarningDto.principalName}, '%')</if>
-        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= #{earlyWarningDto.beginTime}</if>
-        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= #{earlyWarningDto.finishTime}</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
+        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= TO_DATE(#{earlyWarningDto.beginTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= TO_DATE(#{earlyWarningDto.finishTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
     </select>
     <select id="findWarningCountByDay" resultType="java.util.Map">

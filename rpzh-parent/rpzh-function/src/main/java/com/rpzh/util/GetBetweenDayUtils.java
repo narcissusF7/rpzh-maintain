@@ -237,8 +237,7 @@ public class GetBetweenDayUtils {
                 alarmValueSettingDto.getTempCoreChipUpperTwo() >= alarmValueSettingDto.getTempCoreChipUpperThree()){
             return true;
         }
-        if(alarmValueSettingDto.getCoreTempLowEnvTemp() >= alarmValueSettingDto.getCoreTempHighEnvTempOne() || alarmValueSettingDto.getCoreTempHighEnvTempOne() >= alarmValueSettingDto.getCoreTempHighEnvTempTwo() ||
-                alarmValueSettingDto.getCoreTempHighEnvTempTwo() >= alarmValueSettingDto.getCoreTempHighEnvTempThree()){
+        if(alarmValueSettingDto.getCoreTempHighEnvTempOne() >= alarmValueSettingDto.getCoreTempHighEnvTempTwo() || alarmValueSettingDto.getCoreTempHighEnvTempTwo() >= alarmValueSettingDto.getCoreTempHighEnvTempThree()){
             return true;
         }
         return false;
