@@ -233,6 +233,11 @@ public class MonitoringCenterController {
             dataType = "String",
             required = true
     ), @ApiImplicitParam(
+            name = "maintainPlanId",
+            value = "养护计划id",
+            dataType = "Integer",
+            required = true
+    ),@ApiImplicitParam(
             name = "page",
             value = "当前页数",
             dataType = "Integer"

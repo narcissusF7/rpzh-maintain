@@ -42,12 +42,9 @@
         <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">#{pestBoardDto.createdUserId},</if>
         <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">#{pestBoardDto.lastUpdatedUserId},</if>
         <if test="pestBoardDto.remark!='' and pestBoardDto.remark!=null">#{pestBoardDto.remark},</if>
-        sysdate(),
-        sysdate()
+        sysdate,
+        sysdate
         )
-        <selectKey keyProperty="pestBoardDto.id" resultType="java.lang.Integer">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
     </insert>
     <update id="updatePestMonitor">
         update tb_pest_monitor set prewarning_value_one   = #{pestMonitoringRuleDto.valueOne},
@@ -77,37 +74,37 @@
         truncate tb_pest_stack_monitor
     </delete>
     <select id="findSpecialSiteRoute" resultType="java.lang.String">
-        select site_route from tb_pest_stack_monitor where site_route in
+        select site_route "siteRoute" from tb_pest_stack_monitor where site_route in
         <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
             #{siteRoute}
         </foreach>
     </select>
     <select id="findWeekPatrol" resultType="java.util.Map">
-        select * from tb_pest_patrol limit 1;
+        select * from tb_pest_patrol where rownum =  1;
     </select>
     <select id="findPestMonitorValue" resultType="java.util.Map">
-        select  prewarning_value_one   valueOne,
-                prewarning_value_two   valueTwo,
-                prewarning_value_three valueThree,
-                prewarning_color_one   colorOne,
-                prewarning_color_two   colorTwo,
-                prewarning_color_three colorThree
+        select  prewarning_value_one   "valueOne",
+                prewarning_value_two   "valueTwo",
+                prewarning_value_three "valueThree",
+                prewarning_color_one   "colorOne",
+                prewarning_color_two   "colorTwo",
+                prewarning_color_three "colorThree"
         from tb_pest_monitor
     </select>
     <select id="findSpecialSite" resultType="java.util.Map">
-        select  id ,
-                site_route pidRoute,
-                site_name siteName,
-                prewarning_value_one   little,
-                prewarning_value_two   middle,
-                prewarning_value_three big
+        select  id as "id",
+                site_route "pidRoute",
+                site_name "siteName",
+                prewarning_value_one   "little",
+                prewarning_value_two   "middle",
+                prewarning_value_three "big"
         from tb_pest_stack_monitor
     </select>
     <select id="findByPrincipalName" resultType="java.util.Map">
-        select pest_board_id pestBoardId , site_type siteType,site_name siteName from tb_pest_board where principal_user = #{principalUser}
+        select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName" from tb_pest_board where principal_user = #{principalUser}
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
-        select pest_board_id pestBoardId, site_route siteRoute,site_name siteName,site_id siteId  from tb_pest_board where pest_board_id =#{pestBoardId}
+        select pest_board_id "pestBoardId", site_route "siteRoute",site_name "siteName",site_id "siteId"  from tb_pest_board where pest_board_id =#{pestBoardId}
     </select>
     <select id="findPestBoard" resultType="com.rpzh.vo.PestBoardVo">
         SELECT
@@ -127,16 +124,16 @@
         created_time  as createdTime,
         last_updated_time  as lastUpdatedTime,
         last_updated_user  as lastUpdatedUser,
-        last_updated_user_id  as lastUpdatedUserId,
+        last_updated_user_id  as "lastUpdatedUserId,
         remark  as remark
         FROM
         tb_pest_board
         <where>
             <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">
-                and pest_board_id like concat('%', #{pestBoardDto.pestBoardId}, '%')
+                and pest_board_id like concat(concat('%', #{pestBoardDto.pestBoardId}), '%')
             </if>
             <if test="pestBoardDto.siteRoute!='' and pestBoardDto.siteRoute!=null">
-                and site_route like concat('',#{pestBoardDto.siteRoute}, '%')
+                and site_route like concat(concat('',#{pestBoardDto.siteRoute}), '%')
             </if>
             <if test="pestBoardDto.principalUser!='' and pestBoardDto.principalUser!=null">
                 and principal_user = #{pestBoardDto.principalUser}
@@ -148,7 +145,7 @@
         select pest_board_id from tb_pest_board
         <where>
             <if test="monitorCondition.pidRoute!='' and monitorCondition.pidRoute!=null">
-                and site_route like concat('',#{monitorCondition.pidRoute}, '%')
+                and site_route like concat(concat('',#{monitorCondition.pidRoute}), '%')
             </if>
             <if test="monitorCondition.siteType!='' and monitorCondition.siteType!=null">
                 and site_type = #{monitorCondition.siteType}
@@ -172,7 +169,7 @@
         )
         VALUES
         <foreach collection="pestDataList" item="pestData" index="index" separator=",">
-            ( #{pestData.pestBoardId},#{pestData.gatherSite},#{pestData.gatherTime},#{pestData.beetleCount},#{pestData.alertLevel}
+            ( #{pestData.pestBoardId},#{pestData.gatherSite},to_date(#{pestData.gatherTime},'yyyy-mm-dd hh24:mi:ss'),#{pestData.beetleCount},#{pestData.alertLevel}
             <if test="siteType!='04'">
                 ,#{pestData.mealwormCount}
             </if>
@@ -185,7 +182,7 @@
             ,mealworm_count
         </if>
         )VALUES(
-        #{pestDataDto.pestBoardId},#{pestDataDto.gatherSite},sysdate(),#{pestDataDto.beetleCount},#{pestDataDto.alertLevel}
+        #{pestDataDto.pestBoardId},#{pestDataDto.gatherSite},sysdate,#{pestDataDto.beetleCount},#{pestDataDto.alertLevel}
         <if test="pestDataDto.mealwormCount!='' and pestDataDto.mealwormCount!=null">
             ,#{pestDataDto.mealwormCount}
         </if>
@@ -199,10 +196,10 @@
         </if>
         alert_level alertLevel from tb_pest_data_history where pest_board_id = #{pestDataDto.pestBoardId}
         <if test="pestDataDto.startTime!='' and pestDataDto.startTime!=null">
-            and gather_time >= #{pestDataDto.startTime}
+            and gather_time >= to_date(#{pestDataDto.startTime},'yyyy-mm-dd hh24:mi:ss')
         </if>
         <if test="pestDataDto.endTime!='' and pestDataDto.endTime!=null">
-            and gather_time  &lt;= #{pestDataDto.endTime}
+            and gather_time  &lt;= to_date(#{pestDataDto.endTime},'yyyy-mm-dd hh24:mi:ss')
         </if>
     </select>
     <select id="findPestBoardCount" resultType="java.lang.Integer">
@@ -234,12 +231,12 @@
             tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
     </select>
     <select id="findPestWarningColor" resultType="java.util.Map">
-        select prewarning_value_one valueOne,
-               prewarning_color_one colorOne,
-               prewarning_value_two valueTwo,
-               prewarning_color_two colorTwo,
-               prewarning_value_three valueThree,
-               prewarning_color_three colorThree from tb_pest_monitor limit 1;
+        select prewarning_value_one "valueOne",
+               prewarning_color_one "colorOne",
+               prewarning_value_two "valueTwo",
+               prewarning_color_two "colorTwo",
+               prewarning_value_three "valueThree",
+               prewarning_color_three "colorThree" from tb_pest_monitor where rownum =  1;
     </select>
 
     <select id="findPestStackMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
@@ -249,9 +246,9 @@
         from tb_pest_stack_monitor where site_route = #{pidRoute}
     </select>
     <select id="findPestMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
-        select prewarning_value_one as upperOne,
-               prewarning_value_two as upperTwo,
-               prewarning_value_three as  upperThree
+        select prewarning_value_one as "upperOne",
+               prewarning_value_two as "upperTwo",
+               prewarning_value_three as  "upperThree"
         from tb_pest_monitor
     </select>
 </mapper>

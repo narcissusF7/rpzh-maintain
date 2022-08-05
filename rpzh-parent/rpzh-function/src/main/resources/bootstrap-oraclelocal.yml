@@ -112,3 +112,6 @@ node:
   signalStrength: -15
 time:
   cron : 0 0/2 0 * * *
+
+pagehelper:
+  auto-runtime-dialect: true

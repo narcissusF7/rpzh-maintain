@@ -136,7 +136,7 @@ public class NodeServiceImpl implements NodeService {
             nodeDto.setSiteRoute(siteRoute+",[0"+level+":"+siteId+"]");
         }
         if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
-            nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
+            nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
         }
         List<NodeVo> nodeVoList = nodeDao.findAllNodeList(nodeDto);
         return new PageInfo<>(nodeVoList);
@@ -437,7 +437,7 @@ public class NodeServiceImpl implements NodeService {
         if (!ToolUtil.isEmpty(nodeType)){
             Map map = monitoringCenterService.putCacheWarningColor();
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
-                nodeDto.setEndTime(nodeDto.getEndTime()+" 23:59:59");
+                nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
             }
             //查询数据库设备信息
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());

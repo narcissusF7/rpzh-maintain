@@ -124,10 +124,10 @@ public class NodeOperateAspect {
                             setValue(type,nodeDto1,"设备"+nodeDto1.getNodeId() +"入垛至"+nodeDto1.getStack(),username,nodeOperationDtos)
                     );
                     break;
-                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
-                    nodeDto =(NodeDto) args[0];
-                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
-                    break;
+//                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
+//                    nodeDto =(NodeDto) args[0];
+//                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
+//                    break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
                     nodeDtoList = maintainPlanDto.getNodeDtoList();

@@ -551,6 +551,7 @@ public class DataReportServiceImpl implements DataReportService {
         long endDate = localDateUtil(acquisitionTimeTwo).toEpochDay();
 
         List<NodeExportData> list = new ArrayList<>();
+        EasyPoiUtil easyPoiUtil = new EasyPoiUtil();
 
         switch (comparisonType){
             case "1":
@@ -562,6 +563,7 @@ public class DataReportServiceImpl implements DataReportService {
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
                 comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData);
+
 
                 break;
 
@@ -586,16 +588,51 @@ public class DataReportServiceImpl implements DataReportService {
 
             default:
         }
-        EasyPoiUtil easyPoiUtil = new EasyPoiUtil();
-        list.forEach(item->{
-            easyPoiUtil.t = item;
-            try {
-                easyPoiUtil.hihdColumn("avgOxygen", true);
-            } catch (Exception e) {
-                System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                e.printStackTrace();
+
+
+        if (list.size()>0){
+            for (int i = 0; i < list.size(); i++) {
+
+                easyPoiUtil.t = list.get(i);
+                switch (comparisonType){
+                    case "1":
+                        list.get(i).setTempReduce(list.get(i).getAvgCoreTemp()-list.get(i).getAvgTemp());
+                        try {
+                            easyPoiUtil.hihdColumn("avgOxygen", true);
+                            easyPoiUtil.hihdColumn("maxOxygen", true);
+                            easyPoiUtil.hihdColumn("minOxygen", true);
+                        } catch (Exception e) {
+                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "2":
+                        try {
+                            easyPoiUtil.hihdColumn("avgCoreTemp", true);
+                            easyPoiUtil.hihdColumn("maxCoreTemp", true);
+                            easyPoiUtil.hihdColumn("minCoreTemp", true);
+                            easyPoiUtil.hihdColumn("tempReduce", true);
+                        } catch (Exception e) {
+                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "3":
+                        try {
+                            easyPoiUtil.hihdColumn("avgCoreTemp", true);
+                            easyPoiUtil.hihdColumn("maxCoreTemp", true);
+                            easyPoiUtil.hihdColumn("minCoreTemp", true);
+                            easyPoiUtil.hihdColumn("tempReduce", true);
+                        } catch (Exception e) {
+                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+
             }
-        });
+        }
+
         EasyPoiUtil.exportExcel(list,"xx","xx.xls",NodeExportData.class,"xx.xls",response);
         return new Result(false,StatusCode.ERROR,"查询成功");
     }

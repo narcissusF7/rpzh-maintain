@@ -10,6 +10,8 @@
     WHERE name = #{name}
   </select>
   <insert id="addWarehouse">
+
+
     INSERT INTO tb_warehouse
     (
     <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>
@@ -35,7 +37,7 @@
     VALUES
     (
     <if test="warehouseDto.name != null and warehouseDto.name != ''">#{warehouseDto.name},</if>
-    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">#{warehouseDto.buildTime},</if>
+    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">to_date(#{warehouseDto.buildTime},'yyyy-mm-dd hh24:mi:ss')),</if>
     <if test="warehouseDto.code != null and warehouseDto.code != ''">#{warehouseDto.code},</if>
     <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">#{warehouseDto.useVolume},</if>
     <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">#{warehouseDto.useVolumeUnit},</if>
@@ -45,30 +47,28 @@
     <if test="warehouseDto.isStatistics != null and warehouseDto.isStatistics != ''"> #{warehouseDto.isStatistics},</if>
     <if test="warehouseDto.isUsing != null and warehouseDto.isUsing != ''">#{warehouseDto.isUsing},</if>
     <if test="warehouseDto.remark != null and warehouseDto.remark != ''"> #{warehouseDto.remark},</if>
-    <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''">#{warehouseDto.createdTime},</if>
+    <if test="warehouseDto.createdTime != null and warehouseDto.createdTime != ''">to_date(#{warehouseDto.createdTime},'yyyy-mm-dd hh24:mi:ss'),</if>
     <if test="warehouseDto.username != null and warehouseDto.username != ''">#{warehouseDto.username},</if>
     <if test="warehouseDto.pidRoute != null and warehouseDto.pidRoute != ''">#{warehouseDto.pidRoute},</if>
     <if test="warehouseDto.siteName != null and warehouseDto.siteName != ''">#{warehouseDto.siteName},</if>
     <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''">#{warehouseDto.wareType},</if>
     <if test="warehouseDto.principalId != null and warehouseDto.principalId != ''">#{warehouseDto.principalId},</if>
     <if test="warehouseDto.principalName != null and warehouseDto.principalName != ''">#{warehouseDto.principalName},</if>
-    sysdate()
+    sysdate
     )
-    <selectKey keyProperty="warehouseDto.id" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID() AS id
-    </selectKey>
+
   </insert>
   <select id="findWareName" resultType="java.lang.String">
     SELECT name
     FROM tb_warehouse
     WHERE name = #{name} and id != #{id}
-      limit 1
+      and rownum = 1
   </select>
   <update id="updateWarehouse">
     UPDATE tb_warehouse
     <set>
       <if test="warehouseDto.name != null and warehouseDto.name != ''">name =  #{warehouseDto.name},</if>
-      <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time = #{warehouseDto.buildTime},</if>
+      <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">build_time = to_date(#{warehouseDto.buildTime},'yyyy-mm-dd hh24:mi:ss'),</if>
       <if test="warehouseDto.code != null and warehouseDto.code != ''">code = #{warehouseDto.code},</if>
       <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''"> use_volume =  #{warehouseDto.useVolume},</if>
       <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''"> use_volume_unit =  #{warehouseDto.useVolumeUnit},</if>
@@ -82,7 +82,7 @@
       <if test="warehouseDto.wareType != null and warehouseDto.wareType != ''"> ware_type = #{warehouseDto.wareType},</if>
       <if test="warehouseDto.principalId != null and warehouseDto.principalId != ''">principal_id = #{warehouseDto.principalId},</if>
       <if test="warehouseDto.principalName != null and warehouseDto.principalName != ''">principal_name = #{warehouseDto.principalName},</if>
-      last_updated_time = sysdate()
+      last_updated_time = sysdate
     </set>
     WHERE
     id = #{warehouseDto.id}
@@ -96,7 +96,7 @@
     SELECT code
     FROM tb_warehouse
     WHERE code = #{code} and id != #{id}
-      limit 1
+      and rownum = 1
   </select>
   <select id="findWarehouse" resultType="com.rpzh.vo.WarehouseVo">
     SELECT id as id,name as name,build_time as buildTime,code as code,use_volume as useVolume,use_area as useArea,use_area_unit as useAreaUnit,is_automation as isAutomation,is_statistics as isStatistics,is_using as isUsing,
@@ -108,6 +108,11 @@
     WHERE id = #{warehouseId}
   </select>
   <insert id="addBuilding">
+
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="buildingDto.id">
+      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+    </selectKey>
+
     INSERT INTO tb_building
     (
     <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no,</if>
@@ -137,7 +142,7 @@
     <if test="buildingDto.useAreaUnit != null and buildingDto.useAreaUnit != ''"> #{buildingDto.useAreaUnit},</if>
     <if test="buildingDto.buildingOrientation != null and buildingDto.buildingOrientation != ''"> #{buildingDto.buildingOrientation},</if>
     <if test="buildingDto.remark != null and buildingDto.remark != ''"> #{buildingDto.remark},</if>
-    <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> #{buildingDto.createdTime},</if>
+    <if test="buildingDto.createdTime != null and buildingDto.createdTime != ''"> to_date(#{buildingDto.createdTime},'yyyy-mm-dd hh24:mi:ss'),</if>
     <if test="buildingDto.createdUser != null and buildingDto.createdUser != ''"> #{buildingDto.createdUser},</if>
     <if test="buildingDto.warehouseId != null and buildingDto.warehouseId != ''"> #{buildingDto.warehouseId},</if>
     <if test="buildingDto.pidRoute != null and buildingDto.pidRoute != ''">#{buildingDto.pidRoute},</if>
@@ -146,12 +151,9 @@
     <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''"> #{buildingDto.buildingType},</if>
     <if test="buildingDto.principalId != null and buildingDto.principalId != ''">#{buildingDto.principalId},</if>
     <if test="buildingDto.principalName != null and buildingDto.principalName != ''">#{buildingDto.principalName},</if>
-    sysdate()
+    sysdate
     )
 
-    <selectKey keyProperty="buildingDto.id" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID() AS id
-    </selectKey>
   </insert>
   <update id="updateBuilding">
     UPDATE tb_building
@@ -171,7 +173,7 @@
       <if test="buildingDto.buildingType != null and buildingDto.buildingType != ''">building_type  =  #{buildingDto.buildingType},</if>
       <if test="buildingDto.principalId != null and buildingDto.principalId != ''">principal_id = #{buildingDto.principalId},</if>
       <if test="buildingDto.principalName != null and buildingDto.principalName != ''">principal_name = #{buildingDto.principalName},</if>
-      last_updated_time = sysdate()
+      last_updated_time = sysdate
     </set>
     WHERE id = #{buildingDto.id}
   </update>
@@ -197,6 +199,12 @@
     WHERE id = #{buildingId}
   </select>
   <insert id="addFloor">
+
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="floorDto.id">
+      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+    </selectKey>
+
+
     INSERT INTO tb_floor
     (
     <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no,</if>
@@ -226,12 +234,9 @@
     <if test="floorDto.floorType != null and floorDto.floorType != ''">#{floorDto.floorType},</if>
     <if test="floorDto.principalId != null and floorDto.principalId != ''">#{floorDto.principalId},</if>
     <if test="floorDto.principalName != null and floorDto.principalName != ''">#{floorDto.principalName},</if>
-    sysdate(),
-    sysdate()
+    sysdate,
+    sysdate
     )
-    <selectKey keyProperty="floorDto.id" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID() AS id
-    </selectKey>
   </insert>
   <update id="updateFloor">
     UPDATE tb_floor
@@ -247,7 +252,7 @@
       <if test="floorDto.floorType != null and floorDto.floorType != ''">floor_type =  #{floorDto.floorType},</if>
       <if test="floorDto.principalId != null and floorDto.principalId != ''">principal_id = #{floorDto.principalId},</if>
       <if test="floorDto.principalName != null and floorDto.principalName != ''">principal_name = #{floorDto.principalName},</if>
-      last_updated_time = sysdate()
+      last_updated_time = sysdate
     </set>
     WHERE id = #{floorDto.id}
   </update>
@@ -265,6 +270,11 @@
     WHERE id = #{floorId}
   </select>
   <insert id="addWarearea">
+
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="wareAreaDto.id">
+      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+    </selectKey>
+
     INSERT INTO tb_ware_area
     (
     <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no, </if>
@@ -292,12 +302,9 @@
     <if test="wareAreaDto.wareAreaType != null and wareAreaDto.wareAreaType != ''"> #{wareAreaDto.wareAreaType},</if>
     <if test="wareAreaDto.principalId != null and wareAreaDto.principalId != ''">#{wareAreaDto.principalId},</if>
     <if test="wareAreaDto.principalName != null and wareAreaDto.principalName != ''">#{wareAreaDto.principalName},</if>
-    sysdate(),
-    sysdate()
+    sysdate,
+    sysdate
     )
-    <selectKey keyProperty="wareAreaDto.id" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID() AS id
-    </selectKey>
   </insert>
   <update id="updateWarearea">
     UPDATE tb_ware_area
@@ -312,7 +319,7 @@
       <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark = #{wareAreaDto.remark},</if>
       <if test="wareAreaDto.principalId != null and wareAreaDto.principalId != ''">principal_id = #{wareAreaDto.principalId},</if>
       <if test="wareAreaDto.principalName != null and wareAreaDto.principalName != ''">principal_name = #{wareAreaDto.principalName},</if>
-      last_updated_time = sysdate()
+      last_updated_time = sysdate
     </set>
     WHERE id = #{wareAreaDto.id}
   </update>
@@ -331,6 +338,11 @@
     WHERE id = #{areaId}
   </select>
   <insert id="addStack">
+
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="stackDto.id">
+      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+    </selectKey>
+
     INSERT INTO tb_stack
     (
     <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no, </if>
@@ -358,12 +370,9 @@
     <if test="stackDto.stackType != null and stackDto.stackType != ''"> #{stackDto.stackType}, </if>
     <if test="stackDto.principalId != null and stackDto.principalId != ''">#{stackDto.principalId},</if>
     <if test="stackDto.principalName != null and stackDto.principalName != ''">#{stackDto.principalName},</if>
-    sysdate(),
-    sysdate()
+    sysdate,
+    sysdate
     )
-    <selectKey keyProperty="stackDto.stackId" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID() AS id
-    </selectKey>
   </insert>
   <update id="updateStack">
     UPDATE tb_stack
@@ -379,7 +388,7 @@
       <if test="stackDto.stackType != null and stackDto.stackType != ''"> stack_type =  #{stackDto.stackType}, </if>
       <if test="stackDto.principalId != null and stackDto.principalId != ''">principal_id = #{stackDto.principalId},</if>
       <if test="stackDto.principalName != null and stackDto.principalName != ''">principal_name = #{stackDto.principalName},</if>
-      last_updated_time = sysdate()
+      last_updated_time = sysdate
     </set>
     WHERE id = #{stackDto.stackId}
   </update>

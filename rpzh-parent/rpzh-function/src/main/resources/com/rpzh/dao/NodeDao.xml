@@ -2,147 +2,151 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.NodeDao">
 
-    <insert id="addNode">
-        INSERT INTO tb_node (
-        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id,</if>
-        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type,</if>
-        <if test="nodeDto.status != null and nodeDto.status != ''">status,</if>
-        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site,</if>
-        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack,</if>
-        <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id,</if>
-        <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">created_user,</if>
-        <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type,</if>
-        last_updated_time,
-        created_time
-        )
-        VALUES
-        (
-        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">#{nodeDto.nodeId},</if>
-        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">#{nodeDto.nodeType},</if>
-        <if test="nodeDto.status != null and nodeDto.status != ''">#{nodeDto.status},</if>
-        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">#{nodeDto.gatherSite},</if>
-        <if test="nodeDto.stack != null and nodeDto.stack != ''">#{nodeDto.stack},</if>
-        <if test="nodeDto.stackId != null and nodeDto.stackId != ''">#{nodeDto.stackId},</if>
-        <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
-        <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
-        sysdate(),
-        sysdate()
-        )
-    </insert>
-    <select id="findNodeID" resultType="java.lang.String">
-        SELECT node_id
+  <insert id="addNode">
+    INSERT INTO tb_node (
+    <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id,</if>
+    <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type,</if>
+    <if test="nodeDto.status != null and nodeDto.status != ''">status,</if>
+    <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site,</if>
+    <if test="nodeDto.stack != null and nodeDto.stack != ''">stack,</if>
+    <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id,</if>
+    <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">created_user,</if>
+    <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type,</if>
+    last_updated_time,
+    created_time
+    )
+    VALUES
+    (
+    <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">#{nodeDto.nodeId},</if>
+    <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">#{nodeDto.nodeType},</if>
+    <if test="nodeDto.status != null and nodeDto.status != ''">#{nodeDto.status},</if>
+    <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">#{nodeDto.gatherSite},</if>
+    <if test="nodeDto.stack != null and nodeDto.stack != ''">#{nodeDto.stack},</if>
+    <if test="nodeDto.stackId != null and nodeDto.stackId != ''">#{nodeDto.stackId},</if>
+    <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
+    <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
+    sysdate,
+    sysdate
+    )
+  </insert>
+  <select id="findNodeID" resultType="java.lang.String">
+        SELECT node_id nodeId
         FROM tb_node
         WHERE node_id = #{nodeId}
           and id != #{id}
-            limit 1
+          and rownum =1
     </select>
 
-    <select id="findCountByNodeID" resultType="java.lang.Integer">
+  <select id="findCountByNodeID" resultType="java.lang.Integer">
         SELECT count(*)
         FROM tb_node
         WHERE node_id = #{nodeId} and status = '4'
     </select>
-    <select id="findCountByCaseNo" resultType="java.lang.Integer">
+  <select id="findCountByCaseNo" resultType="java.lang.Integer">
         SELECT count(*)
         FROM tb_node
         WHERE case_no = #{caseNo}
     </select>
-    <select id="findSiteRouteByNodeId" resultType="java.lang.String">
+  <select id="findSiteRouteByNodeId" resultType="java.lang.String">
         select site_route from tb_node where node_id = #{nodeId}
     </select>
-    <update id="updateNode">
-        UPDATE tb_node
-        <set>
-            <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id = #{nodeDto.nodeId},</if>
-            <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type = #{nodeDto.nodeType},</if>
-            <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},stack = #{nodeDto.stack},</if>
-            <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''">last_updated_user =#{nodeDto.lastUpdatedUser},</if>
-            <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type = #{nodeDto.siteType},</if>
-            <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
-            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
-            <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
-            <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
-            <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
-            <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
-            <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
-            last_updated_time = sysdate()
-        </set>
-        WHERE id = #{nodeDto.id}
-    </update>
-    <delete id="deleteNode">
-        DELETE
-        FROM tb_node
-        WHERE node_id in
-        <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">
-            #{nodeId}
-        </foreach>
-    </delete>
-    <select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
-        SELECT
-        id as id,
-        node_id as nodeId,
-        node_type as nodeType,
-        created_time as createTime ,
-        status as status ,
-        gather_site as gatherSite,
-        stack as stack ,
-        site_type as siteType ,
-        site_id as siteId ,
-        site_x as siteX,
-        site_y as siteY ,
-        site_z as siteZ,
-        case_no as caseNo,
-        into_stack_time as intoStackTime ,
-        site_route as siteRoute
-        FROM tb_node
-        <where>
-            <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
-                and node_id like concat('%', #{nodeDto.nodeId}, '%')
-            </if>
-            <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
-                and node_type = #{nodeDto.nodeType}
-            </if>
-            <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">
-                and site_route like concat(#{nodeDto.siteRoute}, '%')
-            </if>
-            <if test="nodeDto.status != null and nodeDto.status != ''">
-                and status = #{nodeDto.status}
-            </if>
-            <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
-                and into_stack_time &gt;= #{nodeDto.startTime}
-            </if>
-            <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
-                and into_stack_time &lt;= #{nodeDto.endTime}
-            </if>
-        </where>
-        order by created_time desc
-    </select>
-    <select id="findNodeCountById" resultType="int">
+  <update id="updateNode">
+    UPDATE tb_node
+    <set>
+      <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">node_id = #{nodeDto.nodeId},</if>
+      <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">node_type = #{nodeDto.nodeType},</if>
+      <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},stack = #{nodeDto.gatherSite},</if>
+      <if test="nodeDto.lastUpdatedUser != null and nodeDto.lastUpdatedUser != ''">last_updated_user =#{nodeDto.lastUpdatedUser},</if>
+      <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type = #{nodeDto.siteType},</if>
+      <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
+      <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
+      <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
+      <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
+      <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
+      <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
+      last_updated_time = sysdate
+    </set>
+    WHERE id = #{nodeDto.id}
+  </update>
+  <delete id="deleteNode">
+    DELETE
+    FROM tb_node
+    WHERE node_id in
+    <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">
+      #{nodeId}
+    </foreach>
+  </delete>
+  <select id="findAllNodeList" resultType="com.rpzh.vo.NodeVo">
+    SELECT
+    id as id,
+    node_id as nodeId,
+    node_type as nodeType,
+    created_time as createTime ,
+    status as status ,
+    gather_site as gatherSite,
+    stack as stack ,
+    site_type as siteType,
+    site_id as siteId ,
+    site_x as siteX,
+    site_y as siteY ,
+    site_z as siteZ,
+    case_no as caseNo,
+    into_stack_time as intoStackTime ,
+    site_route as siteRoute
+    FROM tb_node
+    <where>
+      <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
+        and node_id LIKE concat(concat( '%', #{nodeDto.nodeId}),'%')
+      </if>
+      <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
+        and node_type = #{nodeDto.nodeType}
+      </if>
+      <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">
+        and site_route like concat(#{nodeDto.siteRoute}, '%')
+      </if>
+      <if test="nodeDto.status != null and nodeDto.status != ''">
+        and status = #{nodeDto.status}
+      </if>
+      <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
+        and into_stack_time >= to_date(#{nodeDto.startTime},'yyyy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
+        and into_stack_time &lt;=  to_date(#{nodeDto.endTime},'yyyy-mm-dd hh24:mi:ss')
+      </if>
+    </where>
+    order by created_time desc
+  </select>
+
+  <select id="findNodeCountById" resultType="int">
         SELECT count(1)
         FROM tb_node
         WHERE node_id = #{nodeId}
     </select>
-    <update id="replaceNodeId">
+  <update id="replaceNodeId">
         UPDATE tb_node
         SET node_id = #{nodeDto.afterNodeId}
         WHERE node_id = #{nodeDto.nodeId}
     </update>
-    <insert id="insertReplaceNodeIdLog">
+  <insert id="insertReplaceNodeIdLog">
         INSERT INTO tb_node_replace_history
         (before_node_id,
          after_node_id,
-         replace_location,
+         <if test="nodeDto.gatherSite!='' and nodeDto.gatherSite!=null">
+           REPLACE_LOCATION,
+         </if>
          username,
          original_id,
          create_time)
         VALUES (#{nodeDto.nodeId},
                 #{nodeDto.afterNodeId},
-                #{nodeDto.gatherSite},
+    <if test="nodeDto.gatherSite!='' and nodeDto.gatherSite!=null">
+      #{nodeDto.gatherSite},
+    </if>
                 #{nodeDto.lastUpdatedUser},
                 #{nodeDto.id},
-                sysdate())
+                sysdate)
     </insert>
-    <select id="findNodeReplaceLog" resultType="com.rpzh.vo.NodeVo">
+  <select id="findNodeReplaceLog" resultType="com.rpzh.vo.NodeVo">
         SELECT id,
                before_node_id   as beforeNodeId,
                after_node_id    as afterNodeId,
@@ -152,115 +156,117 @@
         FROM tb_node_replace_history
         WHERE original_id = #{nodeDto.id}
     </select>
-    <update id="unbindStack">
-        UPDATE tb_node
-        SET status = '0',
-        stack  = '--',
-        stack_id =null ,
-        site_id =null ,
-        site_x = '-',
-        site_y = '-',
-        site_z = '-',
-        gather_site = '--',
-        site_route = '',
-        case_no = ""
-        WHERE id in
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </update>
-    <select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
-        SELECT id , node_id as nodeId, node_type as nodeType,stack as stack
-        FROM tb_node
-        WHERE status != '1'
-        <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
-            and node_id like concat('%', #{nodeDto.nodeId}, '%')
-        </if>
-        <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
-            and node_type = #{nodeDto.nodeType}
-        </if>
-        <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
-            and site_id = #{nodeDto.siteId}
-        </if>
-    </select>
-    <update id="enterStack">
-        UPDATE tb_node SET
-        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
-        <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id = #{nodeDto.stackId},</if>
-        <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
-        <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
-        <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
-        <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
-        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
-        <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
-        <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
-        <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
-        STATUS = '1',
-        into_stack_time = sysdate()
-        WHERE
-        id = #{nodeDto.id}
-    </update>
-    <select id="findNodeIdCount" resultType="int">
+  <update id="unbindStack">
+    UPDATE tb_node
+    SET status = '0',
+    stack  = '--',
+    stack_id =null ,
+    site_id =null ,
+    site_x = '-',
+    site_y = '-',
+    site_z = '-',
+    gather_site = '--',
+    site_route = '',
+    case_no = ''
+    WHERE id in
+    <foreach collection="ids" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+  <select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
+    SELECT id as id, node_id as nodeId, node_type as nodeType,stack as stack
+    FROM tb_node
+    WHERE status != '1'
+    <if test="nodeDto.nodeId != null and nodeDto.nodeId != ''">
+      and node_id like concat(concat('%', #{nodeDto.nodeId}), '%')
+    </if>
+    <if test="nodeDto.nodeType != null and nodeDto.nodeType != ''">
+      and node_type = #{nodeDto.nodeType}
+    </if>
+    <if test="nodeDto.siteId != null and nodeDto.siteId != ''">
+      and site_id = #{nodeDto.siteId}
+    </if>
+  </select>
+  <update id="enterStack">
+    UPDATE tb_node SET
+    <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
+    <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id = #{nodeDto.stackId},</if>
+    <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
+    <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
+    <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
+    <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
+    <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+    <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
+    <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
+    <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
+    STATUS = 1,
+    into_stack_time = sysdate
+    WHERE
+    id = #{nodeDto.id}
+  </update>
+  <select id="findNodeIdCount" resultType="int">
         SELECT count(*)
         FROM tb_node
         WHERE node_id = #{nodeId}
     </select>
-    <insert id="exportNode">
-        INSERT INTO tb_node
-        (node_id,node_type,created_time)
-        VALUES
-        <foreach collection="nodeVoList" item="nodeVo" separator=",">
-            (#{nodeVo.nodeId},#{nodeVo.nodeType},#{nodeVo.createTime})
-        </foreach>
-    </insert>
+  <insert id="exportNode">
+    INSERT INTO tb_node
+    (node_id,node_type,created_time)
+    VALUES
+    <foreach collection="nodeVoList" item="nodeVo" separator=",">
+      (#{nodeVo.nodeId},#{nodeVo.nodeType},sysdate)
+    </foreach>
+  </insert>
 
-    <select id="findNodeType" resultType="java.lang.String">
+  <select id="findNodeType" resultType="java.lang.String">
         SELECT node_type as nodeType
         FROM tb_node
-        WHERE node_id = #{nodeId} LIMIT 1
+        WHERE node_id = #{nodeId} AND ROWNUM = 1
     </select>
-    <select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
-        SELECT node_id as nodeId, id
+  <select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
+        SELECT node_id as nodeId, id AS id
         FROM tb_node
-        WHERE status != '1' and node_id like concat('%', #{nodeDto.nodeId}
-            , '%')
+        WHERE status != '1'
+        <if test="nodeDto.nodeId !='' and nodeDto.nodeId !=null">
+          and node_id like concat(concat('%', #{nodeDto.nodeId}), '%')
+        </if>
     </select>
-    <select id="testFindNode" resultType="com.rpzh.vo.NodeVo">
-        SELECT
-        id as id,
-        node_id as nodeId,
-        node_type as nodeType,
-        created_time as createTime ,
-        status as status ,
-        gather_site as gatherSite,
-        stack as stack ,
-        site_type as siteType ,
-        site_id as siteId ,
-        site_x as siteX,
-        site_y as siteY ,
-        site_z as siteZ,
-        into_stack_time as intoStackTime ,
-        site_route as siteRoute
-        FROM tb_node
-        <where>
-            <if test="nodeId != null and nodeId != ''">
-                and node_id like concat('%', #{nodeId}, '%')
-            </if>
-            <if test="nodeType != null and nodeType != ''">
-                and node_type = #{nodeType}
-            </if>
-            <if test="createTime != null and createTime != ''">
-                and into_stack_time &gt;= #{createTime}
-            </if>
-            <if test="startTime != null and startTime != ''">
-                and created_time &gt;= #{startTime}
-            </if>
-            <if test="endTime != null and endTime != ''">
-                and created_time &lt;= #{endTime}
-            </if>
-        </where>
-    </select>
-    <select id="findNodeByStackId" resultType="com.rpzh.vo.NodeVo">
+  <select id="testFindNode" resultType="com.rpzh.vo.NodeVo">
+    SELECT
+    id as id,
+    node_id as nodeId,
+    node_type as nodeType,
+    created_time as createTime,
+    status as status,
+    gather_site as gatherSite,
+    stack as stack ,
+    site_type as siteType ,
+    site_id as siteId ,
+    site_x as siteX,
+    site_y as siteY ,
+    site_z as siteZ,
+    into_stack_time as intoStackTime ,
+    site_route as siteRoute
+    FROM tb_node
+    <where>
+      <if test="nodeId != null and nodeId != ''">
+        and node_id like concat(concat('%', #{nodeId}), '%')
+      </if>
+      <if test="nodeType != null and nodeType != ''">
+        and node_type = #{nodeType}
+      </if>
+      <if test="createTime != null and createTime != ''">
+        and into_stack_time >= to_date(#{createTime},'yyyy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="startTime != null and startTime != ''">
+        and created_time >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+      </if>
+      <if test="endTime != null and endTime != ''">
+        and created_time &lt;= to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+      </if>
+    </where>
+  </select>
+  <select id="findNodeByStackId" resultType="com.rpzh.vo.NodeVo">
         SELECT id              as id,
                node_id         as nodeId,
                node_type       as nodeType,
@@ -277,84 +283,86 @@
                into_stack_time as intoStackTime,
                site_route      as siteRoute
         FROM tb_node
-        where stack_id = #{stackId};
+        where stack_id = #{stackId}
     </select>
-    <select id="findNodeCountByNodeId" resultType="java.lang.Integer">
+  <select id="findNodeCountByNodeId" resultType="java.lang.Integer">
         SELECT count(1)
         FROM tb_node
         WHERE node_id = #{nodeId}
     </select>
-    <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
+  <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
 
-        <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            SELECT t.id , t.nodeId ,t.stackId, t.nodeType from (
-        </if>
-        select id id,node_id nodeId,stack_id stackId ,node_type nodeType from tb_node tnode
-        <where>
-            <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
-                and site_route like  concat('%', #{monitorCondition.pidRoute},'%')
-            </if>
-            <if test="monitorCondition.nodeTypes!=null and monitorCondition.nodeTypes!=''">
-                and node_type in
-                <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
-                    #{nodeType}
-                </foreach>
-            </if>
-            <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=null">
-                and site_type = #{monitorCondition.siteType}
-            </if>
-            and status = 1
-        </where>
-        order by site_route,site_x,site_y,site_z
-        <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            ) t where t.stackId in (select stack_id  from tb_material where material_code like concat('%', #{monitorCondition.materialCode},'%'))
-        </if>
-    </select>
-    <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
-        select id, type, ${tableColumn},transfer_time as transferTime,node_id nodeId,
-        frequency,
-        voltage,
-        signal_strength signalStrength,
-        stack_id stackId,
-        maintain_plan_id maintainPlanId,
-        maintain_stage_id maintainStageId,
-        gather_site gatherSite,
-        site_type siteType,
-        alert_level alertLevel,
-        pid_route siteRoute,
-        site_x siteX,
-        site_y siteY,
-        site_z siteZ
-        from ${tableName} where node_id in #{nodeDto.nodeId}
-        <if test="nodeDto.startTime!=null and nodeDto.startTime!=''">and transfer_time >=#{nodeDto.startTime}</if>
-        <if test="pidRoute!=null and pidRoute!=''">and pid_route =#{pidRoute}</if>
-        <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
-    </select>
-    <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
-        select id ,type ,
-        <if test="tableName == 'tb_node_o2_history'">
-            oxygen ,
-        </if>
-        <if test="tableName == 'tb_node_env_history'">
-            temp ,humiture,
-        </if>
-        <if test="tableName == 'tb_node_temp_core_chip_history'">
-            temp ,
-        </if>
-        node_id nodeId, frequency , voltage , signal_strength signalStrength ,material_code materialCode,
-        stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
-        site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y siteY,site_z siteZ
-        from ${tableName}
-        where node_id = #{nodeId} limit 1
-    </select>
-    <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
+    <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+      SELECT t.id as id , t.nodeId  as nodeId,t.stackId as stackId, t.nodeType as nodeType from (
+    </if>
+    select id id,node_id nodeId,stack_id stackId ,node_type nodeType from tb_node tnode
+    <where>
+      <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
+        and site_route like  concat(concat('%', #{monitorCondition.pidRoute}),'%')
+      </if>
+      <if test="monitorCondition.nodeTypes!=null and monitorCondition.nodeTypes!=''">
+        and node_type in
+        <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
+          #{nodeType}
+        </foreach>
+      </if>
+      <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=null">
+        and site_type = #{monitorCondition.siteType}
+      </if>
+      and status = 1
+    </where>
+    order by site_route,site_x,site_y,site_z
+    <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+      ) t where t.stackId in (select stack_id  from tb_material where material_code like concat(concat('%', #{monitorCondition.materialCode}),'%'))
+    </if>
+  </select>
+  <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
+    select id, type, ${tableColumn},transfer_time as transferTime,node_id nodeId,
+    frequency,
+    voltage,
+    signal_strength signalStrength,
+    stack_id stackId,
+    maintain_plan_id maintainPlanId,
+    maintain_stage_id maintainStageId,
+    gather_site gatherSite,
+    site_type siteType,
+    alert_level alertLevel,
+    pid_route siteRoute,
+    site_x siteX,
+    site_y siteY,
+    site_z siteZ
+    from ${tableName} where node_id in #{nodeDto.nodeId}
+    <if test="nodeDto.startTime!=null and nodeDto.startTime!=''">and transfer_time >=#{nodeDto.startTime}</if>
+    <if test="nodeDto.maintainPlanId!=null and nodeDto.maintainPlanId!=''">and maintain_plan_id >=#{nodeDto.maintainPlanId}</if>
+    <if test="pidRoute!=null and pidRoute!=''">and pid_route =#{pidRoute}</if>
+    <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
+  </select>
+
+  <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
+    select id ,type ,
+    <if test="tableName == 'tb_node_o2_history'">
+      oxygen ,
+    </if>
+    <if test="tableName == 'tb_node_env_history'">
+      temp ,humiture,
+    </if>
+    <if test="tableName == 'tb_node_temp_core_chip_history'">
+      temp ,
+    </if>
+    node_id nodeId, frequency , voltage , signal_strength signalStrength ,material_code materialCode,
+    stack_id stackId , maintain_plan_id maintainPlanId , maintain_stage_id maintainStageId , gather_site gatherSite ,
+    site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y siteY,site_z siteZ
+    from ${tableName}
+    where node_id = #{nodeId} limit 1
+  </select>
+  <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
         SELECT
-            tnode.id,
+            tnode.id id,
             tnode.node_id nodeId,
             tnode.node_type nodeType,
-            tnode.STATUS,
+            tnode.STATUS status,
             tnode.gather_site gatherSite,
-            tnode.stack,
+            tnode.stack stack,
             tnode.site_type siteType,
             tnode.site_id siteId,
             tnode.site_x siteX,
@@ -367,250 +375,220 @@
             tnode.last_updated_time lastUpdateTime,
             tnode.last_updated_user lastUpdateUser,
             tnode.stack_id stackId,
-            GROUP_CONCAT(DISTINCT tmate.material_code ORDER BY tmate.material_code) materialCode
+            LISTAGG(to_char(tmate.material_code),',')WITHIN GROUP( ORDER BY tmate.material_code) OVER(PARTITION BY tnode.id) listagg
         FROM
             tb_node tnode left join tb_material tmate
                                     on  tnode.stack_id = tmate.stack_id
-        where node_id = #{nodeId}
-        group by tnode.id
+        where node_id = #{nodeId} AND ROWNUM = 1
     </select>
 
 
-    <insert id="insertNodeHistory">
-        insert into ${tableName} (
-        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
-        <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
-        <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
-        <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
-        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signal_strength,</if>
-        <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
-        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
-        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
-        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
-        <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
-        <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
-        <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
-        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
-        <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">transfer_time,</if>
-        <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
-        <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
-        <if test="nodeData.siteX!=null and nodeData.siteX!=''">site_x,</if>
-        <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
-        <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
-        <if test="nodeData.warningType!=null and nodeData.warningType!=''">warning_type,</if>
-        <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
-        createdTime
-        ) values (
-        <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
-        <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
-        <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
-        <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
-        <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
-        <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
-        <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
-        <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
-        <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
-        <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
-        <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
-        <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
-        <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
-        <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">#{nodeData.transferTime},</if>
-        <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
-        <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
-        <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>
-        <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
-        <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
-        <if test="nodeData.warningType!=null and nodeData.warningType!=''">#{nodeData.warningType},</if>
-        <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">#{nodeData.materialCode},</if>
-        now()
-        )
-    </insert>
+  <insert id="insertNodeHistory">
+    insert into ${tableName} (
+    <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
+    <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
+    <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
+    <if test="nodeData.voltage!=null and nodeData.voltage!=''">voltage,</if>
+    <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">signal_strength,</if>
+    <if test="nodeData.stackId!=null and nodeData.stackId!=''">stack_id,</if>
+    <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">maintain_plan_id,</if>
+    <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">maintain_stage_id,</if>
+    <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">gather_site,</if>
+    <if test="nodeData.siteType!=null and nodeData.siteType!=''">site_type,</if>
+    <if test="nodeData.temp!=null and nodeData.temp!=''">temp,</if>
+    <if test="nodeData.humiture!=null and nodeData.humiture!=''">humiture,</if>
+    <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
+    <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">transfer_time,</if>
+    <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
+    <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
+    <if test="nodeData.siteX!=null and nodeData.siteX!=''">site_x,</if>
+    <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
+    <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
+    <if test="nodeData.warningType!=null and nodeData.warningType!=''">warning_type,</if>
+    <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
+    createdTime
+    ) values (
+    <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
+    <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
+    <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
+    <if test="nodeData.voltage!=null and nodeData.voltage!=''">#{nodeData.voltage},</if>
+    <if test="nodeData.signalStrength!=null and nodeData.signalStrength!=''">#{nodeData.signalStrength},</if>
+    <if test="nodeData.stackId!=null and nodeData.stackId!=''">#{nodeData.stackId},</if>
+    <if test="nodeData.maintainPlanId!=null and nodeData.maintainPlanId!=''">#{nodeData.maintainPlanId},</if>
+    <if test="nodeData.maintainStageId!=null and nodeData.maintainStageId!=''">#{nodeData.maintainStageId},</if>
+    <if test="nodeData.gatherSite!=null and nodeData.gatherSite!=''">#{nodeData.gatherSite},</if>
+    <if test="nodeData.siteType!=null and nodeData.siteType!=''">#{nodeData.siteType},</if>
+    <if test="nodeData.temp!=null and nodeData.temp!=''">#{nodeData.temp},</if>
+    <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
+    <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
+    <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">#{nodeData.transferTime},</if>
+    <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
+    <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
+    <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>
+    <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
+    <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
+    <if test="nodeData.warningType!=null and nodeData.warningType!=''">#{nodeData.warningType},</if>
+    <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">#{nodeData.materialCode},</if>
+    now()
+    )
+  </insert>
 
-    <select id="findNodeStatus" resultType="java.lang.Integer">
+  <select id="findNodeStatus" resultType="java.lang.Integer">
         select status from tb_node where id = #{id}
     </select>
-    <select id="findNodeIdBySiteType" resultType="com.rpzh.vo.NodeVo">
-        select node_type as nodeType,node_id as nodeId from tb_node where site_type = #{siteType}
-        <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
-        <if test="pidRoute != null and pidRoute != ''">and site_route = #{pidRoute}</if>
-    </select>
+  <select id="findNodeIdBySiteType" resultType="com.rpzh.vo.NodeVo">
+    select node_type as "nodeType",node_id as "nodeId" from tb_node where site_type = #{siteType}
+    <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
+    <if test="pidRoute != null and pidRoute != ''">and site_route = #{pidRoute}</if>
+  </select>
 
-    <!--<select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">-->
-    <!--SELECT-->
-    <!--t.nodeId,-->
-    <!--t.pidRoute-->
-    <!--FROM-->
-    <!--(-->
-    <!--SELECT-->
-    <!--node_id AS nodeId,-->
-    <!--site_route pidRoute-->
-    <!--FROM-->
-    <!--tb_node-->
-    <!--WHERE-->
-    <!--node_type in-->
-    <!--<foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">-->
-    <!--#{nodeType}-->
-    <!--</foreach>-->
-    <!--AND site_route =#{monitorCondition.pidRoute}-->
-    <!--UNION-->
-    <!--SELECT-->
-    <!--air_conditioning_no AS nodeId,-->
-    <!--pid_route pidRoute-->
-    <!--FROM-->
-    <!--tb_air_conditioning-->
-    <!--WHERE-->
-    <!--pid_route =#{monitorCondition.pidRoute}-->
-    <!--) as t-->
-    <!--ORDER BY-->
-    <!--t.pidRoute-->
-    <!--</select>-->
-    <select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">
-        SELECT
-        node_id AS nodeId,
-        site_route siteRoute,
-        node_type nodeType
-        FROM
-        tb_node
-        WHERE
-        node_type in
-        <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
-            #{nodeType}
-        </foreach>
+  <select id="findHumitureDevice" resultType="com.rpzh.vo.NodeVo">
+    SELECT
+    node_id AS nodeId,
+    site_route siteRoute,
+    node_type nodeType
+    FROM
+    tb_node
+    WHERE
+    node_type in
+    <foreach collection="monitorCondition.nodeTypes" item="nodeType" open="(" separator="," close=")">
+      #{nodeType}
+    </foreach>
 
-        <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
-            AND  site_route like concat ('%',#{monitorCondition.pidRoute},'%')
-        </if>
-        <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=''">
-            AND site_type = #{monitorCondition.siteType}
-        </if>
-        order by siteRoute
+    <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
+      AND  site_route like concat (concat ('%',#{monitorCondition.pidRoute}),'%')
+    </if>
+    <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=''">
+      AND site_type = #{monitorCondition.siteType}
+    </if>
+    order by siteRoute
+  </select>
+  <select id="findEnterStack" resultType="java.util.Map">
+        select node_id nodeId, node_type nodeType from tb_node where status = 1
     </select>
-    <select id="findEnterStack" resultType="java.util.Map">
-        select node_id nodeId, node_type nodeType from tb_node where status = 1;
-    </select>
-    <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
+  <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
         select * from
             (select ${tableColumn} as node,transfer_time as transferTime,maintain_stage_id as maintainStageId,site_type as siteType from ${tableName} where node_id = #{nodeId} order by transfer_time Desc LIMIT 10) order by transferTime asc
     </select>
-    <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">
-        select oxygen,node_id as nodeId,material_code as materialCode,pid_route as pidRoute from tb_node_o2_history where (transfer_time,node_id) in
-        (select max(transfer_time),node_id from tb_node_o2_history where 1=1
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
-            </foreach>
-        </if>
-        group by node_id)
-    </select>
-    <select id="findDataNode" resultType="com.rpzh.pojo.NodeData">
-        select ${column},node_id as nodeId,material_code as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
-        (select max(transfer_time),node_id from ${tableName} where site_type = '05'
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
-            </foreach>
-        </if>
-        group by node_id)
-    </select>
-    <select id="findDataContrast" resultType="com.rpzh.pojo.NodeData">
-        select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
-        (select max(transfer_time),node_id from ${tableName} where site_type = '04'
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
-            </foreach>
-        </if>
-        group by node_id) group by pid_route
-    </select>
-    <select id="findAirConditioner" resultType="com.rpzh.vo.NodeVo">
-        SELECT
-        air_conditioning_no AS nodeId,
-        pid_route as siteRoute
-        FROM
-        tb_air_conditioning
-        <where>
-            <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
-                site_route like concat ('%',#{monitorCondition.pidRoute},'%')
-            </if>
-        </where>
-        order by siteRoute
-    </select>
+  <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">
+    select oxygen,node_id as nodeId,material_code as materialCode,pid_route as pidRoute from tb_node_o2_history where (transfer_time,node_id) in
+    (select max(transfer_time),node_id from tb_node_o2_history where 1=1
+    <if test="pidRoutes!=null">and pid_route in
+      <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+        #{pidRoute}
+      </foreach>
+    </if>
+    group by node_id)
+  </select>
+  <select id="findDataNode" resultType="com.rpzh.pojo.NodeData">
+    select ${column},node_id as nodeId,material_code as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
+    (select max(transfer_time),node_id from ${tableName} where site_type = '05'
+    <if test="pidRoutes!=null">and pid_route in
+      <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+        #{pidRoute}
+      </foreach>
+    </if>
+    group by node_id)
+  </select>
+  <select id="findDataContrast" resultType="com.rpzh.pojo.NodeData">
+    select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as pidRoute from ${tableName} where (transfer_time,node_id) in
+    (select max(transfer_time),node_id from ${tableName} where site_type = '04'
+    <if test="pidRoutes!=null">and pid_route in
+      <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
+        #{pidRoute}
+      </foreach>
+    </if>
+    group by node_id) group by pid_route
+  </select>
+  <select id="findAirConditioner" resultType="com.rpzh.vo.NodeVo">
+    SELECT
+    air_conditioning_no AS nodeId,
+    pid_route as siteRoute
+    FROM
+    tb_air_conditioning
+    <where>
+      <if test="monitorCondition.pidRoute!=''and monitorCondition.pidRoute!=null">
+        site_route like concat (concat ('%',#{monitorCondition.pidRoute}),'%')
+      </if>
+    </where>
+    order by siteRoute
+  </select>
 
-    <select id="findSelectedNode" resultType="java.util.Map">
-        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where node_id = #{nodeId}
-        <if test="startTime !=null">and transfer_time >= #{startTime}</if>
-        <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
-        group by dayTime
-    </select>
-    <select id="findSelectedSiteRoute" resultType="java.util.Map">
-        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where pid_route = #{siteRoute}
-        <if test="startTime !=null">and transfer_time >= #{startTime}</if>
-        <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
-        group by dayTime
-    </select>
-    <select id="findNowNodeData" resultType="java.util.Map">
-        select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_air_conditioner_history where
-        (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_air_conditioner_history where
-        node_id in
-        <foreach collection="airNodes" item="nodeId" open="(" separator="," close=")">
-            #{nodeId}
-        </foreach>
-        group by node_id)
-    </select>
-    <select id="findStackEnv" resultType="java.util.Map">
+  <select id="findSelectedNode" resultType="java.util.Map">
+    select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where node_id = #{nodeId}
+    <if test="startTime !=null">and transfer_time >= #{startTime}</if>
+    <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
+    group by dayTime
+  </select>
+  <select id="findSelectedSiteRoute" resultType="java.util.Map">
+    select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where pid_route = #{siteRoute}
+    <if test="startTime !=null">and transfer_time >= #{startTime}</if>
+    <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
+    group by dayTime
+  </select>
+  <select id="findNowNodeData" resultType="java.util.Map">
+    select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_air_conditioner_history where
+    (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_air_conditioner_history where
+    node_id in
+    <foreach collection="airNodes" item="nodeId" open="(" separator="," close=")">
+      #{nodeId}
+    </foreach>
+    group by node_id)
+  </select>
+  <select id="findStackEnv" resultType="java.util.Map">
         select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_node_env_history where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_env_history
         where maintain_plan_id = #{id}
         group by node_id)
     </select>
-    <select id="findStackCore" resultType="java.lang.Double">
+  <select id="findStackCore" resultType="java.lang.Double">
         select ifNotFinite(avg(temp),0) as temp from tb_node_temp_core_chip_history where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where maintain_plan_id = #{id}
         group by node_id)
     </select>
-    <select id="findO2StackData" resultType="java.lang.Double">
+  <select id="findO2StackData" resultType="java.lang.Double">
         select ifNotFinite(avg(oxygen),0) as oxygen from tb_node_o2_history
         where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where maintain_plan_id = #{id} and site_type = '05'
         group by node_id)
     </select>
-    <select id="findO2AreaData" resultType="java.lang.Double">
+  <select id="findO2AreaData" resultType="java.lang.Double">
         select ifNotFinite(avg(oxygen),0) as oxygen from tb_node_o2_history
         where (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_node_temp_core_chip_history
         where pid_route = #{pidRoute} and site_type = '04'
         group by node_id)
     </select>
-    <select id="findNodeTypeByNodeId" resultType="java.lang.String">
-        select node_type nodeType from tb_node where id = #{id} and node_id = #{nodeId};
+  <select id="findNodeTypeByNodeId" resultType="java.lang.String">
+        select node_type nodeType from tb_node where id = #{id} and node_id = #{nodeId}
     </select>
-    <select id="findStatistics" resultType="java.util.Map">
-        select pid_route pidRoute,gather_site gatherSite
-        <if test="dateType=='day'">,toStartOfDay(createdTime) </if>
-        <if test="dateType=='week'">,toStartOfWeek(createdTime) </if> as dateTime
-        <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) avgOxygen,MAX(oxygen) maxOxygen,MIN(oxygen) minOxygen </if>
-        <if test="tableName=='tb_node_env_history'">, floor(AVG(temp),2) avgTemp,MAX(temp) maxTemp,MIN(temp) minTemp , floor(AVG(humiture),2) avgHumiture,MAX(humiture) maxHumiture,MIN(humiture) minHumiture</if>
-        <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) avgCoreTemp,MAX(temp) maxCoreTemp,MIN(temp) minCoreTemp </if>
-        from ${tableName}
-        <where>
-            <if test="array!='' and array!=null">
+  <select id="findStatistics" resultType="java.util.Map">
+    select pid_route pidRoute,gather_site gatherSite
+    <if test="dateType=='day'">,toStartOfDay(createdTime) </if>
+    <if test="dateType=='week'">,toStartOfWeek(createdTime) </if> as dateTime
+    <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) avgOxygen,MAX(oxygen) maxOxygen,MIN(oxygen) minOxygen </if>
+    <if test="tableName=='tb_node_env_history'">, floor(AVG(temp),2) avgTemp,MAX(temp) maxTemp,MIN(temp) minTemp , floor(AVG(humiture),2) avgHumiture,MAX(humiture) maxHumiture,MIN(humiture) minHumiture</if>
+    <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) avgCoreTemp,MAX(temp) maxCoreTemp,MIN(temp) minCoreTemp </if>
+    from ${tableName}
+    <where>
+      <if test="array!='' and array!=null">
 
-                and pid_route in
-                <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="beginTime!='' and beginTime!=null">
-                and  createdTime >= #{beginTime}
-            </if>
-            <if test="endTime!='' and endTime!=null">
-                and  createdTime &lt;= #{endTime}
-            </if>
-        </where>
-        group by pid_route,gather_site
-        <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
-        <if test="dateType=='week'">,toStartOfWeek(createdTime)</if>
-        order by dateTime
-    </select>
+        and pid_route in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="beginTime!='' and beginTime!=null">
+        and  createdTime >= #{beginTime}
+      </if>
+      <if test="endTime!='' and endTime!=null">
+        and  createdTime &lt;= #{endTime}
+      </if>
+    </where>
+    group by pid_route,gather_site
+    <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
+    <if test="dateType=='week'">,toStartOfWeek(createdTime)</if>
+    order by dateTime
+  </select>
 
 </mapper>

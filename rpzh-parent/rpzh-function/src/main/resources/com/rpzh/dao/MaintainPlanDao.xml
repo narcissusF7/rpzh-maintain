@@ -324,10 +324,10 @@
         select count(*) from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'
     </select>
     <update id="updateStackByStackId" parameterType="java.lang.Integer">
-        update tb_maintain_plan set stack_id = #{stackId} where id = #{id};
+        update tb_maintain_plan set stack_id = #{stackId} where id = #{id}
     </update>
     <select id="findStackCountByStackId" resultType="java.lang.Integer">
-        select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0;
+        select count(*) from  tb_maintain_plan where stack_id = #{stackId} and is_end = 0
     </select>
     <select id="findMaintainMaxIdByStackId" resultType="java.lang.String">
         select material_code from tb_maintain_plan where id in (select max(id) from tb_maintain_plan where stack_id = #{stackId})
@@ -343,7 +343,7 @@
         LEFT JOIN tb_maintain_plan_stage t2 ON t.stage_id = t2.id
         WHERE
             stack_id = #{stackId} AND
-        	is_end = 0;
+        	is_end = 0 AND ROWNUM =1
     </select>
     <insert id="insertMaintainCount">
         insert into tb_maintain_count(
