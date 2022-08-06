@@ -205,19 +205,19 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             if (dayType == 1) {
                 //日统计
                 betweenDays = GetBetweenDayUtils.getBetweenDays(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());//对获取日期排序
-                dateType = "DATE_FORMAT(warning_time,'%Y-%m-%d' )";
+                dateType = "to_char(warning_time, 'YYYY-MM-DD')";
             } else if (dayType == 2) {
                 //周统计
                 betweenDays = GetBetweenDayUtils.getBetweenWeek(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "DATE_FORMAT(DATE_SUB(warning_time,INTERVAL DATE_FORMAT(warning_time,'%w')-1 DAY),'%Y-%m-%d' )";
+                dateType = "to_char(NEXT_DAY(trunc(warning_time),'星期一')，'YYYY-MM-DD')";
             } else if (dayType == 3) {
                 //月统计
                 betweenDays = GetBetweenDayUtils.getMonthBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "DATE_FORMAT(warning_time, '%Y-%m')";
+                dateType = "to_char(warning_time , 'YYYY-MM')";
             } else if (dayType == 4) {
                 //年统计
                 betweenDays = GetBetweenDayUtils.getYearBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "DATE_FORMAT(warning_time, '%Y')";
+                dateType = "to_char(warning_time , 'YYYY')";
             }
             //报警数量统计
             warningCount = earlyWarningDao.findWarningCountByDay(ids, dateType);
