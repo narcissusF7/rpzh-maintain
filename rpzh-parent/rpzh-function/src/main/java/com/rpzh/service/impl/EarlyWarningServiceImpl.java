@@ -161,6 +161,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             warningTypeCount = earlyWarningDao.findWarningTypeCount(ids);
             Integer countByOne = 0;
             for (int i = 0; i < warningTypeCount.size(); i++) {
+                System.out.println(warningTypeCount.get(i).get("warningType").toString());
                 String warningType = getWarningType(warningTypeCount.get(i).get("warningType").toString()).get("warningType");
                 warningTypeCount.get(i).put("warningType",warningType);
                 warningTypeCount.get(i).put("sum", Math.round(Double.parseDouble(warningTypeCount.get(i).get("sum").toString())));

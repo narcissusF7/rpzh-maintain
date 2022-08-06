@@ -29,10 +29,10 @@
     </select>
     <select id="findEarlyWarningCountByOne" resultType="com.rpzh.vo.WarningCountVo">
         select
-        substring_index(group_concat(warning_type),',',1) AS warningType,
-        ifnull(count(warning_grade='1' or null),0) AS oneWarningCount,
-        ifnull(count(warning_grade='2' or null),0) AS twoWarningCount,
-        ifnull(count(warning_grade='3' or null),0) AS threeWarningCount
+        '01' AS warningType,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '1' , 1, NULL)),0) AS oneWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '2' , 1, NULL)),0) AS twoWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '3' , 1, NULL)),0) AS threeWarningCount
         from tb_early_warning
         where is_affirm in ('1','2')
         and warning_type in ('01','02','03')
@@ -42,10 +42,10 @@
     </select>
     <select id="findEarlyWarningCountByNotOne" resultType="com.rpzh.vo.WarningCountVo">
         select
-        substring_index(group_concat(warning_type),',',1) AS warningType,
-        ifnull(count(warning_grade='1' or null),0) AS oneWarningCount,
-        ifnull(count(warning_grade='2' or null),0) AS twoWarningCount,
-        ifnull(count(warning_grade='3' or null),0) AS threeWarningCount
+        #{earlyWarningDto.warningType} AS warningType,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '1' , 1, NULL)),0) AS oneWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '2' , 1, NULL)),0) AS twoWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '3' , 1, NULL)),0) AS threeWarningCount
         from tb_early_warning
         where is_affirm in ('1','2')
         and warning_type = #{earlyWarningDto.warningType}
@@ -56,9 +56,9 @@
     <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
         select
         warning_type as warningType,
-        ifnull(count(warning_grade='1' or null),0) AS oneWarningCount,
-        ifnull(count(warning_grade='2' or null),0) AS twoWarningCount,
-        ifnull(count(warning_grade='3' or null),0) AS threeWarningCount
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '1' , 1, NULL)),0) AS oneWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '2' , 1, NULL)),0) AS twoWarningCount,
+        COALESCE(count(DECODE(TO_CHAR(warning_grade), '3' , 1, NULL)),0) AS threeWarningCount
         from tb_early_warning
         where is_affirm = '2' and warning_type not in ('01','02','03')
         <if test="earlyWarningDto.warningType != '' and earlyWarningDto.warningType != null"> and warning_type = #{earlyWarningDto.warningType} </if>
@@ -219,23 +219,23 @@
         <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
     </select>
     <select id="findWarningCountByDay" resultType="java.util.Map">
-        SELECT count(1) as sum,
-        ifnull(count(is_affirm = '0' or null),0) as deal,ifnull(count(is_affirm != '0' or null),0) as noDeal,round((ifnull(count(is_affirm = '0' or null),0)/ifnull(count(1),1)),2) as treatmentRate,
-        ${dateType} AS day
+        SELECT count(1) as "sum",
+        ifnull(count(is_affirm = '0' or null),0) as "deal",ifnull(count(is_affirm != '0' or null),0) as "noDeal",round((ifnull(count(is_affirm = '0' or null),0)/ifnull(count(1),1)),2) as "treatmentRate",
+        ${dateType} AS "day"
         FROM tb_early_warning
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY day
         ORDER BY day
     </select>
     <select id="findWarningTypeCount" resultType="java.util.Map">
-        SELECT count(1) as sum,warning_type AS warningType
+        SELECT count(1) as "sum",warning_type AS "warningType"
         FROM tb_early_warning
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY warning_type
         ORDER BY warning_type
     </select>
     <select id="findIsDeal" resultType="java.util.Map">
-        SELECT count(1) as sumDeal,round(COUNT(1)/#{count},2) * 100 as ratioDeal
+        SELECT count(1) as "sumDeal",round(COUNT(1)/#{count},2) * 100 as "ratioDeal"
         FROM tb_early_warning
         WHERE is_affirm = '0' <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
     </select>
@@ -256,17 +256,17 @@
         select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId} limit 1
     </select>
     <select id="findColor" resultType="java.util.Map">
-        select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as oneColor,
-        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') as twoColor,
-        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as threeColor
-        from tb_general_setting limit 1
+        select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as "oneColor",
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') as "twoColor",
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as "threeColor"
+        from tb_general_setting where rownum =1
     </select>
     <select id="findPrincipal" resultType="java.lang.String">
         select principal from tb_early_warning WHERE site_route = #{earlyWarningDto.pidRoute} and is_affirm = #{earlyWarningDto.isAffirm} and  warning_grade =#{earlyWarningDto.warningGrade}  limit 1
     </select>
 
     <select id="findThreeEarlyData" resultType="java.util.Map">
-        select node_id as nodeId,warning_val as warningVal from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+        select node_id as "nodeId",warning_val as "warningVal" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
         <if test="warningType != null and warningType != ''">and ${warningType}</if>
     </select>
     <select id="findThreeWarningGradeCount" resultType="java.lang.Integer">

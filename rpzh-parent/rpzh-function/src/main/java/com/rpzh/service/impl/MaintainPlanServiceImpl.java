@@ -617,8 +617,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         }catch (Exception e){
             e.printStackTrace();
         }
-        maintainPlanDao.insertMaintainStage(maintainPlanDto);
         maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
+        maintainPlanDao.insertMaintainStage(maintainPlanDto);
         Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
         int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
         maintainPlanDto.setMaintainDays(day);
@@ -647,8 +647,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDtos.add(maintainPlanDto1);
         }
         maintainPlanDao.insertMaintainCount(maintainPlanDtos);
-        maintainPlanDao.changeMaintainPlan(maintainPlanDto);
-        Integer result = maintainPlanDao.changeMaintainPlanStage(maintainPlanDto);
+        maintainPlanDao.changeMaintainPlanStage(maintainPlanDto);
+        maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
+        Integer result = maintainPlanDao.changeMaintainPlan(maintainPlanDto);
         return result;
     }
 
