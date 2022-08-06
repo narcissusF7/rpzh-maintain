@@ -16,8 +16,8 @@
     left join tb_stack t3 on t3.id = t1.stack_id
     where t1.is_end = '1'
     <if test="maintainPlanDto.pidRoute != null and maintainPlanDto.pidRoute != ''">and ${column}</if>
-    <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''">and t1.material_code like concat('%',#{maintainPlanDto.materialCode},'%')</if>
-    <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId != ''">and t1.principal_name like concat('%',#{maintainPlanDto.principalId},'%')</if>
+    <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''">and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
+    <if test="maintainPlanDto.principalId != null and maintainPlanDto.principalId != ''">and t1.principal_name like concat(concat('%',#{maintainPlanDto.principalId}),'%')</if>
     <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle != ''">and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
     <if test="maintainPlanDto.phases != null and maintainPlanDto.phases != ''">and t2.phases = #{maintainPlanDto.phases}</if>
 </select>

@@ -41,7 +41,7 @@ public class MaintainReviewServiceImpl implements MaintainReviewService {
                 column = "t3.area_id = #{maintainPlanDto.stackId}";
             }else{
                 maintainPlanDto.setPidRoute(maintainPlanDto.getPidRoute() + ",[0"+maintainPlanDto.getPidRoute().split(",").length+":" + maintainPlanDto.getStackId() + "]");
-                column = "t3.pid_route like concat('%',#{maintainPlanDto.pidRoute},'%')";
+                column = "t3.pid_route like concat(concat('%',#{maintainPlanDto.pidRoute}),'%')";
             }
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
