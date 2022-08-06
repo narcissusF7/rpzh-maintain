@@ -228,9 +228,9 @@
             tboard.last_updated_user_id  as lastUpdatedUserId,
             tboard.remark  as remark
         FROM
-            tb_pest_board tboard,tb_rfid_relationship trfid
+            tb_pest_board
         where
-            tboard.pest_board_id = trfid.site_id and trfid.rfid_type = '02' and trfid.rfid = #{rfid}
+            rfid = #{rfid}
     </select>
     <select id="findPestWarningColor" resultType="java.util.Map">
         select prewarning_value_one "valueOne",

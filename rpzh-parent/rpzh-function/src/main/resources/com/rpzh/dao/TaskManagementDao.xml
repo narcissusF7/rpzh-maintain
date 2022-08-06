@@ -552,7 +552,7 @@
         </if>
     </select>
     <select id="findAllOverdueTask" resultType="java.util.Map">
-  SELECT task_num as "taskNum","principal"
+  SELECT task_num as "taskNum",principal "principal"
   FROM tb_task
   WHERE status = '2'
 </select>
@@ -584,16 +584,32 @@
     <select id="findTaskId" resultType="java.lang.Long">
         select id from tb_task where site_route = #{siteRoute} and type = #{warningType} and status &lt;> 1 and rownum &lt; 1
     </select>
+    <!--
     <select id="findTaskFromMonitored" resultMap="findTask">
-        SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,deal_result,
+        SELECT id ,task_num ,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,deal_result,
         move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
-        where rownum &lt; 1 and site_route = #{siteRoute}
+        where rownum = 1 and site_route = #{siteRoute}
         <if test="taskType!='' and taskType!=null">
           and type in ${taskType}
        </if>
         order by create_time
     </select>
+
+    -->
+
+    <select id="findTaskFromMonitored" resultMap="findTask">
+        SELECT id ,type
+        FROM tb_task
+        where rownum = 1 and site_route = #{siteRoute}
+        <if test="taskType!='' and taskType!=null">
+            and type in ${taskType}
+        </if>
+        and status &lt;&gt; 1
+        order by create_time
+    </select>
+
+
     <select id="findCount" resultType="java.lang.Integer">
         select count(*) from tb_task where site_route = #{siteRoute} and type = '03' and status &lt;> 1
     </select>

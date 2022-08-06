@@ -410,6 +410,9 @@ public class NodeServiceImpl implements NodeService {
                     taskType = "('08','10')";
                 case "04":
                     taskType = "('12')";
+                case "P1":
+                    taskType = "('04')";
+
             }
         }else if (split.length==5){
             switch (nodeType){
@@ -418,6 +421,8 @@ public class NodeServiceImpl implements NodeService {
                     break;
                 case "03":
                     taskType = "('09','11')";
+                case "P2":
+                    taskType = "('05','14')";
 
             }
         }

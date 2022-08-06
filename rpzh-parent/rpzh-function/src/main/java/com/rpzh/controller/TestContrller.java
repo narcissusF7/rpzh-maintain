@@ -326,7 +326,7 @@ public class TestContrller{
             PestBoardDto pestBoardDto = new PestBoardDto();
             pestBoardDto.setPrincipalUser("ljj");
             pestBoardDto.setPrincipalName("刘疆疆");
-            pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9]");
+            pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9],[04:11]");
             pestBoardDto.setSiteId(9);
             pestBoardDto.setPestBoardId(pestBoards.get(i).get(0));
 
