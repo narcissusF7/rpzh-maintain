@@ -472,4 +472,9 @@ public class NodeServiceImpl implements NodeService {
                 nodeDataVo.setWarningColor("");
         }
     }
+
+    @Override
+    public List<Map<String, Object>> findNodeAddress(String deviceId, String addressRoute) {
+        return nodeDao.findNodeAddress(deviceId, addressRoute);
+    }
 }

@@ -611,4 +611,15 @@ public class NodeController {
         return new Result(true, StatusCode.OK, "查询成功", nodeOperationVos);
     }
 
+    /**
+     * 查询设备的入垛位置
+     *
+     * @return
+     */
+    @RequestMapping("/findNodeAddress")
+    public List<Map<String, Object>> findNodeAddress(@RequestParam("deviceId") String deviceId,
+                                                     @RequestParam("addressRoute") String addressRoute) {
+        return nodeService.findNodeAddress(deviceId, addressRoute);
+    }
+
 }
