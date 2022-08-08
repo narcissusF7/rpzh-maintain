@@ -30,7 +30,7 @@ public interface EarlyWarningService {
 
     Result findNodeData(EarlyWarningDto earlyWarningDto);
 
-    int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime);
+    int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime,String warningType);
 
     void warningSend(String number,String username,String siteRoute);
 

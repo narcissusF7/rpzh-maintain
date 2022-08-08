@@ -424,8 +424,11 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     }
 
     @Override
-    public int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime) {
-        return earlyWarningDao.updateRepairId(affirm,deviceId,id,principal,dealTime);
+    public int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime,String warningType) {
+        if(ToolUtil.isEmpty(deviceId)){
+            deviceId = earlyWarningDao.findDeviceId(id);
+        }
+        return earlyWarningDao.updateRepairId(affirm,deviceId,id,principal,dealTime,warningType);
     }
 
     //预警信息

@@ -15,8 +15,11 @@
     <update id="updateRepairId">
     UPDATE tb_early_warning
     SET repair_id = #{id},is_affirm = #{affirm},principal=#{principal}
-    WHERE is_affirm &lt;> '0' and node_id = #{deviceId}  AND warning_type in('01','02','03')
+    WHERE is_affirm &lt;> '0' and node_id = #{deviceId}  AND warning_type = #{warningType}
 </update>
+    <select id="findDeviceId" resultType="java.lang.String">
+        select node_id from tb_early_warning where repair_id = #{id}
+    </select>
     <select id="findUndoEarlyWarningByNodeId" resultType="com.rpzh.vo.EarlyWarningVo">
         select id , warning_grade as warningGrade  , warning_type warningType  , is_affirm affirm from tb_early_warning where node_id =#{nodeId} and is_affirm in (1,2)
         <if test="warningType!='' and warningType!=null">
