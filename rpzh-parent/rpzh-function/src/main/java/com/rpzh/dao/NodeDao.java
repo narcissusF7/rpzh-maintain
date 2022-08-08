@@ -106,6 +106,8 @@ public interface NodeDao {
      */
     int unbindStack(@Param("ids") Integer[] ids);
 
+    List<NodeVo> findNodeIdAndCaseNo(@Param("ids") Integer[] ids);
+
     /**
      * 查询未入垛
      *

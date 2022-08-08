@@ -2,6 +2,7 @@ package com.rpzh.netty;
 
 import com.rpzh.dao.NodeDao;
 import com.rpzh.dao.TaskManagementDao;
+import com.rpzh.entity.ToolUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -10,7 +11,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import tk.mybatis.mapper.util.StringUtil;
+
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 
@@ -24,6 +28,8 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
     private NodeDao nodeDao;
     @Resource
     private TaskManagementDao taskManagementDao;
+    @Resource
+    private RedisTemplate redisTemplate;
     /**
      * 获取数据
      *
@@ -47,29 +53,44 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
                 tagNum = Integer.parseInt(strMeg.substring(22,24),16);
                 int site = 24;
                 for (int i = 0; i < tagNum; i++) {
-                    log.info("strMeg:{}",strMeg);
                     //获取当前标签数据的长度
                     int length = Integer.parseInt(strMeg.substring(site, site+2), 16);
-                    log.info("length:{}",length);
                     //获取当前标签的设备id
                     String nodeId = strMeg.substring(site + 6, site + length*2);
-                    //查询该设备是否运维中
-                    Integer countRepair = nodeDao.findCountByNodeID(nodeId);
-                    if(countRepair==0){
-                        //根据设备id查询位置路由
-                        String siteRoute = nodeDao.findSiteRouteByNodeId(nodeId);
-                        Integer count1 = taskManagementDao.findCount(siteRoute);
-                        if(count1==0) {
-                            //判断nodeId和箱号是否绑定
-                            Integer countByCaseNo = nodeDao.findCountByCaseNo(nodeId);
-                            if (countByCaseNo > 0) {
-                                String rmsg = "53 57 00 03 FF 85 CF";
-                                byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
-                                ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
-                                ctx.writeAndFlush(message);//返回信息
-                                break;
+                    Integer countRepair=0,count1=0,countByCaseNo=0;
+                    if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("repairNode_"+nodeId)) &&
+                            ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("maintain_rfid_moveStack_"+nodeId)) &&
+                            ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("maintain_rfid_caseNo_"+nodeId))){
+                        countRepair = Integer.parseInt(redisTemplate.opsForValue().get("repairNode_"+nodeId).toString());
+                        count1 = Integer.parseInt(redisTemplate.opsForValue().get("maintain_rfid_moveStack_"+nodeId).toString());
+                        countByCaseNo = Integer.parseInt(redisTemplate.opsForValue().get("maintain_rfid_caseNo_"+nodeId).toString());
+                    }else {
+                        //查询该设备是否运维中
+                        countRepair = nodeDao.findCountByNodeID(nodeId);
+                        //设备id是8位数
+                        if(countRepair==0 && nodeId.length()==8){
+                            //根据设备id查询位置路由
+                            String siteRoute = nodeDao.findSiteRouteByNodeId(nodeId);
+                            //根据位置路由判断是否有移库任务
+                            if(StringUtil.isNotEmpty(siteRoute)) {
+                                count1 = taskManagementDao.findCount(siteRoute);
                             }
                         }
+                        if(countRepair == 0 && count1 == 0){
+                            //判断nodeId和箱号是否绑定
+                            countByCaseNo  = nodeDao.findCountByCaseNo(nodeId);
+                        }
+                        redisTemplate.opsForValue().set("maintain_rfid_repairNode_"+nodeId,countRepair);
+                        redisTemplate.opsForValue().set("maintain_rfid_moveStack_"+nodeId,count1);
+                        redisTemplate.opsForValue().set("maintain_rfid_caseNo_"+nodeId,countByCaseNo);
+                    }
+                    if(countRepair==0 && count1==0 && countByCaseNo > 0){
+                        log.info("开启声光报警器---------");
+                        String rmsg = "53 57 00 03 FF 85 CF";
+                        byte[] cmdInfor2 = hexStrToBinaryStr(rmsg);
+                        ByteBuf message = Unpooled.copiedBuffer(cmdInfor2);
+                        ctx.writeAndFlush(message);//返回信息
+                        break;
                     }
                     site = site + length * 2 + 2;
                 }

@@ -28,6 +28,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
      * 新建任务
@@ -455,11 +459,19 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             for (Map map : list) {
                 //设备id
                 String nodeId = map.get("nodeId").toString();
+                //用于声光报警器中,移垛完成后将redis中的移库任务删除
+                if(ToolUtil.isNotEmpty("maintain_rfid_moveStack_"+nodeId) && "1".equals(taskDto.getStatus())){
+                    redisTemplate.delete("maintain_rfid_moveStack_"+nodeId);
+                }
                 //设备坐标
                 int x = Integer.parseInt(map.get("x").toString());
                 int y = Integer.parseInt(map.get("y").toString());
                 int z = Integer.parseInt(map.get("z").toString());
                 String caseNo = map.get("caseNo")+"";
+                //用于声光报警器中,移垛完成后将redis中的设备和箱号绑定关系删除
+                if(ToolUtil.isNotEmpty("maintain_rfid_caseNo_"+caseNo) && "1".equals(taskDto.getStatus())){
+                    redisTemplate.delete("maintain_rfid_caseNo_"+caseNo);
+                }
                 int updateFlag = taskManagementDao.updateNodeAddress(nodeId, x, y, z, siteRoute, siteId, siteName, stackId,caseNo);
             }
         } catch (NumberFormatException e) {

@@ -180,6 +180,12 @@
             #{id}
         </foreach>
     </update>
+    <select id="findNodeIdAndCaseNo" resultType="com.rpzh.vo.NodeVo">
+        select node_id as nodeid,case_no as caseNo from tb_node WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
     <select id="findNoEnterStack" resultType="com.rpzh.vo.NodeVo">
         SELECT id as id, node_id as nodeId, node_type as nodeType,stack as stack
         FROM tb_node

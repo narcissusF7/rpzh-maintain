@@ -28,9 +28,11 @@ import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.TaskVo;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -54,6 +56,10 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     TaskManagementDao taskManagementDao;
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
     /**
      * 添加节点
      *
@@ -201,8 +207,14 @@ public class NodeServiceImpl implements NodeService {
      */
     @Override
     public int unbindStack(NodeDto nodeDto) {
+        List<NodeVo> nodeVos = nodeDao.findNodeIdAndCaseNo(nodeDto.getIds());
         int updateFlag = nodeDao.unbindStack(nodeDto.getIds());
-
+        nodeVos.forEach(nodeVo -> {
+            //用于声光报警器中,移垛完成后将redis中的设备和箱号绑定关系删除
+            if(ToolUtil.isNotEmpty("maintain_rfid_caseNo_"+nodeVo.getCaseNo())){
+                redisTemplate.delete("maintain_rfid_caseNo_"+nodeVo.getCaseNo());
+            }
+        });
         return updateFlag;
     }
 
