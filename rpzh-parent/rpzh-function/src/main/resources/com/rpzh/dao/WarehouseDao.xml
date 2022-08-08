@@ -828,20 +828,20 @@
     where area_id = #{areaId}
   </select>
   <select id="findWareAreaSiteRoute" resultType="java.lang.String">
-    select concat(pid_route,',[04:',id,']') as pid_route from tb_ware_area where pid_route like concat('%',#{siteRoute},'%')
+    select concat(concat(pid_route,',[04:'),concat(id,']')) as pid_route from tb_ware_area where pid_route like concat(concat('%',#{siteRoute}),'%')
   </select>
   <select id="findStackSiteRoute" resultType="java.lang.String">
-    select concat(pid_route,',[05:',id,']') as pid_route from tb_stack where pid_route like concat('%',#{siteRoute},'%')
+    select concat(concat(pid_route,',[05:'),concat(id,']')) as pid_route from tb_stack where pid_route like concat(concat('%',#{siteRoute}),'%')
   </select>
   <select id="findWareAreaInfos" resultType="java.util.Map">
-    select site_name as siteName,concat(pid_route,',[04:',id,']') as siteRoute from tb_ware_area where
+    select site_name as siteName,concat(concat(pid_route,',[04:'),concat(id,']')) as siteRoute from tb_ware_area where
     id in
     <foreach collection="areaIds" item="id" open="(" separator="," close=")">
       #{id}
     </foreach>
   </select>
   <select id="findStackInfos" resultType="java.util.Map">
-    select site_name as siteName,concat(pid_route,',[05:',id,']') as siteRoute from tb_stack where
+    select site_name as siteName,concat(concat(pid_route,',[05:'),concat(id,']')) as siteRoute from tb_stack where
     id in
     <foreach collection="stackIds" item="id" open="(" separator="," close=")">
       #{id}

@@ -30,8 +30,7 @@ public class DataContrastController {
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", required = false, dataType = "int"),
             @ApiImplicitParam(name = "stackId", value = "位置id", required = false, dataType = "int"),
             @ApiImplicitParam(name = "nodeType", value = "设备类型 01:氧气 02:包芯温度 03:环境温度 04:环境湿度 05:垛内平均包芯温度 06:仓间平均氧气 07:仓间平均温度 08:仓间平均湿度", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "contrastType", value = "对比的类型:1:设备  2:位置", required = true, dataType = "int"),
-            @ApiImplicitParam(name = "flag", value = "是否重置:0:是 1:否", required = true, dataType = "int")
+            @ApiImplicitParam(name = "contrastType", value = "对比的类型:01:设备  02:位置", required = true, dataType = "int")
     })
     public Result getNodeData(@ApiIgnore NodeDto nodeDto) {
         return dataContrastService.getNodeData(nodeDto);
@@ -40,7 +39,10 @@ public class DataContrastController {
     @PostMapping("/getNodeDataList")
     @ApiOperation(value = "数据对比")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "nodeDataInfos", value = "选择设备,json字符串,NodeData包含nodeId、type、pidRoute、nodeName、siteName", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "nodeId", value = "设备id", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "nodeType", value = "设备类型", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "siteRoute", value = "位置路由", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "siteName ", value = "位置名称", required = true, dataType = "String"),
             @ApiImplicitParam(name = "startTime", value = "采集的开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "采集的结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "beginTime", value = "对比的开始时间", required = false, dataType = "String"),

@@ -74,8 +74,6 @@ public class NodeDto {
     private Integer dataType;
     //主键id集
     private Integer[] ids;
-    //数据对比时判断前端是否有按下重置按钮
-    private Integer flag=0;
     //物料代码
     private String materialCode;
     //对比的类型:1:设备   2:位置
