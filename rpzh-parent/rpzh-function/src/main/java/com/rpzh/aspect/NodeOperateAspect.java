@@ -2,6 +2,7 @@ package com.rpzh.aspect;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.dao.NodeDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
@@ -45,6 +46,8 @@ public class NodeOperateAspect {
     NodeOperationService operationService;
     @Autowired
     RedisTemplate redisTemplate;
+    @Autowired
+    NodeDao nodeDao;
 
     @AfterReturning(value = "execution(* com.rpzh.controller.NodeController.*(..))||execution(* com.rpzh.controller.MaintainPlanController..*(..)))", returning = "result")
     public void NodeOperateLog(JoinPoint pjp, Result<T> result){
@@ -95,13 +98,13 @@ public class NodeOperateAspect {
                     nodeDto =(NodeDto) args[0];
                     setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"添加成功",username,nodeOperationDtos);
                     break;
-                case NodeConstant.DELETE_NODE_OPERATE_NUMBER:
-                    String[] nodeIds =(String[]) args[0];
-                    StringBuffer detail =new StringBuffer("设备");
-                    Arrays.stream(nodeIds).forEach(nodeId-> detail.append(nodeId).append("  "));
-                    detail.append("被删除");
-                    setValue(type,new NodeDto(),detail.toString(),username,nodeOperationDtos);
-                    break;
+//                case NodeConstant.DELETE_NODE_OPERATE_NUMBER:
+//                    String[] nodeIds =(String[]) args[0];
+//                    StringBuffer detail =new StringBuffer("设备");
+//                    Arrays.stream(nodeIds).forEach(nodeId-> detail.append(nodeId).append("  "));
+//                    detail.append("被删除");
+//                    setValue(type,new NodeDto(),detail.toString(),username,nodeOperationDtos);
+//                    break;
                 case NodeConstant.UPDATE_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
                     setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"被修改",username,nodeOperationDtos);
@@ -124,10 +127,13 @@ public class NodeOperateAspect {
                             setValue(type,nodeDto1,"设备"+nodeDto1.getNodeId() +"入垛至"+nodeDto1.getStack(),username,nodeOperationDtos)
                     );
                     break;
-//                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
-//                    nodeDto =(NodeDto) args[0];
-//                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
-//                    break;
+                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
+                    nodeDto =(NodeDto) args[0];
+                    for (int i = 0; i < nodeDto.getIds().length; i++) {
+//                        nodeDao.findNode
+                    }
+                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
+                    break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
                     nodeDtoList = maintainPlanDto.getNodeDtoList();

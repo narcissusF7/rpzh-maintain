@@ -343,8 +343,9 @@ public class TestContrller{
         return new Result<>(true, StatusCode.OK, "addPestBoard");
     }
 
-    @GetMapping("export")
-    public Result export(String[] pidRoutes, String comparisonType , String dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
-        return dataReportService.exportComparisonData(pidRoutes,comparisonType,dateType,acquisitionTimeOne,acquisitionTimeTwo, response);
-    }
+
+//    @GetMapping("export")
+//    public Result export(String pidRoutes, String comparisonType , Integer exportType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
+//        return dataReportService.exportComparisonData(pidRoutes,comparisonType,exportType,acquisitionTimeOne,acquisitionTimeTwo, response);
+//    }
 }

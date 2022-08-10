@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -532,7 +533,7 @@ public class DataReportServiceImpl implements DataReportService {
 
 
     @Override
-    public Result exportComparisonData(String[] pidRoutes, String comparisonType , String dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response) {
+    public Result exportComparisonData(List<String> pidRoutes, String comparisonType , Integer exportType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response) {
         //包芯温度数据
         List<Map> coreTimeData;
         //垛位温湿度数据
@@ -543,10 +544,24 @@ public class DataReportServiceImpl implements DataReportService {
         List<Map> wareHumitureData;
         //垛位氧气数据
         List<Map> wareOxygenData;
-        comparisonType ="1";
-        dateType ="day";
-        acquisitionTimeOne= "2022-08-01 00:00:00";
-        acquisitionTimeTwo= "2022-08-05 00:00:00";
+        String dateType ="day";
+        if (exportType.equals(2)){
+            dateType = "week";
+        }
+        //如果结束时间为空
+        if (ToolUtil.isEmpty(acquisitionTimeTwo)||"undefined".equals(acquisitionTimeTwo)){
+            SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            acquisitionTimeTwo = sm.format(new Date());
+        }
+        acquisitionTimeTwo = acquisitionTimeTwo.split(" ")[0]+" 23:59:59";
+        //如果开始时间为空 默认结束时间前的一个月
+        if (ToolUtil.isEmpty(acquisitionTimeOne)||"undefined".equals(acquisitionTimeOne)){
+            SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date()); // 设置为当前时间
+            calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 1); // 设置为上一个月
+            acquisitionTimeOne = sm.format(calendar.getTime());
+        }
         long beginDate = localDateUtil(acquisitionTimeOne).toEpochDay();
         long endDate = localDateUtil(acquisitionTimeTwo).toEpochDay();
 
@@ -562,7 +577,7 @@ public class DataReportServiceImpl implements DataReportService {
                 //垛位温湿度数据
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData);
+                comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData,dateType);
 
 
                 break;
@@ -574,7 +589,7 @@ public class DataReportServiceImpl implements DataReportService {
                 //垛位温湿度数据
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                comparsionData(beginDate,endDate,list,starckOxygenData,starckHumitureData);
+                comparsionData(beginDate,endDate,list,starckOxygenData,starckHumitureData,dateType);
                 break;
             case "3":
                 //仓间氧气数据
@@ -583,7 +598,7 @@ public class DataReportServiceImpl implements DataReportService {
                 //仓间温湿度数据
                 wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
-                comparsionData(beginDate,endDate,list,wareOxygenData,wareHumitureData);
+                comparsionData(beginDate,endDate,list,wareOxygenData,wareHumitureData,dateType);
                 break;
 
             default:
@@ -634,7 +649,7 @@ public class DataReportServiceImpl implements DataReportService {
         }
 
         EasyPoiUtil.exportExcel(list,"xx","xx.xls",NodeExportData.class,"xx.xls",response);
-        return new Result(false,StatusCode.ERROR,"查询成功");
+        return new Result(true,StatusCode.OK,"查询成功");
     }
 
     public LocalDate localDateUtil(String str){
@@ -642,7 +657,7 @@ public class DataReportServiceImpl implements DataReportService {
         return LocalDate.of(Integer.parseInt(s[0]),Integer.parseInt(s[1]),Integer.parseInt(s[2]));
     }
 
-    public void comparsionData(long beginDate,long endDate ,List list ,List<Map> list1,List<Map> list2){
+    public void comparsionData(long beginDate,long endDate ,List list ,List<Map> list1,List<Map> list2,String dateType){
 
 
         //key  时间  value 那个时间的map1里面数据的下标
@@ -651,57 +666,58 @@ public class DataReportServiceImpl implements DataReportService {
 
         List<Map>  dataList  = new ArrayList<>();
 
-        for (long i = beginDate; i < endDate; i++) {
+        for (long i = beginDate; i <= endDate; i++) {
             //获取这一天每个位置产生的数据
-            List<Map> list3 = dateTimeList1.get(LocalDate.ofEpochDay(i)+" 00:00:00.0");
+            List<Map> list3 = dateTimeList1.get(LocalDate.ofEpochDay(i) + " 00:00:00");
 
-            List<Map> list4 = dateTimeList2.get(LocalDate.ofEpochDay(i)+" 00:00:00.0");
+            List<Map> list4 = dateTimeList2.get(LocalDate.ofEpochDay(i) + " 00:00:00");
             //如果当天没有数据
-            if (ToolUtil.isEmpty(list3)&&ToolUtil.isEmpty(list4)){
+            if (ToolUtil.isEmpty(list3) && ToolUtil.isEmpty(list4)) {
                 Map map = new HashMap<>();
                 map.put("dateTime", LocalDate.ofEpochDay(i));
-                list.add(JSONObject.parseObject(JSONObject.toJSONString(map),NodeExportData.class));
+                dataList.add(map);
             }
             //同一时间不同位置
-            Map<String,Map> map = new HashMap<>();
-            if (ToolUtil.isNotEmpty(list3)){
+            Map<String, Map> map = new HashMap<>();
+            if (ToolUtil.isNotEmpty(list3)) {
                 for (int j = 0; j < list3.size(); j++) {
                     Map map1 = new HashMap<>();
                     map1.put("dateTime", i);
                     //数据
                     map1.putAll(list3.get(j));
-
-                    map.put(map1.get("pidRoute").toString(),map1);
-
+                    map.put(map1.get("pidRoute").toString(), map1);
                 }
             }
-            if (ToolUtil.isNotEmpty(list4)){
+            if (ToolUtil.isNotEmpty(list4)) {
                 for (int j = 0; j < list4.size(); j++) {
 
                     String pidRoute = list4.get(j).get("pidRoute").toString();
-                    if (ToolUtil.isNotEmpty(map.get(pidRoute))){
+                    if (ToolUtil.isNotEmpty(map.get(pidRoute))) {
                         //上面有同样的位置路由  即同一天  同一个位置的数据存到一起
                         Map data = list4.get(j);
                         data.putAll(map.get(pidRoute));
                         dataList.add(data);
                         map.remove(pidRoute);
-                    }else {
-                        //如果 同一天不同位置
-                        Map map1 = list4.get(j);
+                    } else {
                         dataList.add(list4.get(j));
                     }
                 }
             }
 
             //把剩下的都放到dataList
-            if (map.size()>0){
-                map.forEach((k,v)->{
+            if (map.size() > 0) {
+                map.forEach((k, v) -> {
                     dataList.add(v);
                 });
             }
-            dataList.forEach(map1 -> map1.put("dateTime",map1.get("dateTime").toString().split(" ")[0]));
+            if (dateType.equals("week")){
+                i=i+6;
+            }
         }
+        dataList.forEach(map1 -> map1.put("dateTime", map1.get("dateTime").toString().split(" ")[0]));
         dataList.forEach(map -> list.add(JSONObject.parseObject(JSONObject.toJSONString(map),NodeExportData.class)));
+
+
 
     }
     //key  时间  value 那个时间的map1里面数据的下标

@@ -4,7 +4,9 @@
 
     <insert id="bulkInsert">
 
-        INSERT INTO tb_node_operation_history (
+        INSERT ALL
+        <foreach collection="nodeOperationDtos" item="nodeOperationDto">
+        INTO tb_node_operation_history (
         node_id,
         node_type,
         site_id,
@@ -17,7 +19,7 @@
         created_time
         )
         VALUES
-        <foreach collection="nodeOperationDtos" item="nodeOperationDto"  separator=",">(
+        (
             #{nodeOperationDto.nodeId},
             #{nodeOperationDto.nodeType},
             #{nodeOperationDto.siteId},
@@ -30,6 +32,7 @@
             sysdate
             )
         </foreach>
+        SELECT 1 FROM DUAL
     </insert>
     <select id="selectNodeOperation" resultType="com.rpzh.vo.NodeOperationVo">
         select

@@ -5,6 +5,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.vo.DataReportVo;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author wbl
@@ -68,5 +69,5 @@ public interface DataReportService {
      */
     Result<DataReportVo> findSummaryReportDetails(DataReportDto dataReportDto);
 
-    Result exportComparisonData(String[] pidRoutes, String comparisonType , String dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response);
+    Result exportComparisonData(List<String> pidRoutes, String comparisonType , Integer dateType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response);
 }

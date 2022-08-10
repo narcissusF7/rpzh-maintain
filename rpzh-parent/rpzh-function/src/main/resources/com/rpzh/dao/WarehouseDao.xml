@@ -37,7 +37,7 @@
     VALUES
     (
     <if test="warehouseDto.name != null and warehouseDto.name != ''">#{warehouseDto.name},</if>
-    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">to_date(#{warehouseDto.buildTime},'yyyy-mm-dd hh24:mi:ss')),</if>
+    <if test="warehouseDto.buildTime != null and warehouseDto.buildTime != ''">to_date(#{warehouseDto.buildTime},'yyyy-mm-dd hh24:mi:ss'),</if>
     <if test="warehouseDto.code != null and warehouseDto.code != ''">#{warehouseDto.code},</if>
     <if test="warehouseDto.useVolume != null and warehouseDto.useVolume != ''">#{warehouseDto.useVolume},</if>
     <if test="warehouseDto.useVolumeUnit != null and warehouseDto.useVolumeUnit != ''">#{warehouseDto.useVolumeUnit},</if>
@@ -110,7 +110,7 @@
   <insert id="addBuilding">
 
     <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="buildingDto.id">
-      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+      SELECT BULIDING.NEXTVAL as "id" from DUAL
     </selectKey>
 
     INSERT INTO tb_building
@@ -201,7 +201,7 @@
   <insert id="addFloor">
 
     <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="floorDto.id">
-      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+      SELECT TFLOOR.NEXTVAL as "id" from DUAL
     </selectKey>
 
 
@@ -272,7 +272,7 @@
   <insert id="addWarearea">
 
     <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="wareAreaDto.id">
-      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+      SELECT WAREAREA.NEXTVAL as "id" from DUAL
     </selectKey>
 
     INSERT INTO tb_ware_area
@@ -339,8 +339,8 @@
   </select>
   <insert id="addStack">
 
-    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="stackDto.id">
-      SELECT SEQ_USER.NEXTVAL as ID from DUAL
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="stackDto.stackId">
+      SELECT TSTACK.NEXTVAL as "stackId" from DUAL
     </selectKey>
 
     INSERT INTO tb_stack

@@ -405,6 +405,7 @@
 
     <insert id="insertNodeHistory">
         insert into ${tableName} (
+        <if test="nodeData.id!=null and nodeData.id!=''">id,</if>
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
         <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
         <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
@@ -428,6 +429,7 @@
         <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
         createdTime
         ) values (
+        <if test="nodeData.id!=null and nodeData.id!=''">#{nodeData.id},</if>
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
         <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
         <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
@@ -483,6 +485,7 @@
         <if test="monitorCondition.siteType!=null and monitorCondition.siteType!=''">
             AND site_type = #{monitorCondition.siteType}
         </if>
+        AND status = 1
         order by siteRoute
     </select>
     <select id="findEnterStack" resultType="java.util.Map">

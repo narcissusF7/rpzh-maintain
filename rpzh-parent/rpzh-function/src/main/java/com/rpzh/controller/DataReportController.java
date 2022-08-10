@@ -8,14 +8,20 @@ import com.rpzh.dao.DataReportDao;
 import com.rpzh.dto.DataReportDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.DataReportService;
+import com.rpzh.util.EscapeToolBox;
 import com.rpzh.vo.DataReportVo;
 import io.swagger.annotations.*;
+import org.springframework.web.bind.EscapedErrors;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author wbl
@@ -500,5 +506,44 @@ public class DataReportController {
         }
 //        dataReportService.exportStackComparisonData(dataReportDto);
         return new Result<>(true, StatusCode.OK, "导出成功!");
+    }
+
+    @ApiOperation(
+            value = "导出数据"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "comparisonType",
+            value = "类型 (1  垛内  包芯对比数据  2 垛位数据  3.仓间数据)",
+            dataType = "Integer",
+            required = true
+    ), @ApiImplicitParam(
+            name = "acquisitionTimeOne",
+            value = "采集时间1",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "acquisitionTimeTwo",
+            value = "采集时间2",
+            dataType = "String"
+    ), @ApiImplicitParam(
+            name = "exportType",
+            value = "导出类型 1 日统计 2 周统计",
+            dataType = "Integer",
+            defaultValue = "1"
+    ),@ApiImplicitParam(
+            name = "pidRoutes",
+            value = "选中的位置路由",
+            dataType = "String",
+            allowMultiple = true
+    )})
+    @GetMapping("export")
+    public void export(String pidRoutes, String comparisonType , Integer exportType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
+        String routesString = EscapeToolBox.unescape(pidRoutes);
+        String[] split = routesString.split(",\\[00");
+        List<String> routes = new ArrayList<>();
+        routes.add(split[0]);
+        for (int i = 1; i < split.length; i++) {
+            routes.add("[00"+split[i]);
+        }
+        dataReportService.exportComparisonData(routes,comparisonType,exportType,acquisitionTimeOne,acquisitionTimeTwo, response);
     }
 }

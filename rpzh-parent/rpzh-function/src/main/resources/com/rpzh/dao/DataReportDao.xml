@@ -230,7 +230,7 @@
         from
         tb_node_env_history
         <where>
-            createdTime in (select max(createdTime) from tb_node_env_history)
+            createdTime in (select max(createdTime) from tb_node_env_history GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
                 and pid_route like concat(#{gatherSiteRoute},'%')
             </if>
@@ -261,7 +261,7 @@
         tb_node_temp_core_chip_history tntcch
         <where>
             site_type = '05'
-            and createdTime in (select max(createdTime) from tb_node_env_history)
+            and createdTime in (select max(createdTime) from tb_node_env_history  GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!= ''">
                 and pid_route like concat(#{gatherSiteRoute},'%')
             </if>
@@ -330,7 +330,7 @@
                 and createdTime &lt;=#{acquisitionTimeTwo}
             </if>
         </where>
-        group by createTime,nodeIdOne,gatherSiteOne,pidRoute
+        group by createTime,node_id,gather_site,pid_route
         order by createTime desc
     </select>
     <select id="findEnvSummaryReport" resultType="com.rpzh.vo.DataReportVo">
@@ -341,7 +341,7 @@
         pid_route as pidRoute
         from tb_node_env_history tneh
         <where>
-            createdTime in (select max(createdTime) from tb_node_env_history)
+            createdTime in (select max(createdTime) from tb_node_env_history  GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
                 and pid_route = #{gatherSiteRoute}
             </if>
@@ -367,7 +367,7 @@
         pid_route as pidRoute
         from tb_node_o2_history tnoh
         <where>
-            createdTime in (select max(createdTime) from tb_node_o2_history)
+            createdTime in (select max(createdTime) from tb_node_o2_history  GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
                 and pid_route = #{gatherSiteRoute}
             </if>
@@ -389,7 +389,7 @@
         pid_route as pidRoute
         from tb_node_temp_core_chip_history tntcch
         <where>
-            createdTime in (select max(createdTime) from tb_node_temp_core_chip_history)
+            createdTime in (select max(createdTime) from tb_node_temp_core_chip_history  GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
                 and pid_route = #{gatherSiteRoute}
             </if>
@@ -432,7 +432,7 @@
         createTime
         from tb_node_o2_history tneh
         <where>
-            createdTime in (select max(createdTime) from tb_node_env_history)
+            createdTime in (select max(createdTime) from tb_node_env_history  GROUP BY gather_site)
             <if test="gatherSiteRoute!=null and gatherSiteRoute!=''">
                 and pid_route = #{gatherSiteRoute}
             </if>
