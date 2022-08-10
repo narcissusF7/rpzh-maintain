@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.rpzh.dao.TestDao1">
+<mapper namespace="com.rpzh.dao.TestDao">
 <select id="findTest" resultType="java.lang.String">
-SELECT cron_expression FROM `task_schedule_job` WHERE job_id = '69'
+SELECT cron_expression FROM task_schedule_job WHERE job_id = '69'
 </select>
 </mapper>

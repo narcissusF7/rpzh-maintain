@@ -14,7 +14,7 @@
 </update>
     <update id="updateRepairId">
     UPDATE tb_early_warning
-    SET repair_id = #{id},is_affirm = #{affirm},principal=#{principal}
+        SET repair_id = #{id},is_affirm = #{affirm},principal=#{principal}<if test="dealTime != null and dealTime != ''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
     WHERE is_affirm &lt;> '0' and node_id = #{deviceId}  AND warning_type = #{warningType}
 </update>
     <select id="findDeviceId" resultType="java.lang.String">
