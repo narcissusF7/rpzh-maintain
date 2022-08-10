@@ -69,6 +69,6 @@ WHERE job_group = #{jobGroup}
   SELECT job_status
   FROM
   task_schedule_job
-  LIMIT 1
+  where rownum = 1
 </select>
 </mapper>
