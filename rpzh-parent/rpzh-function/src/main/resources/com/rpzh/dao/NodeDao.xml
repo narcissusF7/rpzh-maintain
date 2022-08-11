@@ -666,4 +666,7 @@
             </if>
         </where>
     </select>
+    <select id="findNodeIds" resultType="java.lang.String">
+        select node_id from tb_node where stack_id = #{stackId}
+    </select>
 </mapper>

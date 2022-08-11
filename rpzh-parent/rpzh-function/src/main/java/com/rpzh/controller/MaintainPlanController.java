@@ -317,7 +317,7 @@ public class MaintainPlanController {
     public Result endMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         Integer i = maintainPlanService.endMaintainPlan(maintainPlanDto);
         if (i == -1) {
-            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在开垛");
         }
         return new Result<>(true, StatusCode.OK, "开垛成功",i);
     }
@@ -403,7 +403,7 @@ public class MaintainPlanController {
         }
         Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
         if (result == -1) {
-            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在转段");
         }
         return new Result<>(true, StatusCode.OK, "转段成功",result);
     }

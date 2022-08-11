@@ -47,7 +47,7 @@ public class sendWarningThreeTask{
     @Value("${rocketmq.topic}")
     private String topic;
 
-    @Scheduled(cron="0 41 11 * * ? ")
+    //@Scheduled(cron="0 0/2 * * * ? ")
     public void configureTasks() {
         List<String> siteRoutes = earlyWarningDao.findSiteRoute("3");
         for (String siteRoute : siteRoutes) {

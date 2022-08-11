@@ -566,15 +566,19 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
         List<Integer> ids = new ArrayList<>();
         ids.add(maintainPlanDto.getId());
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findPidRoute(ids);
         List<String> pidRoutes = new ArrayList<>();
-        maintainPlanVos.forEach(maintainPlanVo -> {
-            pidRoutes.add(SiteRouteUtil.route(maintainPlanVo.getPidRoute(),maintainPlanVo.getStackId()+""));
-        });
+        Integer stackId = maintainPlanDto.getStackId();
+        pidRoutes.add(SiteRouteUtil.route(maintainPlanDto.getPidRoute(),stackId+""));
         Integer count = maintainPlanDao.findCountBySiteRoute(pidRoutes);
         if(count>0){
             return -1;
         }
+        List<String> nodeIds = nodeDao.findNodeIds(stackId);
+        nodeIds.forEach(nodeId -> {
+            if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("MAINTAIN_CACHE_NODE_"+nodeId))){
+                redisTemplate.delete("MAINTAIN_CACHE_NODE_"+nodeId);
+            }
+        });
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
         BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);
         Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
@@ -627,7 +631,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";
         Integer id = maintainPlanDto.getId();
-        Integer stackId = maintainPlanDto.getStackId();
         maintainPlanDao.deleteMaintainCount(id);
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
@@ -717,6 +720,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         maintainPlanDto.setNowDate(new Date());
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findExpireCollectTable(maintainPlanDto,stackIds);
+        maintainPlanVos.forEach(maintainPlanVo -> {
+            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));
+        });
         return new PageInfo<>(maintainPlanVos);
 
     }
@@ -742,6 +748,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             }
         }
         List<MaintainPlanVo> maintainMonthEndReport = maintainPlanDao.findMaintainMonthEndReport(maintainPlanDto);
+        maintainMonthEndReport.forEach(maintainPlanVo -> {
+            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));
+        });
         return new PageInfo(maintainMonthEndReport);
     }
 

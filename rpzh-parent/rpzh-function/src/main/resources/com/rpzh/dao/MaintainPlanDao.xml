@@ -314,6 +314,7 @@
         <if test="stackIds !=null and stackIds !=''">and id in  <foreach collection="stackIds" item="id" open="(" separator="," close=")">#{id}</foreach> </if>) t3 on t3.id = t1.stack_id
         where t1.is_end = '0' and t2.aftercare_date_end &lt;= #{maintainPlanDto.nowDate} and t2.is_change = '0'
             <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
+            <if test="maintainPlanDto.maintainCount!=null and maintainPlanDto.maintainCount!=''">and t2.maintain_count = #{maintainPlanDto.maintainCount}</if>
             <if test="maintainPlanDto.startTime !=null">and t2.aftercare_date_end >= TO_DATE(#{maintainPlanDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
             <if test="maintainPlanDto.endTime !=null">and t2.aftercare_date_end &lt;= TO_DATE(#{maintainPlanDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
             <if test="maintainPlanDto.phases !=null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>

@@ -160,8 +160,11 @@ public class EarlyWarning {
         if(ToolUtil.isNotEmpty(oneData)){
             message = message + "设备故障有" + String.join(",",oneData)+"。";
         }
-        List<String> types = Arrays.asList("垛内虫数有", "仓间甲虫有", "垛内氧气有", "仓间氧气有", "垛内温度有", "仓间温度有", "垛内湿度有", "仓间湿度有", "包芯温度有", "平均包芯高于环境有", "仓间粉螟有");
-        for (int i = 4; i <=14 ; i++) {
+        List<String> types = Arrays.asList("垛内虫数有", "仓间甲虫有", "垛内氧气有", "仓间氧气有", "垛内温度有", "仓间温度有", "垛内湿度有", "仓间湿度有", "包芯温度有", "平均包芯高于环境有","平均包芯低于环境有", "仓间粉螟有");
+        for (int i = 4; i <=19 ; i++) {
+            if(i==15 || i ==16 || i==17 || i == 18){
+                continue;
+            }
             String warningType = "0" + i;
             if(i>=10){
                 warningType = i + "";
