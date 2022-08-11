@@ -129,9 +129,7 @@ public class NodeOperateAspect {
                     break;
                 case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    for (int i = 0; i < nodeDto.getIds().length; i++) {
-//                        nodeDao.findNode
-                    }
+                    List<String> nodeIds =  nodeDao.findNodeIdByIds(nodeDto.getIds());
                     setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
                     break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:

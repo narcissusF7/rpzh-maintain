@@ -112,6 +112,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         String username = userInfo.get("username");
         //创建仓库账号
         warehouseDto.setUsername(username);
+
+        String principalName = warehouseDto.getPrincipalName();
+        if (ToolUtil.isNotEmpty(principalName)) {
+            warehouseDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }
+
         int updateFlag = warehouseDao.updateWarehouse(warehouseDto);
 
         updatePrincipal(warehouseDto.getPrincipalName(),warehouseDto.getId(),warehouseDto.getPidRoute(),1);
@@ -200,6 +206,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         //获取用户账号
         String username = userInfo.get("username");
         buildingDto.setUpdateUser(username);
+
+        String principalName = buildingDto.getPrincipalName();
+        if (ToolUtil.isNotEmpty(principalName)) {
+            buildingDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }
+
         int updateFlag = warehouseDao.updateBuilding(buildingDto);
         updatePrincipal(buildingDto.getPrincipalName(),buildingDto.getId(),buildingDto.getPidRoute(),2);
         return updateFlag;
@@ -257,6 +269,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         BuildingVo buildingVo = warehouseDao.findBuilding(floorDto.getBuildingId());
         floorDto.setPidRoute(buildingVo.getPidRoute() + ",[" + WarehouseNodeType.BUILDING_NODE.getType() + ":" + buildingVo.getId() + "]");
         floorDto.setSiteName(buildingVo.getSiteName() + floorDto.getFloorName());
+
+        String principalName = floorDto.getPrincipalName();
+        if (ToolUtil.isNotEmpty(principalName)) {
+            floorDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }
+
         int updateFlag = warehouseDao.updateFloor(floorDto);
         updatePrincipal(floorDto.getPrincipalName(),floorDto.getId(),floorDto.getPidRoute(),3);
         return updateFlag;
@@ -312,6 +330,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         //获取用户账号
         String username = userInfo.get("username");
         wareAreaDto.setUpdateUser(username);
+        String principalName = wareAreaDto.getPrincipalName();
+        if (ToolUtil.isNotEmpty(principalName)) {
+            wareAreaDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }
+
         int updateFlag = warehouseDao.updateWarearea(wareAreaDto);
         updatePrincipal(wareAreaDto.getPrincipalName(),wareAreaDto.getId(),wareAreaDto.getPidRoute(),4);
         return updateFlag;
@@ -368,6 +391,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         //获取用户账号
         String username = userInfo.get("username");
         stackDto.setLastUpdatedUser(username);
+        String principalName = stackDto.getPrincipalName();
+        if (ToolUtil.isNotEmpty(principalName)) {
+            stackDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }
         int updateFlag = warehouseDao.updateStack(stackDto);
         updatePrincipal(stackDto.getPrincipalName(),stackDto.getStackId(),stackDto.getPidRoute(),5);
         return updateFlag;

@@ -245,4 +245,5 @@ public interface NodeDao {
 
     List<String> findNodeIds(@Param("stackId")Integer stackId);
 
+    List<String> findNodeIdByIds(@Param("array")Integer[] ids);
 }

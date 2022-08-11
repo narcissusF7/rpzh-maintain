@@ -110,7 +110,7 @@
   <insert id="addBuilding">
 
     <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="buildingDto.id">
-      SELECT BULIDING.NEXTVAL as "id" from DUAL
+      SELECT BUILDING.NEXTVAL as "id" from DUAL
     </selectKey>
 
     INSERT INTO tb_building

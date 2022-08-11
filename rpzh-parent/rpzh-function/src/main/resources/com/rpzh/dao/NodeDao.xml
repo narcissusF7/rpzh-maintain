@@ -672,4 +672,8 @@
     <select id="findNodeIds" resultType="java.lang.String">
         select node_id from tb_node where stack_id = #{stackId}
     </select>
+    <select id="findNodeIdByIds" resultType="java.lang.String">
+        select node_id "nodeId" from  tb_node where id in
+
+    </select>
 </mapper>
