@@ -420,10 +420,13 @@ public class NodeServiceImpl implements NodeService {
                     break;
                 case "03":
                     taskType = "('08','10')";
+                    break;
                 case "04":
                     taskType = "('12')";
+                    break;
                 case "P1":
                     taskType = "('04')";
+                    break;
 
             }
         }else if (split.length==5){
@@ -433,8 +436,10 @@ public class NodeServiceImpl implements NodeService {
                     break;
                 case "03":
                     taskType = "('09','11')";
+                    break;
                 case "P2":
                     taskType = "('05','14')";
+                    break;
 
             }
         }
@@ -456,8 +461,14 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
                 nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
             }
-            //查询数据库设备信息
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
+
+            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
+            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){
+                nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
+            }
+
+
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);

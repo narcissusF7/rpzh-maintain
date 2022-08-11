@@ -124,7 +124,7 @@ public class DataContrastServiceImpl implements DataContrastService {
             return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",new HashMap<>());
         }
         //获取有关的仓间id
-        List<Integer> areaIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==5).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("04:")[1].split("]")[0])).distinct().collect(Collectors.toList());
+        List<Integer> areaIds = data.stream().filter((NodeData nodeData)->nodeData.getSiteRoute().split(",").length==5).map((NodeData nodeData)->Integer.parseInt(nodeData.getSiteRoute().split("04:")[1].split("]")[0])).distinct().collect(Collectors.toList());
         Map<String, String> mapInfos = new HashMap<>();
         if(ToolUtil.isNotEmpty(areaIds)) {
             //获取有关的仓间名称
@@ -136,7 +136,7 @@ public class DataContrastServiceImpl implements DataContrastService {
             });
         }
         //获取有关的垛位id
-        List<Integer> stackIds = data.stream().filter((NodeData nodeData)->nodeData.getPidRoute().split(",").length==6).map((NodeData nodeData)->Integer.parseInt(nodeData.getPidRoute().split("05:")[1].split("]")[0])).distinct().collect(Collectors.toList());
+        List<Integer> stackIds = data.stream().filter((NodeData nodeData)->nodeData.getSiteRoute().split(",").length==6).map((NodeData nodeData)->Integer.parseInt(nodeData.getSiteRoute().split("05:")[1].split("]")[0])).distinct().collect(Collectors.toList());
         if(ToolUtil.isNotEmpty(stackIds)) {
             //获取有关的垛位名称
             List<Map<String, String>> stackInfos = warehouseDao.findStackInfos(stackIds);
@@ -148,11 +148,11 @@ public class DataContrastServiceImpl implements DataContrastService {
         }
         for (NodeData dataInfo : data) {
             //设置位置名称
-            dataInfo.setSiteName(mapInfos.get(dataInfo.getPidRoute()));
+            dataInfo.setSiteName(mapInfos.get(dataInfo.getSiteRoute()));
             //设置曲线名称
-            if("01".equals(nodeType) && "04".equals(mapInfos.get(dataInfo.getPidRoute()+"_siteType"))){
+            if("01".equals(nodeType) && "04".equals(mapInfos.get(dataInfo.getSiteRoute()+"_siteType"))){
                 dataInfo.setNodeName("仓间"+nodeName);
-            }else if("01".equals(nodeType) && "05".equals(mapInfos.get(dataInfo.getPidRoute()+"_siteType"))){
+            }else if("01".equals(nodeType) && "05".equals(mapInfos.get(dataInfo.getSiteRoute()+"_siteType"))){
                 dataInfo.setNodeName("垛内"+nodeName);
             }else{
                 dataInfo.setNodeName(nodeName);

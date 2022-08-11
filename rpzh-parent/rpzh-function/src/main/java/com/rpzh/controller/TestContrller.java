@@ -326,19 +326,18 @@ public class TestContrller{
             PestBoardDto pestBoardDto = new PestBoardDto();
             pestBoardDto.setPrincipalUser("ljj");
             pestBoardDto.setPrincipalName("刘疆疆");
-            pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9],[04:11]");
-            pestBoardDto.setSiteId(9);
+
+            if (i%2==1){
+                pestBoardDto.setSiteId(65);
+                pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9],[04:11],[05:65]");
+            }else {
+                pestBoardDto.setSiteId(66);
+                pestBoardDto.setSiteRoute("[00:0],[01:13],[02:14],[03:9],[04:11],[05:66]");
+            }
+
             pestBoardDto.setPestBoardId(pestBoards.get(i).get(0));
 
             pestMonitoringDao.addPestBoard(pestBoardDto);
-//            ParseData parseData = new ParseData(pestBoards.get(i));
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            List<String> list = new ArrayList<>();
-//            for (int j = 0; j < 6; j++) {
-//                list.add(sdf.format(new Date()));
-//            }
-//            parseData.setDateTime(list);
-//            dataHandler.handlerData(parseData);
         }
         return new Result<>(true, StatusCode.OK, "addPestBoard");
     }

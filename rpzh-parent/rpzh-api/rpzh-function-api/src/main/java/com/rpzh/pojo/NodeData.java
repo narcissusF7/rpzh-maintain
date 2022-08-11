@@ -41,7 +41,7 @@ public class NodeData{
     //采集位置
     private String gatherSite;
     //位置路由
-    private String pidRoute;
+    private String siteRoute;
     //位置类型
     private String siteType;
     //预警等级
@@ -69,7 +69,7 @@ public class NodeData{
     public NodeData(String type, Integer maintainStageId, String pidRoute, String siteType) {
         this.type = type;
         this.maintainStageId = maintainStageId;
-        this.pidRoute = pidRoute;
+        this.siteRoute = pidRoute;
         this.siteType = siteType;
     }
 
@@ -86,7 +86,7 @@ public class NodeData{
         this.gatherSite = nodeVo.getGatherSite();
         this.siteType = nodeVo.getSiteType();
         this.alertLevel = nodeVo.getAlertLevel();
-        this.pidRoute =nodeVo.getSiteRoute();
+        this.siteRoute =nodeVo.getSiteRoute();
         this.materialCode = nodeVo.getMaterialCode();
         this.transferTime = parseData.getDateTime().get(count);
         if (NodeConstant.NODE_STACK.equals(nodeVo.getSiteType())){

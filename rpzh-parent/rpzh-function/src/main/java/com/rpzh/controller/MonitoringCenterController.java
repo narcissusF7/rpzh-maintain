@@ -145,7 +145,7 @@ public class MonitoringCenterController {
             required = true
     )})
     @PostMapping("/findAlarmValue")
-    public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData){
+    public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData,String pidRoute){
         if (ToolUtil.isEmpty(nodeData.getMaintainStageId())){
             return new Result<>(false, StatusCode.ERROR, "养护阶段id不能为空");
         }
@@ -155,9 +155,10 @@ public class MonitoringCenterController {
         if (ToolUtil.isEmpty(nodeData.getSiteType())){
             return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
         }
-        if (ToolUtil.isEmpty(nodeData.getPidRoute())){
+        if (ToolUtil.isEmpty(pidRoute)){
             return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
         }
+        nodeData.setSiteRoute(pidRoute);
         Map<String,String> map = monitoringCenterService.findAlarmValue(nodeData);
         return new Result<>(true,StatusCode.OK,"查询成功",map);
     }
@@ -413,7 +414,7 @@ public class MonitoringCenterController {
             required = true
     ), @ApiImplicitParam(
             name = "nodeType",
-            value = "设备类型  01氧气 03温湿度 04 包芯氧气",
+            value = "设备类型  01氧气 03温湿度 04 包芯氧气 P1垛内虫情 P2仓间虫情",
             dataType = "String",
             required = true
     )})

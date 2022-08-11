@@ -27,11 +27,13 @@ public class PestData {
     private  Integer beetleLevel;
     //粉螟预警等级
     private  Integer mealwormLevel;
+    //采集位置路由
+    private  String siteRoute;
 
     public PestData() {
     }
 
-    public PestData(String pestBoardId, String gatherSite, String gatherTime ,Integer alertLevel, Integer beetleCount,Integer beetleLevel, Integer mealwormCount,Integer mealwormLevel) {
+    public PestData(String pestBoardId, String gatherSite, String gatherTime ,Integer alertLevel, Integer beetleCount,Integer beetleLevel, Integer mealwormCount,Integer mealwormLevel,String siteRoute) {
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
@@ -40,15 +42,16 @@ public class PestData {
         this.alertLevel = alertLevel;
         this.beetleLevel = beetleLevel;
         this.mealwormLevel = mealwormLevel;
-
+        this.siteRoute = siteRoute;
     }
 
-    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount,Integer alertLevel) {
+    public PestData(String pestBoardId, String gatherSite, String gatherTime, Integer beetleCount,Integer alertLevel,String siteRoute) {
         this.pestBoardId = pestBoardId;
         this.gatherSite = gatherSite;
         this.gatherTime = gatherTime;
         this.beetleCount = beetleCount;
         this.alertLevel = alertLevel;
         this.beetleLevel = alertLevel;
+        this.siteRoute = siteRoute;
     }
 }

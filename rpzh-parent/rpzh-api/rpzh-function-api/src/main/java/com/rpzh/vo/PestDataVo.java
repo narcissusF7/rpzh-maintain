@@ -38,4 +38,7 @@ public class PestDataVo {
     private String beetleColor;
     @ApiModelProperty("粉螟预警颜色")
     private String mealwormColor;
+    @ApiModelProperty("位置路由")
+    private String siteRoute;
+
 }

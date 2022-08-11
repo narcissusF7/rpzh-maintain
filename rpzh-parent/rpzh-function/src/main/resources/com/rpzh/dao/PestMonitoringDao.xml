@@ -22,7 +22,7 @@
         created_time,
         last_updated_time
         )
-        VALUE
+        VALUES
         (
         <if test="pestBoardDto.pestBoardId!='' and pestBoardDto.pestBoardId!=null">#{pestBoardDto.pestBoardId},</if>
         <if test="pestBoardDto.boardType!='' and pestBoardDto.boardType!=null">#{pestBoardDto.boardType},</if>
@@ -101,7 +101,7 @@
         from tb_pest_stack_monitor
     </select>
     <select id="findByPrincipalName" resultType="java.util.Map">
-        select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName" from tb_pest_board where principal_user = #{principalUser}
+        select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName",site_route "siteRoute",site_id "siteId" from tb_pest_board where principal_user = #{principalUser}
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
         select pest_board_id "pestBoardId", site_route "siteRoute",site_name "siteName",site_id "siteId"  from tb_pest_board where pest_board_id =#{pestBoardId}
@@ -164,13 +164,13 @@
         INSERT ALL
         <foreach collection="pestDataList" item="pestData" index="index" separator=" ">
           INTO tb_pest_data_history
-        (pest_board_id,gather_site,gather_time,beetle_count,alert_level
+        (pest_board_id,gather_site,gather_time,beetle_count,alert_level,site_route
         <if test="siteType=='04'">
             ,mealworm_count
         </if>
         )
         VALUES
-            ( #{pestData.pestBoardId},#{pestData.gatherSite},to_date(#{pestData.gatherTime},'yyyy-mm-dd hh24:mi:ss'),#{pestData.beetleCount},#{pestData.alertLevel}
+            ( #{pestData.pestBoardId},#{pestData.gatherSite},SYSDATE,#{pestData.beetleCount},#{pestData.alertLevel},#{pestData.siteRoute}
             <if test="siteType=='04'">
                 ,#{pestData.mealwormCount}
             </if>

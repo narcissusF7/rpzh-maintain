@@ -197,7 +197,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         //如果是仓间设备
         if (NodeConstant.NODE_WARE_AREA.equals(nodeData.getSiteType())){
             //将位置路由转成map 然后再拼接kv 作为redis的对象名
-            List<String> hashKeys = dataHandler.getHashKeys(nodeData.getPidRoute());
+            List<String> hashKeys = dataHandler.getHashKeys(nodeData.getSiteRoute());
             //判断缓存中存在该对象名 存在 获取 不存在 从数据库中向上查找 存到缓存中 并返回对象名
             String redisHashKey = dataHandler.putAlarmValueToCache(hashKeys, column[0]);
             //获取这些字段的预警值

@@ -65,7 +65,7 @@
                 =#{nodeDto.lastUpdatedUser},
             </if>
             <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_type = #{nodeDto.siteType},</if>
-            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
+            <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},stack_id = #{nodeDto.siteId},</if>
             <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
             <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
             <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
@@ -351,6 +351,9 @@
         <if test="nodeDto.maintainPlanId!=null and nodeDto.maintainPlanId!=''">and maintain_plan_id
             >=#{nodeDto.maintainPlanId}
         </if>
+        <if test="nodeDto.maintainStage!=null and nodeDto.maintainStage!=''">and maintain_stage_id
+            >=#{nodeDto.maintainStage}
+        </if>
         <if test="pidRoute!=null and pidRoute!=''">and pid_route =#{pidRoute}</if>
         <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
     </select>
@@ -617,8 +620,8 @@
     </select>
     <select id="findStatistics" resultType="java.util.Map">
         select pid_route pidRoute,gather_site gatherSite
-        <if test="dateType=='day'">,toStartOfDay(createdTime)</if>
-        <if test="dateType=='week'">,toStartOfWeek(createdTime)</if>
+        <if test="dateType=='day'">,toString(toStartOfDay(createdTime))</if>
+        <if test="dateType=='week'">,toString(toStartOfWeek(createdTime))</if>
         as dateTime
         <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) avgOxygen,MAX(oxygen) maxOxygen,MIN(oxygen)
             minOxygen

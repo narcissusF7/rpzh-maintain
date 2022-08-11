@@ -139,7 +139,7 @@ public class DataHandler {
         nodeData.setTemp(parseData.getData().get(0));
         nodeData.setHumiture(parseData.getData().get(1));
         nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
-        nodeData.setPidRoute(siteRoute);
+        nodeData.setSiteRoute(siteRoute);
         nodeData.setWarningType(warningType.substring(1));
 
         //向数据库插入当前数据

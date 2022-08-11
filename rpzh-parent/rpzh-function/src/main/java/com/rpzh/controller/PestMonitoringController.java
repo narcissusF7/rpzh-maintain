@@ -179,9 +179,9 @@ public class PestMonitoringController {
         try {
             //垛内只计算甲虫
             if (NodeConstant.NODE_STACK.equals(siteType)){
-                pestData = ExcelUtils.importExcel(file, 1, 0, 3);
-            }else {
                 pestData = ExcelUtils.importExcel(file, 1, 0, 4);
+            }else {
+                pestData = ExcelUtils.importExcel(file, 1, 0, 5);
             }
         } catch (IOException e) {
             e.printStackTrace();

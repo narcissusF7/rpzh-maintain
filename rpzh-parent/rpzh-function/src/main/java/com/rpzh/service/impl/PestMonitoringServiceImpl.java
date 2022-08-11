@@ -255,9 +255,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
             } else {
                 if (NodeConstant.NODE_STACK.equals(siteType)) {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level);
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level,integerStringMap.get("siteRoute"));
                 } else {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"),integerStringMap.get("siteRoute"));
                 }
             }
             //将当前行数据存到list中
@@ -286,7 +286,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
-        //TODO 需要将用户信息存入缓存中
         String username = userInfo.get("username");
         List<PestData> stackList = new ArrayList<>();
         List<PestData> wareList = new ArrayList<>();
@@ -299,12 +298,13 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         for (int i = 0; i < list.size(); i++) {
             Map<String, String> map = list.get(i);
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String siteRoute = map.get("siteRoute")+",[0"+map.get("siteRoute").split(",").length+":"+String.valueOf(map.get("siteId"))+"]";
             if (NodeConstant.NODE_STACK.equals(map.get("siteType"))) {
                 //垛内
-                stackList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0));
+                stackList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0,siteRoute));
             } else {
                 //仓间
-                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0,0));
+                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0,0,siteRoute));
             }
         }
         //执行数据库操作
@@ -461,9 +461,22 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //从缓存中获取对应的数据
         pestBoardIds.forEach(pestBoardId -> {
             Object o = redisTemplate.opsForValue().get(PEST_MONITOR + pestBoardId);
-            if (!ToolUtil.isEmpty(o)) {
+            //如果缓存中没有
+            if (ToolUtil.isEmpty(o)) {
+                //数据库中拿
+                PestDataDto pestDataDto =new PestDataDto();
+                pestDataDto.setPestBoardId(pestBoardId);
+                pestDataDto.setSiteType(monitorCondition.getSiteType());
+                List<PestDataVo> pestDataVos1 = pestMonitoringDao.findPestDataHistoryByOne(pestDataDto);
+                if (pestDataVos1.size()>0){
+                    //放置到缓存中
+                    redisTemplate.opsForValue().set(PEST_MONITOR + pestBoardId,JSONObject.toJSONString(pestDataVos1.get(0)));
+                    pestDataVos.add(pestDataVos1.get(0));
+                }
+            }else {
                 pestDataVos.add(JSONObject.parseObject(o.toString(), PestDataVo.class));
             }
+
         });
         //根据监控类型过滤
         Stream<PestDataVo> stream = pestDataVos.stream();

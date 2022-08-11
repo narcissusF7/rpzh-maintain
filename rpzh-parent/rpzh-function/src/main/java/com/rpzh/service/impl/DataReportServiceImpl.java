@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -568,6 +570,8 @@ public class DataReportServiceImpl implements DataReportService {
         List<NodeExportData> list = new ArrayList<>();
         EasyPoiUtil easyPoiUtil = new EasyPoiUtil();
 
+        String title = "设备数据";
+
         switch (comparisonType){
             case "1":
                 //垛内  包芯对比
@@ -579,7 +583,7 @@ public class DataReportServiceImpl implements DataReportService {
 
                 comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData,dateType);
 
-
+                title ="垛内包芯温度与温湿度数据";
                 break;
 
             case "2":
@@ -590,6 +594,9 @@ public class DataReportServiceImpl implements DataReportService {
                 starckHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
                 comparsionData(beginDate,endDate,list,starckOxygenData,starckHumitureData,dateType);
+
+                title ="垛位氧气与温湿度数据";
+
                 break;
             case "3":
                 //仓间氧气数据
@@ -599,19 +606,25 @@ public class DataReportServiceImpl implements DataReportService {
                 wareHumitureData = nodeDao.findStatistics(pidRoutes,NodeTypeEnum.HUMITURE_NODE.getTableName(),dateType,acquisitionTimeOne,acquisitionTimeTwo);
 
                 comparsionData(beginDate,endDate,list,wareOxygenData,wareHumitureData,dateType);
+                title = "仓间氧气与温湿度数据";
                 break;
 
             default:
         }
 
-
+        DecimalFormat df = new DecimalFormat("#.00");
         if (list.size()>0){
             for (int i = 0; i < list.size(); i++) {
 
                 easyPoiUtil.t = list.get(i);
                 switch (comparisonType){
                     case "1":
-                        list.get(i).setTempReduce(list.get(i).getAvgCoreTemp()-list.get(i).getAvgTemp());
+                        Double avgCoreTemp = list.get(i).getAvgCoreTemp();
+                        Double avgTemp = list.get(i).getAvgTemp();
+                        if (ToolUtil.isNotEmpty(avgCoreTemp)&&ToolUtil.isNotEmpty(avgTemp)){
+                            String s = String.format("%.2f", list.get(i).getAvgCoreTemp() - list.get(i).getAvgTemp());
+                            list.get(i).setTempReduce(Double.parseDouble(s));
+                        }
                         try {
                             easyPoiUtil.hihdColumn("avgOxygen", true);
                             easyPoiUtil.hihdColumn("maxOxygen", true);
@@ -648,7 +661,7 @@ public class DataReportServiceImpl implements DataReportService {
             }
         }
 
-        EasyPoiUtil.exportExcel(list,"xx","xx.xls",NodeExportData.class,"xx.xls",response);
+        EasyPoiUtil.exportExcel(list,title,title+".xls",NodeExportData.class,title+".xls",response);
         return new Result(true,StatusCode.OK,"查询成功");
     }
 
@@ -667,10 +680,22 @@ public class DataReportServiceImpl implements DataReportService {
         List<Map>  dataList  = new ArrayList<>();
 
         for (long i = beginDate; i <= endDate; i++) {
+            //如果是按周统计 就从开始时间的周日算起
+            if (dateType.equals("week")){
+                i = LocalDate.ofEpochDay(i).with(DayOfWeek.SUNDAY).toEpochDay();
+            }
             //获取这一天每个位置产生的数据
-            List<Map> list3 = dateTimeList1.get(LocalDate.ofEpochDay(i) + " 00:00:00");
+            List<Map> list3,list4;
+            if (dateType.equals("week")){
+                list3 = dateTimeList1.get(LocalDate.ofEpochDay(i).toString());
 
-            List<Map> list4 = dateTimeList2.get(LocalDate.ofEpochDay(i) + " 00:00:00");
+                list4 = dateTimeList2.get(LocalDate.ofEpochDay(i).toString());
+            }else {
+                list3 = dateTimeList1.get(LocalDate.ofEpochDay(i) + " 00:00:00");
+
+                list4 = dateTimeList2.get(LocalDate.ofEpochDay(i) + " 00:00:00");
+            }
+
             //如果当天没有数据
             if (ToolUtil.isEmpty(list3) && ToolUtil.isEmpty(list4)) {
                 Map map = new HashMap<>();
