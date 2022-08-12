@@ -93,7 +93,7 @@ public class RpzhFunctionApplication {
         list.forEach(obj->{
             String string = JSONObject.toJSONString(obj);
             Map map = JSONObject.parseObject(string, Map.class);
-            String userName = map.get("principalName")+"";
+            Object userName = map.get("principalName");
             //判断负责人是否为空
             if (ToolUtil.isNotEmpty(userName)){
                 //缓存中获取负责人信息

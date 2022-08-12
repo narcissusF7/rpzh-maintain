@@ -599,7 +599,7 @@
     -->
 
     <select id="findTaskFromMonitored" resultMap="findTask">
-        SELECT id ,type
+        SELECT id ,type,task_num,task_address,site_route,task_detail,principal,deal_method,created_time,end_time,status
         FROM tb_task
         where rownum = 1 and site_route = #{siteRoute}
         <if test="taskType!='' and taskType!=null">

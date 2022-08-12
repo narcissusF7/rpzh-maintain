@@ -424,7 +424,7 @@
         <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">oxygen,</if>
         <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">transfer_time,</if>
         <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">alert_level,</if>
-        <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">pid_route,</if>
+        <if test="nodeData.siteRoute!=null and nodeData.siteRoute!=''">pid_route,</if>
         <if test="nodeData.siteX!=null and nodeData.siteX!=''">site_x,</if>
         <if test="nodeData.siteY!=null and nodeData.siteY!=''">site_y,</if>
         <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">site_z,</if>
@@ -432,7 +432,7 @@
         <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
         createdTime
         ) values (
-        <if test="nodeData.id!=null and nodeData.id!=''">#{nodeData.id},</if>
+        <if test="nodeData.id!=null and nodeData.id!=''">#{id},</if>
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
         <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
         <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>
@@ -448,7 +448,7 @@
         <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
         <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">#{nodeData.transferTime},</if>
         <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
-        <if test="nodeData.pidRoute!=null and nodeData.pidRoute!=''">#{nodeData.pidRoute},</if>
+        <if test="nodeData.siteRoute!=null and nodeData.siteRoute!=''">#{nodeData.siteRoute},</if>
         <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>
         <if test="nodeData.siteY!=null and nodeData.siteY!=''">#{nodeData.siteY},</if>
         <if test="nodeData.siteZ!=null and nodeData.siteZ!=''">#{nodeData.siteZ},</if>
