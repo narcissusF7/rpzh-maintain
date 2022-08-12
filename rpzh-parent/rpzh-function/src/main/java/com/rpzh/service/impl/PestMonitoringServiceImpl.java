@@ -642,9 +642,6 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         list.forEach(pestDataVo -> {
             //设置预警颜色
             pestDataVo.setWarningColor(getPestWarningColor(pestDataVo.getAlertLevel(),pestMonitorValue));
-
-
-
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)){
                 Map<String, Integer> map = decideLevel(pestDataVo.getPestBoardId(), pestDataVo.getBeetleCount(), pestDataVo.getMealwormCount());
                 pestDataVo.setBeetleLevel(map.get("beetleLevel"));
@@ -721,7 +718,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @return 颜色代码
      */
     public String getPestWarningColor(Integer level,Map<String, String> pestMonitorValue){
-        if (ToolUtil.isEmpty(level)) {
+        if (ToolUtil.isEmpty(level)||"0".equals(level)) {
             return pestMonitorValue.get("");
         }
         switch (level) {
@@ -732,7 +729,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             case 3:
                 return pestMonitorValue.get("colorThree");
             default:
-                return pestMonitorValue.get("");
+                return "";
         }
     }
 

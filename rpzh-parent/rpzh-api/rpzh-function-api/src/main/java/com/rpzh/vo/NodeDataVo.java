@@ -14,7 +14,7 @@ import java.util.List;
 @ApiModel(description = "设备数据返回类")
 public class NodeDataVo {
     @ApiModelProperty(notes = "主键Id")
-    private Integer id;
+    private String id;
     @Excel(
             name = "传感器id",
             orderNum = "1"

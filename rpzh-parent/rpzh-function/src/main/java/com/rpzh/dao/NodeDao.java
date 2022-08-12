@@ -181,7 +181,7 @@ public interface NodeDao {
     NodeVo findByNodeId(@Param("nodeId") String nodeId);
 
     @DS("clickhouse")
-    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData, @Param("tableName") String tableName, @Param("id") long id);
+    Integer insertNodeHistory(@Param("nodeData") NodeData nodeData, @Param("tableName") String tableName, @Param("id") String id);
 
 
     Integer findNodeStatus(@Param("id") Integer id);

@@ -143,7 +143,7 @@ public class DataHandler {
         nodeData.setWarningType(warningType.substring(1));
 
         //向数据库插入当前数据
-        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",idWorker.nextId());
+        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
 
         //将该数据放入到缓存中
         redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
@@ -247,7 +247,7 @@ public class DataHandler {
                 nodeData.setWarningType(warningType.substring(1));
             }
             //向数据库插入当前数据
-            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),idWorker.nextId());
+            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
 
             //最后一条数据需要存放到redis中
             if (i==0){

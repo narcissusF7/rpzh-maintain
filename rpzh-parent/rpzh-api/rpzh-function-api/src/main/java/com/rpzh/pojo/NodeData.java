@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class NodeData{
     //主键id
-    private Integer id;
+    private String id;
     //设备id
     private String nodeId = "";
     //设备类型
@@ -75,7 +75,6 @@ public class NodeData{
     }
 
     public NodeData(ParseData parseData, NodeVo nodeVo, int count) {
-        this.id = nodeVo.getId();
         this.nodeId = parseData.getNodeId();
         this.type = parseData.getNodeType();
         this.frequency = parseData.getFrequency();
