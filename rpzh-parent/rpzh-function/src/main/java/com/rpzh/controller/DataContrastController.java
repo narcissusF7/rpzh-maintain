@@ -6,10 +6,15 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.DataContrastService;
 import io.swagger.annotations.*;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 /**
  * @Author: zyq
@@ -21,6 +26,12 @@ import java.util.List;
 @RequestMapping("/maintain/dataContrast")
 @Api(value = "数据对比类", tags = "数据对比类", description = "数据对比类")
 public class DataContrastController {
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(true);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+    }
     @Resource
     private DataContrastService dataContrastService;
     @PostMapping("/getNodeData")
@@ -39,18 +50,14 @@ public class DataContrastController {
     @PostMapping("/getNodeDataList")
     @ApiOperation(value = "数据对比")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "nodeId", value = "设备id", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "nodeType", value = "设备类型", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "siteRoute", value = "位置路由", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "siteName ", value = "位置名称", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "startTime", value = "采集的开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "dataContrasts", value = "所选的设备信息(json):siteName、nodeId、nodeName、nodeType、colorGba", required = true, dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "采集的结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "beginTime", value = "对比的开始时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "finishTime", value = "对比的结束时间", required = false, dataType = "String"),
-            @ApiImplicitParam(name = "gatherType", value = "采集的时间类型 1:天  2:周  3:月  4:年    默认月", required = false, dataType = "String")
+            @ApiImplicitParam(name = "gatherType", value = "时间类型 1:天  2:周  3:月  4:年    默认月", required = false, dataType = "String")
     })
-    public Result getNodeDateList(@ApiIgnore DataContrastDto dataContrastDto){
-        return dataContrastService.getNodeDateList(dataContrastDto);
+    public Result getNodeDateList(String dataContrasts, String gatherType, Date startTime,Date endTime,Date beginTime,Date finishTime){
+        return dataContrastService.getNodeDateList(dataContrasts,gatherType,startTime,endTime,beginTime,finishTime);
     }
 
     @PostMapping("/nodeTypeList")

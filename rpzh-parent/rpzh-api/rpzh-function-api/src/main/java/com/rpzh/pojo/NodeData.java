@@ -62,6 +62,7 @@ public class NodeData{
     //数据对比时所选的曲线名称
     private String nodeName;
     private Double count=0d;
+    private String color;
 
     public NodeData() {
     }

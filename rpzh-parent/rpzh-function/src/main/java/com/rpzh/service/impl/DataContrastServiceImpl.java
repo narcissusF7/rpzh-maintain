@@ -1,5 +1,6 @@
 package com.rpzh.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.*;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.DataContrastDto;
@@ -10,11 +11,13 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.DataContrastService;
 import com.rpzh.util.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -157,171 +160,215 @@ public class DataContrastServiceImpl implements DataContrastService {
             }else{
                 dataInfo.setNodeName(nodeName);
             }
+            dataInfo.setColor(getColor());
         }
         return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",data);
     }
 
     /*
+    * 随机生成rgba的颜色,传给前端
+    * */
+    public String getColor(){
+        Random random = new Random();
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int b = random.nextInt(256);
+        return "rgba("+r+","+g+","+b+",1)";
+    }
+
+    @Resource
+    private RedisTemplate redisTemplate;
+    /*
     * 数据对比
     */
     @Override
-    public Result getNodeDateList(DataContrastDto dataContrastDto) {
-        String siteRoute = dataContrastDto.getSiteRoute();
-        String nodeType = dataContrastDto.getNodeType();
-        String nodeId = dataContrastDto.getNodeId();
-        String siteName = dataContrastDto.getSiteName();
-        if(ToolUtil.isEmpty(siteName) || ToolUtil.isEmpty(siteRoute) || ToolUtil.isEmpty(nodeType)){
-            return new Result(false, StatusCode.ERROR, "设备类型或位置不能为空!");
+    public Result getNodeDateList(String dataContrasts, String gatherType, Date startTime,Date endTime,Date beginTime,Date finishTime) {
+        String user = TokenDecode.getUserInfo().get("username");
+        //dataContrasts为[],将之前存入到redis中的数据清空
+        Set<String> keys = redisTemplate.keys(user+"_maintain_data" + "*");
+        List<DataContrastDto> dataContrastDtos = JSONObject.parseArray(dataContrasts, DataContrastDto.class);
+        if(dataContrastDtos.size()==0){
+            redisTemplate.delete(keys);
+            return new Result(true, StatusCode.OK, "",new ArrayList<>());
         }
-        //时间类型
-        String gatherType= dataContrastDto.getGatherType();
-        if(!("1".equals(gatherType)) && !("2".equals(gatherType)) && !("3".equals(gatherType)) && !("4".equals(gatherType))){
+        //时间类型出错
+        if (!("1".equals(gatherType)) && !("2".equals(gatherType)) && !("3".equals(gatherType)) && !("4".equals(gatherType))) {
             return new Result(false, StatusCode.ERROR, "时间类型错误!");
         }
+        List<Map<String,Object>> gatherInfos = new ArrayList<>();
+        List<Map<String,Object>> contrastInfos = new ArrayList<>();
         //采集的开始时间startTime、结束时间endTime
-        Map<String, Date> setTime = GetBetweenDayUtils.getMonth(dataContrastDto.getStartTime(), dataContrastDto.getEndTime());
-        dataContrastDto.setStartTime(setTime.get("startTime"));
-        dataContrastDto.setEndTime(setTime.get("endTime"));
+        Map<String, Date> setTime = GetBetweenDayUtils.getMonth(startTime, endTime);
+        startTime = setTime.get("startTime");
+        endTime = setTime.get("endTime");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String startTime = sdf.format(dataContrastDto.getStartTime());
-        String endTime = sdf.format(dataContrastDto.getEndTime());
+        String start = sdf.format(startTime);
+        String end = sdf.format(endTime);
         //对比的开始时间beginTime、结束时间finishTime
-        String beginTime="";
-        String finishTime="";
-        if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-            beginTime = sdf.format(dataContrastDto.getBeginTime());
-            finishTime = sdf.format(dataContrastDto.getFinishTime());
+        String begin = "";
+        String finish = "";
+        if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+            begin = sdf.format(beginTime);
+            finish = sdf.format(finishTime);
         }
         //获取采集的所有时间
         List<String> timeDays = new ArrayList<>();
         //获取对比的所有时间
         List<String> contrastDays = new ArrayList<>();
-        switch (gatherType){
+        switch (gatherType) {
             case "1":
                 //按天统计
                 gatherType = "formatDateTime(transfer_time,'%Y-%m-%d')";
-                timeDays = GetBetweenDayUtils.getBetweenDays(startTime, endTime);
-                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
-                    contrastDays = GetBetweenDayUtils.getBetweenDays(beginTime, finishTime);
+                timeDays = GetBetweenDayUtils.getBetweenDays(start, end);
+                if (StringUtil.isNotEmpty(begin) && StringUtil.isNotEmpty(finish)) {
+                    contrastDays = GetBetweenDayUtils.getBetweenDays(begin, finish);
                 }
                 break;
             case "2":
                 //按周统计
                 gatherType = "toMonday(transfer_time)";
-                timeDays = GetBetweenDayUtils.getBetweenWeek(startTime, endTime);
-                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
-                    contrastDays = GetBetweenDayUtils.getBetweenWeek(beginTime, finishTime);
+                timeDays = GetBetweenDayUtils.getBetweenWeek(start, end);
+                if (StringUtil.isNotEmpty(begin) && StringUtil.isNotEmpty(finish)) {
+                    contrastDays = GetBetweenDayUtils.getBetweenWeek(begin, finish);
                 }
                 break;
             case "3":
                 //按月统计
                 gatherType = "formatDateTime(transfer_time,'%Y-%m')";
-                timeDays = GetBetweenDayUtils.getMonthBetweenDate(startTime, endTime);
-                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
-                    contrastDays = GetBetweenDayUtils.getMonthBetweenDate(beginTime, finishTime);
+                timeDays = GetBetweenDayUtils.getMonthBetweenDate(start, end);
+                if (StringUtil.isNotEmpty(begin) && StringUtil.isNotEmpty(finish)) {
+                    contrastDays = GetBetweenDayUtils.getMonthBetweenDate(begin, finish);
                 }
                 break;
             case "4":
                 gatherType = "formatDateTime(transfer_time,'%Y')";
-                timeDays = GetBetweenDayUtils.getYearBetweenDate(startTime, endTime);
-                if(StringUtil.isNotEmpty(beginTime) && StringUtil.isNotEmpty(finishTime)){
-                    contrastDays = GetBetweenDayUtils.getYearBetweenDate(beginTime, finishTime);
+                timeDays = GetBetweenDayUtils.getYearBetweenDate(start, end);
+                if (StringUtil.isNotEmpty(begin) && StringUtil.isNotEmpty(finish)) {
+                    contrastDays = GetBetweenDayUtils.getYearBetweenDate(begin, finish);
                 }
                 break;
         }
-        //曲线数据
-        String nodeName = "";
-        //采集的数据
-        List<Map<String,Object>> data = new ArrayList<>();
-        //对比的数据
-        List<Map<String,Object>> contrastData = new ArrayList<>();
-        if("01".equals(nodeType)){
-            if(siteRoute.split(",").length==5) {
-                nodeName = "仓间氧气设备";
-            }else{
-                nodeName = "垛内氧气设备";
-            }
-            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"oxygen","tb_node_o2_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"oxygen","tb_node_o2_history");
-            }
-        }else if("02".equals(nodeType)){
-            nodeName = "垛内包芯温度设备";
-            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_temp_core_chip_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_temp_core_chip_history");
-            }
-        }else if("03".equals(nodeType)){
-            nodeName = "垛内环境温湿度设备-温度";
-            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_env_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_env_history");
-            }
-        }else if("04".equals(nodeType)){
-            nodeName = "垛内环境温湿度设备-湿度";
-            data = nodeDao.findSelectedNode(nodeId,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"humiture","tb_node_env_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedNode(nodeId,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"humiture","tb_node_env_history");
-            }
-        }else if("05".equals(nodeType)) {
-            nodeName = "垛内平均包芯温度";
-            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_temp_core_chip_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_temp_core_chip_history");
-            }
-        } else if("06".equals(nodeType)) {
-            nodeName = "仓间平均氧气";
-            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"oxygen","tb_node_o2_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"oxygen","tb_node_o2_history");
-            }
-        }else if("07".equals(nodeType)) {
-            nodeName = "仓间平均温度";
-            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"temp","tb_node_env_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"temp","tb_node_env_history");
-            }
-        }else{
-            nodeName = "仓间平均湿度";
-            data = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getStartTime(),dataContrastDto.getEndTime(),gatherType,"humiture","tb_node_env_history");
-            if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-                contrastData = nodeDao.findSelectedSiteRoute(siteRoute,dataContrastDto.getBeginTime(),dataContrastDto.getFinishTime(),gatherType,"humiture","tb_node_env_history");
-            }
-        }
-        if(!"".equals(nodeId)){
-            nodeId = nodeId + "、";
-        }
-        nodeName = nodeId + siteName + "、" + nodeName;
-        List<String> days = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
-        //将没有的采集日期补0
-        for (String timeDay : timeDays) {
-            if(!days.contains(timeDay)){
-                Map<String,Object> map = new HashMap<>();
-                map.put("dayTime",timeDay);
-                map.put("data",0);
-                data.add(map);
-            }
-        }
-        //按日期排序
-        data.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
-        Map<String,Object> mapInfo = new HashMap<>();
-        mapInfo.put("data",data);
-        mapInfo.put("nodeName",nodeName);
-        if(ToolUtil.isNotEmpty(dataContrastDto.getBeginTime()) && ToolUtil.isNotEmpty(dataContrastDto.getFinishTime())){
-            List<String> contrastDates = data.stream().map((Map map) ->map.get("dayTime").toString()).collect(Collectors.toList());
-            //将没有的对比日期补0
-            for (String contrastDay : contrastDays) {
-                if(!contrastDays.contains(contrastDay)){
-                    Map<String,Object> map = new HashMap<>();
-                    map.put("dayTime",contrastDay);
-                    map.put("data",0);
-                    contrastData.add(map);
+        for (DataContrastDto dataContrastDto : dataContrastDtos) {
+            String siteRoute = dataContrastDto.getSiteRoute();
+            String nodeType = dataContrastDto.getNodeType();
+            String nodeId = dataContrastDto.getNodeId();
+            String contrast_key = user+"_maintain_data_contrast"+siteRoute + "_"+nodeType+"_"+nodeId+"_"+beginTime+finishTime+startTime+endTime;
+            String gather_key = user+"_maintain_data_gather"+siteRoute + "_"+nodeType+"_"+nodeId+"_"+beginTime+finishTime+startTime+endTime;
+            if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get(gather_key))){
+                Map<String,Object> gatherRedis = (Map<String,Object>)redisTemplate.opsForValue().get(gather_key);
+                gatherInfos.add(gatherRedis);
+                if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime) && ToolUtil.isNotEmpty(redisTemplate.opsForValue().get(contrast_key))) {
+                    Map<String,Object> contrastRedis = (Map<String,Object>)redisTemplate.opsForValue().get(contrast_key);
+                    contrastInfos.add(contrastRedis);
                 }
+            }else {
+                //采集的数据
+                List<Map<String, Object>> data = new ArrayList<>();
+                Map<String, Object> dataMap = new TreeMap<>();
+                Map<String, Object> contrastDataMap = new TreeMap<>();
+                //对比的数据
+                List<Map<String, Object>> contrastData = new ArrayList<>();
+                if ("01".equals(nodeType)) {
+                    data = nodeDao.findSelectedNode(nodeId, startTime, endTime, gatherType, "oxygen", "tb_node_o2_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedNode(nodeId, beginTime, finishTime, gatherType, "oxygen", "tb_node_o2_history");
+                    }
+                } else if ("02".equals(nodeType)) {
+                    data = nodeDao.findSelectedNode(nodeId, startTime, endTime, gatherType, "temp", "tb_node_temp_core_chip_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedNode(nodeId, beginTime, finishTime, gatherType, "temp", "tb_node_temp_core_chip_history");
+                    }
+                } else if ("03".equals(nodeType)) {
+                    data = nodeDao.findSelectedNode(nodeId, startTime, endTime, gatherType, "temp", "tb_node_env_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedNode(nodeId, beginTime, finishTime, gatherType, "temp", "tb_node_env_history");
+                    }
+                } else if ("04".equals(nodeType)) {
+                    data = nodeDao.findSelectedNode(nodeId, startTime, endTime, gatherType, "humiture", "tb_node_env_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedNode(nodeId, beginTime, finishTime, gatherType, "humiture", "tb_node_env_history");
+                    }
+                } else if ("05".equals(nodeType)) {
+                    data = nodeDao.findSelectedSiteRoute(siteRoute,startTime, endTime, gatherType, "temp", "tb_node_temp_core_chip_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedSiteRoute(siteRoute, beginTime, finishTime, gatherType, "temp", "tb_node_temp_core_chip_history");
+                    }
+                } else if ("06".equals(nodeType)) {
+                    data = nodeDao.findSelectedSiteRoute(siteRoute, startTime, endTime, gatherType, "oxygen", "tb_node_o2_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedSiteRoute(siteRoute, beginTime, finishTime, gatherType, "oxygen", "tb_node_o2_history");
+                    }
+                } else if ("07".equals(nodeType)) {
+                    data = nodeDao.findSelectedSiteRoute(siteRoute, startTime, endTime, gatherType, "temp", "tb_node_env_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedSiteRoute(siteRoute, beginTime, finishTime, gatherType, "temp", "tb_node_env_history");
+                    }
+                } else {
+                    data = nodeDao.findSelectedSiteRoute(siteRoute, startTime, endTime, gatherType, "humiture", "tb_node_env_history");
+                    if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                        contrastData = nodeDao.findSelectedSiteRoute(siteRoute, beginTime, finishTime, gatherType, "humiture", "tb_node_env_history");
+                    }
+                }
+                data.forEach(d -> {
+                    dataMap.put(d.get("dayTime").toString(),d.get("data"));
+                });
+                //将没有的采集日期补0
+                for (String timeDay : timeDays) {
+                    if (ToolUtil.isEmpty(dataMap.get(timeDay))) {
+                        dataMap.put(timeDay,0);
+                    }
+                }
+                Map<String,Object> contrastInfo = new HashMap<>();
+                if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+                    contrastData.forEach(d -> {
+                        contrastDataMap.put(d.get("dayTime").toString(),d.get("data"));
+                    });
+                    //将没有的对比日期补0
+                    for (String timeDay : contrastDays) {
+                        if (ToolUtil.isEmpty(contrastDataMap.get(timeDay))) {
+                            contrastDataMap.put(timeDay,0);
+                        }
+                    }
+                    redisTemplate.opsForValue().set(contrast_key,contrastDataMap,15, TimeUnit.MINUTES);
+                    contrastInfos.add(contrastDataMap);
+                }
+                redisTemplate.opsForValue().set(gather_key,dataMap,15, TimeUnit.MINUTES);
+                gatherInfos.add(dataMap);
             }
-            //按日期排序
-            contrastData.sort((v1, v2) -> v1.get("dayTime").toString().compareTo(v2.get("dayTime").toString()));
-            mapInfo.put("contrastData",contrastData);
         }
-        return new Result<>(true, StatusCode.OK, "数据对比成功!",mapInfo);
+        List<Map> gatherList = new ArrayList<>();
+        List<Map> contrastList = new ArrayList<>();
+        List<Map> totalList = new ArrayList<>();
+        Set<String> gatherKeys = gatherInfos.get(0).keySet();
+        gatherKeys.forEach(key -> {
+            Map t =new HashMap();
+            t.put("day",key);
+            List<Object> data = new ArrayList<>();
+            for (int i = 0; i < dataContrastDtos.size(); i++) {
+                data.add(gatherInfos.get(i).get(key));
+            }
+            t.put("data",data);
+            gatherList.add(t);
+            totalList.add(t);
+        });
+        Map dataInfos = new HashMap();
+        dataInfos.put("gatherList",gatherList);
+        if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
+            Set<String> contrastKeys = contrastInfos.get(0).keySet();
+            contrastKeys.forEach(key -> {
+                Map t = new HashMap();
+                t.put("day", key);
+                List<Object> data = new ArrayList<>();
+                for (int i = 0; i < dataContrastDtos.size(); i++) {
+                    data.add(contrastInfos.get(i).get(key));
+                }
+                t.put("data" , data);
+                contrastList.add(t);
+                totalList.add(t);
+            });
+        }
+        dataInfos.put("contrastList",contrastList);
+        dataInfos.put("totalList",totalList);
+        return new Result<>(true, StatusCode.OK, "数据对比成功!",dataInfos);
     }
 }

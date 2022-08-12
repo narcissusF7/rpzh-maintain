@@ -559,17 +559,7 @@ public class MaintainPlanController {
         String maintenceStyle = maintainCountDto.getMaintenceStyle();
         String phases = maintainCountDto.getPhases();
         String pidRoute = maintainCountDto.getPidRoute();
-        String key = "not";
-        if(StringUtil.isNotEmpty(materialCode) || StringUtil.isNotEmpty(maintenceStyle) || StringUtil.isNotEmpty(phases) || StringUtil.isNotEmpty(pidRoute)){
-            key = maintenceStyle + phases + pidRoute + materialCode;
-        }
-        String maintainCountInfos = redisTemplate.opsForValue().get(key).toString();
-        List<MaintainCountVo> maintainCountVos = new ArrayList<>();
-        if(StringUtil.isNotEmpty(maintainCountInfos)){
-            maintainCountVos= JSONArray.parseArray(maintainCountInfos,MaintainCountVo.class);
-        }else{
-            maintainCountVos = JSONArray.parseArray(maintainPlanService.findMaintainCountReport(maintainCountDto).get("export").toString(),MaintainCountVo.class);
-        }
+        List<MaintainCountVo> maintainCountVos = JSONArray.parseArray(maintainPlanService.findMaintainCountReport(maintainCountDto).get("export").toString(),MaintainCountVo.class);
         List<MaintainCountVo> maintainCountOnes = new ArrayList<>();
         maintainCountVos.forEach(maintainCountVo -> {
             if(ids.contains(maintainCountVo.getId())){

@@ -836,10 +836,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String materialCode = maintainCountDto.getMaterialCode();
         String maintenceStyle = maintainCountDto.getMaintenceStyle();
         String phases = maintainCountDto.getPhases();
-        String key = "not";
-        if(StringUtil.isNotEmpty(materialCode) || StringUtil.isNotEmpty(maintenceStyle) || StringUtil.isNotEmpty(phases) || StringUtil.isNotEmpty(pidRoute)){
-            key = maintenceStyle + phases + pidRoute + materialCode;
-        }
         List<MaintainCountVo> maintainCountVos = new ArrayList<MaintainCountVo>();
         Map<String,Object> map = new HashMap<>();
         //位置不为空
@@ -860,7 +856,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainCountVos.forEach(maintainCountVo -> {
                 maintainCountVo.setChildren(new ArrayList<>());
             });
-            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountVos));
             map.put("sum",sum);
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
@@ -874,7 +869,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainCountVos.forEach(maintainCountVo -> {
                 maintainCountVo.setChildren(new ArrayList<>());
             });
-            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountVos));
             map.put("sum",sum);
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
@@ -939,7 +933,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                     }
                 });
             });
-            redisTemplate.opsForValue().set(key,JSON.toJSONString(maintainCountOnes));
             map.put("sum",sum);
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountOnes));

@@ -492,7 +492,7 @@
         order by siteRoute
     </select>
     <select id="findEnterStack" resultType="java.util.Map">
-        select node_id nodeId, node_type nodeType
+        select node_id "nodeId", node_type "nodeType"
         from tb_node
         where status = 1
     </select>
@@ -509,7 +509,7 @@
         order by transferTime asc
     </select>
     <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">
-        select oxygen,node_id as nodeId,material_code as materialCode,pid_route as pidRoute from tb_node_o2_history
+        select oxygen,node_id as nodeId,material_code as materialCode,pid_route as siteRoute from tb_node_o2_history
         where (transfer_time,node_id) in
         (select max(transfer_time),node_id from tb_node_o2_history where 1=1
         <if test="pidRoutes!=null">and pid_route in
@@ -520,7 +520,7 @@
         group by node_id)
     </select>
     <select id="findDataNode" resultType="com.rpzh.pojo.NodeData">
-        select ${column},node_id as nodeId,material_code as materialCode,pid_route as pidRoute from ${tableName} where
+        select ${column},node_id as nodeId,material_code as materialCode,pid_route as siteRoute from ${tableName} where
         (transfer_time,node_id) in
         (select max(transfer_time),node_id from ${tableName} where site_type = '05'
         <if test="pidRoutes!=null">and pid_route in
@@ -531,7 +531,7 @@
         group by node_id)
     </select>
     <select id="findDataContrast" resultType="com.rpzh.pojo.NodeData">
-        select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as pidRoute from
+        select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as siteRoute from
         ${tableName} where (transfer_time,node_id) in
         (select max(transfer_time),node_id from ${tableName} where site_type = '04'
         <if test="pidRoutes!=null">and pid_route in
@@ -556,20 +556,20 @@
     </select>
 
     <select id="findSelectedNode" resultType="java.util.Map">
-        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where node_id = #{nodeId}
+        select round(avg(${columnOne}),1) as "data",${gatherType} as "dayTime" from ${tableColumn} where node_id = #{nodeId}
         <if test="startTime !=null">and transfer_time >= #{startTime}</if>
         <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
         group by dayTime
     </select>
     <select id="findSelectedSiteRoute" resultType="java.util.Map">
-        select round(avg(${columnOne}),1) as data,${gatherType} as dayTime from ${tableColumn} where pid_route =
+        select round(avg(${columnOne}),1) as "data",${gatherType} as "dayTime" from ${tableColumn} where pid_route =
         #{siteRoute}
         <if test="startTime !=null">and transfer_time >= #{startTime}</if>
         <if test="endTime !=null">and transfer_time &lt;= #{endTime}</if>
         group by dayTime
     </select>
     <select id="findNowNodeData" resultType="java.util.Map">
-        select ifNotFinite(avg(temp),0) as temp,ifNotFinite(avg(humiture),0) as humiture from tb_air_conditioner_history
+        select ifNotFinite(avg(temp),0) as "temp",ifNotFinite(avg(humiture),0) as "humiture" from tb_air_conditioner_history
         where
         (node_id,transfer_time) in (select node_id,max(transfer_time) from tb_air_conditioner_history where
         node_id in
@@ -579,7 +579,7 @@
         group by node_id)
     </select>
     <select id="findStackEnv" resultType="java.util.Map">
-        select ifNotFinite(avg(temp), 0) as temp, ifNotFinite(avg(humiture), 0) as humiture
+        select ifNotFinite(avg(temp), 0) as "temp", ifNotFinite(avg(humiture), 0) as "humiture"
         from tb_node_env_history
         where (node_id, transfer_time) in (select node_id, max(transfer_time)
                                            from tb_node_env_history
@@ -619,18 +619,18 @@
           and node_id = #{nodeId}
     </select>
     <select id="findStatistics" resultType="java.util.Map">
-        select pid_route pidRoute,gather_site gatherSite
+        select pid_route "pidRoute",gather_site "gatherSite"
         <if test="dateType=='day'">,toString(toStartOfDay(createdTime))</if>
         <if test="dateType=='week'">,toString(toStartOfWeek(createdTime))</if>
-        as dateTime
-        <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) avgOxygen,MAX(oxygen) maxOxygen,MIN(oxygen)
-            minOxygen
+        as "dateTime"
+        <if test="tableName=='tb_node_o2_history'">, floor(AVG(oxygen),2) "avgOxygen",MAX(oxygen) "maxOxygen",MIN(oxygen)
+            "minOxygen"
         </if>
-        <if test="tableName=='tb_node_env_history'">, floor(AVG(temp),2) avgTemp,MAX(temp) maxTemp,MIN(temp) minTemp ,
-            floor(AVG(humiture),2) avgHumiture,MAX(humiture) maxHumiture,MIN(humiture) minHumiture
+        <if test="tableName=='tb_node_env_history'">, floor(AVG(temp),2) "avgTemp",MAX(temp) "maxTemp",MIN(temp) "minTemp" ,
+            floor(AVG(humiture),2) "avgHumiture",MAX(humiture) "maxHumiture",MIN(humiture) "minHumiture"
         </if>
-        <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) avgCoreTemp,MAX(temp)
-            maxCoreTemp,MIN(temp) minCoreTemp
+        <if test="tableName=='tb_node_temp_core_chip_history'">, floor(AVG(temp),2) "avgCoreTemp",MAX(temp)
+            "maxCoreTemp",MIN(temp) "minCoreTemp"
         </if>
         from ${tableName}
         <where>
@@ -654,11 +654,11 @@
         order by dateTime
     </select>
     <select id="findNodeAddress" resultType="java.util.Map">
-        select node_id as nodeId,
-        gather_site as gatherSite,
-        site_x as siteX,
-        site_y as siteY,
-        site_z as siteZ
+        select node_id as "nodeId",
+        gather_site as "gatherSite",
+        site_x as "siteX",
+        site_y as "siteY",
+        site_z as "siteZ"
         from tb_node
         <where>
             <if test="deviceId!=null and deviceId!=''">
@@ -673,7 +673,7 @@
         select node_id from tb_node where stack_id = #{stackId}
     </select>
     <select id="findNodeIdByIds" resultType="java.lang.String">
-        select node_id "nodeId" from  tb_node where id in
+        select node_id nodeId from  tb_node where id in
 
     </select>
 </mapper>
