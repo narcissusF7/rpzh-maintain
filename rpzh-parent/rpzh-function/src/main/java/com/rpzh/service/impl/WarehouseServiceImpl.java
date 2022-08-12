@@ -12,15 +12,11 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.WarehouseService;
-import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.*;
-import org.apache.poi.ss.formula.functions.T;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -34,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class WarehouseServiceImpl implements WarehouseService {
 
-    @Autowired
+    @Resource
     private WarehouseDao warehouseDao;
 
     @Autowired
@@ -80,7 +76,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         getUserInfo(warehouseDto.getPrincipalName(),map);
 
         //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"1_"+warehouseDto.getId(), JSONObject.toJSONString(map));
+        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"1_"+(warehouseDto.getId()+1), JSONObject.toJSONString(map));
 
         return addFlag;
     }
@@ -183,7 +179,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addBuilding(buildingDto);
         if (!ToolUtil.isEmpty(principalName)){
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+buildingDto.getId(), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+(buildingDto.getId()+1), JSONObject.toJSONString(map));
 
         }
 
@@ -247,7 +243,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "3_" + floorDto.getId(), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "3_" + (floorDto.getId()+1), JSONObject.toJSONString(map));
         }
         return addFlag;
     }
@@ -308,7 +304,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addWarearea(wareAreaDto);
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "4_" + wareAreaDto.getId(), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "4_" + (wareAreaDto.getId()+1), JSONObject.toJSONString(map));
         }
         return addFlag;
     }
@@ -369,7 +365,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addStack(stackDto);
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "5_" + stackDto.getStackId(), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "5_" + (stackDto.getStackId()+1), JSONObject.toJSONString(map));
         }
         return addFlag;
     }

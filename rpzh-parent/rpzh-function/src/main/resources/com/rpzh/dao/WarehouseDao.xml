@@ -10,8 +10,6 @@
     WHERE name = #{name}
   </select>
   <insert id="addWarehouse">
-
-
     INSERT INTO tb_warehouse
     (
     <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>
@@ -115,6 +113,7 @@
 
     INSERT INTO tb_building
     (
+    ID,
     <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">building_no,</if>
     <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> use_volume,</if>
     <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> use_volume_unit,</if>
@@ -135,6 +134,7 @@
     )
     VALUES
     (
+    BUILDING.CURRVAL,
     <if test="buildingDto.buildingNo != null and buildingDto.buildingNo != ''">#{buildingDto.buildingNo},</if>
     <if test="buildingDto.useVolume != null and buildingDto.useVolume != ''"> #{buildingDto.useVolume},</if>
     <if test="buildingDto.useVolumeUnit != null and buildingDto.useVolumeUnit != ''"> #{buildingDto.useVolumeUnit},</if>
@@ -207,6 +207,7 @@
 
     INSERT INTO tb_floor
     (
+    ID,
     <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> floor_no,</if>
     <if test="floorDto.isPartition != null and floorDto.isPartition != ''">is_partition,</if>
     <if test="floorDto.remark != null and floorDto.remark != ''">remark,</if>
@@ -223,6 +224,7 @@
     )
     VALUES
     (
+    TFLOOR.CURRVAL,
     <if test="floorDto.floorNo != null and floorDto.floorNo != ''"> #{floorDto.floorNo},</if>
     <if test="floorDto.isPartition != null and floorDto.isPartition != ''">#{floorDto.isPartition},</if>
     <if test="floorDto.remark != null and floorDto.remark != ''">#{floorDto.remark},</if>
@@ -277,6 +279,7 @@
 
     INSERT INTO tb_ware_area
     (
+    ID,
     <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> area_no, </if>
     <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> remark,  </if>
     <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> created_user,</if>
@@ -292,6 +295,7 @@
     )
     VALUES
     (
+    WAREAREA.CURRVAL,
     <if test="wareAreaDto.areaNo != null and wareAreaDto.areaNo != ''"> #{wareAreaDto.areaNo}, </if>
     <if test="wareAreaDto.remark != null and wareAreaDto.remark != ''"> #{wareAreaDto.remark},  </if>
     <if test="wareAreaDto.createdUser != null and wareAreaDto.createdUser != ''"> #{wareAreaDto.createdUser},</if>
@@ -345,6 +349,7 @@
 
     INSERT INTO tb_stack
     (
+    ID,
     <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> stack_no, </if>
     <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> name_cn, </if>
     <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> created_user, </if>
@@ -360,6 +365,7 @@
     )
     VALUES
     (
+    TSTACK.CURRVAL,
     <if test="stackDto.stackNo != null and stackDto.stackNo != ''"> #{stackDto.stackNo}, </if>
     <if test="stackDto.nameCn != null and stackDto.nameCn != ''"> #{stackDto.nameCn}, </if>
     <if test="stackDto.createdUser != null and stackDto.createdUser != ''"> #{stackDto.createdUser}, </if>

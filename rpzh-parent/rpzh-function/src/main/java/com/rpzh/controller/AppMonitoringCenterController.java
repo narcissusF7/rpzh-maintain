@@ -6,14 +6,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.dto.PestDataDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.NodeService;
+import com.rpzh.service.PestMonitoringService;
 import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
+import com.rpzh.vo.PestDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,6 +38,9 @@ public class AppMonitoringCenterController {
     MonitoringCenterService monitoringCenterService;
     @Resource
     NodeService nodeService;
+
+    @Resource
+    PestMonitoringService pestMonitoringService;
 
     @ApiOperation(
             value = "查询监控数据列表"
@@ -168,8 +174,6 @@ public class AppMonitoringCenterController {
         if (ToolUtil.isEmpty(nodeDto.getDataType())){
             nodeDto.setDataType(0);
         }
-
-
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
         if (!ToolUtil.isEmpty(nodeDataVos)){
             Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
@@ -214,5 +218,44 @@ public class AppMonitoringCenterController {
         return nodeService.findTask(siteRoute,nodeType);
     }
 
+
+    @ApiOperation("虫情数据实时监控")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "monitorStatus", value = "监控状态 0 全部 1 预警 2 正常", dataType = "Integer"),
+            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
+            @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer"),
+            @ApiImplicitParam(name = "siteType", value = "位置类型 04仓间05垛位", dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer"),
+//            @ApiImplicitParam(name = "sortCondition", value = "排序规则 0 位置排序 1 预警排序", dataType = "Integer")
+    })
+    @PostMapping("/findPestDataHistory")
+    public Result<List<PestDataVo>>  findPestDataHistory(@ApiIgnore MonitorCondition monitorCondition){
+        PageInfo<PestDataVo> pageInfo = pestMonitoringService.findPestDataHistory(monitorCondition);
+        return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
+    }
+
+
+    @ApiOperation("查询单个点位虫情数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String" ,required = true),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", dataType = "String"),
+            @ApiImplicitParam(name = "siteType", value = "位置类型 04仓间05垛位", dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer")
+    })
+    @GetMapping("/findPestDataHistoryByOne")
+    public Result<List<PestDataVo>> findPestDataHistoryByOne(@ApiIgnore PestDataDto pestDataDto){
+        if (ToolUtil.isEmpty(pestDataDto.getPestBoardId())){
+            return new Result(false,StatusCode.ERROR,"虫情点位id不能为空");
+        }
+        if (!ToolUtil.isEmpty(pestDataDto.getPage())&&!ToolUtil.isEmpty(pestDataDto.getSize())){
+            //分页
+            PageHelper.startPage(pestDataDto.getPage(),pestDataDto.getSize());
+        }
+        List<PestDataVo> pestDataVos = pestMonitoringService.findPestDataHistoryByOne(pestDataDto);
+        return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(pestDataVos));
+    }
 
 }
