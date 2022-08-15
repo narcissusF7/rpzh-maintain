@@ -1110,6 +1110,7 @@ public class WarehouseServiceImpl implements WarehouseService {
      * @param siteId 位置id
      * @return
      */
+    @Override
     public Map<String,Object> getSitePrincipal(Integer level , Integer siteId){
         Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, level + "_" + siteId);
         if (!ToolUtil.isEmpty(o)){

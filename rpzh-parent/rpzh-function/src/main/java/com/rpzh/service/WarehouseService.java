@@ -6,6 +6,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.vo.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -392,4 +393,7 @@ public interface WarehouseService {
      * @return
      */
     int findStackNo(String stackNo, Integer id);
+
+
+    Map<String,Object> getSitePrincipal(Integer level , Integer siteId);
 }
