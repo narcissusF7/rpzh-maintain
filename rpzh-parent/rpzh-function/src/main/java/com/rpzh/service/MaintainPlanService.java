@@ -19,7 +19,7 @@ public interface MaintainPlanService {
      */
     int insertMaintainPlan(MaintainPlanDto maintainPlanDto);
 
-    AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName);
+    AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName,String phases);
 
     Integer isExistStackId(Integer stackId);
     /**

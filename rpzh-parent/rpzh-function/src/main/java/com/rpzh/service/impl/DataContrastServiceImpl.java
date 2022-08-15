@@ -65,6 +65,7 @@ public class DataContrastServiceImpl implements DataContrastService {
         //物料代码不为空
         if(ToolUtil.isNotEmpty(materialCode)) {
             //根据物料代码查询位置路由(完整路由)
+            siteRoutes = new ArrayList<>();
             siteRoutes = maintainPlanDao.findSite(materialCode);
         }
         //前端传入的位置路由和满足条件的所有位置路由都不为空
@@ -81,6 +82,7 @@ public class DataContrastServiceImpl implements DataContrastService {
         //前端传入的位置路由不为空,满足条件的所有位置路由为空
         if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isEmpty(siteRoutes)) {
             int size = siteRoute.split(",").length;
+            siteRoutes = new ArrayList<>();
             if(size<5){
                 //位置最多选择到层那一级
                 siteRoutes.addAll(warehouseDao.findWareAreaSiteRoute(siteRoute));
@@ -248,10 +250,14 @@ public class DataContrastServiceImpl implements DataContrastService {
                 }
                 break;
         }
+        List<String> nodeNames = new ArrayList<>();
+        nodeNames.add("时间");
         for (DataContrastDto dataContrastDto : dataContrastDtos) {
             String siteRoute = dataContrastDto.getSiteRoute();
             String nodeType = dataContrastDto.getNodeType();
             String nodeId = dataContrastDto.getNodeId();
+            String siteName = dataContrastDto.getSiteName();
+            String nodeName = dataContrastDto.getNodeName();
             String contrast_key = user+"_maintain_data_contrast"+siteRoute + "_"+nodeType+"_"+nodeId+"_"+beginTime+finishTime+startTime+endTime;
             String gather_key = user+"_maintain_data_gather"+siteRoute + "_"+nodeType+"_"+nodeId+"_"+beginTime+finishTime+startTime+endTime;
             if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get(gather_key))){
@@ -335,7 +341,11 @@ public class DataContrastServiceImpl implements DataContrastService {
                 redisTemplate.opsForValue().set(gather_key,dataMap,15, TimeUnit.MINUTES);
                 gatherInfos.add(dataMap);
             }
+            nodeId = nodeId != null ? nodeId + "、":"";
+            nodeNames.add(nodeId+siteName+"、"+nodeName);
         }
+        String totalNameKey = user+"_maintain_data_total_nodeName";
+        redisTemplate.opsForValue().set(totalNameKey,nodeNames,30, TimeUnit.MINUTES);
         List<Map> gatherList = new ArrayList<>();
         List<Map> contrastList = new ArrayList<>();
         List<Map> totalList = new ArrayList<>();
@@ -367,8 +377,12 @@ public class DataContrastServiceImpl implements DataContrastService {
                 totalList.add(t);
             });
         }
+        totalList.sort((v1, v2) -> v1.get("day").toString().compareTo(v2.get("day").toString()));
         dataInfos.put("contrastList",contrastList);
         dataInfos.put("totalList",totalList);
+        dataInfos.put("username",user);
+        String totalKey = user+"_maintain_data_total_nodeData";
+        redisTemplate.opsForValue().set(totalKey,totalList,30, TimeUnit.MINUTES);
         return new Result<>(true, StatusCode.OK, "数据对比成功!",dataInfos);
     }
 }
