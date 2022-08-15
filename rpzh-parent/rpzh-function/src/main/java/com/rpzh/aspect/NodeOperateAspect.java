@@ -12,6 +12,7 @@ import com.rpzh.handler.DataHandler;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
+import com.rpzh.vo.NodeVo;
 import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -129,8 +130,11 @@ public class NodeOperateAspect {
                     break;
                 case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    List<String> nodeIds =  nodeDao.findNodeIdByIds(nodeDto.getIds());
-                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"从"+nodeDto.getStack()+"解垛",username,nodeOperationDtos);
+                    List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
+                    for (int i = 0; i < nodeDtos1.size(); i++) {
+                        setValue(type,nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getStack()+"解垛",username,nodeOperationDtos);
+                    }
+
                     break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];

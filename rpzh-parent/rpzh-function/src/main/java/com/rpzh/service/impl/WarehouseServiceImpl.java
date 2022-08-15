@@ -1139,4 +1139,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
     }
 
+    @Override
+    public List<StackVo> findStackByRoute(String siteRoute) {
+        return warehouseDao.findStackByRoute(siteRoute);
+    }
+
 }

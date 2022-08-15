@@ -429,7 +429,6 @@ public class NodeController {
         return new Result<>(true, StatusCode.OK, "设备入垛成功");
     }
 
-//todo 需要前端传nodeIds
     @ApiOperation(
             value = "设备解垛"
     )

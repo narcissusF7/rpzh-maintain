@@ -953,4 +953,21 @@
  FROM tb_stack
  WHERE stack_no = #{stackNo} and id != #{id}
 </select>
+    <select id="findStackByRoute" resultType="com.rpzh.vo.StackVo">
+      SELECT
+      id as id,
+      stack_no as stackNo,
+      name_cn as nameCn,
+      created_time as createdTime,
+      created_user as createdUser,
+      last_updated_time as lastUpdatedTime,
+      last_updated_user as lastUpdatedUser,
+      area_id as areaId,
+      pid_route as pidRoute,
+      site_name as siteName,
+      stack_type as stackType,
+      remark as remark,principal_id as principalId , principal_name as principalName
+    FROM tb_stack
+    where pid_route like concat(#{siteRoute},"");
+    </select>
 </mapper>

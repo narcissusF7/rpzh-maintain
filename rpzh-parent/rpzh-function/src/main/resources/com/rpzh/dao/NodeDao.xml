@@ -217,6 +217,23 @@
         WHERE
         id = #{nodeDto.id}
     </update>
+    <update id="nodeOPS">
+        UPDATE tb_node
+        SET status = '4',
+        stack = '--',
+        stack_id =null ,
+        site_id =null ,
+        site_x = '-',
+        site_y = '-',
+        site_z = '-',
+        gather_site = '--',
+        site_route = '',
+        case_no = ''
+        WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
     <select id="findNodeIdCount" resultType="int">
         SELECT count(*)
         FROM tb_node
@@ -356,6 +373,7 @@
         </if>
         <if test="pidRoute!=null and pidRoute!=''">and pid_route =#{pidRoute}</if>
         <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
+        ORDER BY transfer_time
     </select>
 
     <select id="findNodeNowData" resultType="com.rpzh.vo.NodeDataVo">
@@ -672,8 +690,17 @@
     <select id="findNodeIds" resultType="java.lang.String">
         select node_id from tb_node where stack_id = #{stackId}
     </select>
-    <select id="findNodeIdByIds" resultType="java.lang.String">
-        select node_id nodeId from  tb_node where id in
 
+    <select id="findNodeVos" resultType="com.rpzh.dto.NodeDto">
+        select node_id as "nodeId",
+        gather_site as "gatherSite",
+        site_x as "siteX",
+        site_y as "siteY",
+        site_z as "siteZ"
+        from tb_node
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

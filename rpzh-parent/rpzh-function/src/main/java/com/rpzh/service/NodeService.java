@@ -143,4 +143,6 @@ public interface NodeService {
 
     Result findTask(String siteRoute, String nodeType);
     List<Map<String, Object>> findNodeAddress(String deviceId, String addressRoute);
+
+    int nodeOPS(NodeDto nodeDto);
 }

@@ -500,4 +500,9 @@ public class NodeServiceImpl implements NodeService {
     public List<Map<String, Object>> findNodeAddress(String deviceId, String addressRoute) {
         return nodeDao.findNodeAddress(deviceId, addressRoute);
     }
+
+    @Override
+    public int nodeOPS(NodeDto nodeDto) {
+        return nodeDao.nodeOPS(nodeDto.getIds());
+    }
 }

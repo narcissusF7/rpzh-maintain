@@ -488,4 +488,6 @@ public interface WarehouseDao {
      * @return
      */
     int findStackNo(@Param("stackNo")String stackNo, @Param("id")Integer id);
+
+    List<StackVo> findStackByRoute(@Param("siteRoute") String siteRoute);
 }

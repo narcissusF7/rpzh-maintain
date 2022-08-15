@@ -20,6 +20,7 @@ import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
 import com.rpzh.vo.PestDataVo;
+import com.rpzh.vo.StackVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -255,7 +256,7 @@ public class AppMonitoringCenterController {
     @ApiImplicitParam(
             name = "data",
             value = "JSON字符串,可以包含多个对象 每个对象包含" +
-                    "id（设备主键id 必传）,xyz（根据情况填写）,siteId（位置id 垛内设备必传）,caseNo（箱号）,pid_route(必传)",
+                    "id（设备主键id 必传）,xyz（根据情况填写）,siteId（位置id 垛内设备必传）,caseNo（箱号）,pid_route(必传)，stack 位置名称，gather",
             dataType = "String"
     )
     @PostMapping("/enterStack")
@@ -345,5 +346,53 @@ public class AppMonitoringCenterController {
         }
 
         return new Result<>(true, StatusCode.OK, "设备入垛成功");
+    }
+
+    @ApiOperation(value = "设备解垛")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true),
+            @ApiImplicitParam(name = "nodeIds",value = "设备id集", dataType = "String",allowMultiple = true, required = true)
+    })
+    @PostMapping({"/unbindStack"})
+    public Result unbindStack(@ApiIgnore NodeDto nodeDto) {
+        Integer[] ids = nodeDto.getIds();
+        if (ToolUtil.isEmpty(ids)) {
+            return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
+        }
+        int updateFlag = nodeService.unbindStack(nodeDto);
+        return new Result<>(true, StatusCode.OK, "解垛成功");
+    }
+
+    @ApiOperation(value = "设备运维")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true),
+            @ApiImplicitParam(name = "nodeIds",value = "设备id集", dataType = "String",allowMultiple = true, required = true)
+    })
+    @PostMapping({"/nodeOPS"})
+    public Result nodeOPS(@ApiIgnore NodeDto nodeDto) {
+        Integer[] ids = nodeDto.getIds();
+        if (ToolUtil.isEmpty(ids)) {
+            return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
+        }
+        int updateFlag = nodeService.nodeOPS(nodeDto);
+        return new Result<>(true, StatusCode.OK, "解垛成功");
+    }
+
+    @ApiOperation(value = "查询指定位置下的垛位")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pidRoute",value = "位置路由", dataType = "String", required = true),
+            @ApiImplicitParam(name = "siteId",value = "所选的位置id", dataType = "String", required = true)
+    })
+    @PostMapping({"/findStacks"})
+    public Result<List<StackVo>> findStacks(String pidRoute, String siteId) {
+        if (ToolUtil.isEmpty(pidRoute)) {
+            return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
+        }
+        if (ToolUtil.isEmpty(siteId)) {
+            return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
+        }
+        String siteRoute = pidRoute+",[0"+pidRoute.split(",").length+":"+siteId+"]";
+        List<StackVo> list= warehouseService.findStackByRoute(siteRoute);
+        return new Result<>(true, StatusCode.OK, "查询成功",list);
     }
 }

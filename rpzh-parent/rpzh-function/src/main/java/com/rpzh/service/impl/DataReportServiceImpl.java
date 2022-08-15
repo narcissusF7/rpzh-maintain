@@ -614,51 +614,48 @@ public class DataReportServiceImpl implements DataReportService {
 
         DecimalFormat df = new DecimalFormat("#.00");
         if (list.size()>0){
-            for (int i = 0; i < list.size(); i++) {
-
-                easyPoiUtil.t = list.get(i);
-                switch (comparisonType){
-                    case "1":
-                        Double avgCoreTemp = list.get(i).getAvgCoreTemp();
-                        Double avgTemp = list.get(i).getAvgTemp();
-                        if (ToolUtil.isNotEmpty(avgCoreTemp)&&ToolUtil.isNotEmpty(avgTemp)){
-                            String s = String.format("%.2f", list.get(i).getAvgCoreTemp() - list.get(i).getAvgTemp());
-                            list.get(i).setTempReduce(Double.parseDouble(s));
-                        }
-                        try {
-                            easyPoiUtil.hihdColumn("avgOxygen", true);
-                            easyPoiUtil.hihdColumn("maxOxygen", true);
-                            easyPoiUtil.hihdColumn("minOxygen", true);
-                        } catch (Exception e) {
-                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "2":
-                        try {
-                            easyPoiUtil.hihdColumn("avgCoreTemp", true);
-                            easyPoiUtil.hihdColumn("maxCoreTemp", true);
-                            easyPoiUtil.hihdColumn("minCoreTemp", true);
-                            easyPoiUtil.hihdColumn("tempReduce", true);
-                        } catch (Exception e) {
-                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "3":
-                        try {
-                            easyPoiUtil.hihdColumn("avgCoreTemp", true);
-                            easyPoiUtil.hihdColumn("maxCoreTemp", true);
-                            easyPoiUtil.hihdColumn("minCoreTemp", true);
-                            easyPoiUtil.hihdColumn("tempReduce", true);
-                        } catch (Exception e) {
-                            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                            e.printStackTrace();
-                        }
-                        break;
-                }
-
+            easyPoiUtil.t = list.get(0);
+            switch (comparisonType){
+                case "1":
+                    Double avgCoreTemp = list.get(0).getAvgCoreTemp();
+                    Double avgTemp = list.get(0).getAvgTemp();
+                    if (ToolUtil.isNotEmpty(avgCoreTemp)&&ToolUtil.isNotEmpty(avgTemp)){
+                        String s = String.format("%.2f", list.get(0).getAvgCoreTemp() - list.get(0).getAvgTemp());
+                        list.get(0).setTempReduce(Double.parseDouble(s));
+                    }
+                    try {
+                        easyPoiUtil.hihdColumn("avgOxygen", true);
+                        easyPoiUtil.hihdColumn("maxOxygen", true);
+                        easyPoiUtil.hihdColumn("minOxygen", true);
+                    } catch (Exception e) {
+                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                        e.printStackTrace();
+                    }
+                    break;
+                case "2":
+                    try {
+                        easyPoiUtil.hihdColumn("avgCoreTemp", true);
+                        easyPoiUtil.hihdColumn("maxCoreTemp", true);
+                        easyPoiUtil.hihdColumn("minCoreTemp", true);
+                        easyPoiUtil.hihdColumn("tempReduce", true);
+                    } catch (Exception e) {
+                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                        e.printStackTrace();
+                    }
+                    break;
+                case "3":
+                    try {
+                        easyPoiUtil.hihdColumn("avgCoreTemp", true);
+                        easyPoiUtil.hihdColumn("maxCoreTemp", true);
+                        easyPoiUtil.hihdColumn("minCoreTemp", true);
+                        easyPoiUtil.hihdColumn("tempReduce", true);
+                    } catch (Exception e) {
+                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+                        e.printStackTrace();
+                    }
+                    break;
             }
+
         }
 
         EasyPoiUtil.exportExcel(list,title,title+".xls",NodeExportData.class,title+".xls",response);
