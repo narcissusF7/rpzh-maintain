@@ -226,8 +226,7 @@ public class AppMonitoringCenterController {
             @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer"),
             @ApiImplicitParam(name = "siteType", value = "位置类型 04仓间05垛位", dataType = "String"),
             @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer"),
-//            @ApiImplicitParam(name = "sortCondition", value = "排序规则 0 位置排序 1 预警排序", dataType = "Integer")
+            @ApiImplicitParam(name = "size", value = "每页长度", dataType = "Integer")
     })
     @PostMapping("/findPestDataHistory")
     public Result<List<PestDataVo>>  findPestDataHistory(@ApiIgnore MonitorCondition monitorCondition){

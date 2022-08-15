@@ -408,7 +408,7 @@
 
     <insert id="insertNodeHistory">
         insert into ${tableName} (
-        <if test="nodeData.id!=null and nodeData.id!=''">id,</if>
+        id,
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">node_id,</if>
         <if test="nodeData.type!=null and nodeData.type!=''">type,</if>
         <if test="nodeData.frequency!=null and nodeData.frequency!=''">frequency,</if>
@@ -432,7 +432,7 @@
         <if test="nodeData.materialCode!=null and nodeData.materialCode!=''">material_code,</if>
         createdTime
         ) values (
-        <if test="nodeData.id!=null and nodeData.id!=''">#{id},</if>
+        #{id},
         <if test="nodeData.nodeId!=null and nodeData.nodeId!=''">#{nodeData.nodeId},</if>
         <if test="nodeData.type!=null and nodeData.type!=''">#{nodeData.type},</if>
         <if test="nodeData.frequency!=null and nodeData.frequency!=''">#{nodeData.frequency},</if>

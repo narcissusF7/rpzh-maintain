@@ -143,7 +143,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         //判断是否是第一页且包含温湿度设备  是的话需要添加天气数据
         if (pageNum==1&&Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)&&NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())){
             pageSize++;
-            list.add(findNowWeather());
+            WeatherDataVo nowWeather = findNowWeather();
+            nowWeather.setHumiture(nowWeather.getHumidity());
+            list.add(nowWeather);
         }
         list.addAll(collect);
         Page<NodeDataVo> page = ManuallyPageUtil.manuallyPage(list, pageNum, pageSize);
