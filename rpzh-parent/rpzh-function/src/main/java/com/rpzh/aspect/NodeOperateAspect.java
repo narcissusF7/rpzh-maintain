@@ -69,9 +69,7 @@ public class NodeOperateAspect {
                 type =url.split("/maintainPlan/")[1];
             }
 
-
             Object[] args = pjp.getArgs();
-
 
             //获取用户信息
             Map<String, String> userInfo = TokenDecode.getUserInfo();
