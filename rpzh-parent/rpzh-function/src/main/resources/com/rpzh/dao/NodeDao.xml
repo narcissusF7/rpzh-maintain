@@ -202,13 +202,13 @@
     </select>
     <update id="enterStack">
         UPDATE tb_node SET
-        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
+        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},gather_site = #{nodeDto.stack},</if>
         <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id = #{nodeDto.stackId},</if>
         <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
         <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
         <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
         <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
-        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
+        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">stack = #{nodeDto.gatherSite},gather_site = #{nodeDto.gatherSite},</if>
         <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
         <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
         <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
@@ -240,12 +240,14 @@
         WHERE node_id = #{nodeId}
     </select>
     <insert id="exportNode">
-        INSERT INTO tb_node
+        INSERT ALL
+        <foreach collection="nodeVoList" item="nodeVo">
+        INTO tb_node
         (node_id,node_type,created_time)
         VALUES
-        <foreach collection="nodeVoList" item="nodeVo" separator=",">
             (#{nodeVo.nodeId},#{nodeVo.nodeType},sysdate)
         </foreach>
+        select 1 from dual
     </insert>
 
     <select id="findNodeType" resultType="java.lang.String">
@@ -694,6 +696,7 @@
     <select id="findNodeVos" resultType="com.rpzh.dto.NodeDto">
         select node_id as "nodeId",
         gather_site as "gatherSite",
+        node_type as "nodeType",
         site_x as "siteX",
         site_y as "siteY",
         site_z as "siteZ"

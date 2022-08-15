@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.NodeOperationDao;
 import com.rpzh.dao.TaskManagementDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
@@ -20,6 +21,7 @@ import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
+import com.rpzh.service.NodeOperationService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.TokenDecode;
@@ -53,6 +55,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     RedisUtil redisUtil;
+
+    @Autowired
+    NodeOperationDao operationDao;
 
     @Autowired
     TaskManagementDao taskManagementDao;
@@ -176,6 +181,7 @@ public class NodeServiceImpl implements NodeService {
         nodeDto.setLastUpdatedUser(username);
         //插入设备替换日志
         int insertFlag = nodeDao.insertReplaceNodeIdLog(nodeDto);
+        operationDao.updateNodeId(nodeDto);
         if (insertFlag>0){
             return nodeDao.replaceNodeId(nodeDto);
         }
@@ -264,6 +270,7 @@ public class NodeServiceImpl implements NodeService {
         String dateTime = DateUtil.dateNew(new Date()).toString();
         //存放数据
         List<NodeVo> nodeVoList = new ArrayList<>();
+        Set<String> set = new HashSet<>();
         for (int i = 0; i < nodeDate.size(); i++) {
             NodeVo nodeVo = new NodeVo();
             //记录行数,用于返回
@@ -275,7 +282,14 @@ public class NodeServiceImpl implements NodeService {
             if (ToolUtil.isEmpty(nodeId)){
                 return new Result(false, StatusCode.ERROR, "第" + row + "行设备id不能为空");
             }else {
-                nodeVo.setNodeId(nodeId);
+                boolean flag = set.add(nodeId);
+                //如果重复 就跳过当前循环
+                if (flag){
+                    nodeVo.setNodeId(nodeId);
+                }else {
+                    continue;
+                }
+
             }
             //判断设备是否已经存在
             int nodeIdCount = nodeDao.findNodeIdCount(nodeId);

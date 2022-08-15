@@ -1,5 +1,6 @@
 package com.rpzh.dao;
 
+import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.vo.NodeOperationVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -12,4 +13,6 @@ public interface NodeOperationDao {
     int bulkInsert(@Param("nodeOperationDtos") List<NodeOperationDto> var1);
 
     List<NodeOperationVo> selectNodeOperation(@Param("nodeOperationDto") NodeOperationDto var1);
+
+    int updateNodeId(@Param("nodeDto") NodeDto nodeDto);
 }

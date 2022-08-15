@@ -34,6 +34,9 @@
         </foreach>
         SELECT 1 FROM DUAL
     </insert>
+    <update id="updateNodeId">
+        update tb_node_operation_history set  node_id = #{nodeDto.afterNodeId}  where node_id = #{nodeDto.nodeId}
+    </update>
     <select id="selectNodeOperation" resultType="com.rpzh.vo.NodeOperationVo">
         select
         node_id as nodeId,

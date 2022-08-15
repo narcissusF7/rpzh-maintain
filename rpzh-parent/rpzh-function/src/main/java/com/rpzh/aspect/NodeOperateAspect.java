@@ -112,7 +112,9 @@ public class NodeOperateAspect {
                     break;
                 case NodeConstant.REPLACE_NODE_OPERATE_NUMBER:
                     nodeDto =(NodeDto) args[0];
-                    setValue(type,nodeDto,"设备"+nodeDto.getNodeId() +"被设备"+nodeDto.getAfterNodeId()+"替换",username,nodeOperationDtos);
+                    String nodeId = nodeDto.getNodeId();
+                    nodeDto.setNodeId(nodeDto.getAfterNodeId());
+                    setValue(type,nodeDto,"设备"+nodeId +"被设备"+nodeDto.getAfterNodeId()+"替换",username,nodeOperationDtos);
                     break;
                 case NodeConstant.ENTER_STACK_NODE_OPERATE_NUMBER:
 
@@ -132,7 +134,7 @@ public class NodeOperateAspect {
                     nodeDto =(NodeDto) args[0];
                     List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
                     for (int i = 0; i < nodeDtos1.size(); i++) {
-                        setValue(type,nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getStack()+"解垛",username,nodeOperationDtos);
+                        setValue(type,nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getGatherSite()+"解垛",username,nodeOperationDtos);
                     }
 
                     break;

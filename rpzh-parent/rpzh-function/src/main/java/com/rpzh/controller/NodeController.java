@@ -156,7 +156,7 @@ public class NodeController {
             return new Result<>(false, StatusCode.ERROR, "节点id已经存在,不允许修改");
         }
         Integer status = nodeService.findNodeStatus(id);
-        if (status ==0){
+        if ("0".equals(status)){
             return new Result<>(false, StatusCode.ERROR, "解垛设备不允许修改");
         }
         if (NodeTypeEnum.TEMPERATURE_CORE_CHIP_NODE.getCode().equals(nodeDto.getNodeType())){
