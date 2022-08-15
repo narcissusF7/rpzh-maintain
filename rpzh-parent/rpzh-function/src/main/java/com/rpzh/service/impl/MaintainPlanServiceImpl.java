@@ -187,10 +187,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      * 根据预警规则名称预警信息
      * */
     @Override
-    public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName) {
+    public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName,String phases) {
         //获取养护阶段
         String user = TokenDecode.getUserInfo().get("username");
-        String phases = redisTemplate.opsForValue().get(user + "phases").toString();
         //根据预警规则名称获取预警模板数值
         AlarmValueSettingVo alarmSettingTemplate = alarmSettingTemplateDao.findAlarmSettingTemplate(earlyWarningRuleName,phases);
         if(ToolUtil.isEmpty(alarmSettingTemplate)){
@@ -397,8 +396,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
         alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
-        String createUser = TokenDecode.getUserInfo().get("username");
-        redisTemplate.opsForValue().set(createUser+"phases",maintainPlanVo.getPhases());
         return maintainPlanVo;
     }
 
@@ -945,8 +942,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
         List<String> materialCodes = alarmValueSettingDto.getMaterialCodes();
-        String createUser = TokenDecode.getUserInfo().get("username");
-        redisTemplate.opsForValue().set(createUser+"phases",alarmValueSettingDto.getPhases());
         for (String materialCode : materialCodes) {
             alarmValueSettingDto.setMaterialCode(materialCode);
             alarmValueSettingVo = alarmValueSettingDao.findByMaterialCode(alarmValueSettingDto);

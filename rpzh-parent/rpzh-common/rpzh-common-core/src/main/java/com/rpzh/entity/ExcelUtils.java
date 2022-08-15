@@ -13,7 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.apache.poi.ss.util.CellRangeAddress;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -118,6 +118,93 @@ public class ExcelUtils {
         cellStyle2.setAlignment(HorizontalAlignment.CENTER);
         for (int i = 0, isize = body.size(); i < isize; i++) {
             row = sheet.createRow(i + 1);
+            JSONObject exportData = body.getJSONObject(i);
+
+            for (int j = 0, jsize = fileds.size(); j < jsize; j++) {
+                cell = row.createCell(j);
+                String cellVal = "";
+                if (fileds.get(j).indexOf(".") > 0) {
+                    String[] kes = fileds.get(j).split("\\.");
+                    JSONObject childData = new JSONObject();
+                    for (int k = 0; k < kes.length; k++) {
+                        if (null == childData) {
+                            cellVal = "";
+                            continue;
+                        }
+                        if ((k + 1) == kes.length) {
+                            if (childData.get(kes[k]) instanceof Date) {
+                                cellVal = DateUtil.format(childData.getDate(kes[k]), "yyyy-MM-dd HH:mm:ss");
+                            } else {
+                                cellVal = childData.getString(kes[k]);
+                            }
+                        } else {
+                            childData = exportData.getJSONObject(kes[k]);
+                        }
+                    }
+                } else {
+                    if (exportData.get(fileds.get(j)) instanceof Date) {
+                        cellVal = DateUtil.format((Date) exportData.get(fileds.get(j)), "yyyy-MM-dd HH:mm:ss");
+                    } else {
+                        cellVal = ToolUtil.toStr(exportData.get(fileds.get(j)));
+                    }
+                }
+                cell.setCellValue(cellVal);
+                cell.setCellStyle(cellStyle2);
+            }
+        }
+        for (int i = 0, isize = head.size(); i < isize; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        return workbook;
+    }
+
+    /**
+     * 创建excel合并单元格(将备注填入到单元格中)并填入数据
+     */
+    public static HSSFWorkbook expExcel(String sheetName, List<String> head, List<String> fileds, JSONArray body,String remark) {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet(sheetName);
+        HSSFCellStyle cellStyle = workbook.createCellStyle();
+        setBorderStyle(cellStyle, BorderStyle.THIN);
+        cellStyle.setFont(setFontStyle(workbook, "黑体", (short) 14));
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        int lastRow=0;
+        if(ToolUtil.isNotEmpty(remark)) {
+            if (head.size() <= 2) {
+                lastRow = 4;
+            } else if (head.size() > 2 && head.size() <= 4) {
+                lastRow = 3;
+            } else if (head.size() > 4 && head.size() <= 6) {
+                lastRow = 2;
+            } else if (head.size() > 6 && head.size() <= 8) {
+                lastRow = 1;
+            } else {
+                lastRow = 0;
+            }
+            CellRangeAddress callRangeAddress = new CellRangeAddress(0, lastRow, 0, head.size() - 1);//起始行,结束行,起始列,结束列
+            sheet.addMergedRegion(callRangeAddress);
+            HSSFRow row1 = sheet.createRow(0);
+            HSSFCell cell1 = row1.createCell(0);
+            cell1.setCellValue(remark);
+            cell1.setCellStyle(cellStyle);
+        }
+        HSSFRow row = sheet.createRow(lastRow+1);
+        HSSFCell cell = null;
+
+
+        for (int i = 0; i < head.size(); i++) {
+            cell = row.createCell(i);
+            cell.setCellValue(head.get(i));
+            cell.setCellStyle(cellStyle);
+        }
+
+        HSSFCellStyle cellStyle2 = workbook.createCellStyle();
+        setBorderStyle(cellStyle2, BorderStyle.THIN);
+        cellStyle2.setFont(setFontStyle(workbook, "宋体", (short) 12));
+        cellStyle2.setAlignment(HorizontalAlignment.CENTER);
+        for (int i = 0, isize = body.size(); i < isize; i++) {
+            int a = i+1+lastRow;
+            row = sheet.createRow(a + 1);
             JSONObject exportData = body.getJSONObject(i);
 
             for (int j = 0, jsize = fileds.size(); j < jsize; j++) {

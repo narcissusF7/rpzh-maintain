@@ -86,8 +86,8 @@
         where 1=1
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat(concat('%',#{wareAreaAlarmSettingDto.pidRoute}),'%')</if>
         <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user = #{wareAreaAlarmSettingDto.createUser}</if>
-        <if test="wareAreaAlarmSettingDto.startTime !=null and wareAreaAlarmSettingDto.startTime != ''">and updated_time >= #{wareAreaAlarmSettingDto.startTime}</if>
-        <if test="wareAreaAlarmSettingDto.endTime !=null and wareAreaAlarmSettingDto.endTime != ''">and updated_time &lt;= #{wareAreaAlarmSettingDto.endTime}</if>
+        <if test="wareAreaAlarmSettingDto.startTime !=null and wareAreaAlarmSettingDto.startTime != ''">and updated_time >= to_date(#{wareAreaAlarmSettingDto.startTime},'yyyy-mm-dd hh24:mi:ss')</if>
+        <if test="wareAreaAlarmSettingDto.endTime !=null and wareAreaAlarmSettingDto.endTime != ''">and updated_time &lt;= to_date(#{wareAreaAlarmSettingDto.endTime},'yyyy-mm-dd hh24:mi:ss')</if>
     </select>
     <select id="findWareAreaAlarmSettingById" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
         select

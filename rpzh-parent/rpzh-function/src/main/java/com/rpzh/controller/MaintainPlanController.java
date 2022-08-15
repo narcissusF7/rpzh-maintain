@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import com.rpzh.util.TokenDecode;
 
 /**
  * @author wbl
@@ -58,10 +59,11 @@ public class MaintainPlanController {
     @PostMapping("/findAlarmSettingTemplate")
     @ApiOperation(value = "根据预警规则名称预警信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String")
+            @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "phases", value = "养护阶段", required = true,dataType = "String")
     })
-    public Result<AlarmValueSettingVo> findAlarmSettingTemplate(String earlyWarningRuleName){
-        AlarmValueSettingVo alarmSettingTemplate = maintainPlanService.findAlarmSettingTemplate(earlyWarningRuleName);
+    public Result<AlarmValueSettingVo> findAlarmSettingTemplate(String earlyWarningRuleName,String phases){
+        AlarmValueSettingVo alarmSettingTemplate = maintainPlanService.findAlarmSettingTemplate(earlyWarningRuleName,phases);
         return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplate);
     }
 
@@ -539,8 +541,6 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",map);
     }
 
-    @Resource
-    private RedisTemplate redisTemplate;
     @GetMapping("/export")
     @ApiOperation(value = "导出养护数量")
     @ApiImplicitParams({
@@ -551,9 +551,17 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "ids", value = "列表中的id", required = true, dataType = "List")
     })
     public void export(HttpServletResponse response,MaintainCountDto maintainCountDto) {
+        String username = TokenDecode.getUserInfo().get("username");
+        System.out.println(username);
         List<String> ids = maintainCountDto.getIds();
         if(ToolUtil.isEmpty(ids)){
             return;
+        }
+        if("undefined".equals(maintainCountDto.getStartTime())){
+            maintainCountDto.setStartTime(null);
+        }
+        if("undefined".equals(maintainCountDto.getEndTime())){
+            maintainCountDto.setEndTime(null);
         }
         String materialCode = maintainCountDto.getMaterialCode();
         String maintenceStyle = maintainCountDto.getMaintenceStyle();

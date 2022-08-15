@@ -1,21 +1,31 @@
 package com.rpzh.controller;
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dto.DataContrastDto;
 import com.rpzh.dto.NodeDto;
+import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.DataContrastService;
 import io.swagger.annotations.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.*;
+
 /**
  * @Author: zyq
  * @Date: 2022/06/23/13:32
@@ -60,4 +70,41 @@ public class DataContrastController {
         return dataContrastService.getNodeDateList(dataContrasts,gatherType,startTime,endTime,beginTime,finishTime);
     }
 
+    @Resource
+    private RedisTemplate redisTemplate;
+    @GetMapping("export")
+    @ApiOperation(value = "数据对比的导出")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "remark", value = "备注", required = false, dataType = "String"),
+            @ApiImplicitParam(name = "username", value = "用户名", required = false, dataType = "String")
+    })
+    public void export(HttpServletResponse response,@RequestParam("remark") String remark,@RequestParam("username") String username){
+        List<String> head = (List<String>) redisTemplate.opsForValue().get(username+"_maintain_data_total_nodeName");
+        String totalKey = username+"_maintain_data_total_nodeData";
+        //数据集合,这是导出的数据
+        List<Map<String, Object>> data = new ArrayList<>();
+        List<Map> maps = (List<Map>) redisTemplate.opsForValue().get(username + "_maintain_data_total_nodeData");
+        List<String> fileds = new ArrayList<>();
+        for (int i = 0; i < maps.size(); i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("day",maps.get(i).get("day"));
+            if(i==0){
+                fileds.add("day");
+            }
+            List data1 = (List) maps.get(i).get("data");
+            for (int j = 0; j < data1.size(); j++) {
+                map.put("node"+(j+1), data1.get(j));
+                if(i==0){
+                    fileds.add("node"+(j+1));
+                }
+            }
+            data.add(map);
+        }
+        //此处时间用于保证导出时文件名的唯一
+        String dateNow = DateUtil.format(new Date(), "yyyyMMddHHmmss");
+        //这个是导出时的文件名字
+        String fileName = "数据对比导出数据" + dateNow;
+        HSSFWorkbook wb = ExcelUtils.expExcel(fileName, head, fileds, JSONArray.parseArray(JSONObject.toJSONString(data)),"备注:"+remark);
+        ExcelUtils.outFile(wb, response, fileName);
+    }
 }
