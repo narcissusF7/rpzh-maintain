@@ -7,6 +7,7 @@ import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.Result;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeOperationEnum;
 import com.rpzh.handler.DataHandler;
 import com.rpzh.service.NodeOperationService;
@@ -178,9 +179,22 @@ public class NodeOperateAspect {
     private void setValue(String type,NodeDto nodeDto,String detail,String username,List<NodeOperationDto>nodeOperationDtos){
         NodeOperationDto nodeOperationDto = new NodeOperationDto();
         nodeOperationDto.setOperationType(NodeOperationEnum.getTypeNum(type));
+        //移除缓存中的设备数据
         if (!StringUtils.isEmpty(nodeDto.getNodeId())){
             nodeOperationDto.setNodeId(nodeDto.getNodeId());
             redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeDto.getNodeId());
+        }else if (ToolUtil.isNotEmpty(nodeDto.getIds())){
+
+            List<String> nodeIds = nodeDao.findNodeIdByIds(nodeDto.getIds());
+            for (int i = 0; i <nodeIds.size() ; i++) {
+                redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
+            }
+        }else if (ToolUtil.isNotEmpty(nodeDto.getId())){
+            Integer[] ids  = {nodeDto.getId()};
+            List<String> nodeIds = nodeDao.findNodeIdByIds(ids);
+            for (int i = 0; i <nodeIds.size() ; i++) {
+                redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
+            }
         }
         if (nodeDto.getSiteId()!=null){
             nodeOperationDto.setSiteId(nodeDto.getSiteId());

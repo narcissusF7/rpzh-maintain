@@ -255,9 +255,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
             } else {
                 if (NodeConstant.NODE_STACK.equals(siteType)) {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level,integerStringMap.get("siteRoute"));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level,integerStringMap.get(4));
                 } else {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"),integerStringMap.get("siteRoute"));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"),integerStringMap.get(4));
                 }
             }
             //将当前行数据存到list中

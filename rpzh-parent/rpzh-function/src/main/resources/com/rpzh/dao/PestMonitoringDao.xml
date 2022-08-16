@@ -162,7 +162,7 @@
     </insert>
     <insert id="exportPestData">
         INSERT ALL
-        <foreach collection="pestDataList" item="pestData" index="index" separator=" ">
+        <foreach collection="pestDataList" item="pestData" index="index">
           INTO tb_pest_data_history
         (pest_board_id,gather_site,gather_time,beetle_count,alert_level,site_route
         <if test="siteType=='04'">

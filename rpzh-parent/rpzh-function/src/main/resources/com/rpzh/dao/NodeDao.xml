@@ -706,4 +706,10 @@
             #{id}
         </foreach>
     </select>
+    <select id="findNodeIdByIds" resultType="java.lang.String">
+        select node_id "nodeId" from tb_node where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
