@@ -398,6 +398,7 @@
         where node_id = #{nodeId} limit 1
     </select>
     <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
+		select * from (
         SELECT tnode.id                             id,
                tnode.node_id                        nodeId,
                tnode.node_type                      nodeType,
@@ -421,8 +422,7 @@
         FROM tb_node tnode
                  left join tb_material tmate
                            on tnode.stack_id = tmate.stack_id
-        where node_id = #{nodeId}
-          AND ROWNUM = 1
+        where node_id = #{nodeId})where ROWNUM = 1
     </select>
 
 

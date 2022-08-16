@@ -375,7 +375,7 @@ public class AppMonitoringCenterController {
             return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
         }
         int updateFlag = nodeService.nodeOPS(nodeDto);
-        return new Result<>(true, StatusCode.OK, "解垛成功");
+        return new Result<>(true, StatusCode.OK, "运维成功");
     }
 
     @ApiOperation(value = "查询指定位置下的垛位")
