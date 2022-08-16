@@ -194,17 +194,17 @@ public interface NodeDao {
     List<NodeData> findNodeData(@Param("nodeId") String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 
     @DS("clickhouse")
-    List<NodeData> findDataNode(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoutes") List<String> pidRoutes);
+    List<NodeData> findDataNode(@Param("tableName") String tableName, @Param("column") String column, @Param("siteRoutes") List<String> pidRoutes,@Param("size")Integer size);
 
     @DS("clickhouse")
-    List<NodeData> findDataContrast(@Param("tableName") String tableName, @Param("column") String column, @Param("pidRoutes") List<String> pidRoutes);
+    List<NodeData> findDataContrast(@Param("tableName") String tableName, @Param("column") String column, @Param("siteRoutes") List<String> pidRoutes,@Param("size")Integer size);
 
     List<Map<String, String>> findEnterStack();
 
     List<NodeVo> findAirConditioner(@Param("monitorCondition") MonitorCondition monitorCondition);
 
     @DS("clickhouse")
-    List<NodeData> findDataOxygen(@Param("pidRoutes") List<String> pidRoutes);
+    List<NodeData> findDataOxygen(@Param("siteRoutes") List<String> siteRoutes,@Param("size")Integer size);
 
     @DS("clickhouse")
     List<Map<String, Object>> findSelectedNode(@Param("nodeId") String nodeId, @Param("startTime") Date startTime, @Param("endTime") Date endTime,

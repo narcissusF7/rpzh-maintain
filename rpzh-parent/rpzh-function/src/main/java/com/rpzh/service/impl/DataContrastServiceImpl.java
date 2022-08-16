@@ -61,15 +61,17 @@ public class DataContrastServiceImpl implements DataContrastService {
         //设备名称
         String nodeName = "";
         //满足条件的所有位置路由
-        List<String> siteRoutes = null;
+        List<String> siteRoutes = new ArrayList<>();
         //物料代码不为空
         if(ToolUtil.isNotEmpty(materialCode)) {
             //根据物料代码查询位置路由(完整路由)
-            siteRoutes = new ArrayList<>();
             siteRoutes = maintainPlanDao.findSite(materialCode);
+            if(siteRoutes.size()==0){
+                return new Result<>(true, StatusCode.OK, "查询数据对比中的条件选择设备成功!",new HashMap<>());
+            }
         }
         //前端传入的位置路由和满足条件的所有位置路由都不为空
-        if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isNotEmpty(siteRoutes)) {
+        if(StringUtil.isNotEmpty(siteRoute) && siteRoutes.size()>0) {
             int size = siteRoutes.size();
             for (int i = 0; i < size; i++) {
                 //满足条件的所有位置路由不包含前端传入的位置路由
@@ -80,7 +82,7 @@ public class DataContrastServiceImpl implements DataContrastService {
             }
         }
         //前端传入的位置路由不为空,满足条件的所有位置路由为空
-        if(StringUtil.isNotEmpty(siteRoute) && ToolUtil.isEmpty(siteRoutes)) {
+        if(StringUtil.isNotEmpty(siteRoute) && siteRoutes.size()==0) {
             int size = siteRoute.split(",").length;
             siteRoutes = new ArrayList<>();
             if(size<5){
@@ -99,28 +101,28 @@ public class DataContrastServiceImpl implements DataContrastService {
         //contrastType: 01:设备  02:位置
         if("01".equals(nodeType) && "01".equals(contrastType)){
             nodeName = "氧气设备";
-            data = nodeDao.findDataOxygen(siteRoutes);
+            data = nodeDao.findDataOxygen(siteRoutes,siteRoutes.size());
         }else if("02".equals(nodeType) && "01".equals(contrastType)){
             nodeName = "垛内包芯温度设备";
-            data = nodeDao.findDataNode("tb_node_temp_core_chip_history", "temp", siteRoutes);
+            data = nodeDao.findDataNode("tb_node_temp_core_chip_history", "temp", siteRoutes,siteRoutes.size());
         }else if("03".equals(nodeType) && "01".equals(contrastType)){
             nodeName = "垛内环境温湿度设备-温度";
-            data = nodeDao.findDataNode("tb_node_env_history", "temp", siteRoutes);
+            data = nodeDao.findDataNode("tb_node_env_history", "temp", siteRoutes,siteRoutes.size());
         }else if("04".equals(nodeType) && "01".equals(contrastType)){
             nodeName = "垛内环境温湿度设备-湿度";
-            data = nodeDao.findDataNode("tb_node_env_history", "humiture", siteRoutes);
+            data = nodeDao.findDataNode("tb_node_env_history", "humiture", siteRoutes,siteRoutes.size());
         }else if("05".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "垛内平均包芯温度";
-            data = nodeDao.findDataContrast("tb_node_temp_core_chip_history", "avg(temp) as temp", siteRoutes);
+            data = nodeDao.findDataContrast("tb_node_temp_core_chip_history", "avg(temp) as temp", siteRoutes,siteRoutes.size());
         } else if("06".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均氧气";
-            data = nodeDao.findDataContrast("tb_node_o2_history", "avg(oxygen) as oxygen", siteRoutes);
+            data = nodeDao.findDataContrast("tb_node_o2_history", "avg(oxygen) as oxygen", siteRoutes,siteRoutes.size());
         }else if("07".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均温度";
-            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(temp) as temp", siteRoutes);
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(temp) as temp", siteRoutes,siteRoutes.size());
         }else if("08".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均湿度";
-            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(humiture) as humiture", siteRoutes);
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(humiture) as humiture", siteRoutes,siteRoutes.size());
         }else {
             return new Result(false, StatusCode.ERROR, "设备类型出错了!");
         }
@@ -186,12 +188,27 @@ public class DataContrastServiceImpl implements DataContrastService {
     @Override
     public Result getNodeDateList(String dataContrasts, String gatherType, Date startTime,Date endTime,Date beginTime,Date finishTime) {
         String user = TokenDecode.getUserInfo().get("username");
+        String gatherType_key = user+"_maintain_data_gatherType";
+        Object o = redisTemplate.opsForValue().get(gatherType_key);
         //dataContrasts为[],将之前存入到redis中的数据清空
         Set<String> keys = redisTemplate.keys(user+"_maintain_data" + "*");
+        if(ToolUtil.isNotEmpty(o)){
+            if(!gatherType.equals(o.toString())){
+                redisTemplate.delete(keys);
+                redisTemplate.opsForValue().set(gatherType_key,gatherType);
+            }
+        }else{
+            redisTemplate.opsForValue().set(gatherType_key,gatherType);
+        }
+        Map dataInfos = new HashMap();
+        dataInfos.put("username",user);
         List<DataContrastDto> dataContrastDtos = JSONObject.parseArray(dataContrasts, DataContrastDto.class);
         if(dataContrastDtos.size()==0){
             redisTemplate.delete(keys);
-            return new Result(true, StatusCode.OK, "",new ArrayList<>());
+            dataInfos.put("gatherList",new ArrayList<>());
+            dataInfos.put("contrastList",new ArrayList<>());
+            dataInfos.put("totalList",new ArrayList<>());
+            return new Result(true, StatusCode.OK, "",dataInfos);
         }
         //时间类型出错
         if (!("1".equals(gatherType)) && !("2".equals(gatherType)) && !("3".equals(gatherType)) && !("4".equals(gatherType))) {
@@ -361,7 +378,6 @@ public class DataContrastServiceImpl implements DataContrastService {
             gatherList.add(t);
             totalList.add(t);
         });
-        Map dataInfos = new HashMap();
         dataInfos.put("gatherList",gatherList);
         if (ToolUtil.isNotEmpty(beginTime) && ToolUtil.isNotEmpty(finishTime)) {
             Set<String> contrastKeys = contrastInfos.get(0).keySet();
@@ -380,7 +396,6 @@ public class DataContrastServiceImpl implements DataContrastService {
         totalList.sort((v1, v2) -> v1.get("day").toString().compareTo(v2.get("day").toString()));
         dataInfos.put("contrastList",contrastList);
         dataInfos.put("totalList",totalList);
-        dataInfos.put("username",user);
         String totalKey = user+"_maintain_data_total_nodeData";
         redisTemplate.opsForValue().set(totalKey,totalList,30, TimeUnit.MINUTES);
         return new Result<>(true, StatusCode.OK, "数据对比成功!",dataInfos);

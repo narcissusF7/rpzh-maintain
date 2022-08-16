@@ -532,9 +532,9 @@
         select oxygen,node_id as nodeId,material_code as materialCode,pid_route as siteRoute from tb_node_o2_history
         where (transfer_time,node_id) in
         (select max(transfer_time),node_id from tb_node_o2_history where 1=1
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
+        <if test="size!=0">and pid_route in
+            <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
+                #{siteRoute}
             </foreach>
         </if>
         group by node_id)
@@ -543,9 +543,9 @@
         select ${column},node_id as nodeId,material_code as materialCode,pid_route as siteRoute from ${tableName} where
         (transfer_time,node_id) in
         (select max(transfer_time),node_id from ${tableName} where site_type = '05'
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
+        <if test="size!=0">and pid_route in
+            <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
+                #{siteRoute}
             </foreach>
         </if>
         group by node_id)
@@ -554,9 +554,9 @@
         select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as siteRoute from
         ${tableName} where (transfer_time,node_id) in
         (select max(transfer_time),node_id from ${tableName} where site_type = '04'
-        <if test="pidRoutes!=null">and pid_route in
-            <foreach collection="pidRoutes" item="pidRoute" open="(" separator="," close=")">
-                #{pidRoute}
+        <if test="size!=0">and pid_route in
+            <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
+                #{siteRoute}
             </foreach>
         </if>
         group by node_id) group by pid_route
