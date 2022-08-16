@@ -370,8 +370,8 @@ public class AppMonitoringCenterController {
     })
     @PostMapping({"/nodeOPS"})
     public Result nodeOPS(@ApiIgnore NodeDto nodeDto) {
-        Integer[] ids = nodeDto.getIds();
-        if (ToolUtil.isEmpty(ids)) {
+        String [] nodeIds = nodeDto.getNodeIds();
+        if (ToolUtil.isEmpty(nodeIds)) {
             return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
         }
         int updateFlag = nodeService.nodeOPS(nodeDto);

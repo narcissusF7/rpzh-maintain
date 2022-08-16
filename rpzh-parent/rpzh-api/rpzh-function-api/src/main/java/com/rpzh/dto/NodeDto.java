@@ -22,7 +22,7 @@ public class NodeDto {
     //设备id
     private String nodeId;
     //设备id集
-    private List<String> nodeIds;
+    private String[] nodeIds;
     //垛位id
     private Integer stackId;
     //垛位名称

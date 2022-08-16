@@ -229,9 +229,9 @@
         gather_site = '--',
         site_route = '',
         case_no = ''
-        WHERE id in
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
-            #{id}
+        WHERE node_id in
+        <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">
+            #{nodeId}
         </foreach>
     </update>
     <select id="findNodeIdCount" resultType="int">
