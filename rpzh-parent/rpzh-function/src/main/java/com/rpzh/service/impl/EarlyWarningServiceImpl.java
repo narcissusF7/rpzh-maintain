@@ -815,4 +815,38 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Map findAppWarningIndex(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("warningCount",earlyWarningDao.findAppCount());
+        List<Map> warningTypeCount = new ArrayList<>();
+        warningTypeCount.add(earlyWarningDao.findAppDeviceFault());
+        List<String> names = Arrays.asList("垛内虫数预警", "仓间甲虫预警", "垛内氧气预警","仓间氧气预警","垛内温度预警","仓间温度预警","垛内湿度预警",
+                "仓间湿度预警", "包芯温度预警", "平均包芯高于环境预警", "仓间粉螟预警", "平均包芯低于环境预警");
+        List<String> types = Arrays.asList("04","05","06","07","08","09","10","11","12","13","14","19");
+        for (int i = 0; i < types.size(); i++) {
+            Map appWarning = new HashMap();
+            String typeCount = earlyWarningDao.findAppWarning(types.get(i));
+            appWarning.put("warningType",types.get(i));
+            appWarning.put("warningName",names.get(i));
+            appWarning.put("warningTypeCount",typeCount);
+            warningTypeCount.add(appWarning);
+        }
+        map.put("warningTypeCount",warningTypeCount);
+        return map;
+    }
+
+    public Map findAppWarningInfoByWarningType(String warningType, String warningGrade){
+        Map<String, Object> map = new HashMap<>();
+        String appCount = earlyWarningDao.findAppCountByWarningType(warningType, warningGrade);
+        if(ToolUtil.isEmpty(appCount)){
+            appCount = "0";
+            map.put("count", appCount);
+            map.put("warningInfo",new ArrayList<>());
+            return map;
+        }
+        map.put("count", appCount);
+        return map;
+    }
 }

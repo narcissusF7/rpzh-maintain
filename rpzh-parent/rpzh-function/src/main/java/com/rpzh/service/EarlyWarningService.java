@@ -5,6 +5,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.vo.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: zyq
@@ -34,4 +35,7 @@ public interface EarlyWarningService {
 
     void warningSend(String number,String username,String siteRoute);
 
+    Map findAppWarningIndex();
+
+    Map findAppWarningInfoByWarningType(String warningType, String warningGrade);
 }
