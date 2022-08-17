@@ -253,4 +253,7 @@
                prewarning_value_three as  "upperThree"
         from tb_pest_monitor
     </select>
+    <select id="findCountByPestBoradId" resultType="java.lang.Integer">
+        select count(*) from tb_pest_board where pest_board_id =#{pestBoardId}
+    </select>
 </mapper>

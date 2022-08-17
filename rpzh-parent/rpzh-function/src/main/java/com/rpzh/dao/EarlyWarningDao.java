@@ -78,4 +78,6 @@ public interface EarlyWarningDao {
     List<String> findSiteRoute(@Param("warningGrade")String warningGrade);
 
     String findDeviceId(@Param("id") String id);
+
+    int findPestWarningCount(@Param("ids") Integer[] ids);
 }

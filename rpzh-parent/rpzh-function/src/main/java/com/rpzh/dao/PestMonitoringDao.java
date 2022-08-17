@@ -68,4 +68,5 @@ public interface PestMonitoringDao {
     EarlyWarningVo findPestMonitor();
 
 
+    int findCountByPestBoradId(@Param("pestBoardId") String pestBoardId);
 }

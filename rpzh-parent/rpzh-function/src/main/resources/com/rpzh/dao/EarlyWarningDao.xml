@@ -271,4 +271,8 @@
         <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>
         union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
+    <select id="findPestWarningCount" resultType="java.lang.Integer">
+        select count(*) from tb_early_warning where node_id in (select pest_board_id from tb_pest_board where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>)
+    </select>
 </mapper>

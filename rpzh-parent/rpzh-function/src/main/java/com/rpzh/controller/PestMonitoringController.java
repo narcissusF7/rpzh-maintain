@@ -3,6 +3,7 @@ package com.rpzh.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dto.PestBoardDto;
 import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
@@ -10,6 +11,7 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
+import com.rpzh.service.EarlyWarningService;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.PestBoardVo;
@@ -42,6 +44,9 @@ public class PestMonitoringController {
     @Autowired
     PestMonitoringService pestMonitoringService;
 
+    @Autowired
+    EarlyWarningDao earlyWarningDao;
+
     @ApiOperation("添加虫情板")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "pestBoardId", value = "虫情板Id", dataType = "String", required = true),
@@ -57,6 +62,10 @@ public class PestMonitoringController {
     public Result addPestBoard(@ApiIgnore PestBoardDto pestBoardDto){
         if (ToolUtil.isEmpty(pestBoardDto.getPestBoardId())) {
             return new Result<>(false, StatusCode.ERROR, "虫情板Id不能为空");
+        }
+        int count = pestMonitoringService.findCountByPestBoradId(pestBoardDto.getPestBoardId());
+        if (count>0){
+            return new Result<>(false, StatusCode.ERROR, "虫情点位id已存在");
         }
         if (ToolUtil.isEmpty(pestBoardDto.getSiteRoute())) {
             return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
@@ -76,6 +85,7 @@ public class PestMonitoringController {
         if (ToolUtil.isEmpty(pestBoardDto.getRfid())) {
             return new Result<>(false, StatusCode.ERROR, "rfid不能为空");
         }
+
         return pestMonitoringService.addPestBoard(pestBoardDto);
     }
     @ApiOperation("删除虫情板")
@@ -84,6 +94,10 @@ public class PestMonitoringController {
     public Result deletePestBoard(Integer [] ids){
         if (ToolUtil.isEmpty(ids)) {
             return new Result<>(false, StatusCode.ERROR, "id集不能为空");
+        }
+        int count = earlyWarningDao.findPestWarningCount(ids);
+        if (count>0){
+            return new Result(false, StatusCode.ERROR,"所选虫情点位存在未处理预警，删除失败");
         }
         pestMonitoringService.deletePestBoard(ids);
         return new Result(true, StatusCode.OK,"删除成功");

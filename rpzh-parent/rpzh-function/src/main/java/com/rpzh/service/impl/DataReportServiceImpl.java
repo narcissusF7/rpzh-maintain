@@ -583,6 +583,16 @@ public class DataReportServiceImpl implements DataReportService {
 
                 comparsionData(beginDate,endDate,list,coreTimeData,starckHumitureData,dateType);
 
+                if (list.size()>0){
+                    for (int i = 0; i < list.size(); i++) {
+                        Double avgCoreTemp = list.get(i).getAvgCoreTemp();
+                        Double avgTemp = list.get(i).getAvgTemp();
+                        if (ToolUtil.isNotEmpty(avgCoreTemp)&&ToolUtil.isNotEmpty(avgTemp)){
+                            String s = String.format("%.2f", list.get(i).getAvgCoreTemp() - list.get(i).getAvgTemp());
+                            list.get(i).setTempReduce(Double.parseDouble(s));
+                        }
+                    }
+                }
                 title ="垛内包芯温度与温湿度数据";
                 break;
 
@@ -612,17 +622,10 @@ public class DataReportServiceImpl implements DataReportService {
             default:
         }
 
-        DecimalFormat df = new DecimalFormat("#.00");
         if (list.size()>0){
             easyPoiUtil.t = list.get(0);
             switch (comparisonType){
                 case "1":
-                    Double avgCoreTemp = list.get(0).getAvgCoreTemp();
-                    Double avgTemp = list.get(0).getAvgTemp();
-                    if (ToolUtil.isNotEmpty(avgCoreTemp)&&ToolUtil.isNotEmpty(avgTemp)){
-                        String s = String.format("%.2f", list.get(0).getAvgCoreTemp() - list.get(0).getAvgTemp());
-                        list.get(0).setTempReduce(Double.parseDouble(s));
-                    }
                     try {
                         easyPoiUtil.hihdColumn("avgOxygen", true);
                         easyPoiUtil.hihdColumn("maxOxygen", true);

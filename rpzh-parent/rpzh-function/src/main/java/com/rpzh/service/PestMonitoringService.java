@@ -45,4 +45,5 @@ public interface PestMonitoringService {
 
     Map<String, Object> findPestWarningValue(String pestBoardId);
 
+    int findCountByPestBoradId(String pestBoardId);
 }

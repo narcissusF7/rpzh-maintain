@@ -1,6 +1,5 @@
 package com.rpzh.service.impl;
 
-import cn.afterturn.easypoi.cache.manager.IFileLoader;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -11,7 +10,6 @@ import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.GeneralSettingDao;
 import com.rpzh.dao.PestMonitoringDao;
-import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.PestBoardDto;
 import com.rpzh.dto.PestDataDto;
 import com.rpzh.dto.PestMonitoringRuleDto;
@@ -25,7 +23,6 @@ import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.PestData;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.service.TaskManagementService;
-import com.rpzh.service.WarehouseService;
 import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.util.TokenDecode;
@@ -237,6 +234,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             Integer beetleCount = xsxl3.intValue();
             Integer mealwormCount = null;
 
+            String siteRoute = integerStringMap.get(4).trim();
             //如果是仓间虫情点位
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)) {
                 //粉螟数量
@@ -245,33 +243,38 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 if (ToolUtil.isEmpty(mealwormCount)) {
                     return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
                 }
+                siteRoute = integerStringMap.get(5).trim();
             }
             //判断预警等级
             Map<String, Integer> levelMap = decideLevel(pestBoardId, beetleCount, mealwormCount);
+            if (ToolUtil.isEmpty(levelMap)){
+                return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行虫情点位不存在");
+            }
             Integer level = levelMap.get("level");
 
             //判断表格中是否存在空数据
-            if (ToolUtil.isEmpty(pestBoardId) || ToolUtil.isEmpty(gatherSite) || ToolUtil.isEmpty(gatherTime) || ToolUtil.isEmpty(beetleCount)) {
+            if (ToolUtil.isEmpty(pestBoardId) || ToolUtil.isEmpty(gatherSite) || ToolUtil.isEmpty(gatherTime) || ToolUtil.isEmpty(beetleCount)||ToolUtil.isEmpty(siteRoute)) {
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行有数据为空");
             } else {
                 if (NodeConstant.NODE_STACK.equals(siteType)) {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level,integerStringMap.get(4));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, beetleCount,level,siteRoute);
                 } else {
-                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"),integerStringMap.get(4));
+                    pestData = new PestData(pestBoardId, gatherSite, gatherTime, level , beetleCount ,levelMap.get("beetleLevel") ,mealwormCount,levelMap.get("mealwormLevel"),siteRoute);
                 }
             }
             //将当前行数据存到list中
             pestDataList.add(pestData);
 
-
         }
-        //执行数据库操作
-        pestMonitoringDao.exportPestData(pestDataList, siteType);
+        if (pestDataList.size()>0){
+            //执行数据库操作
+            pestMonitoringDao.exportPestData(pestDataList, siteType);
 
-        //把最新的数据存到缓存中
-        pestDataList.forEach(pestData -> {
-            redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData));
-        });
+            //把最新的数据存到缓存中
+            pestDataList.forEach(pestData -> {
+                redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData));
+            });
+        }
 
         return new Result(true, StatusCode.OK, "导入成功");
     }
@@ -558,6 +561,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //通过 pestBoardId 找到对应的虫情板信息
         Map<String,Integer> map = new HashMap<>();
         PestBoardVo pestBoardVo = pestMonitoringDao.findPestBoardByPestBoardId(pestBoardId);
+        if (ToolUtil.isEmpty(pestBoardVo)){
+            return null;
+        }
         //查找特殊位置
         List<String> siteRoutes = getSpecialSiteRoute();
 
@@ -644,6 +650,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             pestDataVo.setWarningColor(getPestWarningColor(pestDataVo.getAlertLevel(),pestMonitorValue));
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)){
                 Map<String, Integer> map = decideLevel(pestDataVo.getPestBoardId(), pestDataVo.getBeetleCount(), pestDataVo.getMealwormCount());
+               if (ToolUtil.isEmpty(map)){
+                   return;
+               }
                 pestDataVo.setBeetleLevel(map.get("beetleLevel"));
                 //甲虫预警颜色
                 pestDataVo.setBeetleColor(getPestWarningColor(pestDataVo.getBeetleLevel(),pestMonitorValue));
@@ -688,6 +697,12 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             }
         });
         return map;
+    }
+
+    @Override
+    public int findCountByPestBoradId(String pestBoardId) {
+
+        return pestMonitoringDao.findCountByPestBoradId(pestBoardId);
     }
 
     /**
