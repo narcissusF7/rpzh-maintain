@@ -279,6 +279,90 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         return new Result(true, StatusCode.OK, "导入成功");
     }
 
+    @Override
+    public Integer addPestHistory(List<Map> maps) {
+        if (maps.size()==0){
+            return 0;
+        }
+        Map<String,Map> pestDataMap = new HashMap<>();
+        try{
+            for (Map map : maps) {
+                //虫情板id
+                String pestBoardId = map.get("pestBoardId") + "";
+
+                //获取甲虫数量
+                int beetle = Integer.parseInt(map.get("beetle") + "");
+                //获取粉虫数量
+                int mealworm = Integer.parseInt(map.get("mealworm") + "");
+
+                pestDataMap.put(pestBoardId,map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("虫情数据格式错误");
+        }
+        String[] strs = new String[pestDataMap.size()];
+        List<PestData> pestBoards = pestMonitoringDao.findPestBoardByPestBoardIds(pestDataMap.keySet().toArray(strs));
+
+        //分别存放垛内虫情数据和仓间虫情数据
+        List<PestData> pestBoardStacks = new ArrayList<>();
+        List<PestData> pestBoardWares = new ArrayList<>();
+
+            for (PestData pestBoard : pestBoards) {
+                Map map = pestDataMap.get(pestBoard.getPestBoardId());
+                //获取甲虫数量
+                int beetle = Integer.parseInt(map.get("beetle") + "");
+
+                int length = pestBoard.getSiteRoute().split(",").length;
+                Integer mealworm =null;
+                //获取粉虫数量
+                if (length==5) {
+                    mealworm = Integer.parseInt(map.get("mealworm") + "");
+                }
+
+                //虫情预警等级
+                Map<String, Integer> levelMap = decideLevel(pestBoard.getPestBoardId(), beetle, mealworm);
+
+
+                pestBoard.setBeetleCount(beetle);
+
+                pestBoard.setMealwormCount(mealworm);
+
+                pestBoard.setBeetleLevel(levelMap.get("beetleLevel"));
+
+                pestBoard.setBeetleLevel(levelMap.get("mealwormLevel"));
+
+                pestBoard.setAlertLevel(levelMap.get("level"));
+                //如果是仓间虫情点位
+                if (length==5){
+                    pestBoardWares.add(pestBoard);
+                }else if (length==6){
+                    pestBoardStacks.add(pestBoard);
+                }
+            }
+
+        int insertFlag = 0;
+        if (pestBoardWares.size()>0){
+            //执行数据库操作
+            insertFlag+=pestMonitoringDao.exportPestData(pestBoardWares, "04");
+
+            //把最新的数据存到缓存中
+            pestBoardWares.forEach(pestData -> {
+                redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData));
+            });
+        }
+        if (pestBoardStacks.size()>0){
+            //执行数据库操作
+            insertFlag+=pestMonitoringDao.exportPestData(pestBoardStacks, "05");
+
+            //把最新的数据存到缓存中
+            pestBoardStacks.forEach(pestData -> {
+                redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData));
+            });
+        }
+        return insertFlag;
+    }
+
     /**
      * 一键上报
      *
@@ -426,6 +510,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 //设置等级及对应的值
                 dataHandler.setLevel(earlyWarning, level, data.doubleValue());
 
+                earlyWarning.setSiteRoute(siteRoute);
                 earlyWarning.setNodeType("07");
                 //将该预警记录插入到数据库中
                 earlyWarningDao.insertWarning(earlyWarning);
@@ -519,6 +604,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         setPestWarningColor(collect,pestDataDto.getSiteType());
         return collect;
     }
+
 
     /**
      * 查询所有特殊位置的位置路由
@@ -752,8 +838,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //查询该垛位、仓间下该类型任务是否存在
         Integer count = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
         if (count<1){
-            Map<String, Object> map = warehouseService.getSitePrincipal(pestBoardVo.getSiteRoute().split(",").length-1, Integer.parseInt(pestBoardVo.getSiteId()));
-            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),map.get("username")+"", DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),pestBoardVo.getPrincipalUser(), DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskManagementService.addDataHandTask(taskDto);
         }
     }

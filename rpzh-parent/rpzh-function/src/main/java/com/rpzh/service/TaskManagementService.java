@@ -91,7 +91,7 @@ public interface TaskManagementService {
      * @param dealResult
      * @return
      */
-    int pestTaskDeal(String pestData, String dealResult,String id);
+    int pestTaskDeal(String pestData, String dealResult,String id,String siteRoute);
 
     /**
      * 一键虫情上报

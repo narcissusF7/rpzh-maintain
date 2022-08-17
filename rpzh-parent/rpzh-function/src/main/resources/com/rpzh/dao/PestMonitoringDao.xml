@@ -104,7 +104,7 @@
         select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName",site_route "siteRoute",site_id "siteId" from tb_pest_board where principal_user = #{principalUser}
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
-        select pest_board_id "pestBoardId", site_route "siteRoute",site_name "siteName",site_id "siteId"  from tb_pest_board where pest_board_id =#{pestBoardId}
+        select pest_board_id "pestBoardId", site_route "siteRoute",site_name "siteName",site_id "siteId",principal_user principalUser  from tb_pest_board where pest_board_id =#{pestBoardId}
     </select>
     <select id="findPestBoard" resultType="com.rpzh.vo.PestBoardVo">
         SELECT
@@ -139,7 +139,7 @@
                 and principal_user = #{pestBoardDto.principalUser}
             </if>
         </where>
-        order by principal_user
+        order by created_time desc
     </select>
     <select id="findPestBoardId" resultType="java.lang.String">
         select pest_board_id from tb_pest_board
@@ -255,5 +255,11 @@
     </select>
     <select id="findCountByPestBoradId" resultType="java.lang.Integer">
         select count(*) from tb_pest_board where pest_board_id =#{pestBoardId}
+    </select>
+    <select id="findPestBoardByPestBoardIds" resultType="com.rpzh.pojo.PestData">
+        select pest_board_id pestBoardId,site_route siteRoute,site_name gatherSite from tb_pest_board where pest_board_id in
+        <foreach collection="pestBoardIds" item="pestBoardId" open="(" separator="," close=")">
+            #{pestBoardId}
+        </foreach>
     </select>
 </mapper>

@@ -69,4 +69,6 @@ public interface PestMonitoringDao {
 
 
     int findCountByPestBoradId(@Param("pestBoardId") String pestBoardId);
+
+    List<PestData> findPestBoardByPestBoardIds(@Param("pestBoardIds") String[] pestBoardIds);
 }

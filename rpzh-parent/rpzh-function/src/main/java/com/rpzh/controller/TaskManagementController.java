@@ -282,14 +282,14 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String")
     })
     @PostMapping("/pestTaskDeal")
-    public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id){
+    public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id,String siteRoute){
         if (ToolUtil.isEmpty(pestData)){
             return new Result(false, StatusCode.ERROR, "请输入虫情数据");
         }
         if (ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "请选择一个任务");
         }
-        int insertFlag = taskManagementService.pestTaskDeal(pestData,dealResult,id);
+        int insertFlag = taskManagementService.pestTaskDeal(pestData,dealResult,id,siteRoute);
         return new Result(true, StatusCode.OK, "处理成功");
     }
 

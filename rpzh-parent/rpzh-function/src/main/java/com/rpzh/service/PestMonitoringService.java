@@ -39,7 +39,7 @@ public interface PestMonitoringService {
 
     List<PestDataVo> findPestDataHistoryByOne(PestDataDto pestDataDto);
 
-//    Integer addPestHistory(PestDataDto pestDataDto);
+    Integer addPestHistory(List<Map> maps);
 
     Result findPestBoardByRfid(String rfid);
 

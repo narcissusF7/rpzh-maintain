@@ -72,6 +72,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     @Resource
     private RedisTemplate redisTemplate;
 
+
     /**
      * 新建任务
      *
@@ -337,7 +338,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      */
     @Override
     @Transactional
-    public int pestTaskDeal(String pestData, String dealResult, String id) {
+    public int pestTaskDeal(String pestData, String dealResult, String id,String siteRoute) {
         String status = null;
         if (ToolUtil.isEmpty(dealResult)) {
             //处理结果为空,状态是处理中
@@ -351,25 +352,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //修改任务状态
         int updateFlag = taskManagementDao.updateTaskStatus(id, status, dealResult,nowTime);
         //解析虫情数据
-        try {
-            List<Map> list = JSONObject.parseObject(pestData, List.class);
-            for (Map map : list) {
-                //虫情板id
-                String pestBoardId = map.get("pestBoardId") + "";
-                //获取采集位置
-                String gatherSite = map.get("gatherSite") + "";
-                //获取甲虫数量
-                int beetle = Integer.parseInt(map.get("beetle") + "");
-                //获取粉虫数量
-                int mealworm = Integer.parseInt(map.get("mealworm") + "");
-                //虫情预警等级
-                //pestMonitoringService.decideLevel(pestBoardId,beetle,mealworm);
-                int insertPest = taskManagementDao.insertPest(pestBoardId, gatherSite, beetle, mealworm, nowTime,id);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("虫情数据格式错误");
-        }
+        List<Map> list = JSONObject.parseObject(pestData, List.class);
+
+        Integer insertFlag = pestMonitoringService.addPestHistory(list);
         return updateFlag;
     }
 

@@ -314,6 +314,7 @@ public class DataReportServiceImpl implements DataReportService {
                 }
             }
         }
+        dataReportVos =dataReportVos.stream().filter(dataReportVo-> ToolUtil.isNotEmpty(dataReportVo.getCreateTime())).collect(Collectors.toList());
         if ("y".equals(dataReportDto.getPaging()) || "".equals(dataReportDto.getPaging())) {
             PageDtoUtil pageDto = PageDtoUtil.getPageDto(dataReportVos, dataReportDto.getPage(), dataReportDto.getSize());
             return new Result<>(true, StatusCode.OK, "查询成功", pageDto);
