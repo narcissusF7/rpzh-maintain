@@ -110,6 +110,11 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             collect.get(i).setWarningName();
             //设置预警颜色
             NodeServiceImpl.setWarningColor(collect.get(i),entries);
+            //如果物料等级不为空
+            String materialCode = collect.get(i).getMaterialCode();
+            if (ToolUtil.isNotEmpty(materialCode)){
+                collect.get(i).setMaterialCode(materialCode.replace(",","、"));
+            }
             //温湿度设备额外对添加温度湿度预警颜色
             if(NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(collect.get(i).getType())){
                 if (ToolUtil.isEmpty(collect.get(i).getTempLevel())){

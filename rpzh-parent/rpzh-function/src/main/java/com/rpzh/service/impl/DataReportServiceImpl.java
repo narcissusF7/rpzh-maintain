@@ -275,11 +275,11 @@ public class DataReportServiceImpl implements DataReportService {
             dataReportDto.setAcquisitionTimeTwo(DateUtil.endOfDay(DateUtil.parse(dataReportDto.getAcquisitionTimeTwo())).toString());
         }
         // 查第一个地址的数据
-        dataReportDto.setGatherSiteRoute(dataReportDto.getGatherSiteRouteComparisonOne());
+//        dataReportDto.setGatherSiteRoute(dataReportDto.getGatherSiteRouteComparisonOne());
         List<DataReportVo> dataReportVos = dataReportDao.findEnvStackComparisonData(dataReportDto);
         // 查找包芯温度数据
         // 查第二个地址的数据
-        dataReportDto.setGatherSiteRoute(dataReportDto.getGatherSiteRouteComparisonTwo());
+//        dataReportDto.setGatherSiteRoute(dataReportDto.getGatherSiteRouteComparisonTwo());
         List<DataReportVo> dataReportTempVos = dataReportDao.findStackAndCoreInfoList(dataReportDto);
         // 如果第一个集合的长度小于第二个就补齐
         int abs = Math.abs(dataReportVos.size() - dataReportTempVos.size());

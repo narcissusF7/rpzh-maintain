@@ -264,6 +264,10 @@ public class NodeController {
             return new Result<>(false, StatusCode.ERROR, "请输入替换之后的设备id");
         }
 
+        int count = nodeService.findNodeCountById(nodeDto.getAfterNodeId());
+        if (count>0){
+            return new Result<>(true, StatusCode.ERROR, "设备替换失败,替换的设备id已存在");
+        }
         int updateFlag = nodeService.replaceNodeId(nodeDto);
         if (updateFlag != 1) {
             return new Result<>(true, StatusCode.ERROR, "设备替换失败");

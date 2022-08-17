@@ -202,13 +202,13 @@
     </select>
     <update id="enterStack">
         UPDATE tb_node SET
-        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},gather_site = #{nodeDto.stack},</if>
+        <if test="nodeDto.stack != null and nodeDto.stack != ''">stack = #{nodeDto.stack},</if>
         <if test="nodeDto.stackId != null and nodeDto.stackId != ''">stack_id = #{nodeDto.stackId},</if>
         <if test="nodeDto.siteId != null and nodeDto.siteId != ''">site_id = #{nodeDto.siteId},</if>
         <if test="nodeDto.siteX != null and nodeDto.siteX != ''">site_x = #{nodeDto.siteX},</if>
         <if test="nodeDto.siteY != null and nodeDto.siteY != ''">site_y = #{nodeDto.siteY},</if>
         <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
-        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">stack = #{nodeDto.gatherSite},gather_site = #{nodeDto.gatherSite},</if>
+        <if test="nodeDto.gatherSite != null and nodeDto.gatherSite != ''">gather_site = #{nodeDto.gatherSite},</if>
         <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
         <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
         <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>

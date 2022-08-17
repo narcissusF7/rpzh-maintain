@@ -56,6 +56,6 @@
         <where>
             <if test="nodeOperationDto.nodeId != null and nodeOperationDto.nodeId != ''">and node_id = #{nodeOperationDto.nodeId}</if>
         </where>
-
+        order by created_time desc
     </select>
 </mapper>
