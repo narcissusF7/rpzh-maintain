@@ -80,4 +80,12 @@ public interface EarlyWarningDao {
     String findDeviceId(@Param("id") String id);
 
     int findPestWarningCount(@Param("ids") Integer[] ids);
+
+    Map<String,Integer> findAppCount();
+
+    String findAppWarning(@Param("warningType")String warningType);
+
+    Map<String,Object> findAppDeviceFault();
+
+    String findAppCountByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
 }
