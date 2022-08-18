@@ -519,13 +519,10 @@
     <select id="findNodeData" resultType="com.rpzh.pojo.NodeData">
         select *
         from (select ${tableColumn}    as node,
-                     transfer_time     as transferTime,
-                     maintain_stage_id as maintainStageId,
-                     site_type         as siteType
+                     transfer_time     as transferTime
               from ${tableName}
               where node_id = #{nodeId}
-              order by transfer_time Desc
-              LIMIT 10)
+             order by transfer_time Desc limit 10)
         order by transferTime asc
     </select>
     <select id="findDataOxygen" resultType="com.rpzh.pojo.NodeData">

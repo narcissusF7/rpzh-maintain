@@ -14,9 +14,12 @@
 </update>
     <update id="updateRepairId">
     UPDATE tb_early_warning
-        SET repair_id = #{id},is_affirm = #{affirm},principal=#{principal}<if test="dealTime != null and dealTime != ''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-    WHERE is_affirm &lt;> '0' and node_id = #{deviceId}  AND warning_type = #{warningType}
+        SET repair_id = #{taskId},is_affirm = #{affirm},principal=#{principal}<if test="dealTime != null and dealTime != ''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+    WHERE id = #{id}
 </update>
+    <select id="findMaxId" resultType="java.lang.Integer">
+        SELECT max(id) FROM TB_EARLY_WARNING WHERE node_id = #{deviceId} and warning_type = #{warningType} and is_affirm = #{beforeAffirm}
+    </select>
     <select id="findDeviceId" resultType="java.lang.String">
         select node_id from tb_early_warning where repair_id = #{id}
     </select>
@@ -244,9 +247,6 @@
     <update id="updateWarningType">
         update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} and rownum = 1 ORDER BY id DESC
     </update>
-    <select id="findMaxTime" resultType="java.lang.String">
-        select warning_time from tb_early_warning where is_affirm = '2' and node_id = #{nodeId} AND rownum = 1
-    </select>
     <select id="findColor" resultType="java.util.Map">
         select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as "oneColor",
         (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') as "twoColor",

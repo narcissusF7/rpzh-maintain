@@ -525,7 +525,7 @@
         FROM tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
         left join (select id,site_name from tb_stack) t3 on t3.id = t1.stack_id
-        WHERE t2.id= #{id} and rownum = 1 order by created_time desc
+        WHERE t1.stack_id= #{stackId} and t1.is_end = '0'
     </select>
     <select id="findCurrentMaintainPlan" resultType="java.lang.String">
         select principal_name from tb_maintain_plan where stack_id = #{stackId} and is_end = '0'

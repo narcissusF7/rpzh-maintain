@@ -111,7 +111,7 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findMaintainHistoryById(@Param("id") Integer id);
 
-    MaintainPlanVo findMaintainPlanNow(@Param("id") Integer id);
+    MaintainPlanVo findMaintainPlanNow(@Param("stackId") Integer stackId);
 
     String findCurrentMaintainPlan(@Param("stackId")Integer stackId);
 

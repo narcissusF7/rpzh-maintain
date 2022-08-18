@@ -38,8 +38,6 @@ public interface EarlyWarningDao {
 
     Integer misreport(@Param("id") Integer id);
 
-    String findMaxTime(@Param("nodeId") String nodeId);
-
     Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
     List<Map> findWarningCountByDay(@Param("ids") List<Integer> ids, @Param("dateType") String dateType);
@@ -68,8 +66,10 @@ public interface EarlyWarningDao {
 
     List<RepairDataVo> findRepairData(@Param("stackId") Integer stackId, @Param("areaId") Integer areaId);
 
-    int updateRepairId(@Param("affirm") String affirm, @Param("deviceId") String deviceId, @Param("id") String id,
-                       @Param("principal") String principal, @Param("dealTime") String dealTime,@Param("warningType")String warningType);
+    int updateRepairId(@Param("affirm") String affirm, @Param("taskId") String taskId,
+                       @Param("principal") String principal, @Param("dealTime") String dealTime,@Param("id")Integer id);
+
+    Integer findMaxId(@Param("beforeAffirm") String beforeAffirm,@Param("deviceId") String deviceId,@Param("warningType")String warningType);
 
     List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
 

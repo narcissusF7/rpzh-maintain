@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -341,10 +343,33 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     public Result findNodeData(EarlyWarningDto earlyWarningDto) {
         String warningType = earlyWarningDto.getWarningType();
         String pidRoute = earlyWarningDto.getPidRoute();
-        Integer stackId = earlyWarningDto.getStackId();
+        Integer stackId = 0;
         Map<String, Object> map = new HashMap<>();
+        if(pidRoute.contains("05")){
+            stackId = Integer.parseInt(pidRoute.split("05:")[1].split("]")[0]);
+            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(stackId);
+            if(ToolUtil.isNotEmpty(maintainPlanVo)) {
+                List<String> usernames = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
+                String userNames = "";
+                for (int i = 0; i < usernames.size(); i++) {
+                    if (i == 0) {
+                        userNames = (String) redisUtil.hget("USER_" + usernames.get(i), "nickname") + "(" + usernames.get(i) + ")";
+                    } else {
+                        userNames = userNames + "," + (String) redisUtil.hget("USER_" + usernames.get(i), "nickname") + "(" + usernames.get(i) + ")";
+                    }
+                }
+                maintainPlanVo.setPrincipalName(userNames);
+            }else{
+                maintainPlanVo = new MaintainPlanVo();
+                maintainPlanVo.setMaintenceStyle("---");
+                maintainPlanVo.setMaterialCode("---");
+                maintainPlanVo.setPhases("---");
+                maintainPlanVo.setPrincipalName("---");
+                maintainPlanVo.setStackName("---");
+            }
+            map.put("maintainPlanVo", maintainPlanVo);
+        }
         String nodeId = earlyWarningDto.getNodeId();
-        String time = earlyWarningDao.findMaxTime(nodeId);
         EarlyWarningVo earlyWarningVo = getEarlyWarningVo(warningType,pidRoute,stackId);
         Map<String,Object> earlyWarning = new HashMap<>();
         Map<String, String> color = earlyWarningDao.findColor();
@@ -357,7 +382,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         earlyWarning.put("earlyWarningLow",earlyWarningVo.getLower());
         map.put("earlyWarningVo", earlyWarning);
         String nodeType = earlyWarningDto.getNodeType();
-        List<NodeData> nodeData;
+        List<NodeData> nodeData = new ArrayList<>();
         if("01".equals(nodeType)){
             nodeData = nodeDao.findNodeData(nodeId, "tb_node_o2_history", "oxygen");
         }else if("03".equals(nodeType)){
@@ -374,36 +399,41 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 case "11":
                     nodeData = nodeDao.findNodeData(nodeId, "tb_air_conditioner_history", "humiture");
                     break;
-                default:
-                    nodeData = new ArrayList<>();
-                    break;
             }
         }else{
-            nodeData = nodeDao.findNodeData(nodeId, "tb_node_temp_core_chip_history", "temp");
-        }
-
-        List<Map> node = new ArrayList<>();
-        for (NodeData nodeDatum : nodeData) {
-            Map map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getNode(),nodeDatum.getTransferTime()));
-            node.add(map1);
-        }
-        String siteType = nodeData.get(0).getSiteType();
-        Integer id = nodeData.get(0).getMaintainStageId();
-        if("05".equals(siteType)){
-            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(id);
-            List<String> usernames = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
-            String userNames = "";
-            for (int i = 0; i < usernames.size(); i++) {
-                if(i==0){
-                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }else{
-                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+            if("13".equals(warningType) || "19".equals(warningType)){
+                List<String> nodeIds = nodeDao.findNodeIds(stackId);
+                List<List<NodeData>> nodeList  = new ArrayList<>();
+                int size = 0;
+                int a = 0;
+                for (int i = 0; i < nodeIds.size(); i++) {
+                    List<NodeData> node = nodeDao.findNodeData(nodeIds.get(i), "tb_node_temp_core_chip_history", "temp");
+                    if(ToolUtil.isNotEmpty(node)) {
+                        nodeList.add(node);
+                    }
+                    if(size<node.size()){
+                        size = node.size();
+                        a = i;
+                    }
                 }
+                for (int j = 0; j < size; j++) {
+                    Double data = 0d;
+                    for (int i = 0; i < nodeList.size(); i++) {
+                        if(j>nodeList.get(i).size()-1){
+                            data = data + 0;
+                        }else {
+                            data = data + nodeList.get(i).get(j).getNode();
+                        }
+                    }
+                    NodeData nodeVo = new NodeData();
+                    nodeVo.setTransferTime(nodeList.get(a).get(j).getTransferTime());
+                    nodeVo.setNode(data / nodeList.size());
+                    nodeData.add(nodeVo);
+                }
+            }else {
+                nodeData = nodeDao.findNodeData(nodeId, "tb_node_temp_core_chip_history", "temp");
             }
-            maintainPlanVo.setPrincipalName(userNames);
-            map.put("maintainPlanVo", maintainPlanVo);
         }
-
         switch (nodeType){
             case "01":
                 map.put("type", "无线氧气传感器");
@@ -418,17 +448,27 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 map.put("type", "");
                 break;
         }
+        if(ToolUtil.isEmpty(nodeData)){
+            map.put("nodeData", new ArrayList<>());
+            map.put("maintainPlanVo", new MaintainPlanVo());
+            return new Result<>(true, StatusCode.OK, "查询成功", map);
+        }
+        List<Map> node = new ArrayList<>();
+        for (NodeData nodeDatum : nodeData) {
+            Map map1 = getMap(Arrays.asList("node","day"),Arrays.asList(nodeDatum.getNode(),nodeDatum.getTransferTime()));
+            node.add(map1);
+        }
         map.put("nodeData", node);
-        map.put("time", time);
         return new Result<>(true, StatusCode.OK, "查询成功", map);
     }
 
     @Override
-    public int updateRepairId(String affirm, String deviceId, String id, String principal,String dealTime,String warningType) {
+    public int updateRepairId(String beforeAffirm,String affirm, String deviceId, String id, String principal, String dealTime, String warningType) {
         if(ToolUtil.isEmpty(deviceId)){
             deviceId = earlyWarningDao.findDeviceId(id);
         }
-        return earlyWarningDao.updateRepairId(affirm,deviceId,id,principal,dealTime,warningType);
+        Integer maxId = earlyWarningDao.findMaxId(beforeAffirm, deviceId, warningType);
+        return earlyWarningDao.updateRepairId(affirm,id,principal,dealTime,maxId);
     }
 
     //预警信息
@@ -695,7 +735,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         map.put("name","");
         switch (warningType) {
             case "001":
-                map.put("warningType", "设备电量电量低");
+                map.put("warningType", "设备电量低");
                 map.put("deal","建议更换电池");
                 return map;
             case "002":

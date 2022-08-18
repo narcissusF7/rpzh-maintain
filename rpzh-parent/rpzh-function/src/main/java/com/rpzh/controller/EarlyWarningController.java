@@ -128,9 +128,9 @@ public class EarlyWarningController {
 
     @PostMapping("/updateRepairId")
     @ApiOperation(value = "去处理（故障），设备维修")
-    public void updateRepairId(@RequestParam("affirm") String affirm, @RequestParam(name = "deviceId",required = false) String deviceId, @RequestParam(name="id",required = false) String id,
+    public void updateRepairId(@RequestParam("beforeAffirm") String beforeAffirm,@RequestParam("affirm") String affirm, @RequestParam(name = "deviceId",required = false) String deviceId, @RequestParam(name="id",required = false) String id,
                                @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime,@RequestParam("warningType")String warningType) {
-        earlyWarningService.updateRepairId(affirm, deviceId, id, principal,dealTime,warningType);
+        earlyWarningService.updateRepairId(beforeAffirm,affirm, deviceId, id, principal,dealTime,warningType);
     }
 
     @PostMapping("/warningSend")
