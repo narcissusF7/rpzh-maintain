@@ -6,24 +6,27 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: localhost:8866
+        server-addr: 10.46.150.170:11808,10.46.150.171:11809,10.46.150.172:11810
       config: # 配置中心地址
-        server-addr: localhost:8866
+        server-addr: 10.46.150.170:11808,10.46.150.171:11809,10.46.150.172:11810
         # 配置文件格式
         file-extension: yml
   redis:
-    host: 127.0.0.1
-    port: 6379
-    password:
-    jedis:
+    database: 0
+    timeout: 3000
+    password: rpzh123456.
+    cluster:
+      nodes: 10.46.150.170:8001,10.46.150.171:8002,10.46.150.172:8003,10.46.150.170:8004,10.46.150.171:8005,10.46.150.172:8006
+    lettuce:
       pool:
-        max-active: 32
-        max-idle: 32
-        min-idle: 0
+        max-idle: 50
+        min-idle: 10
+        max-active: 100
+        max-wait: 1000
   main:
     allow-bean-definition-overriding: true
   rabbitmq: #RabbitMq配置
-    host: 120.24.91.199
+    host: 10.46.150.172
     port: 5672
     password: guest
     username: guest
@@ -33,17 +36,17 @@ spring:
   datasource:
     dynamic:
       #默认这里选择默认数据
-      primary: mysql
+      primary: oracle
       strict: false
       datasource:
         #可以配置多个
-        mysql:
-          url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
-          username: root
-          password: root
-          driver-class-name: com.mysql.jdbc.Driver
+        oracle:
+          url: jdbc:oracle:thin:@10.46.150.173:1521:helowin
+          username: RPZH_FUNCTION
+          password: rpzh123456.
+          driver-class-name: oracle.jdbc.driver.OracleDriver
         clickhouse:
-          url: jdbc:clickhouse://183.250.89.188:8123/default
+          url: jdbc:clickhouse://10.46.150.170:8123/default
           username: default
           password:
           driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
@@ -91,7 +94,7 @@ ribbon:
   ConnectTimeout: 30000
 # mqtt 连接配置
 mqtt:
-  host: tcp://192.168.3.99
+  host: tcp://10.46.150.170
   port: 1883
   qos: 0
   timeout: 2000
@@ -102,7 +105,7 @@ mqtt:
   username: admin
   password: admin1234.
 rocketmq:
-  name-server: 192.168.3.36:9876
+  name-server: 10.46.150.172:9876
   topic: messageTopic # mq主题
   producer:
     group: MessageGroup

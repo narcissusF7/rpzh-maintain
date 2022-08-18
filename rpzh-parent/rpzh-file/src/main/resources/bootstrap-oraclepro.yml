@@ -8,35 +8,38 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: 127.0.0.1:8866
+        server-addr: 10.46.150.170:11808,10.46.150.171:11809,10.46.150.172:11810
       config: # 配置中心地址
-        server-addr: 127.0.0.1:8866
+        server-addr: 10.46.150.170:11808,10.46.150.171:11809,10.46.150.172:11810
         # 配置文件格式
         file-extension: yml
   redis:
-    host: 127.0.0.1
-    port: 6379
-    password:
-    jedis:
+    database: 0
+    timeout: 3000
+    password: rpzh123456.
+    cluster:
+      nodes: 10.46.150.170:8001,10.46.150.171:8002,10.46.150.172:8003,10.46.150.170:8004,10.46.150.171:8005,10.46.150.172:8006
+    lettuce:
       pool:
-        max-active: 32
-        max-idle: 32
-        min-idle: 0
+        max-idle: 50
+        min-idle: 10
+        max-active: 100
+        max-wait: 1000
   servlet:
     multipart:
       max-file-size: 10MB    #单个文件大小
       max-request-size: 10MB   #文件传输大小
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@192.168.3.36:1521:helowin
-    username: LBCTWO
-    password: root
+    url: jdbc:oracle:thin:@10.46.150.173:1521:helowin
+    username: RPZH_FUNCTION
+    password: rpzh123456.
 
 logging:
   level:
     root: info
     org.springframework: info
-    com.rpzh.dao: DEBUG  #sql日志打印
+    com.rpzh.dao: info  #sql日志打印
 feign:  #开启feign熔断器,当feign调用失败时熔断
   hystrix:
     enabled: true
@@ -50,4 +53,4 @@ hystrix:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
 fastdfs:
-  ip: 120.24.91.199:8080
+  ip: 10.46.150.172:8080
