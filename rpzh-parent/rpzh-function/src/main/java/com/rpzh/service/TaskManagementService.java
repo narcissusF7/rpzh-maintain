@@ -3,6 +3,7 @@ package com.rpzh.service;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.vo.TaskVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -190,4 +191,6 @@ public interface TaskManagementService {
      * @return
      */
     int addDataHandTask(TaskDto taskDto);
+
+    List<String> findSystemType(@Param("ids") Long[] ids);
 }

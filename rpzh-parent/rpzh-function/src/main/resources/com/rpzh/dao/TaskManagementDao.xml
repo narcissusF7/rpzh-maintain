@@ -33,6 +33,9 @@
         <if test="taskDto.targetSiteId != null and taskDto.targetSiteId != ''">
             target_siteid,
         </if>
+        <if test="taskDto.createType != null and taskDto.createType != ''">
+            create_type,
+        </if>
         task_address,
         site_route,
         push_way
@@ -68,6 +71,9 @@
         </if>
         <if test="taskDto.targetSiteId != null and taskDto.targetSiteId != ''">
             #{taskDto.targetSiteId},
+        </if>
+        <if test="taskDto.createType != null and taskDto.createType != ''">
+            #{taskDto.createType},
         </if>
         #{taskDto.taskAddress},
         #{taskDto.taskSiteRoute},
@@ -624,4 +630,13 @@
   SELECT count(1) FROM TB_MAINTAIN_PLAN
   WHERE STACK_ID = #{siteId}
 </select>
+    <select id="findSystemType" resultType="java.lang.String">
+        SELECT task_num
+        FROM tb_task
+        WHERE id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+         and create_type = 2
+    </select>
 </mapper>

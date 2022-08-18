@@ -356,9 +356,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             insertFlag+=pestMonitoringDao.exportPestData(pestBoardStacks, "05");
 
             //把最新的数据存到缓存中
-            pestBoardStacks.forEach(pestData -> {
-                redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData));
-            });
+            pestBoardStacks.forEach(pestData -> redisTemplate.opsForValue().set(PEST_MONITOR + pestData.getPestBoardId(), JSONObject.toJSONString(pestData)));
         }
         return insertFlag;
     }
@@ -839,6 +837,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         Integer count = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
         if (count<1){
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),pestBoardVo.getPrincipalUser(), DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
         }
     }

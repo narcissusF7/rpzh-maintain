@@ -170,6 +170,18 @@ public class TaskManagementController {
         if (ToolUtil.isEmpty(ids)){
             return new Result(false, StatusCode.ERROR, "请选择一个任务");
         }
+        //ljj 判断是否是系统生成的任务
+        List<String> list = taskManagementService.findSystemType(ids);
+
+        if (list.size()>0){
+            String msg ="任务编号";
+            for (String s : list) {
+                msg+=(s+" ");
+            }
+            msg+="是系统生成的任务，无法删除";
+            return new Result(false, StatusCode.ERROR, msg);
+        }
+
         int delFlag = taskManagementService.delTask(ids);
         return new Result(true, StatusCode.OK, "删除成功");
     }

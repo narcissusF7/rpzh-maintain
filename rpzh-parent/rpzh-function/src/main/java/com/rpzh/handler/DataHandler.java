@@ -714,6 +714,7 @@ public class DataHandler {
         if (count<1){
             Map<String, Object> map = warehouseService.getSitePrincipal(nodeVo.getSiteRoute().split(",").length-1, nodeVo.getSiteId());
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
         }
     }

@@ -441,4 +441,6 @@ public interface TaskManagementDao {
      * @return
      */
     int findMaintainPlan(@Param("siteId") String siteId);
+
+    List<String> findSystemType(@Param("ids") Long[] ids);
 }

@@ -1253,4 +1253,10 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
     }
+
+    @Override
+    public List<String> findSystemType(Long[] ids) {
+        List<String> list = taskManagementDao.findSystemType(ids);
+        return list;
+    }
 }
