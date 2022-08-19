@@ -2,7 +2,7 @@
 <configuration>
 
     <!--定义日志存放的位置-->
-    <springProperty scope="context" name="rpzhFileLogPath" source="log.path"
+    <springProperty scope="context" name="rpzhJobLogPath" source="log.path"
                     defaultValue="rpzh-job-logs"/>
 
     <!-- ****************************************************************************************** -->
@@ -34,7 +34,7 @@
     <springProfile name="!local">
 
         <!-- 日志记录器，日期滚动记录 -->
-        <appender name="Job_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <!-- 正在记录的日志文件的路径及文件名 -->
             <file>${rpzhJobLogPath}/log_error.log</file>
             <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
@@ -69,7 +69,7 @@
             <file>${rpzhJobLogPath}/log_total.log</file>
             <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${rpzhFileLogPath}/total/log-total-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>${rpzhJobLogPath}/total/log-total-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>2MB</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
@@ -88,7 +88,7 @@
         </appender>
 
         <root level="info">
-            <appender-ref ref="Job_ERROR"/>
+            <appender-ref ref="FILE_ERROR"/>
             <appender-ref ref="FILE_ALL"/>
         </root>
 
