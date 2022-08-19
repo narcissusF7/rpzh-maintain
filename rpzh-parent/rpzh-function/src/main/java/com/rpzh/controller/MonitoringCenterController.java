@@ -388,17 +388,22 @@ public class MonitoringCenterController {
             }
         }
         //显示要导出的字段
-        nodeHistory.forEach((item) -> {
-            easyPoiUtil.t = item;
-            columns.forEach((column) -> {
-                try {
-                    easyPoiUtil.hihdColumn(column, false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+        easyPoiUtil.t = nodeHistory.get(0);
+        columns.forEach((column) -> {
+            try {
+                easyPoiUtil.hihdColumn(column, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
+        columns.forEach((column) -> {
+            try {
+                easyPoiUtil.hihdColumn(column, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
 
         return new Result(true,StatusCode.OK,"导出成功");
