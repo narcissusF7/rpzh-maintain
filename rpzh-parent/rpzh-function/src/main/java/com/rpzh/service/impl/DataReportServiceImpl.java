@@ -625,44 +625,19 @@ public class DataReportServiceImpl implements DataReportService {
 
         if (list.size()>0){
             easyPoiUtil.t = list.get(0);
-            switch (comparisonType){
-                case "1":
-                    try {
-                        easyPoiUtil.hihdColumn("avgOxygen", true);
-                        easyPoiUtil.hihdColumn("maxOxygen", true);
-                        easyPoiUtil.hihdColumn("minOxygen", true);
-                    } catch (Exception e) {
-                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                        e.printStackTrace();
-                    }
-                    break;
-                case "2":
-                    try {
-                        easyPoiUtil.hihdColumn("avgCoreTemp", true);
-                        easyPoiUtil.hihdColumn("maxCoreTemp", true);
-                        easyPoiUtil.hihdColumn("minCoreTemp", true);
-                        easyPoiUtil.hihdColumn("tempReduce", true);
-                    } catch (Exception e) {
-                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                        e.printStackTrace();
-                    }
-                    break;
-                case "3":
-                    try {
-                        easyPoiUtil.hihdColumn("avgCoreTemp", true);
-                        easyPoiUtil.hihdColumn("maxCoreTemp", true);
-                        easyPoiUtil.hihdColumn("minCoreTemp", true);
-                        easyPoiUtil.hihdColumn("tempReduce", true);
-                    } catch (Exception e) {
-                        System.out.println("列隐藏转换失败：{}"+ e.getMessage());
-                        e.printStackTrace();
-                    }
-                    break;
-            }
 
+            String[] columns = null;
+            if ("1".equals(comparisonType)){
+                    columns = new String[]{"avgOxygen","maxOxygen","minOxygen"};
+            }else if ("2".equals(comparisonType)||"3".equals(comparisonType)){
+                    columns = new String[]{"avgCoreTemp","maxCoreTemp","minCoreTemp","tempReduce"};
+            }
+            hiddenColumn(columns,true,easyPoiUtil);
+            EasyPoiUtil.exportExcel(list,title,title+".xls",NodeExportData.class,title+".xls",response);
+            hiddenColumn(columns,false,easyPoiUtil);
         }
 
-        EasyPoiUtil.exportExcel(list,title,title+".xls",NodeExportData.class,title+".xls",response);
+
         return new Result(true,StatusCode.OK,"查询成功");
     }
 
@@ -767,4 +742,14 @@ public class DataReportServiceImpl implements DataReportService {
         return map;
     }
 
+    void hiddenColumn(String[] columns ,boolean isHidden,EasyPoiUtil easyPoiUtil){
+        try {
+            for (String column : columns) {
+                easyPoiUtil.hihdColumn(column, isHidden);
+            }
+        } catch (Exception e) {
+            System.out.println("列隐藏转换失败：{}"+ e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
