@@ -26,6 +26,7 @@ public interface MaintainDataDao {
     //根据预警类型等查询预警信息的设备id
     List<String> findEarlyData(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade, @Param("warningType") String warningType);
 
+    String findVal(@Param("siteRoute") String siteRoute, @Param("warningGrade") String warningGrade, @Param("warningType") String warningType);
     //查询垛位名称、负责人账号
     Map<String, String> findStackById(@Param("stackId") Integer stackId);
 

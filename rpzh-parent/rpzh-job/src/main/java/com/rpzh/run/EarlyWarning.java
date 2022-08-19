@@ -96,7 +96,7 @@ public class EarlyWarning {
                 Integer warningGrade = maintainDataDao.findCountWarningGrade(siteRoute, i + "");
                 //有预警则拼接短信内容
                 if (warningGrade > 0) {
-                    message = message + warningGrades.get(i - 1) + warningGrade + ",其中:";
+                    message = message + warningGrades.get(i - 1) + warningGrade + ",";
                     message = getMessage(message, i + "", siteRoute);
                 }
             }
@@ -112,6 +112,9 @@ public class EarlyWarning {
                 map.put("createTime", sdf.format(new Date()));
                 if (message.length() <= 460) {
                     //长度不大于460,发送一次短信
+                    System.out.println(message);
+                    System.out.println(number.get("number"));
+                    System.out.println(map);
                     get(message, map, number.get("number").toString());
                 } else if (message.length() > 460 && message.length() <= 920) {
                     //长度大于460,不大于920,发送两次短信
@@ -144,7 +147,7 @@ public class EarlyWarning {
             //短信间隔1.5s
             Thread.sleep(1500);
             //将预警信息通过rocketMQ发送到短信管理中,再在短信管理中将信息存入数据库中
-            //rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
+            rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -160,9 +163,9 @@ public class EarlyWarning {
         if(ToolUtil.isNotEmpty(oneData)){
             message = message + "设备故障有" + String.join(",",oneData)+"。";
         }
-        List<String> types = Arrays.asList("垛内虫数有", "仓间甲虫有", "垛内氧气有", "仓间氧气有", "垛内温度有", "仓间温度有", "垛内湿度有", "仓间湿度有", "包芯温度有", "平均包芯高于环境有","平均包芯低于环境有", "仓间粉螟有");
-        for (int i = 4; i <=19 ; i++) {
-            if(i==15 || i ==16 || i==17 || i == 18){
+        List<String> types = Arrays.asList("垛内虫数有", "仓间甲虫有", "垛内氧气有", "仓间氧气有", "垛内温度有", "仓间温度有", "垛内湿度有", "仓间湿度有", "包芯温度有","平均包芯高于环境",  "仓间粉螟有");
+        for (int i = 4; i <=14 ; i++) {
+            if(i==13){
                 continue;
             }
             String warningType = "0" + i;
@@ -175,6 +178,14 @@ public class EarlyWarning {
             if(ToolUtil.isNotEmpty(data)){
                 message = message + types.get(i-4) + String.join(",",data)+"。";
             }
+        }
+        String highVal = maintainDataDao.findVal(siteRoute, warningGrade, "13");
+        if(ToolUtil.isNotEmpty(highVal)){
+            message = message + "平均包芯高于环境的数值为:" + highVal+"。";
+        }
+        String lowVal = maintainDataDao.findVal(siteRoute, warningGrade, "19");
+        if(ToolUtil.isNotEmpty(lowVal)){
+            message = message + "平均包芯低于环境的数值为:" + lowVal+"。";
         }
         return message;
     }

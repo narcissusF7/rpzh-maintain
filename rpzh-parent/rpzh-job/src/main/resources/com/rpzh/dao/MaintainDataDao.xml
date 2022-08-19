@@ -14,6 +14,9 @@
         select node_id  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
         <if test="warningType != null and warningType != ''">and ${warningType}</if>
     </select>
+    <select id="findVal" resultType="java.lang.String">
+        select warning_val  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade} and warning_type = #{warningType}
+    </select>
     <select id="findStackById" resultType="java.util.Map">
     SELECT
       ts.site_name as "siteName",
