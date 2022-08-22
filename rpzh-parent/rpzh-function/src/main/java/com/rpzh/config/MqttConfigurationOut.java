@@ -25,7 +25,7 @@ import javax.annotation.Resource;
  * @create 2021-06-28 14:36
  * @description mqtt出站配置
  */
-@Configuration
+//@Configuration
 @EnableConfigurationProperties(MqttProperties.class)
 @Slf4j
 @EnableAsync

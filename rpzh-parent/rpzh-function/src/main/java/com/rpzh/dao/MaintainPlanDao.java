@@ -120,4 +120,7 @@ public interface MaintainPlanDao {
     List<StackVo> findStackNotInMaintainPlan();
 
     List<Integer> findStackIdBySiteRoute(@Param("siteRoute")String siteRoute);
+
+    //查询垛位名称、负责人账号
+    Map<String, String> findStackById(@Param("stackId") Integer stackId);
 }

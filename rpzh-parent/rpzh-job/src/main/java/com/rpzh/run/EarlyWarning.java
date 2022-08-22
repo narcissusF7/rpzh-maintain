@@ -8,6 +8,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import com.rpzh.util.SendMessageUtil;
 
 /**
  * 预警任务
@@ -82,8 +83,9 @@ public class EarlyWarning {
                     }
                 }
                 Map map = new HashMap();
-                //根据用户账号从redis中取出手机号
+                //根据用户账号从redis中取出手机号,并存入map中
                 map.put("number", (String) redisUtil.hget("USER_" + principalName, "phonenumber"));
+                //将用户名存入map中
                 map.put("username", principalName);
                 //将该垛位的负责人账号、手机号存入list中
                 phonenumber.add(map);
@@ -112,9 +114,6 @@ public class EarlyWarning {
                 map.put("createTime", sdf.format(new Date()));
                 if (message.length() <= 460) {
                     //长度不大于460,发送一次短信
-                    System.out.println(message);
-                    System.out.println(number.get("number"));
-                    System.out.println(map);
                     get(message, map, number.get("number").toString());
                 } else if (message.length() > 460 && message.length() <= 920) {
                     //长度大于460,不大于920,发送两次短信
@@ -143,11 +142,11 @@ public class EarlyWarning {
             //短信内容
             map.put("content",message);
             //将预警短信信息发送到对应的手机号中
-            //SendMessageUtil.sendSms(number, message, "h2");
-            //短信间隔1.5s
-            Thread.sleep(1500);
+            SendMessageUtil.sendSms(number, message, "h2");
             //将预警信息通过rocketMQ发送到短信管理中,再在短信管理中将信息存入数据库中
             rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
+            //短信间隔时间为2秒钟
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -172,17 +171,19 @@ public class EarlyWarning {
             if(i>=10){
                 warningType = i + "";
             }
-            //根据预警类型查询设备id（除设备故障外）
+            //根据预警类型查询设备id（除设备故障、平均包芯高于环境预警、平均包芯低于环境预警外）
             List<String> data = maintainDataDao.findEarlyData(siteRoute,warningGrade, "warning_type = '"+warningType + "'");
             //有预警信息则拼接短信
             if(ToolUtil.isNotEmpty(data)){
                 message = message + types.get(i-4) + String.join(",",data)+"。";
             }
         }
+        //查询平均包芯高于环境预警的数值
         String highVal = maintainDataDao.findVal(siteRoute, warningGrade, "13");
         if(ToolUtil.isNotEmpty(highVal)){
             message = message + "平均包芯高于环境的数值为:" + highVal+"。";
         }
+        //查询平均包芯低于环境预警的数值
         String lowVal = maintainDataDao.findVal(siteRoute, warningGrade, "19");
         if(ToolUtil.isNotEmpty(lowVal)){
             message = message + "平均包芯低于环境的数值为:" + lowVal+"。";

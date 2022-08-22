@@ -12,6 +12,8 @@ import java.util.Map;
 
 @Mapper
 public interface EarlyWarningDao {
+    String findVal(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
+
     List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<EarlyWarningVo> findEarlyWarningByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
@@ -62,8 +64,6 @@ public interface EarlyWarningDao {
 
     Map<String, String> findColor();
 
-    String findPrincipal(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
     List<RepairDataVo> findRepairData(@Param("stackId") Integer stackId, @Param("areaId") Integer areaId);
 
     int updateRepairId(@Param("affirm") String affirm, @Param("taskId") String taskId,
@@ -73,9 +73,9 @@ public interface EarlyWarningDao {
 
     List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
 
-    Integer findThreeWarningGradeCount(@Param("siteRoute") String siteRoute);
+    List<String> findNodeFaultEarlyData(@Param("siteRoute") String siteRoute);
 
-    List<String> findSiteRoute(@Param("warningGrade")String warningGrade);
+    List<String> findSiteRoute();
 
     String findDeviceId(@Param("id") String id);
 

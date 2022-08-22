@@ -59,6 +59,9 @@
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
     </select>
+    <select id="findVal" resultType="java.lang.String">
+        select warning_val  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = '3' and warning_type = #{warningType}
+    </select>
     <select id="findEarlyWarningCount" resultType="com.rpzh.vo.WarningCountVo">
         select
         warning_type as warningType,
@@ -253,22 +256,14 @@
         (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as "threeColor"
         from tb_general_setting where rownum =1
     </select>
-    <select id="findPrincipal" resultType="java.lang.String">
-        select principal from tb_early_warning WHERE site_route = #{earlyWarningDto.pidRoute} and is_affirm = #{earlyWarningDto.isAffirm} and  warning_grade =#{earlyWarningDto.warningGrade}  AND rownum =  1
-    </select>
-
     <select id="findThreeEarlyData" resultType="java.util.Map">
-        select node_id as "nodeId",warning_val as "warningVal" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
-        <if test="warningType != null and warningType != ''">and ${warningType}</if>
+        select node_id as "nodeId",warning_val as "warningVal" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type = #{warningType} and warning_grade = '3'
     </select>
-    <select id="findThreeWarningGradeCount" resultType="java.lang.Integer">
-    select sum(t.countRow) from (
-        select count(1) as countRow from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and
-        warning_grade = '3' and warning_type not in ('01','02','03') union select count(1) as countRow from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type in ('01','02','03')) t
+    <select id="findNodeFaultEarlyData" resultType="java.lang.String">
+        select node_id  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type in ('01','02','03')
     </select>
     <select id="findSiteRoute" resultType="java.lang.String">
-        select t.site_route from (select site_route from tb_early_warning where is_affirm = '2'
-        <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>
+        select t.site_route from (select site_route from tb_early_warning where is_affirm = '2' and warning_grade = '3'
         union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
     <select id="findPestWarningCount" resultType="java.lang.Integer">
