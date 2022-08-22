@@ -76,7 +76,7 @@ logging:
     io.swagger.models.parameters.AbstractSerializableParameter: error
     root: info
     org.springframework: info
-    com.rpzh.dao: DEBUG  #sql日志打印
+    com.rpzh.dao: info  #sql日志打印
 printTime:
   cron: 0/10 * * * * ?
 

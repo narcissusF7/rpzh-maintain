@@ -142,6 +142,12 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             }
         });
         log.info("新建任务发送消息成功:" + uuid + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
+        //发送短信提醒
+        if ("M".equals(pushWay) || "Q".equals(pushWay)){
+            //M:短信,Q:全部,发送短信,提醒有新的任务
+
+        }
+
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
     }
