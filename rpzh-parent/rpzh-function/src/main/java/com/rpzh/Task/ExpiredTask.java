@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.RedisUtil;
-import com.rpzh.vo.MessageVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.rpzh.util.SendMessageUtil;
 import java.util.*;
+import com.rpzh.vo.MessageVo;
 
 /**
  * 每天9点推送过期的任务
@@ -83,7 +83,7 @@ public class ExpiredTask {
                     sb.append(taskNum).append(",");
                 }
                 sb.append("请及时处理");
-                System.out.println(sb.toString());
+                log.info("发送短信内容:"+sb.toString());
                 MessageVo messageVo = SendMessageUtil.sendSms(phonenumber, sb.toString(), "h1");
                 log.info("发送结果:"+messageVo.getResult());
                 Map map = new HashMap();
