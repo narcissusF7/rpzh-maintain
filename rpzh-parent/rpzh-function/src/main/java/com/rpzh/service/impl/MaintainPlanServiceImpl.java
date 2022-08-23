@@ -176,20 +176,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
-        //分页查询
-        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         //获取位置路由
         String pidRoute = maintainPlanDto.getPidRoute();
         List<Integer> stackIds = new ArrayList<>();
         if(StringUtil.isNotEmpty(pidRoute)) {
-            if (!pidRoute.contains("04")) {
-                //选择的位置不是垛位       查询满足位置条件的所有垛位
-                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));
-            }else{
+            if (pidRoute.contains("04")) {
                 //选择的位置是垛位
                 stackIds.add(maintainPlanDto.getStackId());
+            }else{
+                //选择的位置不是垛位       查询满足位置条件的所有垛位
+                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));
             }
         }
+        //分页查询
+        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         //分页查询养护计划
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto,stackIds,stackIds.size());
         return new PageInfo(maintainPlanVos);
