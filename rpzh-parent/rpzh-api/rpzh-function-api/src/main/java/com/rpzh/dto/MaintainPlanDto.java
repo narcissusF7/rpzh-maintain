@@ -1,6 +1,7 @@
 package com.rpzh.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.AlarmValueSettingVo;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -86,8 +87,6 @@ public class MaintainPlanDto {
     private Integer alarmValueSettingId;
     //放在养护阶段表中的养护计划id
     private Integer maintainPlanId;
-    //当前时间
-    private Date nowDate;
     private Integer page = 1;
     private Integer size = 10;
     //位置名称
@@ -160,4 +159,19 @@ public class MaintainPlanDto {
     private String earlyWarningRuleName;
     //该养护计划下的所有设备
     List<String> nodeDtoList;
+
+    public MaintainPlanDto(){}
+
+    public MaintainPlanDto(String materialCode,Double maintainCount,Integer id,Integer stackId,String pidRoute,String maintenceStyle,String phases){
+        this.materialCode = materialCode;//物料代码
+        this.maintainCount = maintainCount;//养护数量
+        this.maintainPlanId = id;//养护计划id
+        this.stackId = stackId;//垛位id
+        this.areaId = SiteRouteUtil.getSiteId(pidRoute, "04");//仓间id
+        this.floorId = SiteRouteUtil.getSiteId(pidRoute, "03");//层id
+        this.buildingId = SiteRouteUtil.getSiteId(pidRoute, "02");//楼栋id
+        this.warehouseId = SiteRouteUtil.getSiteId(pidRoute, "01");//仓库id
+        this.maintenceStyle = maintenceStyle;//养护方式
+        this.phases = phases;//养护阶段
+    }
 }

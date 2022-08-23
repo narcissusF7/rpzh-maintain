@@ -1,6 +1,5 @@
 package com.rpzh.service.impl;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.*;
 import com.github.pagehelper.*;
 import com.github.pagehelper.util.StringUtil;
 import com.rpzh.dao.*;
@@ -8,7 +7,6 @@ import com.rpzh.dto.*;
 import com.rpzh.entity.*;
 import com.rpzh.enums.WarehouseNodeType;
 import com.rpzh.service.MaintainPlanService;
-import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
@@ -88,17 +86,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             }
         }
         maintainPlanDto.setPrincipalName(username);
-        //物料代码
+        //将物料代码转成字符串,并设置到maintainPlanDto中
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",",maintainPlanDto.getMaterialCodes()));
-        //养护计划创建的时间
-        Date nowDate = new Date();
         //获取创建人
         String createUser = TokenDecode.getUserInfo().get("username");
         //设置创建人
         maintainPlanDto.setCreateUser(createUser);
-        //设置创建时间
-        maintainPlanDto.setCreatedTime(nowDate);
         try {
             //设置养护到期时间,并格式化
             maintainPlanDto.setAftercareDateEnd(new Date(new SimpleDateFormat("yyyy-MM-dd").parse(maintainPlanDto.getAftercareDateStart()).getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l));
@@ -112,55 +106,27 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         //将预警数值插入到预警表中
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
         //根据垛位id获取当前养护计划的id
-        Integer id =maintainPlanDao.findIdByStackId(stackId);
-        //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
-        String maintenceStyle = maintainPlanDto.getMaintenceStyle();
-        //获取养护阶段名称
-        String phases = maintainPlanDto.getPhases();
-        //获取位置路由
-        String pidRoute = maintainPlanDto.getPidRoute();
+        //设置养护计划id
+        maintainPlanDto.setId(maintainPlanDto.getId()+1);
         //存储物料代码、养护数量、养护计划id、垛位id、仓间id、层id、楼栋id、仓库id的集合
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         //根据垛位id和物料代码查询各个物料代码的数量
         List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
         if(ToolUtil.isNotEmpty(materialVos)) {
+            //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
             for (MaterialVo materialVo : materialVos) {
-                MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
-                //物料代码
-                maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
-                //养护数量
-                maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
-                //养护计划id
-                maintainPlanDto1.setMaintainPlanId(id);
-                //垛位id
-                maintainPlanDto1.setStackId(stackId);
-                //仓间id
-                maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute, "04"));
-                //层id
-                maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute, "03"));
-                //楼栋id
-                maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute, "02"));
-                //仓库id
-                maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute, "01"));
-                //养护方式
-                maintainPlanDto1.setMaintenceStyle(maintenceStyle);
-                //养护阶段
-                maintainPlanDto1.setPhases(phases);
-                //创建时间
-                maintainPlanDto1.setNowDate(nowDate);
+                MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
                 maintainPlanDtos.add(maintainPlanDto1);
             }
             //养护数量信息批次插入养护数量表中
             maintainPlanDao.insertMaintainCount(maintainPlanDtos);
         }
         //设置预警规则id
-        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findIdByEarlyWarningRuleName(alarmValueSettingDto.getEarlyWarningRuleName()));
-        //设置养护计划id
-        maintainPlanDto.setId(id);
+        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDto.getAlarmValueSettingId()+1);
         //插入到养护阶段表中
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
         //更新养护计划表中的养护阶段id
-        return maintainPlanDao.updateMaintainPlanStageId(id);
+        return maintainPlanDao.updateMaintainPlanStageId(maintainPlanDto.getId(),maintainPlanDto.getStageId()+1);
     }
 
     /*
@@ -188,11 +154,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      * */
     @Override
     public AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName,String phases) {
-        //获取养护阶段
-        String user = TokenDecode.getUserInfo().get("username");
         //根据预警规则名称获取预警模板数值
         AlarmValueSettingVo alarmSettingTemplate = alarmSettingTemplateDao.findAlarmSettingTemplate(earlyWarningRuleName,phases);
         if(ToolUtil.isEmpty(alarmSettingTemplate)){
+            //查询出来为空,则new一个返回给前端
             alarmSettingTemplate = new AlarmValueSettingVo();
         }
         return alarmSettingTemplate;
@@ -208,10 +173,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
 
     /**
      * 查询所有养护计划
-     *
-     *
-     * @param maintainPlanDto
-     * @return success or failure
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
@@ -219,32 +180,27 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
         //获取位置路由
         String pidRoute = maintainPlanDto.getPidRoute();
-        List<Integer> stackIds = null;
+        List<Integer> stackIds = new ArrayList<>();
         if(StringUtil.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            //选择的位置是非垛位
             if (!pidRoute.contains("04")) {
-                String route = SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + "");
-                stackIds = maintainPlanDao.findStackIdBySiteRoute(route);
+                //选择的位置不是垛位       查询满足位置条件的所有垛位
+                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));
             }else{
-                stackIds = new ArrayList<>();
                 //选择的位置是垛位
                 stackIds.add(maintainPlanDto.getStackId());
             }
         }
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto,stackIds);
+        //分页查询养护计划
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainPlanInfo(maintainPlanDto,stackIds,stackIds.size());
         return new PageInfo(maintainPlanVos);
     }
 
     /**
      * 删除/批量删除养护计划
-     *
-     * @param ids 养护计划id
-     * @return success or failure
      */
     @Override
     public Result deleteMaintainPlanInfo(List<Integer> ids) {
-        //根据ids查询位置路由和垛位id
+        //根据ids查询位置路由和垛位id,垛位id用来拼接全位置路由,位置路由用来查询是否存在未处理的任务,
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findPidRoute(ids);
         List<String> pidRoutes = new ArrayList<>();
         maintainPlanVos.forEach(maintainPlanVo -> {
@@ -253,28 +209,24 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         });
         //查询所选的养护计划是否存在未处理的任务
         Integer count = maintainPlanDao.findCountBySiteRoute(pidRoutes);
+        //发现有一个养护计划存在未处理的任务,则禁止删除
         if(count>0){
             return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
         }
         //查询满足条件的预警ids和阶段ids
         List<Map> idInfos = maintainPlanDao.findAlarmValueSettingId(ids);
-        System.out.println("idInfos:"+idInfos);
-        //查询所有预警ids
-        List<Integer> alarmValueSettingIds = idInfos.stream().map((Map map) -> Integer.parseInt(map.get("AID").toString())).collect(Collectors.toList());
-        System.out.println(alarmValueSettingIds);
-        //查询所有阶段ids
-        List<Integer> stageIds = idInfos.stream().map((Map map) -> Integer.parseInt(map.get("ID").toString())).collect(Collectors.toList());
-        System.out.println(stageIds);
+        //筛选所有预警ids
+        List<Integer> alarmValueSettingIds = idInfos.stream().map((Map map) -> Integer.parseInt(map.get("alarmValueSettingId").toString())).collect(Collectors.toList());
+        //筛选所有阶段ids
+        List<Integer> stageIds = idInfos.stream().map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
         for (Integer stageId : stageIds) {
             //删除redis中的养护信息
             if(ToolUtil.isNotEmpty(redisTemplate.opsForHash().entries(MAINTAIN + stageId))){
                 redisTemplate.delete(MAINTAIN + stageId);
             }
         }
-        for (Integer id : ids) {
-            //删除养护数量表数据
-            maintainPlanDao.deleteMaintainCount(id);
-        }
+        //删除养护数量表数据
+        maintainPlanDao.deleteMaintainCount(ids);
         //删除养护计划表信息
         maintainPlanDao.deleteMaintainPlanById(ids);
         if(ToolUtil.isNotEmpty(alarmValueSettingIds)) {
@@ -295,43 +247,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlan(id);
         //将物料代码转为list类型传给前端
         maintainPlanVo.setMaterialCodes(Arrays.asList(maintainPlanVo.getMaterialCode().split(",")));
-        //将负责人转为list类型
-        List<String> names = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
-        String userName = "";
-        for (int i = 0; i < names.size(); i++) {
-            if(i==0){
-                //从redis中取出用户名
-                userName = (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
-            }else{
-                userName = userName + ","+ (String)redisUtil.hget("USER_"+names.get(i),"nickname") + "(" + names.get(i) + ")";
-            }
-        }
         //设置负责人(用户名加账号)
-        maintainPlanVo.setPrincipalName(userName);
+        maintainPlanVo.setPrincipalName(getUserName(maintainPlanVo.getPrincipalName()));
         //根据养护计划id查询各阶段信息
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
-            String userNames = "";
-            for (int i = 0; i < usernames.size(); i++) {
-                if(i==0){
-                    //从redis中取出用户名
-                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }else{
-                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }
-            }
             //设置各阶段的负责人(用户名加账号)
-            maintainPlan.setPrincipalName(userNames);
+            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));
         });
         //将各阶段信息加入到养护信息中
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         //根据预警规则id查询预警信息
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(maintainPlanVo.getAlarmValueSettingId());;
-        String pidRoute = maintainPlanVo.getPidRoute();
         //调用方法向上查找仓间预警数值
-        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
-        maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
+        maintainPlanVo.setAlarmValueSettingVo(getAlarmValueSetting(alarmValueSettingVo,maintainPlanVo.getPidRoute()));
         //获取仓间id(该垛位所在的仓间)
         Integer areaId = maintainPlanVo.getAreaId();
         //获取该仓间的所有空调编号
@@ -357,11 +286,27 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             //根据养护计划id查询垛位当前的氧气
             maintainPlanVo.setStackOxygenNow(Double.parseDouble(String.format("%.2f", nodeDao.findO2StackData(id))));
             //根据位置路由查询仓间当前的氧气
-            maintainPlanVo.setWarehouseOxygenNow(Double.parseDouble(String.format("%.2f", nodeDao.findO2AreaData(pidRoute))));
+            maintainPlanVo.setWarehouseOxygenNow(Double.parseDouble(String.format("%.2f", nodeDao.findO2AreaData(maintainPlanVo.getPidRoute()))));
         }
         return maintainPlanVo;
     }
 
+    /*
+    * 设置负责人(用户名加账号)
+    * */
+    public String getUserName(String name){
+        List<String> usernames = Arrays.asList(name.split(","));
+        String userNames = "";
+        for (int i = 0; i < usernames.size(); i++) {
+            if(i==0){
+                //从redis中取出用户名
+                userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+            }else{
+                userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
+            }
+        }
+        return userNames;
+    }
     /*
      * 更改前回显
      * */
@@ -489,23 +434,13 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute();
-        Integer id = maintainPlanDto.getId();
-        maintainPlanDao.deleteMaintainCount(id);
+        List<Integer> ids = new ArrayList<>();
+        ids.add(maintainPlanDto.getId());
+        maintainPlanDao.deleteMaintainCount(ids);
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
         for (MaterialVo materialVo : materialVos) {
-            MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
-            maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
-            maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
-            maintainPlanDto1.setMaintainPlanId(id);
-            maintainPlanDto1.setStackId(stackId);
-            maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
-            maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
-            maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
-            maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
-            maintainPlanDto1.setMaintenceStyle(maintenceStyle);
-            maintainPlanDto1.setPhases(phases);
-            maintainPlanDto1.setNowDate(nowDate);
+            MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,pidRoute,maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
             maintainPlanDtos.add(maintainPlanDto1);
         }
         System.out.println(maintainPlanDtos.size());
@@ -516,7 +451,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     @Override
-    public Integer endMaintainPlan(MaintainPlanDto maintainPlanDto) {
+    public Integer endMaintainPlan(MaintainPlanDto maintainPlanDto){
         List<Integer> ids = new ArrayList<>();
         ids.add(maintainPlanDto.getId());
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findPidRoute(ids);
@@ -537,25 +472,19 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 e.printStackTrace();
             }
         }
-        Date updateTime = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
-        Integer maintainPlanId = maintainPlanDto.getId();
-        maintainPlanDao.deleteMaintainCount(maintainPlanId);
+        maintainPlanDao.deleteMaintainCount(ids);
         materialDao.updateMaterialStatus(maintainPlanVos.get(0).getStackId());
-        Date createdTime = maintainPlanDao.findCreatedTime(maintainPlanId);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(createdTime);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        Calendar nowCalendar = Calendar.getInstance();
-        nowCalendar.setTime(new Date());
-        nowCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        nowCalendar.set(Calendar.MINUTE, 0);
-        nowCalendar.set(Calendar.SECOND, 0);
-        long maintainDays = (nowCalendar.getTime().getTime() - calendar.getTime().getTime())/(1000 * 24 * 60 * 60);
-        maintainPlanDao.endMaintainPlanStage(updateUser,updateTime,maintainPlanId,maintainDays);
-        Integer result =  maintainPlanDao.endMaintainPlan(maintainPlanId);
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date createdTime = sdf.parse(sdf.format(maintainPlanDao.findCreatedTime(maintainPlanDto.getId())));
+            Date nowTime = sdf.parse(sdf.format(new Date()));
+            long maintainDays = (nowTime.getTime() - createdTime.getTime())/(1000 * 24 * 60 * 60);
+            maintainPlanDao.endMaintainPlanStage(updateUser,maintainPlanDto.getId(),maintainDays);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Integer result =  maintainPlanDao.endMaintainPlan(maintainPlanDto.getId());
         return result;
     }
 
@@ -627,23 +556,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String maintenceStyle = maintainPlanDto.getMaintenceStyle();
         String phases = maintainPlanDto.getPhases();
         String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";
-        Integer id = maintainPlanDto.getId();
-        maintainPlanDao.deleteMaintainCount(id);
+        maintainPlanDao.deleteMaintainCount(ids);
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
         for (MaterialVo materialVo : materialVos) {
-            MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
-            maintainPlanDto1.setMaterialCode(materialVo.getMaterialCode());
-            maintainPlanDto1.setMaintainCount(materialVo.getMaintainCount());
-            maintainPlanDto1.setMaintainPlanId(id);
-            maintainPlanDto1.setStackId(stackId);
-            maintainPlanDto1.setAreaId(SiteRouteUtil.getSiteId(pidRoute,"04"));
-            maintainPlanDto1.setFloorId(SiteRouteUtil.getSiteId(pidRoute,"03"));
-            maintainPlanDto1.setBuildingId(SiteRouteUtil.getSiteId(pidRoute,"02"));
-            maintainPlanDto1.setWarehouseId(SiteRouteUtil.getSiteId(pidRoute,"01"));
-            maintainPlanDto1.setMaintenceStyle(maintenceStyle);
-            maintainPlanDto1.setPhases(phases);
-            maintainPlanDto1.setNowDate(date);
+            MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,pidRoute,maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
             maintainPlanDtos.add(maintainPlanDto1);
         }
         maintainPlanDao.insertMaintainCount(maintainPlanDtos);
@@ -657,16 +574,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId) {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
-            String userNames = "";
-            for (int i = 0; i < usernames.size(); i++) {
-                if(i==0){
-                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }else{
-                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }
-            }
-            maintainPlan.setPrincipalName(userNames);
+            //设置各阶段的负责人(用户名加账号)
+            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
@@ -677,16 +586,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public MaintainPlanVo findEndMaintainPlanDetails(Integer id) {
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
         maintainPlanVos.forEach(maintainPlan->{
-            List<String> usernames = Arrays.asList(maintainPlan.getPrincipalName().split(","));
-            String userNames = "";
-            for (int i = 0; i < usernames.size(); i++) {
-                if(i==0){
-                    userNames = (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }else{
-                    userNames = userNames + ","+ (String)redisUtil.hget("USER_"+usernames.get(i),"nickname") + "(" + usernames.get(i) + ")";
-                }
-            }
-            maintainPlan.setPrincipalName(userNames);
+            //设置各阶段的负责人(用户名加账号)
+            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));
         });
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
@@ -715,7 +616,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             }
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
-        maintainPlanDto.setNowDate(new Date());
         List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findExpireCollectTable(maintainPlanDto,stackIds);
         maintainPlanVos.forEach(maintainPlanVo -> {
             maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));
@@ -779,7 +679,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     @Transactional
     public Result moveStack(MaintainPlanDto maintainPlanDto) {
-
         List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
         List<NodeDto> nodeDtos = new ArrayList<>();
         nodeDtoList.forEach(nodeDtostr ->

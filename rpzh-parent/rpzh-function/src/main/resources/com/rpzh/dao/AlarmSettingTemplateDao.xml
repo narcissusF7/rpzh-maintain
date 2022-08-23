@@ -5,9 +5,7 @@
         select id from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName} and rownum = 1
     </select>
     <select id="findAlarmSettingTemplateList" resultType="java.lang.String">
-        select
-        early_warning_rule_name
-        from tb_alarm_setting_template group  by early_warning_rule_name
+        select early_warning_rule_name from tb_alarm_setting_template group  by early_warning_rule_name
     </select>
     <select id="findAlarmSettingTemplate" resultType="com.rpzh.vo.AlarmValueSettingVo">
         select

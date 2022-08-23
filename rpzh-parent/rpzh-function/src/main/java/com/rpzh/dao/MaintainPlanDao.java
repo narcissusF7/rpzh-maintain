@@ -19,7 +19,7 @@ public interface MaintainPlanDao {
 
     int deleteMaintainPlanStageById(@Param("ids") List<Integer> ids);
 
-    List<MaintainPlanVo> findMaintainPlanInfo(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
+    List<MaintainPlanVo> findMaintainPlanInfo(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds,@Param("size")Integer size);
 
     MaintainPlanVo findMaintainPlan(@Param("id") Integer id);
 
@@ -33,11 +33,7 @@ public interface MaintainPlanDao {
 
     Integer findStageIdById(@Param("id") Integer id);
 
-    Integer findIdByStackId(@Param("stackId") Integer stackId);
-
-    int updateMaintainPlanStageId(@Param("id") Integer id);
-
-    List<MaintainPlanVo> findMaintainCountReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+    int updateMaintainPlanStageId(@Param("id") Integer id,@Param("stageId")Integer stageId);
 
     List<MaintainPlanVo> findMaintainMonthEndReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
@@ -45,17 +41,9 @@ public interface MaintainPlanDao {
 
     Integer endMaintainPlan(@Param("maintainPlanId") Integer maintainPlanId);
 
-    Integer endMaintainPlanStage(@Param("updateUser") String updateUser, @Param("updatedTime") Date updateTime, @Param("maintainPlanId") Integer maintainPlanId, @Param("maintainDays") long maintainDays);
+    Integer endMaintainPlanStage(@Param("updateUser") String updateUser, @Param("maintainPlanId") Integer maintainPlanId, @Param("maintainDays") long maintainDays);
 
     List<Map> findAlarmValueSettingId(@Param("ids") List<Integer> ids);
-
-    MaintainPlanVo findVersion(@Param("stageId") Integer stageId);
-
-    Integer findStageId(@Param("id") Integer id, @Param("version") Integer version);
-
-    Integer updateChange(@Param("id") Integer id, @Param("change") String change);
-
-    Integer updateStageId(@Param("id") Integer id, @Param("stageId") Integer stageId);
 
     List<MaintainPlanVo> findDetails(@Param("id") Integer id);
 
@@ -79,7 +67,7 @@ public interface MaintainPlanDao {
 
     int insertMaintainCount(@Param("maintainPlanDtos") List<MaintainPlanDto> maintainPlanDtos);
 
-    int deleteMaintainCount(@Param("id") Integer id);
+    int deleteMaintainCount(@Param("ids") List<Integer> ids);
 
     List<MaintainCountVo> findMaintainCountBySiteName(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("tableColumn") String tableColumn);
 

@@ -166,7 +166,6 @@ public class AlarmValueSettingDto {
       this.coreTempLowEnvTemp = maintainPlanDto.getCoreTempLowEnvTemp();
       this.updatedTime = maintainPlanDto.getUpdatedTime();
       this.updateUser = maintainPlanDto.getUpdateUser();
-      this.createdTime = maintainPlanDto.getCreatedTime();
       this.createUser = maintainPlanDto.getCreateUser();
       this.alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
     }
