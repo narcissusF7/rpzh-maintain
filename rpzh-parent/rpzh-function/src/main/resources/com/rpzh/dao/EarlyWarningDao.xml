@@ -299,4 +299,11 @@
         <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>
         GROUP BY warning_type
     </select>
+    <select id="findUndoEarlyWarningBySiteRoute" resultType="com.rpzh.vo.EarlyWarningVo">
+        select id , warning_grade as warningGrade  , warning_type warningType  , is_affirm affirm from tb_early_warning where site_route =#{siteRoute} and is_affirm in (1,2)
+        <if test="warningType!='' and warningType!=null">
+            and warning_type =#{warningType}
+        </if>
+        and rownum = 1
+    </select>
 </mapper>

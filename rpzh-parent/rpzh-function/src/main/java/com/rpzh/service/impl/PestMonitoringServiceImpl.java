@@ -94,11 +94,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //拼接成自己的路由id
         pestBoardDto.setSiteRoute(pestBoardDto.getSiteRoute() + ",[0" + siteLevel + ":" + pestBoardDto.getSiteId() + "]");
         synchronized (this) {
-            //通过selectKey 将主键id返回到Bean中
             pestMonitoringDao.addPestBoard(pestBoardDto);
 
-//            redisTemplate.opsForValue().set(PEST_BOARD+pestBoardDto.getId(),JSONObject.toJSONString(pestBoardDto));
-            //向rfid关系表插入数据
         }
 
         return new Result(true, StatusCode.OK, "添加成功");

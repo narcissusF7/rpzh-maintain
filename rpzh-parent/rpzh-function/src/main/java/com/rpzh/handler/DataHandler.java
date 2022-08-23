@@ -464,7 +464,7 @@ public class DataHandler {
      */
     public void avgCoreHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data) {
         //查询数据库中该设备未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(nodeVo.getNodeId(),WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(),WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());

@@ -10,6 +10,9 @@
     WHERE name = #{name}
   </select>
   <insert id="addWarehouse">
+    <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="warehouseDto.id">
+      SELECT TWAREHOUSE.NEXTVAL as "id" from DUAL
+    </selectKey>
     INSERT INTO tb_warehouse
     (
     <if test="warehouseDto.name != null and warehouseDto.name != ''">name,</if>

@@ -21,6 +21,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,35 @@ public class NodeOperateAspect {
     RedisTemplate redisTemplate;
     @Autowired
     NodeDao nodeDao;
+
+
+    /**
+     * 设备解垛 前置通知
+     * @param pjp
+     */
+    @Before(value = "execution(* com.rpzh.controller.NodeController.unbindStack())")
+    public void NodeUnBingOperateLog(JoinPoint pjp){
+        Object[] args = pjp.getArgs();
+        NodeDto nodeDto =(NodeDto) args[0];
+
+        //获取用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+
+        List<NodeOperationDto> nodeOperationDtos = new ArrayList<>();
+
+        List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
+        for (int i = 0; i < nodeDtos1.size(); i++) {
+            setValue("unbindStack",nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getGatherSite()+"解垛",username,nodeOperationDtos);
+        }
+
+        if (nodeOperationDtos.size()>0){
+            operationService.insertNodeOperation(nodeOperationDtos);
+        }
+    }
+
+
 
     @AfterReturning(value = "execution(* com.rpzh.controller.NodeController.*(..))||execution(* com.rpzh.controller.MaintainPlanController..*(..)))", returning = "result")
     public void NodeOperateLog(JoinPoint pjp, Result<T> result){
@@ -129,14 +159,14 @@ public class NodeOperateAspect {
                             setValue(type,nodeDto1,"设备"+nodeDto1.getNodeId() +"入垛至"+nodeDto1.getStack(),username,nodeOperationDtos)
                     );
                     break;
-                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
-                    nodeDto =(NodeDto) args[0];
-                    List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
-                    for (int i = 0; i < nodeDtos1.size(); i++) {
-                        setValue(type,nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getGatherSite()+"解垛",username,nodeOperationDtos);
-                    }
-
-                    break;
+//                case NodeConstant.UNBIND_STACK_NODE_OPERATE_NUMBER:
+//                    nodeDto =(NodeDto) args[0];
+//                    List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
+//                    for (int i = 0; i < nodeDtos1.size(); i++) {
+//                        setValue(type,nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getGatherSite()+"解垛",username,nodeOperationDtos);
+//                    }
+//
+//                    break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
                     nodeDtoList = maintainPlanDto.getNodeDtoList();
