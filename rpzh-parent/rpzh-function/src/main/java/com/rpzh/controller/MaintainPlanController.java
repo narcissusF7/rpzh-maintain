@@ -44,9 +44,6 @@ import com.rpzh.util.TokenDecode;
 @Api(value = "养护计划", tags = "养护计划")
 public class MaintainPlanController {
 
-    /**
-     * 养护服务层
-     */
     @Resource
     private MaintainPlanService maintainPlanService;
 
@@ -75,13 +72,7 @@ public class MaintainPlanController {
         List<String> alarmSettingTemplateNames = maintainPlanService.findAlarmSettingTemplateList();
         return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplateNames);
     }
-    /**
-     * 插入一条养护计划
-     *
-     * @param maintainPlanDto 前端传入添加信息
-     * @return success or failure
-     * @createUser wbl
-     */
+
     @PostMapping(value = "/insert")
     @ApiOperation(value = "新建养护计划")
     @ApiImplicitParams({
@@ -162,13 +153,6 @@ public class MaintainPlanController {
         return new Result<>(true, StatusCode.OK, "养护计划添加成功",result);
     }
 
-    /**
-     * 分页查询养护计划
-     * @param maintainPlanDto 前端传入添加信息
-     * @return Result
-     * @createUser wbl
-     * @updateUser zyq
-     */
     @PostMapping(value = "/findMaintainPlanInfo")
     @ApiOperation(value = "分页查询养护计划")
     @ApiImplicitParams({
@@ -199,13 +183,7 @@ public class MaintainPlanController {
     public Result findCountByName(String earlyWarningRuleName){
         return maintainPlanService.findCountByName(earlyWarningRuleName);
     }
-    /**
-     * 删除养护计划
-     * @param ids  养护计划id
-     * @return Result
-     * @createUser wbl
-     * @updateUser zyq
-     */
+
     @PostMapping("/deleteMaintainPlanInfo")
     @ApiOperation(value = "删除养护计划")
     @ApiImplicitParams({
@@ -217,13 +195,6 @@ public class MaintainPlanController {
         return result;
     }
 
-    /**
-     * 根据养护id查询养护详情
-     *
-     * @param id 养护计划id
-     * @return success or failure
-     * @createUser wbl
-     */
     @PostMapping("/findMaintainPlanById")
     @ApiOperation(value = "根据养护id查询养护详情")
     @ApiImplicitParams({
@@ -254,11 +225,7 @@ public class MaintainPlanController {
         MaintainPlanVo maintainPlan = maintainPlanService.beforeChangeMaintainPlanStage(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "转段前回显成功",maintainPlan);
     }
-    /**
-     * 更改养护计划
-     * @param maintainPlanDto
-     * @return
-     */
+
     @PostMapping("/updateMaintainPlan")
     @ApiOperation(value = "更改养护计划")
     @ApiImplicitParams({
@@ -311,11 +278,6 @@ public class MaintainPlanController {
         return new Result<>(true, StatusCode.OK, "更改养护计划成功",i);
     }
 
-    /**
-     * 开垛使用
-     * @param maintainPlanDto
-     * @return
-     */
     @PostMapping(value = "/endMaintainPlan")
     @ApiOperation(value = "开垛使用")
     @ApiImplicitParams({
@@ -325,11 +287,7 @@ public class MaintainPlanController {
     })
 //    @PreAuthorize("hasAnyAuthority('f:m:open')")
     public Result endMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
-        Integer i = maintainPlanService.endMaintainPlan(maintainPlanDto);
-        if (i == -1) {
-            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在开垛");
-        }
-        return new Result<>(true, StatusCode.OK, "开垛成功",i);
+        return maintainPlanService.endMaintainPlan(maintainPlanDto);
     }
 
     @PostMapping("/getPhases")
@@ -338,10 +296,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String")
     })
     public Result getPhases(String maintenceStyle) {
-        List<String> phases = new ArrayList<>();
-        phases.add("养护阶段");
-        phases.add("充氮杀虫阶段");
-        phases.add("磷化铝杀虫阶段");
+        List<String> phases = new ArrayList<>(Arrays.asList("养护阶段","充氮杀虫阶段","磷化铝杀虫阶段"));
         if(maintenceStyle.equals("机械调控方式")) {
             phases.add("充氮保质阶段");
         }
@@ -359,11 +314,6 @@ public class MaintainPlanController {
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
 
-    /**
-     * 转段
-     * @param maintainPlanDto
-     * @return
-     */
     @PostMapping("/changeMaintainPlanStage")
     @ApiOperation(value = "转段")
     @ApiImplicitParams({
@@ -419,11 +369,6 @@ public class MaintainPlanController {
         return new Result<>(true, StatusCode.OK, "转段成功",result);
     }
 
-    /**
-     * 养护到期汇总中的详情
-     * @param maintainPlanDto
-     * @return
-     */
     @PostMapping("/findMaintainPlanDetails")
     @ApiOperation(value = "养护到期汇总中的详情")
     @ApiImplicitParams({
@@ -436,11 +381,6 @@ public class MaintainPlanController {
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
     }
 
-    /**
-     * 历史汇总单中的详情
-     * @param id
-     * @return
-     */
     @PostMapping("/findEndMaintainPlanDetails")
     @ApiOperation(value = "历史汇总单中的详情")
     @ApiImplicitParams({
@@ -472,11 +412,6 @@ public class MaintainPlanController {
         return new Result<>(true, StatusCode.OK, "养护到期汇总列表查询成功",maintainPlanInfo);
     }
 
-    /**
-     * 养护当月新建报表/月底养护报表
-     * @param maintainPlanDto
-     * @return
-     */
     @PostMapping(value = "/findMaintainMonthEndReport")
     @ApiOperation(value = "月底养护报表")
     @ApiImplicitParams({
@@ -496,11 +431,6 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
     }
 
-    /**
-     * 历史汇总单
-     * @param maintainPlanDto
-     * @return
-     */
     @PostMapping(value = "/findMaintainHistoryCollect")
     @ApiOperation(value = "历史汇总单")
     @ApiImplicitParams({
@@ -532,12 +462,6 @@ public class MaintainPlanController {
         return maintainPlanService.moveStack(maintainPlanDto);
     }
 
-
-    /**
-     * 养护统计报表
-     * @param maintainCountDto
-     * @return
-     */
     @PostMapping(value = "/findMaintainCountReport")
     @ApiOperation(value = "养护数量")
     @ApiImplicitParams({
@@ -567,8 +491,6 @@ public class MaintainPlanController {
     })
 //    @PreAuthorize("hasAnyAuthority('f:m:excel')")
     public void export(HttpServletResponse response,MaintainCountDto maintainCountDto) {
-        String username = TokenDecode.getUserInfo().get("username");
-        System.out.println(username);
         List<String> ids = maintainCountDto.getIds();
         if(ToolUtil.isEmpty(ids)){
             return;

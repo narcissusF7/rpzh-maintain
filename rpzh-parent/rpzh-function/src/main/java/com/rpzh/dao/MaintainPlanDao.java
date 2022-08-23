@@ -23,6 +23,8 @@ public interface MaintainPlanDao {
 
     MaintainPlanVo findMaintainPlan(@Param("id") Integer id);
 
+    MaintainPlanVo beforeChangeMaintainPlan(@Param("id") Integer id);
+
     Integer updateMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
     Integer updateMaintainPlanStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);

@@ -189,10 +189,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     public Result findAlarmSettingTemplateByMaterialCode(String materialCode, String earlyWarningRuleName,String phases) {
         //根据物料代码、预警规则、阶段查询预警信息
         AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateDao.findAlarmSettingTemplateByMaterialCodeAndPhases(materialCode, earlyWarningRuleName,phases);
-        if(ToolUtil.isEmpty(alarmValueSettingVo)){
-            //new一个alarmValueSettingVo对象
-            alarmValueSettingVo = new AlarmValueSettingVo("1");
-        }else{
+        if(ToolUtil.isNotEmpty(alarmValueSettingVo)){
             //不为空,将物料代码转成数组,返回给前端
             alarmValueSettingVo.setMaterialCodes(Arrays.asList(alarmValueSettingVo.getMaterialCode()));
         }

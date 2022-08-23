@@ -73,8 +73,6 @@ public class MaintainPlanDto {
     private String oxygenReductionTime;
     //负责人id集合
     private List<Integer> principalIds;
-    //负责人id
-    private String principalId;
     //负责人
     private String principalName;
     //到期提醒时间

@@ -53,7 +53,7 @@ public interface MaintainPlanService {
 
     MaintainPlanVo beforeUpdateMaintainPlan(Integer id);
 
-    Integer endMaintainPlan(MaintainPlanDto maintainPlanDto);
+    Result endMaintainPlan(MaintainPlanDto maintainPlanDto);
 
     MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId);
 

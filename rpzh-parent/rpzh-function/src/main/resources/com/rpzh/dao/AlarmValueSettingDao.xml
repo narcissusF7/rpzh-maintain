@@ -2,37 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.AlarmValueSettingDao">
     <select id="findAlarmValueSettingByStackId" resultType="com.rpzh.vo.EarlyWarningVo">
-       select ${column}
-       from tb_alarm_value_setting t1
+       select ${column} from tb_alarm_value_setting t1
        inner join tb_maintain_plan_stage t2 on t1.id=t2.alarm_value_setting_id
        inner join tb_maintain_plan t3 on t2.id = t3.stage_id and t3.stack_id = #{stackId} and t3.is_end ='0'
     </select>
     <select id="findAlarmValueSettingById" resultType="com.rpzh.vo.AlarmValueSettingVo">
        select
-        id as alarmValueSettingId,
-       stack_oxygen_upper_one as stackOxygenUpperOne,
-       stack_oxygen_upper_two as stackOxygenUpperTwo,
-       stack_oxygen_upper_three as stackOxygenUpperThree,
-       stack_oxygen_lower as stackOxygenLower,
-       temp_core_chip_upper_one as tempCoreChipUpperOne,
-       temp_core_chip_upper_two as tempCoreChipUpperTwo,
-       temp_core_chip_upper_three as tempCoreChipUpperThree,
-       temp_core_chip_lower as tempCoreChipLower,
-       stack_temp_upper_one as stackTempUpperOne,
-       stack_temp_upper_two as stackTempUpperTwo,
-       stack_temp_upper_three as stackTempUpperThree,
-       stack_temp_lower as stackTempLower,
-       stack_moisture_upper_one as stackMoistureUpperOne,
-       stack_moisture_upper_two as stackMoistureUpperTwo,
-       stack_moisture_upper_three as stackMoistureUpperThree,
-       stack_moisture_lower as stackMoistureLower,
-       core_temp_high_env_temp_one as coreTempHighEnvTempOne,
-       core_temp_high_env_temp_two as coreTempHighEnvTempTwo,
-       core_temp_high_env_temp_three as coreTempHighEnvTempThree,
-       core_temp_low_env_temp as coreTempLowEnvTemp,
-       early_warning_rule_name as earlyWarningRuleName
-       from tb_alarm_value_setting
-       where id = #{alarmValueSettingId}
+        id as alarmValueSettingId,early_warning_rule_name as earlyWarningRuleName,
+       stack_oxygen_upper_one as stackOxygenUpperOne,stack_oxygen_upper_two as stackOxygenUpperTwo,stack_oxygen_upper_three as stackOxygenUpperThree,stack_oxygen_lower as stackOxygenLower,
+       temp_core_chip_upper_one as tempCoreChipUpperOne,temp_core_chip_upper_two as tempCoreChipUpperTwo,temp_core_chip_upper_three as tempCoreChipUpperThree,temp_core_chip_lower as tempCoreChipLower,
+       stack_temp_upper_one as stackTempUpperOne,stack_temp_upper_two as stackTempUpperTwo,stack_temp_upper_three as stackTempUpperThree,stack_temp_lower as stackTempLower,
+       stack_moisture_upper_one as stackMoistureUpperOne,stack_moisture_upper_two as stackMoistureUpperTwo,stack_moisture_upper_three as stackMoistureUpperThree,stack_moisture_lower as stackMoistureLower,
+       core_temp_high_env_temp_one as coreTempHighEnvTempOne,core_temp_high_env_temp_two as coreTempHighEnvTempTwo,core_temp_high_env_temp_three as coreTempHighEnvTempThree,core_temp_low_env_temp as coreTempLowEnvTemp
+       from tb_alarm_value_setting where id = #{alarmValueSettingId}
    </select>
     <update id="updateAlarmValueSetting">
         update tb_alarm_value_setting
@@ -59,7 +41,7 @@
             <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp = #{alarmValueSettingDto.coreTempLowEnvTemp},</if>
             <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name=#{alarmValueSettingDto.earlyWarningRuleName},</if>
             <if test="alarmValueSettingDto.updateUser != null and alarmValueSettingDto.updateUser != ''">update_user=#{alarmValueSettingDto.updateUser},</if>
-            updated_time=#{alarmValueSettingDto.updatedTime}
+            updated_time=sysdate
         </set>
         where id = #{alarmValueSettingDto.alarmValueSettingId}
     </update>
