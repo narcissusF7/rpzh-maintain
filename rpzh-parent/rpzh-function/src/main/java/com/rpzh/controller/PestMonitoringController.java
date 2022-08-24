@@ -93,7 +93,7 @@ public class PestMonitoringController {
     @ApiOperation("删除虫情板")
     @ApiImplicitParam(name = "ids", value = "id集", dataType = "Integer", required = true,allowMultiple = true)
     @PostMapping("/deletePestBoard")
-    @PreAuthorize("hasAnyAuthority('f:n:del')")
+    @PreAuthorize("hasAnyAuthority('f:p:del')")
     public Result deletePestBoard(Integer [] ids){
         if (ToolUtil.isEmpty(ids)) {
             return new Result<>(false, StatusCode.ERROR, "id集不能为空");
@@ -119,7 +119,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "specialStack", value = "特殊垛位集合",dataType = "String")
     })
     @PostMapping("/updatePestRule")
-    @PreAuthorize("hasAnyAuthority('f:n:ur')")
+    @PreAuthorize("hasAnyAuthority('f:p:ur')")
     public Result updatePestRule(PestMonitoringRuleDto pestMonitoringRuleDto){
         if (ToolUtil.isEmpty(pestMonitoringRuleDto.getWeekPatrol())) {
             return new Result<>(false, StatusCode.ERROR, "巡查时间不能为空");
