@@ -26,7 +26,7 @@ public class WarningTypeConstant {
     public static String getWarningType(String siteType , String nodeType , String evnType){
         //非温湿度设备
         if (ToolUtil.isEmpty(evnType)){
-            if (NodeConstant.WET_CORE_CHIP_NODE_TYPE_VALUE.equals(nodeType)){
+            if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(nodeType)){
                 return CORE_TEMP_OVERRUN_WARNING;
             }
             //仓间设备
