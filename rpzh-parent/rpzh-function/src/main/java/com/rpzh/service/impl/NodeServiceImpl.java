@@ -302,7 +302,9 @@ public class NodeServiceImpl implements NodeService {
             nodeVo.setCreatedUser(username);
             nodeVoList.add(nodeVo);
         }
-        int addFlag = nodeDao.exportNode(nodeVoList);
+        if (ToolUtil.isNotEmpty(nodeVoList)){
+            int addFlag = nodeDao.exportNode(nodeVoList);
+        }
         return new Result(true,StatusCode.OK,"批量导入成功");
     }
 

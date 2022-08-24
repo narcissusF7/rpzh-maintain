@@ -8,6 +8,7 @@ import com.rpzh.service.EarlyWarningService;
 import com.rpzh.vo.EarlyWarningVo;
 import io.swagger.annotations.*;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -70,6 +71,7 @@ public class HistoryWarningController {
             @ApiImplicitParam(name = "finishTime", value = "结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "dayType", value = "日期类型 1:日,2:周,3:月,4:年 ", required = true, dataType = "int")
     })
+    @PreAuthorize("hasAnyAuthority('f:h:fwc')")
     public Result<Map<String,String>> findWarningCount(@ApiIgnore EarlyWarningDto earlyWarningDto) {
         return earlyWarningService.findWarningCount(earlyWarningDto);
     }

@@ -8,6 +8,7 @@ import com.rpzh.service.EarlyWarningService;
 import com.rpzh.vo.RepairDataVo;
 import io.swagger.annotations.*;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -95,6 +96,7 @@ public class EarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
     })
+    @PreAuthorize("hasAnyAuthority('f:e:mp')")
     public Result misreport(Integer id){
         if(ToolUtil.isEmpty(id)){
             return new Result<>(false, StatusCode.ERROR, "预警id不能为空");
@@ -128,6 +130,7 @@ public class EarlyWarningController {
 
     @PostMapping("/updateRepairId")
     @ApiOperation(value = "去处理（故障），设备维修")
+    @PreAuthorize("hasAnyAuthority('f:e:upr')")
     public void updateRepairId(@RequestParam("beforeAffirm") String beforeAffirm,@RequestParam("affirm") String affirm, @RequestParam(name = "deviceId",required = false) String deviceId, @RequestParam(name="id",required = false) String id,
                                @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime,@RequestParam("warningType")String warningType) {
         earlyWarningService.updateRepairId(beforeAffirm,affirm, deviceId, id, principal,dealTime,warningType);

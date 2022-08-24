@@ -39,7 +39,7 @@ public class WarehouseController {
      * @param warehouseDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:add')")
+    @PreAuthorize("hasAnyAuthority('p:w:add')")
     @PostMapping("/addWarehouse")
     public Result addWarehouse(WarehouseDto warehouseDto) {
         //获取仓库名称
@@ -78,7 +78,7 @@ public class WarehouseController {
      * @param warehouseDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:up')")
+    @PreAuthorize("hasAnyAuthority('p:w:up')")
     @PostMapping("/updateWarehouse")
     public Result updateWarehouse(WarehouseDto warehouseDto) {
         String name = warehouseDto.getName();
@@ -111,7 +111,7 @@ public class WarehouseController {
      * @param buildingDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:add')")
+    @PreAuthorize("hasAnyAuthority('p:w:add')")
     @PostMapping("/addBuilding")
     public Result addBuilding(BuildingDto buildingDto) {
         //获取楼号
@@ -153,7 +153,7 @@ public class WarehouseController {
      * @param buildingDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:up')")
+    @PreAuthorize("hasAnyAuthority('p:w:up')")
     @PostMapping("/updateBuilding")
     public Result updateBuilding(BuildingDto buildingDto) {
         if (ToolUtil.isEmpty(buildingDto.getId())) {
@@ -202,7 +202,7 @@ public class WarehouseController {
      * @param floorDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:add')")
+    @PreAuthorize("hasAnyAuthority('p:w:add')")
     @PostMapping("/addFloor")
     public Result addFloor(FloorDto floorDto) {
         //获取楼层编号
@@ -246,7 +246,7 @@ public class WarehouseController {
      * @param floorDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:up')")
+    @PreAuthorize("hasAnyAuthority('p:w:up')")
     @PostMapping("/updateFloor")
     public Result updateFloor(FloorDto floorDto) {
         Integer id = floorDto.getId();
@@ -294,7 +294,7 @@ public class WarehouseController {
      * @param wareAreaDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:add')")
+    @PreAuthorize("hasAnyAuthority('p:w:add')")
     @PostMapping("/addWarearea")
     public Result addWarearea(WareAreaDto wareAreaDto) {
         String areaNo = wareAreaDto.getAreaNo();
@@ -332,7 +332,7 @@ public class WarehouseController {
      * @param wareAreaDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:up')")
+    @PreAuthorize("hasAnyAuthority('p:w:up')")
     @PostMapping("/updateWarearea")
     public Result updateWarearea(WareAreaDto wareAreaDto) {
         Integer id = wareAreaDto.getId();
@@ -378,7 +378,7 @@ public class WarehouseController {
      * @param stackDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:add')")
+    @PreAuthorize("hasAnyAuthority('p:w:add')")
     @PostMapping("/addStack")
     public Result addStack(StackDto stackDto) {
         String stackNo = stackDto.getStackNo();
@@ -415,7 +415,7 @@ public class WarehouseController {
      * @param stackDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:up')")
+    @PreAuthorize("hasAnyAuthority('p:w:up')")
     @PostMapping("/updateStack")
     public Result updateStack(StackDto stackDto) {
         Integer id = stackDto.getStackId();
@@ -463,7 +463,7 @@ public class WarehouseController {
      * @param delDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:del')")
+    @PreAuthorize("hasAnyAuthority('p:w:del')")
     @PostMapping("/del")
     public Result del(DelDto delDto) {
         Integer warehouseNodeId = delDto.getWarehouseNodeId();
@@ -528,7 +528,7 @@ public class WarehouseController {
      * @param stackDto
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:f')")
+    @PreAuthorize("hasAnyAuthority('p:w:f')")
     @PostMapping("/getStackPage")
     public Result<PageInfo> getStackPage(StackDto stackDto) {
         if (ToolUtil.isEmpty(stackDto.getWareAreaId())) {
@@ -580,7 +580,7 @@ public class WarehouseController {
      * @param warehouseNodeType 仓库节点类型（01：仓库, 02: 楼号, 03:楼层，04：分区，05：垛位）
      * @return
      */
-//    @PreAuthorize("hasAnyAuthority('p:w:f')")
+    @PreAuthorize("hasAnyAuthority('p:w:f')")
     @PostMapping("/warehouseInfo")
     public Result warehouseInfo(Integer warehouseNodeId, String warehouseNodeType) {
         if (ToolUtil.isEmpty(warehouseNodeId)) {

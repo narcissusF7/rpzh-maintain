@@ -80,7 +80,13 @@
         </foreach>
     </select>
     <select id="findWeekPatrol" resultType="java.util.Map">
-        select * from tb_pest_patrol where rownum =  1
+        select monday  "monday",
+               tuesday  "tuesday",
+               wednesday  "wednesday",
+               thursday   "thursday",
+               friday     "friday",
+               saturday   "saturday",
+               sunday     "sunday" from tb_pest_patrol where rownum =  1
     </select>
     <select id="findPestMonitorValue" resultType="java.util.Map">
         select  prewarning_value_one   "valueOne",

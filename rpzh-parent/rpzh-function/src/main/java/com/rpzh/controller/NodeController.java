@@ -18,6 +18,7 @@ import com.rpzh.vo.NodeOperationVo;
 import com.rpzh.vo.NodeVo;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
@@ -58,6 +59,7 @@ public class NodeController {
             required = true,
             dataType = "String"
     )})
+    @PreAuthorize("hasAnyAuthority('f:n:add')")
     public Result addNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
@@ -142,6 +144,7 @@ public class NodeController {
             dataType = "String"
     )})
     @PostMapping("/updateNode")
+    @PreAuthorize("hasAnyAuthority('f:n:up')")
     public Result updateNode(@ApiIgnore NodeDto nodeDto) {
         String nodeId = nodeDto.getNodeId();
         if (ToolUtil.isEmpty(nodeId)) {
@@ -250,6 +253,7 @@ public class NodeController {
             dataType = "Integer"
     )})
     @PostMapping({"/replaceNode"})
+    @PreAuthorize("hasAnyAuthority('f:n:rn')")
     public Result replaceNodeId(@ApiIgnore NodeDto nodeDto) {
         Integer id = nodeDto.getId();
         if (ToolUtil.isEmpty(id)) {
@@ -341,6 +345,7 @@ public class NodeController {
             dataType = "String"
     )
     @PostMapping("/enterStack")
+    @PreAuthorize("hasAnyAuthority('f:n:es')")
     public Result enterStack(String data) {
         if (ToolUtil.isEmpty(data)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
@@ -440,7 +445,8 @@ public class NodeController {
         @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true),
         @ApiImplicitParam(name = "nodeIds",value = "设备id集", dataType = "String",allowMultiple = true, required = true)
     })
-    @PostMapping({"/unbindStack"})
+    @PostMapping("/unbindStack")
+    @PreAuthorize("hasAnyAuthority('f:n:us')")
     public Result unbindStack(@ApiIgnore NodeDto nodeDto) {
         Integer[] ids = nodeDto.getIds();
         if (ToolUtil.isEmpty(ids)) {
@@ -466,6 +472,7 @@ public class NodeController {
             required = true
     )})
     @PostMapping("/exportNode")
+    @PreAuthorize("hasAnyAuthority('f:n:en')")
     public Result exportNode(MultipartFile file, String nodeType) {
         if (ToolUtil.isEmpty(nodeType)) {
             return new Result<>(false, StatusCode.ERROR, "节点类型不能为空");

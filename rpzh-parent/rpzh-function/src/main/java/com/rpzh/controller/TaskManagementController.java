@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,6 +69,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "detail", value = "任务详情",required = true,dataType = "String"),
             @ApiImplicitParam(name = "pushWay", value = "推送方式,短信:M,App:A,全部:Q",required = true,dataType = "String")
     })
+    @PreAuthorize("hasAnyAuthority('f:t:add')")
     public Result addTask(@ApiIgnore TaskDto taskDto){
         if (ToolUtil.isEmpty(taskDto.getType())){
             return new Result(false, StatusCode.ERROR, "任务类型不能为空");
@@ -166,6 +168,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "ids", value = "任务主键id,id按照逗号隔开,例如1,2,3",required = true,dataType = "Long[]")
     })
     @PostMapping("/delTask")
+    @PreAuthorize("hasAnyAuthority('f:t:del')")
     public Result delTask(@ApiIgnore Long[] ids){
         if (ToolUtil.isEmpty(ids)){
             return new Result(false, StatusCode.ERROR, "请选择一个任务");
@@ -271,6 +274,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String")
     })
     @PostMapping("/taskDispose")
+    @PreAuthorize("hasAnyAuthority('f:t:td')")
     public Result taskDispose(@ApiIgnore TaskDto taskDto){
 
         String id = taskDto.getId();
@@ -294,6 +298,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "dealResult", value = "处理结果", required = true,dataType = "String")
     })
     @PostMapping("/pestTaskDeal")
+    @PreAuthorize("hasAnyAuthority('f:t:td')")
     public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id,String siteRoute){
         if (ToolUtil.isEmpty(pestData)){
             return new Result(false, StatusCode.ERROR, "请输入虫情数据");
@@ -376,6 +381,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteDate", value = "移垛数据:[{\"nodeId\":\"88FFDFD29\",\"x\":15,\"y\":112,\"z\":132},{\"nodeId\":\"88FFDFD30\", \"x\":11, \"y\":122, \"z\":132}]", required = true,dataType = "String")
     })
     @PostMapping("/moveStackDeal")
+    @PreAuthorize("hasAnyAuthority('f:t:td')")
     public Result moveStackDeal(@ApiIgnore TaskDto taskDto){
         if (ToolUtil.isEmpty(taskDto.getSiteRoute())){
             return new Result(false, StatusCode.ERROR, "目标地址路径不能为空");
@@ -409,6 +415,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteDate", value = "翻垛数据", required = true,dataType = "String")
     })
     @PostMapping("/flipStackDeal")
+    @PreAuthorize("hasAnyAuthority('f:t:td')")
     public Result flipStackDeal(@ApiIgnore TaskDto taskDto){
         if (ToolUtil.isEmpty(taskDto.getId())){
             return new Result(false, StatusCode.ERROR, "任务id不能为空");
@@ -496,6 +503,7 @@ public class TaskManagementController {
                     "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String")
     })
     @PostMapping("/taskScheduleCount")
+    @PreAuthorize("hasAnyAuthority('f:t:tc')")
     public Result<TaskVo> taskScheduleCount(@ApiIgnore TaskDto taskDto){
         String deteType = taskDto.getDeteType();
         if (ToolUtil.isEmpty(deteType)){
@@ -525,6 +533,7 @@ public class TaskManagementController {
                     "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String")
     })
     @PostMapping("/taskScheduleCountByOne")
+    @PreAuthorize("hasAnyAuthority('f:t:tco')")
     public Result<TaskVo> taskScheduleCountByOne(@ApiIgnore TaskDto taskDto){
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
@@ -559,6 +568,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskCountTrend")
+    @PreAuthorize("hasAnyAuthority('f:t:tc')")
     public Result<TaskVo> taskCountTrend(@ApiIgnore TaskDto taskDto){
         List<Map> taskList = taskManagementService.taskCountTrend(taskDto);
         return new Result<>(true,StatusCode.OK,"查询成功",taskList);
@@ -577,6 +587,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer")
     })
     @PostMapping("/taskCountTrendByOne")
+    @PreAuthorize("hasAnyAuthority('f:t:tco')")
     public Result<TaskVo> taskCountTrendByOne(@ApiIgnore TaskDto taskDto){
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
@@ -602,6 +613,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskCountByType")
+    @PreAuthorize("hasAnyAuthority('f:t:tc')")
     public Result taskCountByType(@ApiIgnore TaskDto taskDto){
         List<Map> typeCount = taskManagementService.taskCountByType(taskDto);
         return new Result(true,StatusCode.OK,"查询成功",typeCount);
@@ -620,6 +632,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer")
     })
     @PostMapping("/taskCountByTypeByOne")
+    @PreAuthorize("hasAnyAuthority('f:t:tco')")
     public Result taskCountByTypeByOne(@ApiIgnore TaskDto taskDto){
          //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
@@ -645,6 +658,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskTypePercent")
+    @PreAuthorize("hasAnyAuthority('f:t:tc')")
     public Result taskTypePercent(@ApiIgnore TaskDto taskDto){
         Map typeCount = taskManagementService.taskCountByTypeMap(taskDto);
         //获取所有的和,所有的任务和
@@ -768,6 +782,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer")
     })
     @PostMapping("/taskTypePercentByOne")
+    @PreAuthorize("hasAnyAuthority('f:t:tco')")
     public Result taskTypePercentByOne(@ApiIgnore TaskDto taskDto){
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
@@ -897,6 +912,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "principal", value = "负责人账号", required = false,dataType = "String")
     })
     @PostMapping("/taskAvlFinishTime")
+    @PreAuthorize("hasAnyAuthority('f:t:tc')")
     public Result taskAvlFinishTime(@ApiIgnore TaskDto taskDto){
         List<Map> mapList = taskManagementService.taskAvlFinishTime(taskDto);
         return new Result(true,StatusCode.OK,"查询成功",mapList);
@@ -915,6 +931,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "siteId", value = "任务目标地址Id", required = false,dataType = "integer")
     })
     @PostMapping("/taskAvlFinishTimeByOne")
+    @PreAuthorize("hasAnyAuthority('f:t:tco')")
     public Result taskAvlFinishTimeByOne(@ApiIgnore TaskDto taskDto){
          //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();

@@ -109,7 +109,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境",required = true,dataType ="double")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:add')")
+    @PreAuthorize("hasAnyAuthority('f:m:add')")
     public Result insertMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto){
         // 烟叶代码是否为null
         if (ToolUtil.isEmpty(maintainPlanDto.getMaterialCodes())) {
@@ -166,7 +166,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
             @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:f')")
+    @PreAuthorize("hasAnyAuthority('f:m:f')")
     public Result<MaintainPlanVo> findMaintainPlanInfo(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         if(StringUtils.isNotEmpty(maintainPlanDto.getEndTime())){
             maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00", "23:59:59"));
@@ -189,7 +189,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "养护计划ids", required = true, dataType = "String")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:del')")
+    @PreAuthorize("hasAnyAuthority('f:m:del')")
     public Result<Integer> deleteMaintainPlanInfo(@RequestParam("ids") List<Integer> ids) {
         Result result = maintainPlanService.deleteMaintainPlanInfo(ids);
         return result;
@@ -200,7 +200,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:f')")
+    @PreAuthorize("hasAnyAuthority('f:m:f')")
     public Result<MaintainPlanVo> findMaintainPlanById(Integer id) {
         MaintainPlanVo maintainPlan = maintainPlanService.findMaintainPlan(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询养护详情成功",maintainPlan);
@@ -221,6 +221,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
+    @PreAuthorize("hasAnyAuthority('f:m:change')")
     public Result<MaintainPlanVo> beforeChangeMaintainPlanStage(Integer id){
         MaintainPlanVo maintainPlan = maintainPlanService.beforeChangeMaintainPlanStage(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "转段前回显成功",maintainPlan);
@@ -265,7 +266,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:up')")
+    @PreAuthorize("hasAnyAuthority('f:m:up')")
     public Result updateMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
@@ -285,7 +286,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "stageId", value = "养护阶段id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:open')")
+    @PreAuthorize("hasAnyAuthority('f:m:open')")
     public Result endMaintainPlan(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         return maintainPlanService.endMaintainPlan(maintainPlanDto);
     }
@@ -309,6 +310,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "Integer")
     })
+    @PreAuthorize("hasAnyAuthority('f:m:change')")
     public Result beforeChangePhases(Integer stackId,String maintenceStyle){
         List<String> phases = maintainPlanService.beforeChangePhases(stackId, maintenceStyle);
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
@@ -353,7 +355,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "pidRoute", value = "位置路径,00:根节点,01:仓库, 02: 楼号, 03: 层, 04: 区, 05: 垛位",required = true,dataType ="String"),
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
-    //    @PreAuthorize("hasAnyAuthority('f:m:change')")
+    @PreAuthorize("hasAnyAuthority('f:m:change')")
     public Result changeMaintainPlanStage(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         if(GetBetweenDayUtils.getFlag(alarmValueSettingDto)){
@@ -371,7 +373,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int"),
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "int")
     })
-    //    @PreAuthorize("hasAnyAuthority('f:m:df')")
+    @PreAuthorize("hasAnyAuthority('f:m:ctf')")
     public Result<MaintainPlanVo> findMaintainPlanDetails(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         MaintainPlanVo maintainPlanVo = maintainPlanService.findMaintainPlanDetails(maintainPlanDto.getId(),maintainPlanDto.getStackId());
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
@@ -382,7 +384,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
-    //    @PreAuthorize("hasAnyAuthority('f:m:hdf')")
+    @PreAuthorize("hasAnyAuthority('f:m:ctf')")
     public Result<MaintainPlanVo> findEndMaintainPlanDetails(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanService.findEndMaintainPlanDetails(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
@@ -402,7 +404,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
             @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
     })
-    //    @PreAuthorize("hasAnyAuthority('f:m:ctf')")
+    @PreAuthorize("hasAnyAuthority('f:m:ctf')")
     public Result<MaintainPlanVo> findExpireCollectTable(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         PageInfo<MaintainPlanVo> maintainPlanInfo = maintainPlanService.findExpireCollectTable(maintainPlanDto);
         return new Result<>(true, StatusCode.OK, "养护到期汇总列表查询成功",maintainPlanInfo);
@@ -421,7 +423,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
             @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:mef')")
     public Result<MaintainPlanVo> findMaintainMonthEndReport(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         PageInfo<MaintainPlanVo> maintainPlanVos = maintainPlanService.findMaintainMonthEndReport(maintainPlanDto);
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",maintainPlanVos);
@@ -469,7 +470,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = false,dataType = "int"),
             @ApiImplicitParam(name = "page", value = "当前页",required = false,dataType ="int")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:crf')")
     public Result findMaintainCountReport(@ApiIgnore MaintainCountDto maintainCountDto) {
         Map<String,Object> map = maintainPlanService.findMaintainCountReport(maintainCountDto);
         return new Result(true, StatusCode.OK, "查询养护统计报表成功",map);
@@ -484,7 +484,6 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = false, dataType = "String"),
             @ApiImplicitParam(name = "ids", value = "列表中的id", required = true, dataType = "List")
     })
-//    @PreAuthorize("hasAnyAuthority('f:m:excel')")
     public void export(HttpServletResponse response,MaintainCountDto maintainCountDto) {
         List<String> ids = maintainCountDto.getIds();
         if(ToolUtil.isEmpty(ids)){

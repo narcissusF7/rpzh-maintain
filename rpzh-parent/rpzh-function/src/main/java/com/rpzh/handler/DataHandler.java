@@ -353,6 +353,8 @@ public class DataHandler {
                     String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
                     EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,siteRoute);
                     earlyWarningDao.insertWarning(earlyWarning);
+                    NodeVo nodeVo =nodeDao.findByNodeId(parseData.getNodeId());
+                    addTask(nodeVo,"20");
                     redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
                 }else {
                     //否则次数加1

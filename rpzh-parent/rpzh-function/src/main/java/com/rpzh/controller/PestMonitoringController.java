@@ -19,6 +19,7 @@ import com.rpzh.vo.PestDataVo;
 import com.rpzh.vo.PestMonitoringRuleVo;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
@@ -59,6 +60,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "remark", value = "备注", dataType = "String")
     })
     @PostMapping("/addPestBoard")
+    @PreAuthorize("hasAnyAuthority('f:p:add')")
     public Result addPestBoard(@ApiIgnore PestBoardDto pestBoardDto){
         if (ToolUtil.isEmpty(pestBoardDto.getPestBoardId())) {
             return new Result<>(false, StatusCode.ERROR, "虫情板Id不能为空");
@@ -91,6 +93,7 @@ public class PestMonitoringController {
     @ApiOperation("删除虫情板")
     @ApiImplicitParam(name = "ids", value = "id集", dataType = "Integer", required = true,allowMultiple = true)
     @PostMapping("/deletePestBoard")
+    @PreAuthorize("hasAnyAuthority('f:n:del')")
     public Result deletePestBoard(Integer [] ids){
         if (ToolUtil.isEmpty(ids)) {
             return new Result<>(false, StatusCode.ERROR, "id集不能为空");
@@ -116,6 +119,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "specialStack", value = "特殊垛位集合",dataType = "String")
     })
     @PostMapping("/updatePestRule")
+    @PreAuthorize("hasAnyAuthority('f:n:ur')")
     public Result updatePestRule(PestMonitoringRuleDto pestMonitoringRuleDto){
         if (ToolUtil.isEmpty(pestMonitoringRuleDto.getWeekPatrol())) {
             return new Result<>(false, StatusCode.ERROR, "巡查时间不能为空");
@@ -179,6 +183,7 @@ public class PestMonitoringController {
             @ApiImplicitParam(name = "siteType", value = "位置类型仓间04 垛内05", dataType = "String", required = true)
     })
     @PostMapping("/exportPestData")
+    @PreAuthorize("hasAnyAuthority('f:p:fp')")
     public Result exportPestData(MultipartFile file,String siteType){
         if (ToolUtil.isEmpty(file)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个文件");
@@ -207,6 +212,7 @@ public class PestMonitoringController {
 
     @ApiOperation("虫情数据一键导入")
     @PostMapping("/fullExport")
+    @PreAuthorize("hasAnyAuthority('f:p:fp')")
     public Result fullExport(){
         return pestMonitoringService.fullExport();
     }

@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -51,6 +52,7 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "stackId", value = "位置id",required = true,dataType ="Integer")
     })
     @ApiOperation(value = "添加仓间预警规则成功")
+    @PreAuthorize("hasAnyAuthority('f:wa:add')")
     public Result insertWareAreaAlarmSetting(@ApiIgnore WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         return wareAreaAlarmSettingService.insertWareAreaAlarmSetting(wareAreaAlarmSettingDto);
     }
@@ -60,6 +62,7 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "ids", value = "仓间预警规则ids", required = true,dataType = "List")
     })
     @ApiOperation(value = "删除仓间预警规则")
+    @PreAuthorize("hasAnyAuthority('f:wa:del')")
     public Result deleteWareAreaAlarmSetting(@RequestParam("ids") List<Integer> ids){
         Result result = wareAreaAlarmSettingService.deleteWareAreaAlarmSetting(ids);
         return result;
@@ -107,6 +110,7 @@ public class WareAreaAlarmSettingController {
             @ApiImplicitParam(name = "warehouseTempLower", value = "仓间温度下限",required = true,dataType ="double")
     })
     @ApiOperation(value = "修改仓间预警规则成功")
+    @PreAuthorize("hasAnyAuthority('f:wa:up')")
     public Result updateWareAreaAlarmSetting(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         return wareAreaAlarmSettingService.updateWareAreaAlarmSetting(wareAreaAlarmSettingDto);
     }

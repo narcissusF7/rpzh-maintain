@@ -8,6 +8,7 @@ import com.rpzh.service.AlarmSettingTemplateService;
 import com.rpzh.vo.*;
 import io.swagger.annotations.*;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -60,6 +61,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "ids", value = "id集合", required = true,dataType = "List")
     })
     @ApiOperation(value = "删除预警模板设置")
+    @PreAuthorize("hasAnyAuthority('f:a:tdel')")
     public Result deleteAlarmValueSetting(@RequestParam List<Integer> ids) {
         Result result = alarmSettingTemplateService.deleteAlarmSettingTemplate(ids);
         return result;
@@ -94,6 +96,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     @ApiOperation(value = "添加预警设置模板")
+    @PreAuthorize("hasAnyAuthority('f:a:tadd')")
     public Result insertAlarmSettingTemplate(@ApiIgnore AlarmValueSettingDto alarmSettingTemplateDto) {
         return alarmSettingTemplateService.insertAlarmSettingTemplate(alarmSettingTemplateDto);
     }
@@ -114,6 +117,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "twoToThreeDay", value = "预警二级升三级的天数", required = true,dataType = "Integer")
     })
     @ApiOperation(value = "修改或添加升级规则成功")
+    @PreAuthorize("hasAnyAuthority('f:a:lud')")
     public Result updateOrInsertColorAndAlertUpgradeDay(@ApiIgnore SettingColorAndDayDto settingColorAndDayDto) {
         Result result = alarmSettingTemplateService.updateOrInsertColorAndAlertUpgradeDay(settingColorAndDayDto);
         return result;
@@ -169,6 +173,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "coreTempLowEnvTemp", value = "平均包芯低于环境三级",required = true,dataType ="double")
     })
     @ApiOperation(value = "更改预警设置模板")
+    @PreAuthorize("hasAnyAuthority('f:a:tup')")
     public Result updateAlarmSettingTemplate(@ApiIgnore AlarmValueSettingDto alarmValueSettingDto) {
         return  alarmSettingTemplateService.updateAlarmSettingTemplate(alarmValueSettingDto);
     }
