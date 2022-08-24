@@ -16,76 +16,75 @@ import java.util.List;
 public class AlarmValueSettingDto {
 
     //垛内氧气上限一级
-    private Double stackOxygenUpperOne=0d;
+    private Double stackOxygenUpperOne;
     //垛内氧气上限二级
-    private Double stackOxygenUpperTwo=0d;
+    private Double stackOxygenUpperTwo;
     //垛内氧气上限三级
-    private Double stackOxygenUpperThree=0d;
+    private Double stackOxygenUpperThree;
     //垛内氧气下限
-    private Double stackOxygenLower=0d;
+    private Double stackOxygenLower;
 
     //仓间氧气上限一级
-    private Double warehouseOxygenUpperOne=0d;
+    private Double warehouseOxygenUpperOne;
     //仓间氧气上限二级
-    private Double warehouseOxygenUpperTwo=0d;
+    private Double warehouseOxygenUpperTwo;
     //仓间氧气上限三级
-    private Double warehouseOxygenUpperThree=0d;
+    private Double warehouseOxygenUpperThree;
     //仓间氧气下限
-    private Double warehouseOxygenLower=0d;
-
+    private Double warehouseOxygenLower;
     //包芯温度上限一级
-    private Double tempCoreChipUpperOne=0d;
+    private Double tempCoreChipUpperOne;
     //包芯温度上限二级
-    private Double tempCoreChipUpperTwo=0d;
+    private Double tempCoreChipUpperTwo;
     //包芯温度上限三级
-    private Double tempCoreChipUpperThree=0d;
+    private Double tempCoreChipUpperThree;
     //包芯温度下限
-    private Double tempCoreChipLower=0d;
+    private Double tempCoreChipLower;
 
     //垛内温度上限一级
-    private Double stackTempUpperOne=0d;
+    private Double stackTempUpperOne;
     //垛内温度上限二级
-    private Double stackTempUpperTwo=0d;
+    private Double stackTempUpperTwo;
     //垛内温度上限三级
-    private Double stackTempUpperThree=0d;
+    private Double stackTempUpperThree;
     //垛内温度下限
-    private Double stackTempLower=0d;
+    private Double stackTempLower;
 
     //垛内水分上限一级
-    private Double stackMoistureUpperOne=0d;
+    private Double stackMoistureUpperOne;
     //垛内水分上限二级
-    private Double stackMoistureUpperTwo=0d;
+    private Double stackMoistureUpperTwo;
     //垛内水分上限三级
-    private Double stackMoistureUpperThree=0d;
+    private Double stackMoistureUpperThree;
     //垛内水分下限
-    private Double stackMoistureLower=0d;
+    private Double stackMoistureLower;
 
     //仓间温度上限一级
-    private Double warehouseTempUpperOne=0d;
+    private Double warehouseTempUpperOne;
     //仓间温度上限二级
-    private Double warehouseTempUpperTwo=0d;
+    private Double warehouseTempUpperTwo;
     //仓间温度上限三级
-    private Double warehouseTempUpperThree=0d;
+    private Double warehouseTempUpperThree;
     //仓间温度下限
-    private Double warehouseTempLower=0d;
+    private Double warehouseTempLower;
 
     //仓间水分上限一级
-    private Double warehouseMoistureUpperOne=0d;
+    private Double warehouseMoistureUpperOne;
     //仓间水分上限二级
-    private Double warehouseMoistureUpperTwo=0d;
+    private Double warehouseMoistureUpperTwo;
     //仓间水分上限三级
-    private Double warehouseMoistureUpperThree=0d;
+    private Double warehouseMoistureUpperThree;
     //仓间水分下限
-    private Double warehouseMoistureLower=0d;
+    private Double warehouseMoistureLower;
 
     //平均包芯高于环境上限一级
-    private Double coreTempHighEnvTempOne=0d;
+    private Double coreTempHighEnvTempOne;
     //平均包芯高于环境上限二级
-    private Double coreTempHighEnvTempTwo=0d;
+    private Double coreTempHighEnvTempTwo;
     //平均包芯高于环境上限三级
-    private Double coreTempHighEnvTempThree=0d;
+    private Double coreTempHighEnvTempThree;
     //平均包芯高于环境下限
-    private Double coreTempLowEnvTemp=0d;
+    private Double coreTempLowEnvTemp;
 
     //位置类型 1:仓库, 2: 楼号, 3: 层, 4: 区, 5: 垛位
     private String siteType;
@@ -167,5 +166,39 @@ public class AlarmValueSettingDto {
       this.updateUser = maintainPlanDto.getUpdateUser();
       this.createUser = maintainPlanDto.getCreateUser();
       this.alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
+    }
+    public AlarmValueSettingDto(String earlyWarningRuleName,String maintenceStyle,String createUser){
+        this.earlyWarningRuleName=earlyWarningRuleName;
+        this.maintenceStyle=maintenceStyle;
+        this.createUser = createUser;
+    }
+    public AlarmValueSettingDto(Double stackOxygenUpperOne,Double stackOxygenUpperTwo,Double stackOxygenUpperThree,Double stackOxygenLower,
+                                Double stackMoistureUpperOne,Double stackMoistureUpperTwo,Double stackMoistureUpperThree,Double stackMoistureLower,
+                                Double tempCoreChipUpperOne,Double tempCoreChipUpperTwo,Double tempCoreChipUpperThree,Double tempCoreChipLower,
+                                Double stackTempUpperOne,Double stackTempUpperTwo,Double stackTempUpperThree,Double stackTempLower,
+                                Double coreTempHighEnvTempOne,Double coreTempHighEnvTempTwo,Double coreTempHighEnvTempThree,Double coreTempLowEnvTemp, String phases,String updateUser,Integer alarmValueSettingId){
+        this.stackOxygenUpperOne =stackOxygenUpperOne;
+        this.stackOxygenUpperTwo =stackOxygenUpperTwo;
+        this.stackOxygenUpperThree =stackOxygenUpperThree;
+        this.stackOxygenLower =stackOxygenLower;
+        this.tempCoreChipUpperOne =tempCoreChipUpperOne;
+        this.tempCoreChipUpperTwo =tempCoreChipUpperTwo;
+        this.tempCoreChipUpperThree=tempCoreChipUpperThree;
+        this.tempCoreChipLower=tempCoreChipLower;
+        this.stackTempUpperOne=stackTempUpperOne;
+        this.stackTempUpperTwo=stackTempUpperTwo;
+        this.stackTempUpperThree=stackTempUpperThree;
+        this.stackTempLower=stackTempLower;
+        this.stackMoistureUpperOne=stackMoistureUpperOne;
+        this.stackMoistureUpperTwo=stackMoistureUpperTwo;
+        this.stackMoistureUpperThree=stackMoistureUpperThree;
+        this.stackMoistureLower=stackMoistureLower;
+        this.coreTempHighEnvTempOne=coreTempHighEnvTempOne;
+        this.coreTempHighEnvTempTwo=coreTempHighEnvTempTwo;
+        this.coreTempHighEnvTempThree=coreTempHighEnvTempThree;
+        this.coreTempLowEnvTemp = coreTempLowEnvTemp;
+        this.phases=phases;
+        this.updateUser = updateUser;
+        this.alarmValueSettingId = alarmValueSettingId;
     }
 }

@@ -578,7 +578,7 @@
         where 1=1 <if test="id != null and id != ''">and id = #{id}</if>
     </select>
     <select id="findTaskBySiteRoute" resultType="java.lang.Integer">
-        select count(*) from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
+        select id from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
     </select>
     <select id="findMinAveTemp" resultType="int">
         SELECT count(*)

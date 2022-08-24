@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.AlarmSettingTemplateDao">
+    <select id="findAlarmSettingTemplateCount" resultType="java.lang.Integer">
+        select count(*) from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName}
+    </select>
     <select id="findCountByName" resultType="java.lang.Integer">
         select id from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName} and rownum = 1
     </select>
@@ -38,19 +41,13 @@
         <if test="phases != null and phases != ''">and t1.phases = #{phases}</if>
     </select>
     <select id="findAlarmSettingTemplateTable" resultType="com.rpzh.vo.AlarmValueSettingVo">
-        SELECT
-        CASE when instr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
-        ELSE LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id) end AS id,
+        SELECT DISTINCT
+        t2.id as id,
         t2.early_warning_rule_name as earlyWarningRuleName,
-        CASE when instr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id),'、') != 0 THEN substr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id), '、',1,1)-1)
-        ELSE LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id) end AS materialCode,
-        CASE when instr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
-        ELSE LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id) end AS maintenceStyle,
-        CASE when instr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
-        ELSE LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id) end AS createUser,
-        CASE when instr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id),',') > 0 THEN substr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',')
-        WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
-        ELSE LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id) end AS updatedTime
+        t2.material_code as materialCode,
+        t2.maintence_style as maintenceStyle,
+        t2.create_user as createUser,
+        t1.updated_time as updatedTime
         from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where 1=1
@@ -60,7 +57,7 @@
         <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and t2.create_user = #{alarmValueSettingDto.createUser}</if>
         <if test = "alarmValueSettingDto.startTime != null">and t1.updated_time >= #{alarmValueSettingDto.startTime}</if>
         <if test = "alarmValueSettingDto.endTime != null">and t1.updated_time &lt;= #{alarmValueSettingDto.endTime}</if>
-        group by early_warning_rule_name
+        order by t2.id desc
     </select>
     <delete id="deleteStage">
         delete from tb_setting_template_stage where
@@ -77,19 +74,22 @@
         </foreach>
     </delete>
     <insert id="insertAlarmSettingTemplate">
+        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="alarmValueSettingDto.alarmValueSettingId">
+            SELECT SEIINGTEMPLATE.NEXTVAL  from DUAL
+        </selectKey>
         insert into tb_alarm_setting_template
         (
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name,</if>
         <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">material_code,</if>
         <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">maintence_style,</if>
-        created_time,create_user
+        created_time,create_user,id
         )
         values
         (
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">#{alarmValueSettingDto.earlyWarningRuleName},</if>
         <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">#{alarmValueSettingDto.materialCode},</if>
         <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">#{alarmValueSettingDto.maintenceStyle},</if>
-        #{alarmValueSettingDto.createdTime},#{alarmValueSettingDto.createUser}
+        sysdate,#{alarmValueSettingDto.createUser},SEIINGTEMPLATE.CURRVAL
         )
     </insert>
     <insert id="insertAlarmSettingTemplateStage">
@@ -143,7 +143,7 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">#{alarmValueSettingDto.alarmValueSettingId},</if>
-        #{alarmValueSettingDto.updatedTime},#{alarmValueSettingDto.updateUser}
+        sysdate,#{alarmValueSettingDto.updateUser}
         )
     </insert>
     <select id = "findColorAndAlertUpgradeDay" resultType="com.rpzh.vo.SettingColorAndDayVo">
@@ -193,7 +193,7 @@ FROM tb_general_setting where rownum = 1
        t1.phases as phases
        from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
-       where t2.material_code = #{materialCode}  and t2.early_warning_rule_name= #{earlyWarningRuleName} and t1.phases = #{phases}
+       where t2.early_warning_rule_name= #{earlyWarningRuleName} and t1.phases = #{phases} <if test="materialCode!='' and materialCode != null">and t2.material_code = #{materialCode}</if>
    </select>
     <select id="findSum" resultType="java.lang.Integer">
         select count(*) from tb_setting_template_stage t1

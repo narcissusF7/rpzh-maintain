@@ -46,6 +46,7 @@ public class MaintainPlanDto {
     private Integer id;
     //垛位名称
     private String stackName;
+    private String principalId;
     //制定时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdTime;

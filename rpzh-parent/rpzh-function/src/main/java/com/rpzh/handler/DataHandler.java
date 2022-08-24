@@ -716,15 +716,15 @@ public class DataHandler {
     //添加任务
     public Integer addTask(NodeVo nodeVo ,String type){
         //查询该垛位、仓间下该类型任务是否存在
-        Integer count = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
-        if (count<1){
+        Integer id = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
+        if (ToolUtil.isEmpty(id)){
             Map<String, Object> map = warehouseService.getSitePrincipal(nodeVo.getSiteRoute().split(",").length-1, nodeVo.getSiteId());
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
             return Integer.parseInt(taskDto.getId())+1;
         }
-        return -1;
+        return id;
     }
 
     /**
