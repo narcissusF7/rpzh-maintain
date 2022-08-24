@@ -96,7 +96,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         //将预警数值插入到预警表中
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-        //根据垛位id获取当前养护计划的id
         //设置养护计划id
         maintainPlanDto.setId(maintainPlanDto.getId()+1);
         //存储物料代码、养护数量、养护计划id、垛位id、仓间id、层id、楼栋id、仓库id的集合
@@ -381,7 +380,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public Integer updateMaintainPlan(MaintainPlanDto maintainPlanDto) {
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
-        BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);//将养护计划Vo中的预警数值复制到预警规则Vo中的预警数值
+        BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);//将养护计划Dto中的预警数值复制到预警规则Vo中的预警数值
         Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();//获取 AlarmValueSettingVo中所有的字段
         for (Field field : fields) {
             try {
@@ -444,7 +443,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer count = maintainPlanDao.findCountBySiteRoute(pidRoutes);//查询所选的养护计划是否存在未处理的任务
         //发现有一个养护计划存在未处理的任务,则禁止删除
         if(count>0){
-            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在删除");
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理再开垛");
         }
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
         //将养护计划Dto中的预警数值复制到预警规则Vo中的预警数值
@@ -479,24 +478,24 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     * 转段
     * */
     @Override
-    public Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
-        List<Integer> ids = new ArrayList<>();
-        ids.add(maintainPlanDto.getId());
+    public Result changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
         List<String> pidRoutes = new ArrayList<>();
         Integer stackId = maintainPlanDto.getStackId();
         pidRoutes.add(SiteRouteUtil.route(maintainPlanDto.getPidRoute(),stackId+""));
+        //根据ids查询位置路由和垛位id,垛位id用来拼接全位置路由,位置路由用来查询是否存在未处理的任务,
         Integer count = maintainPlanDao.findCountBySiteRoute(pidRoutes);
+        //发现有一个养护计划存在未处理的任务,则禁止删除
         if(count>0){
-            return -1;
+            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在转段");
         }
-        List<String> nodeIds = nodeDao.findNodeIds(stackId);
-        nodeIds.forEach(nodeId -> {
+        nodeDao.findNodeIds(stackId).forEach(nodeId -> {
             if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("MAINTAIN_CACHE_NODE_"+nodeId))){
+                //删除redis缓存中的设备数据
                 redisTemplate.delete("MAINTAIN_CACHE_NODE_"+nodeId);
             }
         });
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
-        BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);
+        BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);//将养护计划Dto中的预警数值复制到预警规则Vo中的预警数值
         Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();//获取 AlarmValueSettingVo中所有的字段
         for (Field field : fields) {
             try {
@@ -507,108 +506,108 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 e.printStackTrace();
             }
         }
-        List<Integer> principalIds = maintainPlanDto.getPrincipalIds().stream().distinct().collect(Collectors.toList());
         //从redis中获取账号,并拼接负责人账号
-        maintainPlanDto.setPrincipalName(getUsername(principalIds));
+        maintainPlanDto.setPrincipalName(getUsername(maintainPlanDto.getPrincipalIds().stream().distinct().collect(Collectors.toList())));
+        //将物料代码转成字符串,并设置到maintainPlanDto中
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
         maintainPlanDto.setMaterialCode(String.join(",", materialCodes));
-        String createUser = TokenDecode.getUserInfo().get("username");
-        Date date = new Date();
+        String createUser = TokenDecode.getUserInfo().get("username");//获取用户账号
         maintainPlanDto.setCreateUser(createUser);
-        maintainPlanDto.setCreatedTime(date);
-        maintainPlanDto.setUpdatedTime(date);
         maintainPlanDto.setUpdateUser(createUser);
-        maintainPlanDto.setVersion(0);
+        maintainPlanDto.setVersion(0);//标记为不是新建养护计划,而是转段（月底养护报表会用到）
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
-        alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDao.findIdByEarlyWarningRuleName(maintainPlanDto.getEarlyWarningRuleName()));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);//将预警数值插入到预警表中
+        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDto.getAlarmValueSettingId()+1);//设置预警规则id
         try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //设置养护到期时间,并格式化
             maintainPlanDto.setAftercareDateEnd(new Date(sdf.parse(maintainPlanDto.getAftercareDateStart()+" 00:00:00").getTime() + maintainPlanDto.getMaintainDays() * 24 * 60 * 60 * 1000l));
         }catch (Exception e){
             e.printStackTrace();
         }
-        maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
-        maintainPlanDao.insertMaintainStage(maintainPlanDto);
-        Date createdTime = maintainPlanDao.findMaintainPlan(maintainPlanDto.getId()).getCreatedTime();
-        int day = new Long((new Date().getTime() - createdTime.getTime()) / (1000 * 60 * 60 * 24)).intValue() + 1;
-        maintainPlanDto.setMaintainDays(day);
-        maintainPlanDto.setAftercareDateEnd(date);
-        String maintenceStyle = maintainPlanDto.getMaintenceStyle();
-        String phases = maintainPlanDto.getPhases();
-        String pidRoute = maintainPlanDto.getPidRoute()  + ",[" + WarehouseNodeType.STACK_NODE.getType() + ":" + maintainPlanDto.getStackId() + "]";
-        maintainPlanDao.deleteMaintainCount(ids);
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findStageIdById(maintainPlanDto.getId());//根据养护计划id查询上一阶段的养护阶段id和上一阶段的创建时间
+        maintainPlanDto.setStageId(maintainPlanVo.getStageId());//上一阶段的养护阶段id
+        long createdTime = maintainPlanVo.getCreatedTime().getTime();//上一阶段的创建时间
+        maintainPlanDao.insertMaintainStage(maintainPlanDto);//将当前阶段的信息插入阶段表中
+        maintainPlanDto.setMaintainDays(new Long((new Date().getTime() - createdTime) / (1000 * 60 * 60 * 24)).intValue() + 1);//计算上一阶段的养护天数
+        maintainPlanDto.setAftercareDateEnd(new Date());//设置上一阶段的转段时间
+        String pidRoute = SiteRouteUtil.route(maintainPlanDto.getPidRoute(),stackId+"");//拼接全位置路由
+        List<Integer> ids = new ArrayList<>(Arrays.asList(maintainPlanDto.getId()));
+        maintainPlanDao.deleteMaintainCount(ids);//删除养护数量表数据
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
-        List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);
+        List<MaterialVo> materialVos = materialDao.findCount(stackId, materialCodes);//根据垛位id和物料代码查询各个物料代码的数量
         for (MaterialVo materialVo : materialVos) {
             //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,pidRoute,maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
             maintainPlanDtos.add(maintainPlanDto1);
         }
-        //养护数量信息批次插入养护数量表中
-        maintainPlanDao.insertMaintainCount(maintainPlanDtos);
-        maintainPlanDao.changeMaintainPlanStage(maintainPlanDto);
-        maintainPlanDto.setStageId(maintainPlanDao.findStageIdById(maintainPlanDto.getId()));
-        Integer result = maintainPlanDao.changeMaintainPlan(maintainPlanDto);
-        return result;
+        maintainPlanDao.insertMaintainCount(maintainPlanDtos);//养护数量信息批次插入养护数量表中
+        maintainPlanDao.changeMaintainPlanStage(maintainPlanDto);//修改上一阶段的信息
+        maintainPlanDto.setStageId(maintainPlanDto.getStageId()+1);//设置当前的阶段id
+        Integer result = maintainPlanDao.changeMaintainPlan(maintainPlanDto);//转段
+        return new Result(true, StatusCode.OK, "转段成功!");
     }
 
+    /*
+    * 养护到期汇总中的详情
+    * */
     @Override
     public MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId) {
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);//根据养护计划id查询当前阶段基本信息
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);//根据养护计划id查询已创建的阶段信息
         maintainPlanVos.forEach(maintainPlan->{
-            //设置各阶段的负责人(用户名加账号)
-            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));
+            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));//设置各阶段的负责人(用户名加账号)
         });
-        MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
         return maintainPlanVo;
     }
 
+    /*
+    * 历史汇总单中的详情
+    * */
     @Override
     public MaintainPlanVo findEndMaintainPlanDetails(Integer id) {
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);
+        MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);//根据养护计划id查询当前阶段基本信息
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findDetails(id);//根据养护计划id查询全部阶段信息
         maintainPlanVos.forEach(maintainPlan->{
-            //设置各阶段的负责人(用户名加账号)
-            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));
+            maintainPlan.setPrincipalName(getUserName(maintainPlan.getPrincipalName()));//设置各阶段的负责人(用户名加账号)
         });
-        MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);
         maintainPlanVo.setMaintainPlanVos(maintainPlanVos);
-        maintainPlanVo.setMaintainDays(maintainPlanDao.findMaintainDays(id));
+        maintainPlanVo.setMaintainDays(maintainPlanDao.findMaintainDays(id));//设置总养护天数
         return maintainPlanVo;
     }
 
+    /*
+    * 养护到期汇总列表
+    * */
     @Override
     public PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
         if(StringUtil.isNotEmpty(maintainPlanDto.getEndTime())){
-            maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00","23:59:59"));
+            maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00","23:59:59"));//设置结束时间
         }
-        //获取位置路由
-        String pidRoute = maintainPlanDto.getPidRoute();
-        List<Integer> stackIds = null;
+        String pidRoute = maintainPlanDto.getPidRoute();//获取位置路由
+        List<Integer> stackIds = new ArrayList<>();
         if(StringUtil.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            //选择的位置是非垛位
-            if (!pidRoute.contains("04")) {
-                String route = SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + "");
-                stackIds = maintainPlanDao.findStackIdBySiteRoute(route);
+            if (pidRoute.contains("04")) {
+                stackIds.add(maintainPlanDto.getStackId());//选择的位置是垛位
             }else{
-                stackIds = new ArrayList<>();
-                //选择的位置是垛位
-                stackIds.add(maintainPlanDto.getStackId());
+                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));//选择的位置是非垛位
             }
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findExpireCollectTable(maintainPlanDto,stackIds);
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findExpireCollectTable(maintainPlanDto,stackIds,stackIds.size());//分页查询养护到期汇总列表
         maintainPlanVos.forEach(maintainPlanVo -> {
-            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));
+            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));//将物料代码中的,替换成、,使得导出时不出错
         });
         return new PageInfo<>(maintainPlanVos);
-
     }
 
+    /*
+    * 月底养护报表
+    * */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto) {
+        //开始时间和结束时间为空,则默认当前一个月
         if(ToolUtil.isEmpty(maintainPlanDto.getStartTime()) && ToolUtil.isEmpty(maintainPlanDto.getEndTime())){
             SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
             Calendar calast = Calendar.getInstance();
@@ -617,49 +616,46 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             calast.set(Calendar.DAY_OF_MONTH, calast.getActualMinimum(Calendar.DAY_OF_MONTH));
             maintainPlanDto.setStartTime(sm.format(calast.getTime())+ " 00:00:00");
         }
-        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
-        String pidRoute = maintainPlanDto.getPidRoute();
+        String pidRoute = maintainPlanDto.getPidRoute();//获取位置路由
+        List<Integer> stackIds = new ArrayList<>();
         if(StringUtil.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            if (length < 5) {
-                pidRoute = pidRoute + ",[0" + length + ":" + maintainPlanDto.getStackId() + "]";
-                maintainPlanDto.setStackId(null);
-                maintainPlanDto.setPidRoute(pidRoute);
+            if (pidRoute.contains("04")) {
+                stackIds.add(maintainPlanDto.getStackId());//选择的位置是垛位
+            }else{
+                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));//选择的位置是非垛位
             }
         }
-        List<MaintainPlanVo> maintainMonthEndReport = maintainPlanDao.findMaintainMonthEndReport(maintainPlanDto);
+        PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
+        List<MaintainPlanVo> maintainMonthEndReport = maintainPlanDao.findMaintainMonthEndReport(maintainPlanDto,stackIds,stackIds.size());//分页查询月底养护报表
         maintainMonthEndReport.forEach(maintainPlanVo -> {
-            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));
+            maintainPlanVo.setMaterialCode(maintainPlanVo.getMaterialCode().replaceAll(",","、"));//将物料代码中的,替换成、,使得导出时不出错
         });
         return new PageInfo(maintainMonthEndReport);
     }
 
+    /*
+    * 历史汇总单
+    * */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
-        String pidRoute = maintainPlanDto.getPidRoute();
-        List<Integer> stackIds = null;
+        String pidRoute = maintainPlanDto.getPidRoute();//获取位置路由
+        List<Integer> stackIds = new ArrayList<>();
         if(StringUtil.isNotEmpty(pidRoute)) {
-            int length = pidRoute.split(",").length;
-            //选择的位置是非垛位
-            if (!pidRoute.contains("04")) {
-                String route = SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + "");
-                stackIds = maintainPlanDao.findStackIdBySiteRoute(route);
+            if (pidRoute.contains("04")) {
+                stackIds.add(maintainPlanDto.getStackId());//选择的位置是垛位
             }else{
-                stackIds = new ArrayList<>();
-                //选择的位置是垛位
-                stackIds.add(maintainPlanDto.getStackId());
+                stackIds = maintainPlanDao.findStackIdBySiteRoute(SiteRouteUtil.route(pidRoute, maintainPlanDto.getStackId() + ""));//选择的位置是非垛位
             }
         }
         PageHelper.startPage(maintainPlanDto.getPage(), maintainPlanDto.getSize());
-        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainHistoryCollect(maintainPlanDto,stackIds);
+        List<MaintainPlanVo> maintainPlanVos = maintainPlanDao.findMaintainHistoryCollect(maintainPlanDto,stackIds,stackIds.size());//分页查询历史汇总单
         maintainPlanVos.forEach(maintainPlanVo -> {
-            Integer maintainDays = maintainPlanDao.findMaintainDays(maintainPlanVo.getId());
-            maintainPlanVo.setMaintainDays(maintainDays);
+            maintainPlanVo.setMaintainDays(maintainPlanDao.findMaintainDays(maintainPlanVo.getId()));//设置总养护天数
         });
         return new PageInfo(maintainPlanVos);
     }
 
-    @Override
+    /*@Override
     @Transactional
     public Result moveStack(MaintainPlanDto maintainPlanDto) {
         List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
@@ -704,8 +700,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 return new Result(false, StatusCode.ERROR, "养护计划修改失败!");
             }
         }
-    }
+    }*/
 
+    /*
+    * 养护数量
+    * */
     @Override
     public Map<String,Object> findMaintainCountReport(MaintainCountDto maintainCountDto) {
         Double sum = 0d;
@@ -820,6 +819,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return new HashMap<>();
     }
 
+    /*
+    * 根据物流代码、养护方式、养护阶段查询预警数值
+    * */
     @Override
     public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
@@ -840,6 +842,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return alarmValueSettingVo;
     }
 
+    /*
+    * 向上查找仓间预警数值
+    * */
     public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute){
         List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
         pidRoutes.sort((v1, v2) -> v2.compareTo(v1));

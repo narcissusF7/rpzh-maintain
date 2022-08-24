@@ -362,11 +362,7 @@ public class MaintainPlanController {
         if(GetBetweenDayUtils.get(alarmValueSettingDto)){
             return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
-        Integer result = maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
-        if (result == -1) {
-            return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在转段");
-        }
-        return new Result<>(true, StatusCode.OK, "转段成功",result);
+        return maintainPlanService.changeMaintainPlanStage(maintainPlanDto);
     }
 
     @PostMapping("/findMaintainPlanDetails")
@@ -448,7 +444,7 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询历史汇总单成功",maintainPlanVos);
     }
 
-    @ApiOperation(value = "移垛")
+    /*@ApiOperation(value = "移垛")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", dataType = "Integer",required = true),
             @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
@@ -458,9 +454,8 @@ public class MaintainPlanController {
     })
     @PostMapping({"/moveStack"})
     public Result moveStack(MaintainPlanDto maintainPlanDto) {
-
         return maintainPlanService.moveStack(maintainPlanDto);
-    }
+    }*/
 
     @PostMapping(value = "/findMaintainCountReport")
     @ApiOperation(value = "养护数量")

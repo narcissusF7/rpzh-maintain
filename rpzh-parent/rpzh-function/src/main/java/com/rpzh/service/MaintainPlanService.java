@@ -42,7 +42,7 @@ public interface MaintainPlanService {
 
     MaintainPlanVo findMaintainPlan(Integer id);
 
-    Integer changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
+    Result changeMaintainPlanStage(MaintainPlanDto maintainPlanDto);
 
     /**
      * 更改养护计划
@@ -65,7 +65,7 @@ public interface MaintainPlanService {
 
     PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto);
 
-    Result moveStack(MaintainPlanDto maintainPlanDto);
+ /*   Result moveStack(MaintainPlanDto maintainPlanDto);*/
 
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 

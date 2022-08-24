@@ -151,6 +151,7 @@
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">area_id,</if>
         <if test="earlyWarning.principalName != '' and earlyWarning.principalName != null">principal,</if>
         <if test="earlyWarning.siteRoute != '' and earlyWarning.siteRoute != null">site_route,</if>
+        <if test="earlyWarning.taskId != '' and earlyWarning.taskId != null">task_id,</if>
         is_affirm
         ) values (
         <if test="earlyWarning.warningType != '' and earlyWarning.warningType != null">#{earlyWarning.warningType},</if>
@@ -173,6 +174,7 @@
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
         <if test="earlyWarning.principalName != '' and earlyWarning.principalName != null">#{earlyWarning.principalName},</if>
         <if test="earlyWarning.siteRoute != '' and earlyWarning.siteRoute != null">#{earlyWarning.siteRoute},</if>
+        <if test="earlyWarning.taskId != '' and earlyWarning.taskId != null">#{earlyWarning.taskId},</if>
         2
         )
     </insert>
@@ -182,6 +184,7 @@
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade = #{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_val = #{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_val = #{earlyWarning.warningValThree},</if>
+        <if test="earlyWarning.taskId != '' and earlyWarning.taskId != null">task_id = #{earlyWarning.taskId},</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate,warning_time = sysdate</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate,warning_time = sysdate</if>
         where id = #{earlyWarning.id}

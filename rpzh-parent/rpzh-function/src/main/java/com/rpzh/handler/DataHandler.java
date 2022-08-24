@@ -483,11 +483,13 @@ public class DataHandler {
 
             if (level==-1){
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
-                addTask(nodeVo1,"19");
+                Integer taskId = addTask(nodeVo1, "19");
+                earlyWarning.setTaskId(taskId);
                 setLevel(earlyWarning, 1, data);
             }else {
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
-                addTask(nodeVo1,"13");
+                Integer taskId = addTask(nodeVo1, "13");
+                earlyWarning.setTaskId(taskId);
                 setLevel(earlyWarning, level, data);
             }
             earlyWarningDao.insertWarning(earlyWarning);
@@ -603,12 +605,13 @@ public class DataHandler {
                 //设置主键id
                 earlyWarning.setId(earlyWarningVo.getId());
 
-                //更新数据
-                earlyWarningDao.updateWarning(earlyWarning);
                 NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
                 if (level>0){
-                    addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
+                    Integer taskId = addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
+                    earlyWarning.setTaskId(taskId);
                 }
+                //更新数据
+                earlyWarningDao.updateWarning(earlyWarning);
             }
             if (level==3){
                 //达到3级 不用连续预警
@@ -635,8 +638,9 @@ public class DataHandler {
                 //设置设备类型
                 earlyWarning.setNodeType(parseData.getNodeType());
                 setLevel(earlyWarning, level, data);
+                Integer taskId = addTask(nodeVo1, taskType);
+                earlyWarning.setTaskId(taskId);
                 earlyWarningDao.insertWarning(earlyWarning);
-                addTask(nodeVo1,taskType);
                 //往redis中设置连续预警次数为1
                 if (level < 3) {
                     redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, 1);
@@ -708,7 +712,7 @@ public class DataHandler {
     }
 
     //添加任务
-    public void addTask(NodeVo nodeVo ,String type){
+    public Integer addTask(NodeVo nodeVo ,String type){
         //查询该垛位、仓间下该类型任务是否存在
         Integer count = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
         if (count<1){
@@ -716,7 +720,9 @@ public class DataHandler {
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
+            return Integer.parseInt(taskDto.getId())+1;
         }
+        return -1;
     }
 
     /**

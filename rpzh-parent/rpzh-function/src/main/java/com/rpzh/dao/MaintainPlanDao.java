@@ -33,13 +33,13 @@ public interface MaintainPlanDao {
 
     Integer insertMaintainStage(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    Integer findStageIdById(@Param("id") Integer id);
+    MaintainPlanVo findStageIdById(@Param("id") Integer id);
 
     int updateMaintainPlanStageId(@Param("id") Integer id,@Param("stageId")Integer stageId);
 
-    List<MaintainPlanVo> findMaintainMonthEndReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
+    List<MaintainPlanVo> findMaintainMonthEndReport(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds,@Param("size")Integer size);
 
-    List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
+    List<MaintainPlanVo> findMaintainHistoryCollect(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds,@Param("size")Integer size);
 
     Integer endMaintainPlan(@Param("maintainPlanId") Integer maintainPlanId);
 
@@ -55,7 +55,7 @@ public interface MaintainPlanDao {
 
     int changeMaintainPlan(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    List<MaintainPlanVo> findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds);
+    List<MaintainPlanVo> findExpireCollectTable(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto,@Param("stackIds")List<Integer> stackIds,@Param("size")Integer size);
 
     Integer isExistStackId(@Param("stackId") Integer stackId);
 

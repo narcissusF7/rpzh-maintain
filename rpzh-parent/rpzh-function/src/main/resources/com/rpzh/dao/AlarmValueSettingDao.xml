@@ -102,9 +102,6 @@
         sysdate,VALUESETTING.CURRVAL
         )
     </insert>
-    <select id="findIdByEarlyWarningRuleName" resultType="java.lang.Integer">
-        select id from tb_alarm_value_setting where early_warning_rule_name = #{earlyWarningRuleName} and rownum = 1 order by id desc
-    </select>
     <delete id="deleteIds">
         delete from tb_alarm_value_setting where
         id in

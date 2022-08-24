@@ -18,8 +18,6 @@ public interface AlarmValueSettingDao {
 
     Integer insertAlarmValueSetting(@Param("alarmValueSettingDto") AlarmValueSettingDto alarmValueSettingDto);
 
-    Integer findIdByEarlyWarningRuleName(@Param("earlyWarningRuleName") String earlyWarningRuleName);
-
     int deleteIds(@Param("alarmValueSettingIds") List<Integer> alarmValueSettingIds);
 
     AlarmValueSettingVo findByMaintainStageId(@Param("id") Integer maintainStageId);

@@ -185,10 +185,10 @@ public class GetBetweenDayUtils {
         //开始时间和结束时间为空时，开始时间为今天,结束时间为上个月的今天
         if(ToolUtil.isEmpty(startTime) && ToolUtil.isEmpty(endTime)){
             endTime = new Date();
-            endTime.setHours(0);
-            endTime.setMinutes(0);
-            endTime.setSeconds(0);
-            startTime = new Date(endTime.getTime()- 30 * 24 * 60 * 60 * 1000l);
+            endTime.setHours(23);
+            endTime.setMinutes(59);
+            endTime.setSeconds(59);
+            startTime = new Date(endTime.getTime() + 1000 - 30 * 24 * 60 * 60 * 1000l);
         }
         Map<String,Date> map = new HashMap<>();
         map.put("startTime",startTime);

@@ -47,7 +47,7 @@ public class EarlyWarning {
     //仓间id
     private Integer areaId;
     private String siteRoute;
-
+    private Integer taskId;
     public EarlyWarning(){
 
     }
