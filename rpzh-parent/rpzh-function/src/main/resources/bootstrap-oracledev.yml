@@ -6,13 +6,13 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: localhost:8866
+        server-addr: 192.168.3.37:8866
       config: # 配置中心地址
-        server-addr: localhost:8866
+        server-addr: 192.168.3.37:8866
         # 配置文件格式
         file-extension: yml
   redis:
-    host: 127.0.0.1
+    host: 192.168.3.37
     port: 6379
     password:
     jedis:
@@ -33,15 +33,15 @@ spring:
   datasource:
     dynamic:
       #默认这里选择默认数据
-      primary: mysql
+      primary: oracle
       strict: false
       datasource:
         #可以配置多个
-        mysql:
-          url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
-          username: root
+        oracle:
+          url: jdbc:oracle:thin:@192.168.3.36:1521:helowin
+          username: RPZH_FUNCTION
           password: root
-          driver-class-name: com.mysql.jdbc.Driver
+          driver-class-name: oracle.jdbc.driver.OracleDriver
         clickhouse:
           url: jdbc:clickhouse://183.250.89.188:8123/default
           username: default
@@ -112,5 +112,6 @@ node:
   signalStrength: -15
 time:
   cron : 0 0/2 0 * * *
+
 pagehelper:
   auto-runtime-dialect: true
