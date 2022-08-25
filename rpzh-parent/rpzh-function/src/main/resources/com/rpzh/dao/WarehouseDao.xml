@@ -5,9 +5,10 @@
     select storage_age as age,name as name from tb_warehouse where id= #{siteId}
   </select>
   <select id="findNameCount" resultType="int">
-    SELECT count(*)
-    FROM tb_warehouse
-    WHERE name = #{name}
+    SELECT count(*) FROM tb_warehouse WHERE name = #{name}
+  </select>
+  <select id ="findAllWarehouseIds" resultType="java.lang.Integer">
+    select id from tb_warehouse
   </select>
   <insert id="addWarehouse">
     <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="warehouseDto.id">

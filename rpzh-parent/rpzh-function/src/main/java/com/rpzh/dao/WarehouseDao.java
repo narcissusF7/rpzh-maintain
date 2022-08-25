@@ -26,6 +26,10 @@ public interface WarehouseDao {
      */
     int findNameCount(@Param("name") String name);
 
+    /*
+    * 查询所有仓库id
+    * */
+    List<Integer> findAllWarehouseIds();
     /**
      * 添加仓库
      *

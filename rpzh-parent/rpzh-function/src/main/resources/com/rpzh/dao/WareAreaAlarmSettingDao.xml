@@ -58,7 +58,7 @@
         <if test="wareAreaAlarmSettingDto.stackId != null and wareAreaAlarmSettingDto.stackId != ''">#{wareAreaAlarmSettingDto.stackId},</if>
         <if test="wareAreaAlarmSettingDto.siteType != null and wareAreaAlarmSettingDto.siteType != ''">#{wareAreaAlarmSettingDto.siteType},</if>
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">#{wareAreaAlarmSettingDto.pidRoute},</if>
-        #{wareAreaAlarmSettingDto.createdTime},#{wareAreaAlarmSettingDto.createUser},#{wareAreaAlarmSettingDto.updatedTime},#{wareAreaAlarmSettingDto.updateUser}
+        sysdate,#{wareAreaAlarmSettingDto.createUser},sysdate,#{wareAreaAlarmSettingDto.updateUser}
         )
     </insert>
     <delete id="deleteIds">
@@ -139,5 +139,11 @@
     </select>
     <select id="findCount" resultType="java.lang.Integer">
         select count(*) from tb_ware_area_alarm_setting where pid_route = #{pidRoute}
+    </select>
+    <select id="findWarehouseIds" resultType="java.lang.Integer">
+        select site_id from tb_ware_area_alarm_setting where site_type = '01'
+    </select>
+    <select id="findCountByWarehouseId" resultType="java.lang.Integer">
+        select count(*) from tb_ware_area_alarm_setting where site_type = '01'
     </select>
 </mapper>

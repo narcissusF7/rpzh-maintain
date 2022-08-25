@@ -9,6 +9,7 @@ import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.AlarmValueSettingDto;
 import com.rpzh.dto.LogAlarmSettingDto;
 import com.rpzh.dto.WareAreaAlarmSettingDto;
+import com.rpzh.dto.WarehouseDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -24,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Author: zyq
@@ -126,6 +124,7 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
     private RedisUtil redisUtil;
     @Override
     public PageInfo<WareAreaAlarmSettingVo> findWareAreaAlarmSettingInfo(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
+        createDefaultRule();
         String pidRoute = wareAreaAlarmSettingDto.getPidRoute();
         Integer stackId = wareAreaAlarmSettingDto.getStackId();
         if(StringUtil.isNotEmpty(pidRoute)){
@@ -153,6 +152,36 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
             }
         }
         return new PageInfo<>(wareAreaAlarmSettingInfos);
+    }
+
+    public void createDefaultRule(){
+        if(wareAreaAlarmSettingDao.findCountByWarehouseId()>0) {
+            List<Integer> warehouseIds = new ArrayList<>(warehouseDao.findAllWarehouseIds());
+            List<Integer> siteIds = new ArrayList<>(wareAreaAlarmSettingDao.findWarehouseIds());
+            warehouseIds.removeAll(siteIds);
+            for (Integer warehouseId : warehouseIds) {
+                WareAreaAlarmSettingDto wareAreaAlarmSettingDto1 = new WareAreaAlarmSettingDto();
+                wareAreaAlarmSettingDto1.setSiteType("01");
+                wareAreaAlarmSettingDto1.setStackId(warehouseId);
+                wareAreaAlarmSettingDto1.setCreateUser(TokenDecode.getUserInfo().get("username"));
+                wareAreaAlarmSettingDto1.setUpdateUser(TokenDecode.getUserInfo().get("username"));
+                wareAreaAlarmSettingDto1.setPidRoute("[00:0],[01:" + warehouseId + "]");
+                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperOne(10d);
+                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperTwo(11d);
+                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperThree(12d);
+                wareAreaAlarmSettingDto1.setWarehouseMoistureLower(9d);
+                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperOne(20d);
+                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperTwo(21d);
+                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperThree(22d);
+                wareAreaAlarmSettingDto1.setWarehouseOxygenLower(19d);
+                wareAreaAlarmSettingDto1.setWarehouseTempUpperOne(32d);
+                wareAreaAlarmSettingDto1.setWarehouseTempUpperTwo(33d);
+                wareAreaAlarmSettingDto1.setWarehouseTempUpperThree(34d);
+                wareAreaAlarmSettingDto1.setWarehouseTempLower(31d);
+                wareAreaAlarmSettingDao.insertWareAreaAlarmSetting(wareAreaAlarmSettingDto1);
+            }
+        }
+
     }
 
     @Resource

@@ -28,4 +28,8 @@ public interface WareAreaAlarmSettingDao {
     List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
 
     Integer findCount(@Param("pidRoute")String pidRoute);
+
+    List<Integer> findWarehouseIds();
+
+    Integer findCountByWarehouseId();
 }

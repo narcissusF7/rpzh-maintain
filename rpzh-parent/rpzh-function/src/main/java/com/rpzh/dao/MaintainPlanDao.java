@@ -113,4 +113,6 @@ public interface MaintainPlanDao {
 
     //查询垛位名称、负责人账号
     Map<String, String> findStackById(@Param("stackId") Integer stackId);
+
+    Integer findCountByMaintainPlan();
 }

@@ -498,7 +498,7 @@
   t.remark as remark,t.principal_name as principalName
   FROM tb_stack t
   inner join (select distinct stack_id from tb_material where is_end = '0') m on t.id = m.stack_id
-  where id not in (select stack_id from tb_maintain_plan where is_end = '0') order by node_id
+  where id not in (select stack_id from tb_maintain_plan where is_end = '0') order by m.stack_id
   </select>
     <select id="findStackIdBySiteRoute" resultType="java.lang.Integer">
     select id from tb_stack where pid_route like concat(concat('%',#{siteRoute}),'%')
@@ -511,4 +511,7 @@
     inner join tb_maintain_plan tm on tm.stack_id = ts.id and tm.is_end = '0'
     where ts.id = #{stackId}
   </select>
+    <select id="findCountByMaintainPlan" resultType="java.lang.Integer">
+        select count(*) from tb_maintain_plan
+    </select>
 </mapper>

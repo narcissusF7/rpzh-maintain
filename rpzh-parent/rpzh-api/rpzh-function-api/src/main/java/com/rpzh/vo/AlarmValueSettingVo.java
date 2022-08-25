@@ -17,69 +17,69 @@ import java.util.List;
 @ApiModel(description = "预警规则数据返回")
 public class AlarmValueSettingVo {
     @ApiModelProperty(notes = "垛内氧气上限一级")
-    public Double stackOxygenUpperOne= AlertSettingSetDefault.stackOxygenUpperOne;
+    public Double stackOxygenUpperOne;
     @ApiModelProperty(notes = "垛内氧气上限二级")
-    private Double stackOxygenUpperTwo=AlertSettingSetDefault.stackOxygenUpperTwo;
+    private Double stackOxygenUpperTwo;
     @ApiModelProperty(notes = "垛内氧气上限三级")
-    private Double stackOxygenUpperThree=AlertSettingSetDefault.stackOxygenUpperThree;
+    private Double stackOxygenUpperThree;
     @ApiModelProperty(notes = "垛内氧气下限")
-    private Double stackOxygenLower=AlertSettingSetDefault.stackOxygenLower;
+    private Double stackOxygenLower;
     @ApiModelProperty(notes = "仓间氧气上限一级")
-    private Double warehouseOxygenUpperOne=AlertSettingSetDefault.warehouseOxygenUpperOne;
+    private Double warehouseOxygenUpperOne;
     @ApiModelProperty(notes = "仓间氧气上限二级")
-    private Double warehouseOxygenUpperTwo=AlertSettingSetDefault.warehouseOxygenUpperTwo;
+    private Double warehouseOxygenUpperTwo;
     @ApiModelProperty(notes = "仓间氧气上限三级")
-    private Double warehouseOxygenUpperThree=AlertSettingSetDefault.warehouseOxygenUpperThree;
+    private Double warehouseOxygenUpperThree;
     @ApiModelProperty(notes = "仓间氧气下限")
-    private Double warehouseOxygenLower=AlertSettingSetDefault.warehouseOxygenLower;
+    private Double warehouseOxygenLower;
     @ApiModelProperty(notes = "包芯温度上限一级")
-    private Double tempCoreChipUpperOne=AlertSettingSetDefault.tempCoreChipUpperOne;
+    private Double tempCoreChipUpperOne;
     @ApiModelProperty(notes = "包芯温度上限二级")
-    private Double tempCoreChipUpperTwo=AlertSettingSetDefault.tempCoreChipUpperTwo;
+    private Double tempCoreChipUpperTwo;
     @ApiModelProperty(notes = "包芯温度上限三级")
-    private Double tempCoreChipUpperThree=AlertSettingSetDefault.tempCoreChipUpperThree;
+    private Double tempCoreChipUpperThree;
     @ApiModelProperty(notes = "包芯温度下限")
-    private Double tempCoreChipLower=AlertSettingSetDefault.tempCoreChipLower;
+    private Double tempCoreChipLower;
     @ApiModelProperty(notes = "垛内温度上限一级")
-    private Double stackTempUpperOne=AlertSettingSetDefault.stackTempUpperOne;
+    private Double stackTempUpperOne;
     @ApiModelProperty(notes = "垛内温度上限二级")
-    private Double stackTempUpperTwo=AlertSettingSetDefault.stackTempUpperTwo;
+    private Double stackTempUpperTwo;
     @ApiModelProperty(notes = "垛内温度上限三级")
-    private Double stackTempUpperThree=AlertSettingSetDefault.stackTempUpperThree;
+    private Double stackTempUpperThree;
     @ApiModelProperty(notes = "垛内温度下限")
-    private Double stackTempLower=AlertSettingSetDefault.stackTempLower;
+    private Double stackTempLower;
     @ApiModelProperty(notes = "垛内水分上限一级")
-    private Double stackMoistureUpperOne=AlertSettingSetDefault.stackMoistureUpperOne;
+    private Double stackMoistureUpperOne;
     @ApiModelProperty(notes = "垛内水分上限二级")
-    private Double stackMoistureUpperTwo=AlertSettingSetDefault.stackMoistureUpperTwo;
+    private Double stackMoistureUpperTwo;
     @ApiModelProperty(notes = "垛内水分上限三级")
-    private Double stackMoistureUpperThree=AlertSettingSetDefault.stackMoistureUpperThree;
+    private Double stackMoistureUpperThree;
     @ApiModelProperty(notes = "垛内水分下限")
-    private Double stackMoistureLower=AlertSettingSetDefault.stackMoistureLower;
+    private Double stackMoistureLower;
     @ApiModelProperty(notes = "仓间温度上限一级")
-    private Double warehouseTempUpperOne=AlertSettingSetDefault.warehouseTempUpperOne;
+    private Double warehouseTempUpperOne;
     @ApiModelProperty(notes = "仓间温度上限二级")
-    private Double warehouseTempUpperTwo=AlertSettingSetDefault.warehouseTempUpperTwo;
+    private Double warehouseTempUpperTwo;
     @ApiModelProperty(notes = "仓间温度上限三级")
-    private Double warehouseTempUpperThree=AlertSettingSetDefault.warehouseTempUpperThree;
+    private Double warehouseTempUpperThree;
     @ApiModelProperty(notes = "仓间温度下限")
-    private Double warehouseTempLower=AlertSettingSetDefault.warehouseTempLower;
+    private Double warehouseTempLower;
     @ApiModelProperty(notes = "仓间水分上限一级")
-    private Double warehouseMoistureUpperOne=AlertSettingSetDefault.warehouseMoistureUpperOne;
+    private Double warehouseMoistureUpperOne;
     @ApiModelProperty(notes = "仓间水分上限二级")
-    private Double warehouseMoistureUpperTwo=AlertSettingSetDefault.warehouseMoistureUpperTwo;
+    private Double warehouseMoistureUpperTwo;
     @ApiModelProperty(notes = "仓间水分上限三级")
-    private Double warehouseMoistureUpperThree=AlertSettingSetDefault.warehouseMoistureUpperThree;
+    private Double warehouseMoistureUpperThree;
     @ApiModelProperty(notes = "仓间水分下限")
-    private Double warehouseMoistureLower=AlertSettingSetDefault.warehouseMoistureLower;
+    private Double warehouseMoistureLower;
     @ApiModelProperty(notes = "平均包芯高于环境一级")
-    private Double coreTempHighEnvTempOne=AlertSettingSetDefault.coreTempHighEnvTempOne;
+    private Double coreTempHighEnvTempOne;
     @ApiModelProperty(notes = "平均包芯高于环境二级")
-    private Double coreTempHighEnvTempTwo=AlertSettingSetDefault.coreTempHighEnvTempTwo;
+    private Double coreTempHighEnvTempTwo;
     @ApiModelProperty(notes = "平均包芯高于环境三级")
-    private Double coreTempHighEnvTempThree=AlertSettingSetDefault.coreTempHighEnvTempThree;
+    private Double coreTempHighEnvTempThree;
     @ApiModelProperty(notes = "平均包芯低于环境")
-    private Double coreTempLowEnvTemp=AlertSettingSetDefault.coreTempLowEnvTemp;
+    private Double coreTempLowEnvTemp;
     @ApiModelProperty(notes = "预警设置表id")
     private Integer alarmValueSettingId;
     @ApiModelProperty(notes = "预警规则名称")

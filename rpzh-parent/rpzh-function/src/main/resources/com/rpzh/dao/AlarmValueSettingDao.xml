@@ -164,7 +164,8 @@
             t1.id as alarmValueSettingId
         from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
-        where t2.material_code like concat(concat('%',#{alarmValueSettingDto.materialCode}),'%')
-        and t1.phases = #{alarmValueSettingDto.phases} and t2.maintence_style = #{alarmValueSettingDto.maintenceStyle} and rownum = 1
+        where t1.phases = #{alarmValueSettingDto.phases} and t2.maintence_style = #{alarmValueSettingDto.maintenceStyle}
+        <if test="alarmValueSettingDto.earlyWarningRuleName != '' and alarmValueSettingDto.earlyWarningRuleName != null">and t2.early_warning_rule_name = #{alarmValueSettingDto.earlyWarningRuleName}</if>
+        <if test="alarmValueSettingDto.materialCode != '' and alarmValueSettingDto.materialCode != null">and t2.material_code like concat(concat('%',#{alarmValueSettingDto.materialCode}),'%') and rownum = 1</if>
     </select>
 </mapper>
