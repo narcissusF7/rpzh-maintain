@@ -15,6 +15,8 @@
         t1.stack_oxygen_upper_one as stackOxygenUpperOne,
         t1.stack_oxygen_upper_two as stackOxygenUpperTwo,
         t1.stack_oxygen_upper_three as stackOxygenUpperThree,
+        t1.stack_oxygen_upper_three as stackOxygenUpperThree,
+        t1.stack_oxygen_upper_three as stackOxygenUpperThree,
         t1.stack_oxygen_lower as stackOxygenLower,
         t1.temp_core_chip_upper_one as tempCoreChipUpperOne,
         t1.temp_core_chip_upper_two as tempCoreChipUpperTwo,
@@ -41,13 +43,19 @@
         <if test="phases != null and phases != ''">and t1.phases = #{phases}</if>
     </select>
     <select id="findAlarmSettingTemplateTable" resultType="com.rpzh.vo.AlarmValueSettingVo">
-        SELECT DISTINCT
-        t2.id as id,
+        SELECT
+        CASE when instr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
+        ELSE LISTAGG(t2.id, ',') WITHIN GROUP(ORDER BY t2.id) end AS id,
         t2.early_warning_rule_name as earlyWarningRuleName,
-        t2.material_code as materialCode,
-        t2.maintence_style as maintenceStyle,
-        t2.create_user as createUser,
-        t1.updated_time as updatedTime
+        CASE when instr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id),'、') != 0 THEN substr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id), '、',1,1)-1)
+        ELSE LISTAGG(TO_CHAR(t2.material_code), '、') WITHIN GROUP(ORDER BY t2.id) end AS materialCode,
+        CASE when instr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
+        ELSE LISTAGG(TO_CHAR(t2.maintence_style), ',') WITHIN GROUP(ORDER BY t2.id) end AS maintenceStyle,
+        CASE when instr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
+        ELSE LISTAGG(TO_CHAR(t2.create_user), ',') WITHIN GROUP(ORDER BY t2.id) end AS createUser,
+        CASE when instr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id),',') > 0 THEN substr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',')
+        WITHIN GROUP(ORDER BY t2.id), 1, instr(LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id), ',',1,1)-1)
+        ELSE LISTAGG(TO_char(t1.updated_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t2.id) end AS updatedTime
         from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where 1=1
@@ -57,7 +65,7 @@
         <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and t2.create_user = #{alarmValueSettingDto.createUser}</if>
         <if test = "alarmValueSettingDto.startTime != null">and t1.updated_time >= #{alarmValueSettingDto.startTime}</if>
         <if test = "alarmValueSettingDto.endTime != null">and t1.updated_time &lt;= #{alarmValueSettingDto.endTime}</if>
-        order by t2.id desc
+        group by early_warning_rule_name
     </select>
     <delete id="deleteStage">
         delete from tb_setting_template_stage where
