@@ -185,8 +185,9 @@
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_val = #{earlyWarning.warningValTwo},</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_val = #{earlyWarning.warningValThree},</if>
         <if test="earlyWarning.taskId != '' and earlyWarning.taskId != null">task_id = #{earlyWarning.taskId},</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate,warning_time = sysdate</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate,warning_time = sysdate</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_time_two = sysdate,</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_time_three = sysdate,</if>
+        warning_time = sysdate
         where id = #{earlyWarning.id}
     </update>
 

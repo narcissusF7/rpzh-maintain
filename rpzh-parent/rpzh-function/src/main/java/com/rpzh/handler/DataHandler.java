@@ -352,9 +352,10 @@ public class DataHandler {
                     //达到3次新增一条数据
                     String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
                     EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,siteRoute);
-                    earlyWarningDao.insertWarning(earlyWarning);
                     NodeVo nodeVo =nodeDao.findByNodeId(parseData.getNodeId());
-                    addTask(nodeVo,"20");
+                    Integer taskId = addTask(nodeVo, "20");
+                    earlyWarning.setTaskId(taskId);
+                    earlyWarningDao.insertWarning(earlyWarning);
                     redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
                 }else {
                     //否则次数加1
@@ -470,6 +471,7 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
+        earlyWarning.setId(earlyWarningVo.getId());
         NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
         String siteRoute = nodeVo1.getSiteRoute();
         earlyWarning.setSiteRoute(siteRoute);
