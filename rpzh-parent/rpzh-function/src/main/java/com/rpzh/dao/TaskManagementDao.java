@@ -397,9 +397,7 @@ public interface TaskManagementDao {
      */
     List<Map> pestCountDetail(@Param("id") String id);
 
-    Map findInfo(@Param("id") String id);
-
-    Integer findTaskBySiteRoute(@Param("siteRoute") String siteRoute, @Param("type") String type);
+    Map findTaskBySiteRoute(@Param("siteRoute") String siteRoute, @Param("type") String type);
 
     /**
      * 平均包芯低于环境预警任务
@@ -423,8 +421,8 @@ public interface TaskManagementDao {
     TaskVo findTaskFromMonitored(@Param("siteRoute") String siteRoute, @Param("taskType") String taskType);
 
     /*
-    * 根据位置路由查询是否存在未处理或正在处理的移垛任务
-    * */
+     * 根据位置路由查询是否存在未处理或正在处理的移垛任务
+     * */
     Integer findCount(@Param("siteRoute")String siteRoute);
 
     /**

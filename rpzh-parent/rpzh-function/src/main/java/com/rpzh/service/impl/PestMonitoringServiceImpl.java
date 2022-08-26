@@ -305,38 +305,38 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         List<PestData> pestBoardStacks = new ArrayList<>();
         List<PestData> pestBoardWares = new ArrayList<>();
 
-            for (PestData pestBoard : pestBoards) {
-                Map map = pestDataMap.get(pestBoard.getPestBoardId());
-                //获取甲虫数量
-                int beetle = Integer.parseInt(map.get("beetle") + "");
+        for (PestData pestBoard : pestBoards) {
+            Map map = pestDataMap.get(pestBoard.getPestBoardId());
+            //获取甲虫数量
+            int beetle = Integer.parseInt(map.get("beetle") + "");
 
-                int length = pestBoard.getSiteRoute().split(",").length;
-                Integer mealworm =null;
-                //获取粉虫数量
-                if (length==5) {
-                    mealworm = Integer.parseInt(map.get("mealworm") + "");
-                }
-
-                //虫情预警等级
-                Map<String, Integer> levelMap = decideLevel(pestBoard.getPestBoardId(), beetle, mealworm);
-
-
-                pestBoard.setBeetleCount(beetle);
-
-                pestBoard.setMealwormCount(mealworm);
-
-                pestBoard.setBeetleLevel(levelMap.get("beetleLevel"));
-
-                pestBoard.setBeetleLevel(levelMap.get("mealwormLevel"));
-
-                pestBoard.setAlertLevel(levelMap.get("level"));
-                //如果是仓间虫情点位
-                if (length==5){
-                    pestBoardWares.add(pestBoard);
-                }else if (length==6){
-                    pestBoardStacks.add(pestBoard);
-                }
+            int length = pestBoard.getSiteRoute().split(",").length;
+            Integer mealworm =null;
+            //获取粉虫数量
+            if (length==5) {
+                mealworm = Integer.parseInt(map.get("mealworm") + "");
             }
+
+            //虫情预警等级
+            Map<String, Integer> levelMap = decideLevel(pestBoard.getPestBoardId(), beetle, mealworm);
+
+
+            pestBoard.setBeetleCount(beetle);
+
+            pestBoard.setMealwormCount(mealworm);
+
+            pestBoard.setBeetleLevel(levelMap.get("beetleLevel"));
+
+            pestBoard.setBeetleLevel(levelMap.get("mealwormLevel"));
+
+            pestBoard.setAlertLevel(levelMap.get("level"));
+            //如果是仓间虫情点位
+            if (length==5){
+                pestBoardWares.add(pestBoard);
+            }else if (length==6){
+                pestBoardStacks.add(pestBoard);
+            }
+        }
 
         int insertFlag = 0;
         if (pestBoardWares.size()>0){
@@ -731,9 +731,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             pestDataVo.setWarningColor(getPestWarningColor(pestDataVo.getAlertLevel(),pestMonitorValue));
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)){
                 Map<String, Integer> map = decideLevel(pestDataVo.getPestBoardId(), pestDataVo.getBeetleCount(), pestDataVo.getMealwormCount());
-               if (ToolUtil.isEmpty(map)){
-                   return;
-               }
+                if (ToolUtil.isEmpty(map)){
+                    return;
+                }
                 pestDataVo.setBeetleLevel(map.get("beetleLevel"));
                 //甲虫预警颜色
                 pestDataVo.setBeetleColor(getPestWarningColor(pestDataVo.getBeetleLevel(),pestMonitorValue));
@@ -831,8 +831,8 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
     public void addTask(PestBoardVo pestBoardVo , String type){
         //查询该垛位、仓间下该类型任务是否存在
-        Integer id = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
-        if (ToolUtil.isEmpty(id)){
+        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
+        if (ToolUtil.isEmpty(selectTaskMap)){
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),pestBoardVo.getPrincipalUser(), DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);

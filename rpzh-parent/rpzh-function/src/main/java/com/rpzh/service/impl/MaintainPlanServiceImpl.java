@@ -6,6 +6,7 @@ import com.rpzh.dao.*;
 import com.rpzh.dto.*;
 import com.rpzh.entity.*;
 import com.rpzh.enums.WarehouseNodeType;
+import com.rpzh.service.AlarmSettingTemplateService;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
@@ -173,6 +174,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
+        //AlarmSettingTemplateServiceImpl.createDefaultRule()
         //宁波测试用
         if(maintainPlanDao.findCountByMaintainPlan()==0){
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
@@ -377,8 +379,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 设置负责人(用户名加账号)
-    * */
+     * 设置负责人(用户名加账号)
+     * */
     public String getUserName(String name){
         List<String> usernames = Arrays.asList(name.split(","));
         String userNames = "";
@@ -421,8 +423,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 获取负责人id集合
-    * */
+     * 获取负责人id集合
+     * */
     public List<Integer> getPrincipalIds(String name){
         List<String> names = Arrays.asList(name.split(","));
         String userName = "";
@@ -448,8 +450,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return username;
     }
     /*
-    * 转段前回显
-    * */
+     * 转段前回显
+     * */
     @Override
     public MaintainPlanVo beforeChangeMaintainPlanStage(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.beforeChangeMaintainPlan(id);//根据养护计划id查询养护信息
@@ -466,8 +468,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 转段时的养护阶段列表
-    * */
+     * 转段时的养护阶段列表
+     * */
     @Override
     public List<String> beforeChangePhases(Integer stackId,String maintenceStyle) {
         List<String> phases = new ArrayList<>(Arrays.asList("养护阶段","充氮杀虫阶段","磷化铝杀虫阶段"));
@@ -540,8 +542,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 开垛使用
-    * */
+     * 开垛使用
+     * */
     @Override
     public Result endMaintainPlan(MaintainPlanDto maintainPlanDto){
         List<Integer> ids = new ArrayList<>(Arrays.asList(maintainPlanDto.getId()));
@@ -584,8 +586,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 转段
-    * */
+     * 转段
+     * */
     @Override
     public Result changeMaintainPlanStage(MaintainPlanDto maintainPlanDto) {
         List<String> pidRoutes = new ArrayList<>();
@@ -659,8 +661,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 养护到期汇总中的详情
-    * */
+     * 养护到期汇总中的详情
+     * */
     @Override
     public MaintainPlanVo findMaintainPlanDetails(Integer id,Integer stackId) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findDetailsNew(id);//根据养护计划id查询当前阶段基本信息
@@ -673,8 +675,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 历史汇总单中的详情
-    * */
+     * 历史汇总单中的详情
+     * */
     @Override
     public MaintainPlanVo findEndMaintainPlanDetails(Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainHistoryById(id);//根据养护计划id查询当前阶段基本信息
@@ -688,8 +690,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 养护到期汇总列表
-    * */
+     * 养护到期汇总列表
+     * */
     @Override
     public PageInfo<MaintainPlanVo> findExpireCollectTable(MaintainPlanDto maintainPlanDto) {
         if(StringUtil.isNotEmpty(maintainPlanDto.getEndTime())){
@@ -713,8 +715,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 月底养护报表
-    * */
+     * 月底养护报表
+     * */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainMonthEndReport(MaintainPlanDto maintainPlanDto) {
         //开始时间和结束时间为空,则默认当前一个月
@@ -744,8 +746,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 历史汇总单
-    * */
+     * 历史汇总单
+     * */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto) {
         String pidRoute = maintainPlanDto.getPidRoute();//获取位置路由
@@ -813,8 +815,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }*/
 
     /*
-    * 养护数量
-    * */
+     * 养护数量
+     * */
     @Override
     public Map<String,Object> findMaintainCountReport(MaintainCountDto maintainCountDto) {
         Double sum = 0d;
@@ -824,45 +826,35 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String materialCode = maintainCountDto.getMaterialCode();
         String maintenceStyle = maintainCountDto.getMaintenceStyle();
         String phases = maintainCountDto.getPhases();
-        List<MaintainCountVo> maintainCountVos = new ArrayList<MaintainCountVo>();
+        List<MaintainCountVo> maintainCountVos = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         //位置不为空
         if(ToolUtil.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(stackId)){
-            int length = pidRoute.split(",").length;
             String column="";
-            switch (length){
+            switch (pidRoute.split(",").length){
                 case 1: column = "t1.warehouse_id";break;
                 case 2: column = "t1.buliding_id";break;
                 case 3: column = "t1.floor_id";break;
                 case 4: column = "t1.area_id";break;
                 case 5: column = "t1.stack_id";break;
             }
-            sum = maintainPlanDao.findCount(maintainCountDto,column);
-            maintainCountDto.setPidRoute(pidRoute);
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
             maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,column);
-            maintainCountVos.forEach(maintainCountVo -> {
-                maintainCountVo.setChildren(new ArrayList<>());
-            });
-            map.put("sum",sum);
+            map.put("sum",maintainPlanDao.findCount(maintainCountDto,column));
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
         //位置为空且物料代码也为空
         if(ToolUtil.isEmpty(pidRoute) && ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(materialCode)){
-            sum = maintainPlanDao.findCount(maintainCountDto,"");
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
-            maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,"t1.stack_id");
-            maintainCountVos.forEach(maintainCountVo -> {
-                maintainCountVo.setChildren(new ArrayList<>());
-            });
-            map.put("sum",sum);
+            maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,"");
+            map.put("sum",maintainPlanDao.findCount(maintainCountDto,""));
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
-        //物料代码不为空而位置为空
+        //位置为空而物料代码不为空而位置
         if(ToolUtil.isEmpty(pidRoute) && ToolUtil.isEmpty(stackId) && ToolUtil.isNotEmpty(materialCode)){
             sum = maintainPlanDao.findCount(maintainCountDto,"");
             if(ToolUtil.isEmpty(sum)){
@@ -930,8 +922,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 根据物流代码、养护方式、养护阶段查询预警数值
-    * */
+     * 根据物流代码、养护方式、养护阶段查询预警数值
+     * */
     @Override
     public AlarmValueSettingVo findAlarmValueSetting(AlarmValueSettingDto alarmValueSettingDto) {
         AlarmValueSettingVo alarmValueSettingVo = null;
@@ -955,8 +947,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     }
 
     /*
-    * 向上查找仓间预警数值
-    * */
+     * 向上查找仓间预警数值
+     * */
     public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute){
         List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
         pidRoutes.sort((v1, v2) -> v2.compareTo(v1));
