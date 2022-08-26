@@ -74,18 +74,13 @@ public class EarlyWarning {
         this.areaId = areaId;
     }
 
-    public EarlyWarning(String warningType, String nodeId, String nodeType, Double warningValOne, Integer warningGrade,String siteRoute,String siteType,Integer siteId) {
+    public EarlyWarning(String warningType, String nodeId, String nodeType, Double warningValOne, Integer warningGrade,String siteRoute) {
         this.warningType = warningType;
         this.nodeId = nodeId;
         this.nodeType = nodeType;
         this.warningValOne = warningValOne;
         this.warningGrade = warningGrade;
         this.siteRoute = siteRoute;
-        if("04".equals(siteRoute)){
-            this.areaId = siteId;
-        }else{
-            this.stackId = siteId;
-        }
     }
     public EarlyWarning(String warningType, String nodeId, String nodeType, Integer warningGrade) {
         this.warningType = warningType;

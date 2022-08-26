@@ -131,8 +131,9 @@ public class EarlyWarningController {
     @PostMapping("/updateRepairId")
     @ApiOperation(value = "去处理（故障），设备维修")
     @PreAuthorize("hasAnyAuthority('f:e:upr')")
-    public void updateRepairId(@RequestBody List<Map<String,String>> repairInfos) {
-        earlyWarningService.updateRepairId(repairInfos);
+    public void updateRepairId(@RequestParam("beforeAffirm") String beforeAffirm,@RequestParam("affirm") String affirm, @RequestParam(name = "deviceId",required = false) String deviceId, @RequestParam(name="id",required = false) String id,
+                               @RequestParam(name = "principal",required = false) String principal,@RequestParam(name = "dealTime",required = false)String dealTime,@RequestParam("warningType")String warningType) {
+        earlyWarningService.updateRepairId(beforeAffirm,affirm, deviceId, id, principal,dealTime,warningType);
     }
 
     @PostMapping("/warningSend")

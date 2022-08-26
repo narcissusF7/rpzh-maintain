@@ -31,7 +31,7 @@ public interface EarlyWarningService {
 
     Result findNodeData(EarlyWarningDto earlyWarningDto);
 
-    int updateRepairId(List<Map<String,String>> repairInfos);
+    int updateRepairId(String beforeAffirm,String affirm, String deviceId, String id, String principal,String dealTime,String warningType);
 
     void warningSend(String number,String username,String siteRoute);
 

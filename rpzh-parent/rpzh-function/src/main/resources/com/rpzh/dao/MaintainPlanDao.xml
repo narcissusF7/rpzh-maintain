@@ -400,7 +400,8 @@
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id,a.site_name order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id
     </select>
     <select id="findPhases" resultType="java.lang.String">
-        select t.phases from tb_maintain_plan_stage t inner join tb_maintain_plan t1 on t1.stack_id = #{stackId} and t1.is_end = '0' and t1.maintence_style = #{maintenceStyle} and t1.id=t.maintain_plan_id
+        select t.phases from tb_maintain_plan_stage t
+        inner join tb_maintain_plan t1 on t1.stack_id = #{stackId} and t1.is_end = '0' and t1.maintence_style = #{maintenceStyle} and t1.id=t.maintain_plan_id
     </select>
     <select id="findMaintainCountBySiteName" resultType="com.rpzh.vo.MaintainCountVo">
         select
@@ -421,7 +422,7 @@
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t1.phases = #{maintainCountDto.phases}</if>
         <if test="maintainCountDto.startTime !=null">and t1.created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
         <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        order by t1.stack_id
+        order by t1.warehouse_id,t1.buliding_id,t1.floor_id,t1.area_id,t1.stack_id
     </select>
     <select id="findCount" resultType="java.lang.Double">
         select sum(t1.maintain_count) from tb_maintain_count t1

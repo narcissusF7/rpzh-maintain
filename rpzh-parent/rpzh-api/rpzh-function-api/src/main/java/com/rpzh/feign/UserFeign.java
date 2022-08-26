@@ -22,4 +22,7 @@ public interface UserFeign {
      */
     @PostMapping("/username/findPhoneNumberById")
     Result findPhoneNumberById(@RequestParam("id") String id);
+
+    @PostMapping("/repair/findRepairInfo")
+    Map<String, String> findRepairInfo(@RequestParam("id") String id);
 }

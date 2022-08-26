@@ -3,11 +3,9 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.*;
 import com.rpzh.dao.*;
 import com.rpzh.dto.EarlyWarningDto;
-import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.*;
 import com.rpzh.enums.*;
 import com.rpzh.feign.UserFeign;
-import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.EarlyWarningService;
 import com.rpzh.util.*;
@@ -88,7 +86,19 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 //查询仓间名称
                 earlyWarningInfo.setSiteName(warehouseDao.findWareArea(earlyWarningInfo.getAreaId()).getSiteName());
             }
-            earlyWarningInfo.setPrincipalName((String)redisUtil.hget("USER_"+earlyWarningInfo.getPrincipalName(),"nickname") + "(" + earlyWarningInfo.getPrincipalName() + ")");
+            Map<String, String> info = new HashMap<>();
+            if(ToolUtil.isNotEmpty(earlyWarningInfo.getTaskId())){
+                //从任务表中获取(除设备故障)
+                info = taskManagementDao.findInfo(earlyWarningInfo.getTaskId());
+            }else{
+                //从维修表中获取(设备故障)
+                info = userFeign.findRepairInfo(earlyWarningInfo.getRepairId());
+            }
+            //设置备注、处理措施
+            earlyWarningInfo.setDealSuggestion(info.get("dealMethod"));
+            earlyWarningInfo.setRemark(info.get("remark"));
+            String principalName = earlyWarningInfo.getPrincipalName();
+            earlyWarningInfo.setPrincipalName((String)redisUtil.hget("USER_"+principalName,"nickname") + "(" + principalName + ")");
         }
         return new PageInfo<>(earlyWarningInfos);
     }
@@ -153,6 +163,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             warningTypeCount = earlyWarningDao.findWarningTypeCount(ids);
             Integer countByOne = 0;
             for (int i = 0; i < warningTypeCount.size(); i++) {
+                System.out.println(warningTypeCount.get(i).get("warningType").toString());
                 String warningType = getWarningType(warningTypeCount.get(i).get("warningType").toString()).get("warningType");
                 warningTypeCount.get(i).put("warningType",warningType);
                 warningTypeCount.get(i).put("sum", Math.round(Double.parseDouble(warningTypeCount.get(i).get("sum").toString())));
@@ -452,27 +463,12 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     }
 
     @Override
-    public int updateRepairId(List<Map<String,String>> repairInfos) {
-        if(ToolUtil.isNotEmpty(repairInfos)){
-            String taskId = earlyWarningDao.findMaxId(repairInfos.get(0).get("deviceId"), repairInfos.get(0).get("warningType"));
-            TaskDto taskDto = new TaskDto();
-            taskDto.setDealMethod("需要提交给运维人员进行维修");
-            taskDto.setDealResult("进行运维");
-            taskDto.setStatus("1");
-            taskDto.setId(taskId);
-            taskDto.setPrincipal(repairInfos.get(0).get("repairPrincipal"));
-            taskManagementDao.taskDispose(taskDto);
-            List<EarlyWarning> earlyWarnings = new ArrayList<>();
-            for (Map<String, String> repairInfo : repairInfos) {
-                EarlyWarning earlyWarning = new EarlyWarning();
-                earlyWarning.setWarningType(repairInfo.get("warningType"));
-                earlyWarning.setNodeId(repairInfo.get("deviceId"));
-                earlyWarning.setPrincipalName(repairInfo.get("repairPrincipal"));
-                earlyWarnings.add(earlyWarning);
-            }
-            return earlyWarningDao.updateRepairId(earlyWarnings);
+    public int updateRepairId(String beforeAffirm,String affirm, String deviceId, String id, String principal, String dealTime, String warningType) {
+        if(ToolUtil.isEmpty(deviceId)){
+            deviceId = earlyWarningDao.findDeviceId(id);
         }
-        return -1;
+        Integer maxId = earlyWarningDao.findMaxId(beforeAffirm, deviceId, warningType);
+        return earlyWarningDao.updateRepairId(affirm,id,principal,dealTime,maxId);
     }
 
     //预警信息

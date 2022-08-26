@@ -6,7 +6,6 @@ import com.rpzh.dao.*;
 import com.rpzh.dto.*;
 import com.rpzh.entity.*;
 import com.rpzh.enums.WarehouseNodeType;
-import com.rpzh.service.AlarmSettingTemplateService;
 import com.rpzh.service.MaintainPlanService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
@@ -174,7 +173,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
-        //AlarmSettingTemplateServiceImpl.createDefaultRule()
         //宁波测试用
         if(maintainPlanDao.findCountByMaintainPlan()==0){
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
@@ -826,35 +824,45 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         String materialCode = maintainCountDto.getMaterialCode();
         String maintenceStyle = maintainCountDto.getMaintenceStyle();
         String phases = maintainCountDto.getPhases();
-        List<MaintainCountVo> maintainCountVos = new ArrayList<>();
+        List<MaintainCountVo> maintainCountVos = new ArrayList<MaintainCountVo>();
         Map<String,Object> map = new HashMap<>();
         //位置不为空
         if(ToolUtil.isNotEmpty(pidRoute) && ToolUtil.isNotEmpty(stackId)){
+            int length = pidRoute.split(",").length;
             String column="";
-            switch (pidRoute.split(",").length){
+            switch (length){
                 case 1: column = "t1.warehouse_id";break;
                 case 2: column = "t1.buliding_id";break;
                 case 3: column = "t1.floor_id";break;
                 case 4: column = "t1.area_id";break;
                 case 5: column = "t1.stack_id";break;
             }
+            sum = maintainPlanDao.findCount(maintainCountDto,column);
+            maintainCountDto.setPidRoute(pidRoute);
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
             maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,column);
-            map.put("sum",maintainPlanDao.findCount(maintainCountDto,column));
+            maintainCountVos.forEach(maintainCountVo -> {
+                maintainCountVo.setChildren(new ArrayList<>());
+            });
+            map.put("sum",sum);
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
         //位置为空且物料代码也为空
         if(ToolUtil.isEmpty(pidRoute) && ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(materialCode)){
+            sum = maintainPlanDao.findCount(maintainCountDto,"");
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
-            maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,"");
-            map.put("sum",maintainPlanDao.findCount(maintainCountDto,""));
+            maintainCountVos = maintainPlanDao.findMaintainCountBySiteName(maintainCountDto,"t1.stack_id");
+            maintainCountVos.forEach(maintainCountVo -> {
+                maintainCountVo.setChildren(new ArrayList<>());
+            });
+            map.put("sum",sum);
             map.put("export",JSON.toJSONString(maintainCountVos));
             map.put("list",new PageInfo(maintainCountVos));
             return map;
         }
-        //位置为空而物料代码不为空而位置
+        //物料代码不为空而位置为空
         if(ToolUtil.isEmpty(pidRoute) && ToolUtil.isEmpty(stackId) && ToolUtil.isNotEmpty(materialCode)){
             sum = maintainPlanDao.findCount(maintainCountDto,"");
             if(ToolUtil.isEmpty(sum)){

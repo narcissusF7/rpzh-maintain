@@ -9,18 +9,16 @@
     </select>
     <update id="updateTackId">
     UPDATE tb_early_warning
-        SET is_affirm = #{affirm}<if test="dealTime!=null and dealTime!=''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-    WHERE task_id = #{taskId}
+    SET task_id = #{id},is_affirm = #{affirm},principal=#{principal},deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )
+    WHERE is_affirm &lt;> '0' and site_route =  #{siteRoute} AND warning_type = #{warningType}
 </update>
-    <update id="updateRepairId" parameterType="java.util.List">
-        <foreach collection="earlyWarnings" item="earlyWarning" index="index" separator=";" open="begin" close=";end;">
-            update tb_early_warning
-            set is_affirm = '0',deal_time = sysdate,principal = #{earlyWarning.principalName}
-            where node_id = #{earlyWarning.nodeId} and warning_type = #{earlyWarning.warningType} and is_affirm = '2'
-        </foreach>
+    <update id="updateRepairId">
+    UPDATE tb_early_warning
+        SET repair_id = #{taskId},is_affirm = #{affirm},principal=#{principal}<if test="dealTime != null and dealTime != ''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+    WHERE id = #{id}
 </update>
-    <select id="findMaxId" resultType="java.lang.String">
-        SELECT task_id  FROM tb_early_warning WHERE node_id = #{deviceId} and warning_type = #{warningType} and is_affirm = '2'
+    <select id="findMaxId" resultType="java.lang.Integer">
+        SELECT max(id) FROM TB_EARLY_WARNING WHERE node_id = #{deviceId} and warning_type = #{warningType} and is_affirm = #{beforeAffirm}
     </select>
     <select id="findDeviceId" resultType="java.lang.String">
         select node_id from tb_early_warning where repair_id = #{id}
@@ -199,19 +197,18 @@
 
     <select id="findHistoryWarningData" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
-        t.node_id as nodeId,t.warning_type as warningType,t.warning_grade as warningGrade,t.warning_val as warningVal,t.principal as principalName,t.deal_time as dealTime,
-        t.stack_id as stackId,t.area_id as areaId,a.deal_method as dealSuggestion,a.deal_result as remark
-        FROM tb_early_warning t
-        left join tb_task a on a.id = t.task_id
+        node_id as nodeId,warning_type as warningType,warning_grade as warningGrade,warning_val as warningVal,principal as principalName,deal_time as dealTime,
+        stack_id as stackId,area_id as areaId,task_id as taskId,repair_id as repairId
+        FROM tb_early_warning
         WHERE is_affirm = '0'
-        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and t.site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
-        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t.warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t.warning_grade = #{earlyWarningDto.warningGrade}</if>
-        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t.node_id like concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
-        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t.principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
-        <if test="earlyWarningDto.startTime != null">and t.deal_time >= #{earlyWarningDto.startTime}</if>
-        <if test="earlyWarningDto.endTime != null">and t.deal_time &lt;= #{earlyWarningDto.endTime}</if>
-        ORDER BY t.deal_time desc
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and node_id like concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
+        <if test="earlyWarningDto.startTime != null">and deal_time >= #{earlyWarningDto.startTime}</if>
+        <if test="earlyWarningDto.endTime != null">and deal_time &lt;= #{earlyWarningDto.endTime}</if>
+        ORDER BY site_route
     </select>
 
     <select id="findIds" resultType="java.lang.Integer">

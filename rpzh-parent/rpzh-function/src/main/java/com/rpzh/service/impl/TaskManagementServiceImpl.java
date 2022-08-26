@@ -279,11 +279,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String affirm = "";
         //如果处理结果为空,状态为处理中
         if (ToolUtil.isEmpty(dealResult)) {
-            //设置任务状态为正在处理
             taskDto.setStatus("3");
             //设置预警表中的处理状态为正在处理
             affirm = "1";
-            nowTime = null;
         } else {
             //设置任务状态为完成
             taskDto.setStatus("1");
@@ -295,10 +293,10 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteRoute = taskDetail.getSiteRoute();
         String principal = taskDetail.getPrincipal();
         //除了设备故障外的所有预警类型
-            if(!"01,02,03".contains(type) && ToolUtil.isNotEmpty(nowTime)){
+            if(!"01,02,03".contains(type)){
             //更新到预警表中
-                int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime);
-            }
+            earlyWarningDao.updateTackId(affirm,type,siteRoute,Integer.parseInt(taskDto.getId()),principal,nowTime);
+        }
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;
     }
@@ -1120,7 +1118,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     }
 
     @Override
-    public Map findTaskBySiteRoute(String siteRoute, String type) {
+    public Integer findTaskBySiteRoute(String siteRoute, String type) {
         return taskManagementDao.findTaskBySiteRoute(siteRoute,type);
     }
 
