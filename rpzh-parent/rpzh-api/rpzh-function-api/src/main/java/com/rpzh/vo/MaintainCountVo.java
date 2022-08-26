@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class MaintainCountVo {
     @ApiModelProperty(notes = "垛位的中文名称")
     private String nameCn;
     @ApiModelProperty(notes = "养护数量集合")
-    private List<MaintainCountVo> children;
+    private List<MaintainCountVo> children = new ArrayList<>();
     @ApiModelProperty(notes = "养护数量表id")
     private String id;
     @ApiModelProperty(notes = "仓间id")

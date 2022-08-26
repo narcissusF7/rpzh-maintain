@@ -193,8 +193,9 @@
         <set>
             <if test="taskDto.dealMethod != null and taskDto.dealMethod != ''">deal_method = #{taskDto.dealMethod},</if>
             <if test="taskDto.dealResult != null and taskDto.dealResult != ''">deal_result = #{taskDto.dealResult},</if>
+            <if test="taskDto.principal != null and taskDto.principal != ''">principal = #{taskDto.principal},</if>
             status = #{taskDto.status},
-            finish_time = TO_DATE(#{taskDto.finishTime}, 'SYYYY-MM-DD HH24:MI:SS' )
+            finish_time = sysdate
         </set>
         WHERE id = #{taskDto.id}
     </update>
@@ -573,12 +574,8 @@
   tb_pest_data_history
   WHERE task_id = #{id}
 </select>
-    <select id="findInfo" resultType="java.util.Map">
-        select deal_method as "dealMethod",deal_result as "remark" from tb_task
-        where 1=1 <if test="id != null and id != ''">and id = #{id}</if>
-    </select>
-    <select id="findTaskBySiteRoute" resultType="java.lang.Integer">
-        select id from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
+    <select id="findTaskBySiteRoute" resultType="java.util.Map">
+        select id as "id",principal as "principal" from tb_task where site_route =#{siteRoute} and type = #{type} and status = 0
     </select>
     <select id="findMinAveTemp" resultType="int">
         SELECT count(*)

@@ -183,7 +183,7 @@ public interface TaskManagementService {
      * @param type
      * @return
      */
-    Integer findTaskBySiteRoute(String siteRoute, String type);
+    Map findTaskBySiteRoute(String siteRoute, String type);
 
     /**
      * 添加数据处理发送过来的任务

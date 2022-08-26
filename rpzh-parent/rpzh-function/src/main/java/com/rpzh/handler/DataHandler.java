@@ -16,6 +16,7 @@ import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.service.impl.WarehouseServiceImpl;
+import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -350,11 +351,11 @@ public class DataHandler {
                 //如果缓存中存在次数
                 if ((Integer) o ==2){
                     //达到3次新增一条数据
-                    String siteRoute = nodeDao.findByNodeId(parseData.getNodeId()).getSiteRoute();
-                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,siteRoute);
                     NodeVo nodeVo =nodeDao.findByNodeId(parseData.getNodeId());
-                    Integer taskId = addTask(nodeVo, "20");
-                    earlyWarning.setTaskId(taskId);
+                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,nodeVo.getSiteRoute(),nodeVo.getSiteType(),nodeVo.getSiteId());
+                    Map taskMap = addTask(nodeVo, "20");
+                    earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                    earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                     earlyWarningDao.insertWarning(earlyWarning);
                     redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
                 }else {
@@ -471,12 +472,12 @@ public class DataHandler {
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
-        earlyWarning.setId(earlyWarningVo.getId());
         NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
         String siteRoute = nodeVo1.getSiteRoute();
         earlyWarning.setSiteRoute(siteRoute);
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
+            earlyWarning.setId(earlyWarningVo.getId());
             //如果当前的等级更高
             if (earlyWarningVo.getWarningGrade() < level) {
                 setLevel(earlyWarning, level, data);
@@ -487,13 +488,15 @@ public class DataHandler {
 
             if (level==-1){
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
-                Integer taskId = addTask(nodeVo1, "19");
-                earlyWarning.setTaskId(taskId);
+                Map taskMap = addTask(nodeVo, "19");
+                earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 setLevel(earlyWarning, 1, data);
             }else {
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
-                Integer taskId = addTask(nodeVo1, "13");
-                earlyWarning.setTaskId(taskId);
+                Map taskMap = addTask(nodeVo, "13");
+                earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 setLevel(earlyWarning, level, data);
             }
             earlyWarningDao.insertWarning(earlyWarning);
@@ -611,8 +614,9 @@ public class DataHandler {
 
                 NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
                 if (level>0){
-                    Integer taskId = addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
-                    earlyWarning.setTaskId(taskId);
+                    Map taskMap = addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
+                    earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                    earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 }
                 //更新数据
                 earlyWarningDao.updateWarning(earlyWarning);
@@ -642,8 +646,9 @@ public class DataHandler {
                 //设置设备类型
                 earlyWarning.setNodeType(parseData.getNodeType());
                 setLevel(earlyWarning, level, data);
-                Integer taskId = addTask(nodeVo1, taskType);
-                earlyWarning.setTaskId(taskId);
+                Map taskMap = addTask(nodeVo1,taskType);
+                earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 earlyWarningDao.insertWarning(earlyWarning);
                 //往redis中设置连续预警次数为1
                 if (level < 3) {
@@ -716,17 +721,27 @@ public class DataHandler {
     }
 
     //添加任务
-    public Integer addTask(NodeVo nodeVo ,String type){
+    public Map addTask(NodeVo nodeVo ,String type){
         //查询该垛位、仓间下该类型任务是否存在
-        Integer id = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
-        if (ToolUtil.isEmpty(id)){
-            Map<String, Object> map = warehouseService.getSitePrincipal(nodeVo.getSiteRoute().split(",").length-1, nodeVo.getSiteId());
+        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
+        if (ToolUtil.isEmpty(selectTaskMap)){
+            int siteType = nodeVo.getSiteRoute().split(",").length - 1;
+            nodeVo.setSiteId(SiteRouteUtil.getSiteId(nodeVo.getSiteRoute(),"0"+siteType));
+            if(siteType==4){
+                nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
+            }else{
+                nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
+            }
+            Map<String, Object> map = warehouseService.getSitePrincipal(siteType, nodeVo.getSiteId());
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
-            return Integer.parseInt(taskDto.getId())+1;
+            Map taskMap = new HashMap();
+            taskMap.put("principal",taskDto.getPrincipal());
+            taskMap.put("id",Integer.parseInt(taskDto.getId()) + 1);
+            return taskMap;
         }
-        return id;
+        return selectTaskMap;
     }
 
     /**

@@ -59,17 +59,15 @@ public interface EarlyWarningDao {
 
     List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    int updateTackId(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRout,
-                     @Param("id") Integer id, @Param("principal") String principal, @Param("dealTime") String dealTime);
+    int updateTackId(@Param("affirm") String affirm, @Param("taskId")String taskId, @Param("dealTime") String dealTime);
 
     Map<String, String> findColor();
 
     List<RepairDataVo> findRepairData(@Param("stackId") Integer stackId, @Param("areaId") Integer areaId);
 
-    int updateRepairId(@Param("affirm") String affirm, @Param("taskId") String taskId,
-                       @Param("principal") String principal, @Param("dealTime") String dealTime,@Param("id")Integer id);
+    int updateRepairId(@Param("earlyWarnings")List<EarlyWarning> earlyWarnings);
 
-    Integer findMaxId(@Param("beforeAffirm") String beforeAffirm,@Param("deviceId") String deviceId,@Param("warningType")String warningType);
+    String findMaxId(@Param("deviceId") String deviceId,@Param("warningType")String warningType);
 
     List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
 
