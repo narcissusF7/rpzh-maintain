@@ -91,7 +91,7 @@ ribbon:
   ConnectTimeout: 30000
 # mqtt 连接配置
 mqtt:
-  host: tcp://192.168.3.99
+  host: tcp://114.132.182.218
   port: 1883
   qos: 0
   timeout: 2000

@@ -86,7 +86,7 @@ public class ParseData{
             // 温度
             case "temp":
                 this.nodeType = "04";
-                for (int i = 0; i < 3; i++) {
+                for (int i = 2; i >=0; --i) {
                     Double envData = ((BigDecimal)((List) map.get("tempData")).get(i)).doubleValue();
                     listData.add(envData);
                     String tempDate = ((List<String>) map.get("tempDateTime")).get(i);
@@ -96,7 +96,7 @@ public class ParseData{
                 break;
             // 氧气
             case "oxygen":
-                for (int i = 0; i < 3; i++) {
+                for (int i = 2; i >=0; --i) {
                     Double envData = ((BigDecimal)((List) map.get("o2Data")).get(i)).doubleValue();
                     listData.add(envData);
                     String o2Date = ((List<String>) map.get("o2DateTime")).get(i);
@@ -106,13 +106,13 @@ public class ParseData{
                 break;
             // 温湿度
             case "humiture":
-                for (int i = 0; i < 3; i++) {
+                for (int i = 2; i >=0; --i) {
                     List<BigDecimal> envData = (List<BigDecimal>)((List) map.get("envData")).get(i);
                     listData.add(envData.get(0).doubleValue());
                     String envDate = ((List<String>) map.get("envDateTime")).get(i);
                     listDate.add(sm.format(simpleDateFormat.parse(envDate)));
                 }
-                for (int i = 0; i < 3; i++) {
+                for (int i = 2; i >=0; --i) {
                     List<BigDecimal> envData = (List<BigDecimal>)((List) map.get("envData")).get(i);
                     listData.add(envData.get(1).doubleValue());
                     String envDate = ((List<String>) map.get("envDateTime")).get(i);

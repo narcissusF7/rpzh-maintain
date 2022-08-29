@@ -268,4 +268,7 @@
             #{pestBoardId}
         </foreach>
     </select>
+    <select id="findCountBySiteRoute" resultType="java.lang.Integer">
+        select count(*) from tb_pest_board where site_route = #{siteRoute}
+    </select>
 </mapper>

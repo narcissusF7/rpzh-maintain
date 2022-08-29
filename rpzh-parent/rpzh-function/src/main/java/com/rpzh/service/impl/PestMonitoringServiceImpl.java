@@ -93,6 +93,13 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         pestBoardDto.setSiteType(siteLevel == 4 ? NodeConstant.NODE_WARE_AREA : NodeConstant.NODE_STACK);
         //拼接成自己的路由id
         pestBoardDto.setSiteRoute(pestBoardDto.getSiteRoute() + ",[0" + siteLevel + ":" + pestBoardDto.getSiteId() + "]");
+        //判断所在的垛位是否存在虫情板
+        if (siteLevel.equals("5")){
+            int count = pestMonitoringDao.findCountBySiteRoute(pestBoardDto.getSiteRoute());
+            if (count>0){
+                new Result(false, StatusCode.ERROR, "该位置已存在虫情板");
+            }
+        }
         synchronized (this) {
             pestMonitoringDao.addPestBoard(pestBoardDto);
 
@@ -243,7 +250,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 siteRoute = integerStringMap.get(5).trim();
             }
             //判断预警等级
-            Map<String, Integer> levelMap = decideLevel(pestBoardId, beetleCount, mealwormCount);
+            Map<String, Integer> levelMap = decideLevel(pestBoardId, beetleCount, mealwormCount,true);
             if (ToolUtil.isEmpty(levelMap)){
                 return new Result(false, StatusCode.ERROR, "第" + i + 2 + "行虫情点位不存在");
             }
@@ -318,7 +325,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             }
 
             //虫情预警等级
-            Map<String, Integer> levelMap = decideLevel(pestBoard.getPestBoardId(), beetle, mealworm);
+            Map<String, Integer> levelMap = decideLevel(pestBoard.getPestBoardId(), beetle, mealworm,true);
 
 
             pestBoard.setBeetleCount(beetle);
@@ -380,13 +387,12 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         for (int i = 0; i < list.size(); i++) {
             Map<String, String> map = list.get(i);
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String siteRoute = map.get("siteRoute")+",[0"+map.get("siteRoute").split(",").length+":"+String.valueOf(map.get("siteId"))+"]";
             if (NodeConstant.NODE_STACK.equals(map.get("siteType"))) {
                 //垛内
-                stackList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0,siteRoute));
+                stackList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0,map.get("siteRoute")));
             } else {
                 //仓间
-                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0,0,siteRoute));
+                wareList.add(new PestData(map.get("pestBoardId"), map.get("siteName"), ft.format(new Date()), 0, 0, 0,0,0,map.get("siteRoute")));
             }
         }
         //执行数据库操作
@@ -461,7 +467,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @param warningType 预警类型
      * @return
      */
-    private Integer decideEarlyWarning(PestBoardVo pestBoardVo, Integer level, Integer data, String warningType) {
+    private Integer decideEarlyWarning(PestBoardVo pestBoardVo, Integer level, Integer data, String warningType,boolean addOrFind) {
 
         //获取数据库中未处理的预警
         EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(pestBoardVo.getPestBoardId(), warningType);
@@ -484,37 +490,41 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             }
 
         } else {//如果不存在
-            //如果出现预警
-            if (level > 0) {
-                String siteRoute = pestBoardVo.getSiteRoute();
-                String[] splits = siteRoute.split(",");
+            if (addOrFind) {
+                //如果出现预警
+                if (level > 0) {
+                    String siteRoute = pestBoardVo.getSiteRoute();
+                    String[] splits = siteRoute.split(",");
 
-                //剔除中括号
-                String strip = StringUtils.strip(splits[splits.length - 1], "[]");
-                if (splits.length == 5) {
-                    //设置仓间id
-                    earlyWarning.setAreaId(Integer.parseInt(strip.split(":")[1]));
+                    //剔除中括号
+                    String strip = StringUtils.strip(splits[splits.length - 1], "[]");
+                    if (splits.length == 5) {
+                        //设置仓间id
+                        earlyWarning.setAreaId(Integer.parseInt(strip.split(":")[1]));
 
+                    } else {
+                        //设置垛位id
+                        earlyWarning.setStackId(Integer.parseInt(strip.split(":")[1]));
+                    }
+                    earlyWarning.setWarningType(warningType);
+                    //设置虫情点位id
+                    earlyWarning.setNodeId(pestBoardVo.getPestBoardId());
+                    //设置等级及对应的值
+                    dataHandler.setLevel(earlyWarning, level, data.doubleValue());
+
+                    earlyWarning.setSiteRoute(siteRoute);
+                    earlyWarning.setNodeType("07");
+                    //添加任务
+                    Map taskMap = addTask(pestBoardVo, warningType);
+                    earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                    earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
+                    //将该预警记录插入到数据库中
+                    earlyWarningDao.insertWarning(earlyWarning);
                 } else {
-                    //设置垛位id
-                    earlyWarning.setStackId(Integer.parseInt(strip.split(":")[1]));
+                    earlyWarning.setWarningGrade(0);
                 }
-                earlyWarning.setWarningType(warningType);
-                //设置虫情点位id
-                earlyWarning.setNodeId(pestBoardVo.getPestBoardId());
-                //设置等级及对应的值
-                dataHandler.setLevel(earlyWarning, level, data.doubleValue());
-
-                earlyWarning.setSiteRoute(siteRoute);
-                earlyWarning.setNodeType("07");
-                //添加任务
-                Map taskMap = addTask(pestBoardVo,warningType);
-                earlyWarning.setPrincipalName(taskMap.get("principal").toString());
-                earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
-                //将该预警记录插入到数据库中
-                earlyWarningDao.insertWarning(earlyWarning);
-            }else {
-                earlyWarning.setWarningGrade(0);
+            } else {
+                return level;
             }
         }
         return earlyWarning.getWarningGrade();
@@ -641,6 +651,9 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @return
      */
     public Map<String,Integer> decideLevel(String pestBoardId, Integer beetleCount, Integer mealwormCount) {
+        return decideLevel(pestBoardId,beetleCount,mealwormCount,false);
+    }
+    public Map<String,Integer> decideLevel(String pestBoardId, Integer beetleCount, Integer mealwormCount,boolean addOrFind) {
         //通过 pestBoardId 找到对应的虫情板信息
         Map<String,Integer> map = new HashMap<>();
         PestBoardVo pestBoardVo = pestMonitoringDao.findPestBoardByPestBoardId(pestBoardId);
@@ -677,15 +690,15 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         Integer beetleLevel = decideValue(beetleCount, split);
         //通过甲虫预警等级和数据库该虫情
         if (pestBoardVo.getSiteRoute().split(",").length==5){
-            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING);
+            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.WARE_BEETLE_OVERRUN_WARNING,addOrFind);
         }else {
-            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING);
+            level = decideEarlyWarning(pestBoardVo, beetleLevel, beetleCount, WarningTypeConstant.STACK_BEETLE_OVERRUN_WARNING,addOrFind);
         }
         map.put("beetleLevel",level);
         if (!ToolUtil.isEmpty(mealwormCount)) {
             //仓间粉螟
             int mealwormLevel = decideValue(mealwormCount, split);
-            mealwormLevel = decideEarlyWarning(pestBoardVo, mealwormLevel, mealwormCount, WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING);
+            mealwormLevel = decideEarlyWarning(pestBoardVo, mealwormLevel, mealwormCount, WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING,addOrFind);
             map.put("mealwormLevel",mealwormLevel);
 
             map.put("level",Math.max(level,mealwormLevel));

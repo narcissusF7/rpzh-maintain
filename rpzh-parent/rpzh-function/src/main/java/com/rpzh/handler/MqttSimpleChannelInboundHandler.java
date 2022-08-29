@@ -24,7 +24,7 @@ import java.util.*;
  * @create 2021-06-29 16:17
  * @description mqtt入站
  */
-//@Component
+@Component
 @Slf4j
 public class MqttSimpleChannelInboundHandler implements MessageHandler {
     private static final String RPZH_MAINTAIN_FCNT = "RPZH_MAINTAIN_FCNT_";
@@ -65,7 +65,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
                 redisUtil.set(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"),map.get("fCnt"));
                 parseData.setPacketLossNum(0);
             }
-//            dataHandler.handlerData(parseData);
+            dataHandler.handlerData(parseData);
         }
     }
 }
