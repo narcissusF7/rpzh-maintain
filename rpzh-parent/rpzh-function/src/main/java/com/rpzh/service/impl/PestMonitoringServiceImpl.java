@@ -740,7 +740,43 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                 pestDataVo.setMealwormLevel(map.get("mealwormLevel"));
                 //粉螟预警颜色
                 pestDataVo.setMealwormColor(getPestWarningColor(pestDataVo.getMealwormLevel(),pestMonitorValue));
+
+//                if (pestDataVo.getAlertLevel()>0){
+//                    EarlyWarningVo undoEarlyWarning = earlyWarningDao.findUndoEarlyWarningByNodeId(pestDataVo.getPestBoardId(), "05");
+//                    EarlyWarningVo undoEarlyWarning1 = earlyWarningDao.findUndoEarlyWarningByNodeId(pestDataVo.getPestBoardId(), "14");
+//                    //如果存在未处理的预警
+//                    if (ToolUtil.isNotEmpty(undoEarlyWarning)||ToolUtil.isNotEmpty(undoEarlyWarning1)){
+//                        //状态设置为未处理处理
+//                        pestDataVo.setTaskStatus(0);
+//                    }else {
+//                        //状态设置为已处理
+//                        pestDataVo.setTaskStatus(1);
+//                    }
+//                }
+
             }
+//            else {
+//                if (pestDataVo.getAlertLevel()>0){
+//                    EarlyWarningVo undoEarlyWarning = earlyWarningDao.findUndoEarlyWarningByNodeId(pestDataVo.getPestBoardId(), "04");
+//                    //如果不存在未处理的预警
+//                    if (ToolUtil.isNotEmpty(undoEarlyWarning)){
+//                        //状态设置为未处理
+//                        pestDataVo.setTaskStatus(0);
+//                    }else {
+//                        //状态设置为已处理
+//                        pestDataVo.setTaskStatus(1);
+//                    }
+//                }
+//            }
+//            if (pestDataVo.getAlertLevel()>0){
+//                Integer count = earlyWarningDao.findUndoStatusByNodeId(pestDataVo.getPestBoardId());
+//                if (count>0){
+//                    pestDataVo.setTaskStatus(0);
+//                }else {
+//                    pestDataVo.setTaskStatus(1);
+//                }
+//            }
+
         });
     }
 

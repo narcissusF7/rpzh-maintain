@@ -88,4 +88,7 @@ public interface EarlyWarningDao {
     String findAppCountByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
 
     EarlyWarningVo findUndoEarlyWarningBySiteRoute(@Param("siteRoute") String siteRoute, @Param("warningType") String coreTempOverrunStackWarning);
+
+
+    Integer findUndoStatusByNodeId(@Param("nodeId") String nodeId);
 }

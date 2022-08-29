@@ -40,5 +40,7 @@ public class PestDataVo {
     private String mealwormColor;
     @ApiModelProperty("位置路由")
     private String siteRoute;
+    @ApiModelProperty("任务状态")
+    private Integer taskStatus;
 
 }

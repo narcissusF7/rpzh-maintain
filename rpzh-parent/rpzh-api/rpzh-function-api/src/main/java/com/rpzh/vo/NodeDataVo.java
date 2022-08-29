@@ -137,6 +137,8 @@ public class NodeDataVo {
     private Integer humidityLevel;
     @ApiModelProperty(notes = "湿度预警颜色")
     private String humidityColor;
+    @ApiModelProperty(notes = "任务状态")
+    private Integer taskStatus;
 
 
     public void setType(String type){

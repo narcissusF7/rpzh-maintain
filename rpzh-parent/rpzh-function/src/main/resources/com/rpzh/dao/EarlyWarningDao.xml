@@ -313,4 +313,8 @@
         </if>
         and rownum = 1
     </select>
+    <select id="findUndoStatusByNodeId" resultType="java.lang.Integer">
+        select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm in (1,2)
+    </select>
+
 </mapper>

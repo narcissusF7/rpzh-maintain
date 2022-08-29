@@ -152,8 +152,22 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nowWeather.setHumiture(nowWeather.getHumidity());
             list.add(nowWeather);
         }
+//        collect.forEach(nodeDataVo -> {
+//            if (nodeDataVo.getAlertLevel()>0){
+//                Integer count = earlyWarningDao.findUndoStatusByNodeId(nodeDataVo.getNodeId());
+//                if (count>0){
+//                    nodeDataVo.setTaskStatus(0);
+//                }else {
+//                    nodeDataVo.setTaskStatus(1);
+//                }
+//            }
+//        });
         list.addAll(collect);
+
+
         Page<NodeDataVo> page = ManuallyPageUtil.manuallyPage(list, pageNum, pageSize);
+
+
         return new PageInfo<>(page);
     }
 

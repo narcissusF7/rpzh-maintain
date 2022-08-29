@@ -97,20 +97,20 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteRoute = taskDto.getSiteRoute();
         //获取当前位置id
         String siteId = taskDto.getSiteId();
-        if (siteRoute.contains("04")) {
+        if (siteRoute.contains("04:")) {
             //如果包含04,拼接05加位置id [00:0],[01:1],[02:1],[03:1],[04:1],[05:2]
             String siteRouteC = siteRoute + ",[05:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        } else if (siteRoute.contains("03")) {
+        } else if (siteRoute.contains("03:")) {
             String siteRouteC = siteRoute + ",[04:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        } else if (siteRoute.contains("02")) {
+        } else if (siteRoute.contains("02:")) {
             String siteRouteC = siteRoute + ",[03:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
-        } else if (siteRoute.contains("01")) {
+        } else if (siteRoute.contains("01:")) {
             String siteRouteC = siteRoute + ",[02:" + siteId + "]";
             //设置位置路径
             taskDto.setTaskSiteRoute(siteRouteC);
