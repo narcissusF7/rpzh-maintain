@@ -167,14 +167,12 @@ public class DataHandler {
             return;
         }
 
-
         warningType = "";
         //判断电量
         decideFault(parseData.getVoltage(),voltage,WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN,parseData);
 
         //判断信号强度
         decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
-
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
@@ -341,7 +339,7 @@ public class DataHandler {
      * @param warningType   预警类型
      * @param warningValOne 一级预警的值
      */
-    public void nodeMalfunction(ParseData parseData, String warningType, Double warningValOne) {
+    public void  nodeMalfunction(ParseData parseData, String warningType, Double warningValOne) {
         //查询该设备在预警记录表中该类型的预警记录是否存在
         Integer count = earlyWarningDao.findUndoCount(parseData.getNodeId(), warningType);
         if (count < 1) {
@@ -352,7 +350,7 @@ public class DataHandler {
                 if ((Integer) o ==2){
                     //达到3次新增一条数据
                     NodeVo nodeVo =nodeDao.findByNodeId(parseData.getNodeId());
-                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne, 1,nodeVo.getSiteRoute(),nodeVo.getSiteType(),nodeVo.getSiteId());
+                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne+"", "1",nodeVo.getSiteRoute(),nodeVo.getSiteType(),nodeVo.getSiteId());
                     Map taskMap = addTask(nodeVo, "20");
                     earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                     earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
@@ -386,7 +384,8 @@ public class DataHandler {
 
     //设置等级
     public void setLevel(EarlyWarning earlyWarning, Integer level, Double value) {
-        earlyWarning.setWarningGrade(level);
+        earlyWarning.setWarningGrade(level+"");
+        earlyWarning.setWarningVal(value+"");
         switch (level) {
             case 1:
                 earlyWarning.setWarningValOne(value);
@@ -437,8 +436,8 @@ public class DataHandler {
     public void earlyWarningHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data, String evnType) {
 
         String warningType = WarningTypeConstant.getWarningType(nodeVo.getSiteType(), nodeVo.getNodeType(), evnType);
-        //查询数据库中该设备未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(nodeVo.getNodeId(),warningType);
+        //查询数据库中该位置未处理的预警
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(),warningType);
 
         EarlyWarning earlyWarning = new EarlyWarning();
 
@@ -479,8 +478,11 @@ public class DataHandler {
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
             earlyWarning.setId(earlyWarningVo.getId());
             //如果当前的等级更高
-            if (earlyWarningVo.getWarningGrade() < level) {
+            if (Integer.parseInt(earlyWarningVo.getWarningGrade()) < level) {
                 setLevel(earlyWarning, level, data);
+                //判断是那一级预警
+                setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+
                 earlyWarningDao.updateWarning(earlyWarning);
             }
         } else if (level > 0) {
@@ -499,6 +501,10 @@ public class DataHandler {
                 earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 setLevel(earlyWarning, level, data);
             }
+
+            //判断哪一等级的预警
+            setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+
             earlyWarningDao.insertWarning(earlyWarning);
 
         }
@@ -569,65 +575,99 @@ public class DataHandler {
             redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
         }
         //如果存在未处理的预警
-        if (!ToolUtil.isEmpty(earlyWarningVo)) {
-            //如果这条预警处于处理中状态的话
-            if ("1".equals(earlyWarningVo.getAffirm())){
-                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
-                return level;
-            }
-            if (!warningType.contains(earlyWarningVo.getWarningType())){
-                warningType = warningType+","+earlyWarningVo.getWarningType();
-            }
+        if (ToolUtil.isNotEmpty(earlyWarningVo)) {
 
-            //获取缓存中的连续预警次数
-            Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId()+evnType);
-            int i;
-            if (ToolUtil.isEmpty(o)){
-                i = 0;
-            }else {
-                i = Integer.parseInt(o.toString());
-            }
-            //用于判断当前数据判断后预警是否达到更高一级
-            boolean flag = false;
-            //如果当前预警等级更高
-            if (earlyWarningVo.getWarningGrade() < level) {
-                flag=true;
-            } else {
-                int frequency = parseData.getFrequency();
+            //获取nodeIds
+            String[] nodeIds = earlyWarningVo.getNodeId().split(",");
+            //获取预警值
+            String[] warningVals = earlyWarningVo.getWarningVal().split(",");
+            //获取预警等级
+            String[] levels = earlyWarningVo.getWarningGrade().split(",");
 
-                //通过频率计算升级所需的连续预警次数
-                Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
-                if (level == 1) {
-                    flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - i >= 1;
-                } else if (level == 2) {
-                    flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - i >= 1;
+            boolean unContains = true;
+            for (int i = 0; i < nodeIds.length; i++) {
+                //判断当前设备属于该条预警的第几位
+                if (nodeIds[i].equals(parseData.getNodeId())) {
+                    unContains =false;
+                    if (!warningType.contains(earlyWarningVo.getWarningType())){
+                        warningType = warningType+","+earlyWarningVo.getWarningType();
+                    }
+                    //获取缓存中的连续预警次数
+                    Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId()+evnType);
+                    int j;
+                    if (ToolUtil.isEmpty(o)){
+                        j = 0;
+                    }else {
+                        j = Integer.parseInt(o.toString());
+                    }
+                    //用于判断当前数据判断后预警是否达到更高一级
+                    boolean flag = false;
+                    //如果当前预警等级更高
+                    if (Integer.parseInt(levels[i]) < level) {
+                        flag=true;
+                    } else {
+                        int frequency = parseData.getFrequency();
+                        //通过频率计算升级所需的连续预警次数
+                        Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
+                        if (level == 1) {
+                            flag = Integer.parseInt(warningThreshold.get("oneToTwo")) * 24 * 60 * 60 / frequency - j >= 1;
+                        } else if (level == 2) {
+                            flag = Integer.parseInt(warningThreshold.get("twoToThree")) * 24 * 60 * 60 / frequency - j >= 1;
+                        }
+                        if (flag) {
+                            level += 1;
+                        }
+                    }
+                    if (flag){
+
+                        //设置等级
+                        levels[i] =  level+"";
+                        warningVals[i] = data+"";
+                        //新的预警值集合
+                        String warningVal = warningVals[0];
+                        //新的预警等级集合
+                        String level1 =  levels[0];
+                        for (int i1 = 1; i1 < levels.length; i1++) {
+                            warningVal = warningVal+","+warningVals[i1];
+                            level1 =level1+","+levels[i1];
+                        }
+                        //赋值
+                        earlyWarning.setWarningGrade(level1);
+                        earlyWarning.setWarningVal(warningVal);
+                        //设置主键id
+                        earlyWarning.setId(earlyWarningVo.getId());
+                        //判断是那一级预警
+                        setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+
+                        //更新数据
+                        earlyWarningDao.updateWarning(earlyWarning);
+                    }
+                    if (level==3){
+                        //达到3级 不用连续预警
+                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
+                    }else if (level>0){
+                        //连续预警次数+1
+                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, j + 1);
+                    }
                 }
-                if (flag) {
-                    level += 1;
-                }
             }
-            if (flag){
-                //设置等级
-                setLevel(earlyWarning, level, data);
-                //设置主键id
-                earlyWarning.setId(earlyWarningVo.getId());
 
-                NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+            //当前位置存在预警但不包含当前设备id
+            if (unContains){
                 if (level>0){
-                    Map taskMap = addTask(nodeVo,dexxx(siteType, evnType, parseData.getNodeType())[1]);
-                    earlyWarning.setPrincipalName(taskMap.get("principal").toString());
-                    earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
+                    earlyWarning.setId(earlyWarningVo.getId());
+                    earlyWarning.setWarningVal(earlyWarningVo.getWarningVal()+","+data);
+                    earlyWarning.setNodeId(earlyWarningVo.getNodeId()+","+parseData.getNodeId());
+                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade()+","+level);
+                    //判断哪一等级的预警
+                    setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+
+                    //更新数据
+                    earlyWarningDao.updateWarning(earlyWarning);
                 }
-                //更新数据
-                earlyWarningDao.updateWarning(earlyWarning);
             }
-            if (level==3){
-                //达到3级 不用连续预警
-                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
-            }else if (level>0){
-                //连续预警次数+1
-                redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, i + 1);
-            }
+
+
         } else {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             if (level > 0) {
@@ -649,6 +689,10 @@ public class DataHandler {
                 Map taskMap = addTask(nodeVo1,taskType);
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                 earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
+
+                //判断哪一等级的预警
+                setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+                //插入数据库
                 earlyWarningDao.insertWarning(earlyWarning);
                 //往redis中设置连续预警次数为1
                 if (level < 3) {
@@ -783,5 +827,28 @@ public class DataHandler {
             }
         }
         return new String[]{type,taskType};
+    }
+
+    public void setEarlyLevel(EarlyWarning earlyWarning ,Integer level,EarlyWarningVo earlyWarningVo,Double data){
+        if (ToolUtil.isEmpty(earlyWarningVo)) {
+            //判断哪一等级的预警
+            if (level==1){
+                earlyWarning.setWarningValOne(data.doubleValue());
+            }else if (level==2){
+                earlyWarning.setWarningValTwo(data.doubleValue());
+            }else if (level==3){
+                earlyWarning.setWarningValThree(data.doubleValue());
+            }
+        }else {
+            //判断哪一等级的预警
+            if (ToolUtil.isEmpty(earlyWarningVo.getWarningValOne())&&level==1){
+                earlyWarning.setWarningValOne(data.doubleValue());
+            }else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValTwo())&&level==2){
+                earlyWarning.setWarningValTwo(data.doubleValue());
+            }else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValThree())&&level==3){
+                earlyWarning.setWarningValThree(data.doubleValue());
+            }
+        }
+
     }
 }

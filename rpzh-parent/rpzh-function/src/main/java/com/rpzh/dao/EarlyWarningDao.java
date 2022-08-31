@@ -14,9 +14,7 @@ import java.util.Map;
 public interface EarlyWarningDao {
     String findVal(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
 
-    List<WarningCountVo> findEarlyWarningCount(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<EarlyWarningVo> findEarlyWarningByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    List<EarlyWarningVo> findEarlyWarningByWarningType(@Param("ids")List<Integer> ids,@Param("size")Integer size,@Param("warningType")String warningType);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
@@ -34,9 +32,7 @@ public interface EarlyWarningDao {
 
     List<Integer> findIds(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    List<EarlyWarningVo> findEarlyWarningByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
-
-    List<EarlyWarningVo> findByIds(@Param("ids") List<Integer> ids);
+    EarlyWarningVo findById(@Param("id")String id);
 
     Integer misreport(@Param("id") Integer id);
 
@@ -48,15 +44,19 @@ public interface EarlyWarningDao {
 
     Map findIsDeal(@Param("ids") List<Integer> ids, @Param("count") Integer count);
 
-    List<WarningCountVo> findEarlyWarningCountByOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+    WarningCountVo findEarlyWarningCountByWarningType(@Param("ids")List<Integer> ids,@Param("size")Integer size);
+
+    List<String> findWarningTypes(@Param("ids")List<Integer> ids);
+
+    List<Map> findIdsByWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     List<WarningCountVo> findEarlyWarningCountByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    String findNewTime(@Param("affirm") String affirm, @Param("warningGrade") String warningGrade,
-                       @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
+    String findNewTime(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    List<Map> findWarningDataWarningTypeIsOne(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute);
+    List<Map> findWarningDataWarningType(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute,@Param("warningType") String warningType);
 
+    List<Map> findsiteXYZByNodeIds(@Param("nodeIds")List<String> nodeIds);
     List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
     int updateTackId(@Param("affirm") String affirm, @Param("taskId")String taskId, @Param("dealTime") String dealTime);

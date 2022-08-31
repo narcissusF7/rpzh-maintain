@@ -32,15 +32,15 @@ public class EarlyWarningVo {
     private String siteY;
     @ApiModelProperty(notes = "z坐标")
     private String siteZ;
-    @ApiModelProperty(notes = "预警等级,1:一级预警,2:二级预警,3:三级预警")
-    private Integer warningGrade;
+    @ApiModelProperty(notes = "各个节点设备id的预警等级集合,1:一级预警,2:二级预警,3:三级预警")
+    private String warningGrade;
     @ApiModelProperty(notes = "预警信息")
     private String warningNews;
     @ApiModelProperty(notes = "预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警")
     private String warningType;
     @ApiModelProperty(notes = "预警类型名称警")
     private String warningName;
-    @ApiModelProperty(notes = "设备id")
+    @ApiModelProperty(notes = "预警的节点设备id集合")
     private String nodeId;
     @ApiModelProperty(notes = "垛位id")
     private Integer stackId;
@@ -59,6 +59,23 @@ public class EarlyWarningVo {
     private Date dealTime;
     @ApiModelProperty(notes = "预警设备类型  01：无线氧气传感器，03：无线温湿度传感器,04： 无线包芯温度传感器")
     private String nodeType;
+    @ApiModelProperty(notes = "预警值集合")
+    private String warningVal;
+    @ApiModelProperty(notes = "最新预警时间")
+    private Date warningTime;
+    @ApiModelProperty(notes = "处理措施")
+    private String dealSuggestion;
+    @ApiModelProperty(notes = "仓间id")
+    private Integer areaId;
+    @ApiModelProperty(notes = "位置路由")
+    private String siteRoute;
+
+    private String nodeName;
+    @ApiModelProperty(notes = "颜色")
+    private String color;
+    @ApiModelProperty(notes = "任务id")
+    private String taskId;
+
     @ApiModelProperty(notes = "一级预警值")
     private Double warningValOne;
     @ApiModelProperty(notes = "二级预警值")
@@ -66,25 +83,9 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes = "三级预警值")
     private Double warningValThree;
     @ApiModelProperty(notes = "一级预警时间")
-    private String warningTimeOne;
+    private Date warningTimeOne;
     @ApiModelProperty(notes = "二级预警时间")
-    private String warningTimeTwo;
+    private Date warningTimeTwo;
     @ApiModelProperty(notes = "三级预警时间")
-    private String warningTimeThree;
-    @ApiModelProperty(notes = "最新预警值")
-    private Double warningVal;
-    @ApiModelProperty(notes = "最新预警时间")
-    private String warningTime;
-    @ApiModelProperty(notes = "备注")
-    private String remark;
-    @ApiModelProperty(notes = "处理措施")
-    private String dealSuggestion;
-    @ApiModelProperty(notes = "仓间id")
-    private Integer areaId;
-    @ApiModelProperty(notes = "位置路由")
-    private String siteRoute;
-    private String nodeName;
-    private String color;
-    private String taskId;
-    private String repairId;
+    private Date warningTimeThree;
 }

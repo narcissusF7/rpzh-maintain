@@ -250,4 +250,10 @@ public interface NodeDao {
     List<NodeDto> findNodeVos(@Param("ids") Integer[] ids);
 
     List<String> findNodeIdByIds(@Param("ids")Integer[] ids);
+
+    //查询历史数据中时间范围内的设备
+    @DS("clickhouse")
+    List<String> findAllNodeHistory(@Param("begin") Date begin, @Param("end") Date end);
+
+    List<String> findEnterStackNodeId();
 }

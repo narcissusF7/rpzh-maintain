@@ -13,7 +13,9 @@ import com.rpzh.service.EarlyWarningService;
 import com.rpzh.util.*;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.util.StringUtil;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.support.MessageBuilder;
@@ -247,7 +249,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         String warningName = "";
         String column = "";
         if(warningType.equals("06") || warningType.equals("08") || warningType.equals("10") || warningType.equals("12") || warningType.equals("13")){
-            //04:垛内甲虫预警,06:垛内氧气预警,08:垛内温度预警,10:垛内湿度预警,12:包芯温度预警,13:平均包芯高于环境预警
             if(warningType.equals("06")){
                 column = "stack_oxygen_upper_one as upperOne,stack_oxygen_upper_two as upperTwo,stack_oxygen_upper_three as upperThree,stack_oxygen_lower as lower";
                 warningName = "垛内氧气";
@@ -260,41 +261,31 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }else if(warningType.equals("12")){
                 column = "temp_core_chip_upper_one as upperOne,temp_core_chip_upper_two as upperTwo,temp_core_chip_upper_three as upperThree,temp_core_chip_lower as lower";
                 warningName = "包芯温度";
-            }else{
+            }else if(warningType.equals("13")){
                 column = "core_temp_high_env_temp_one as upperOne,core_temp_high_env_temp_two as upperTwo,core_temp_high_env_temp_three as upperThree,core_temp_low_env_temp as lower";
                 warningName = "平均包芯高于环境";
             }
             earlyWarningInfo = alarmValueSettingDao.findAlarmValueSettingByStackId(column,stackId);
         }else if(warningType.equals("07") || warningType.equals("09") || warningType.equals("11")){
+            if(warningType.equals("07")){
+                column = "warehouse_oxygen_upper_one as upperOne,warehouse_oxygen_upper_two as upperTwo,warehouse_oxygen_upper_three as upperThree,warehouse_oxygen_lower as lower";
+                warningName = "仓间氧气";
+            }else if(warningType.equals("09")){
+                column = "warehouse_temp_upper_one as upperOne,warehouse_temp_upper_two as upperTwo,warehouse_temp_upper_three as upperThree,warehouse_temp_lower as lower";
+                warningName = "仓间温度";
+            }else if(warningType.equals("11")){
+                column = "warehouse_moisture_upper_one as upperOne,warehouse_moisture_upper_two as upperTwo,warehouse_moisture_upper_three as upperThree,warehouse_moisture_lower as lower";
+                warningName = "仓间湿度";
+            }
             List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
             pidRoutes.sort((v1, v2) -> v2.compareTo(v1));
-            AlarmValueSettingVo alarmValueSettingVo1=null;
             //从下往上找
             for (String routes : pidRoutes) {
                 String[] route = routes.split(":");
-                alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
-                if(ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
+                earlyWarningInfo = wareAreaAlarmSettingDao.findAlarmValueSettingByAreaId(column,route[0]+route[1]);
+                if(ToolUtil.isNotEmpty(earlyWarningInfo)) {
                     break;
                 }
-            }
-            if(warningType.equals("07")){
-                earlyWarningInfo.setUpperOne(alarmValueSettingVo1.getWarehouseOxygenUpperOne());
-                earlyWarningInfo.setUpperTwo(alarmValueSettingVo1.getWarehouseOxygenUpperTwo());
-                earlyWarningInfo.setUpperThree(alarmValueSettingVo1.getWarehouseOxygenUpperThree());
-                earlyWarningInfo.setLower(alarmValueSettingVo1.getWarehouseOxygenLower());
-                warningName = "仓间氧气";
-            }else if(warningType.equals("09")){
-                earlyWarningInfo.setUpperOne(alarmValueSettingVo1.getWarehouseTempUpperOne());
-                earlyWarningInfo.setUpperTwo(alarmValueSettingVo1.getWarehouseTempUpperTwo());
-                earlyWarningInfo.setUpperThree(alarmValueSettingVo1.getWarehouseTempUpperThree());
-                earlyWarningInfo.setLower(alarmValueSettingVo1.getWarehouseTempLower());
-                warningName = "仓间温度";
-            }else{
-                earlyWarningInfo.setUpperOne(alarmValueSettingVo1.getWarehouseMoistureUpperOne());
-                earlyWarningInfo.setUpperTwo(alarmValueSettingVo1.getWarehouseMoistureUpperTwo());
-                earlyWarningInfo.setUpperThree(alarmValueSettingVo1.getWarehouseMoistureUpperThree());
-                earlyWarningInfo.setLower(alarmValueSettingVo1.getWarehouseMoistureLower());
-                warningName = "仓间湿度";
             }
         }else {
             warningName = "虫数";
@@ -482,42 +473,40 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         earlyWarningDto.setStartTime(month.get("startTime"));
         earlyWarningDto.setEndTime(month.get("endTime"));
         String warningType = earlyWarningDto.getWarningType();
-        List<WarningCountVo> warningCount = new ArrayList<>();
-        if(ToolUtil.isNotEmpty(warningType)){
-            switch (warningType){
-                case "01":
-                    warningCount = earlyWarningDao.findEarlyWarningCountByOne(earlyWarningDto);
-                    break;
-                default:
-                    warningCount = earlyWarningDao.findEarlyWarningCountByNotOne(earlyWarningDto);
-                    break;
-
-            }
-        }else{
-            //查询设备故障的个数
-            WarningCountVo warningCountVo = earlyWarningDao.findEarlyWarningCountByOne(earlyWarningDto).get(0);
-            //查询除设备故障外预警的个数
-            warningCount = earlyWarningDao.findEarlyWarningCount(earlyWarningDto);
-            if(warningCountVo.getOneWarningCount()!=0 || warningCountVo.getTwoWarningCount()!=0 || warningCountVo.getThreeWarningCount()!=0){
-                warningCount.add(0,warningCountVo);
-            }
-        }
+        List<WarningCountVo> warningCountVos = new ArrayList<>();
+        List<Map> mapId = earlyWarningDao.findIdsByWarning(earlyWarningDto);
+        List<WarningCountVo> warningCountInfos = new ArrayList<>();
         Map<String, String> color = earlyWarningDao.findColor();
-        warningCount.forEach(count -> {
-            if(StringUtils.isNotEmpty(count.getWarningType())) {
-                count.setWarningName(getWarningType(count.getWarningType()).get("warningType"));
-                count.setColorOne(color.get("oneColor"));
-                count.setColorTwo(color.get("twoColor"));
-                count.setColorThree(color.get("threeColor"));
-            }
-        });
-        if (warningCount.size()==1){
-            if(warningCount.get(0).getOneWarningCount()==0 && warningCount.get(0).getTwoWarningCount()==0 && warningCount.get(0).getThreeWarningCount() == 0) {
-                warningCount = new ArrayList<>();
-                return new Result<>(true, StatusCode.OK, "查无数据", warningCount);
+        if(ToolUtil.isNotEmpty(mapId)){
+            List<Integer> ids = mapId.stream().map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
+            if(ToolUtil.isNotEmpty(warningType)) {
+                WarningCountVo warningCountInfo = earlyWarningDao.findEarlyWarningCountByWarningType(ids,ids.size());
+                warningCountInfo.setWarningName(getWarningType(warningType).get("warningType"));
+                warningCountInfo.setWarningType(warningType);
+                warningCountInfo.setColorOne(color.get("oneColor"));
+                warningCountInfo.setColorTwo(color.get("twoColor"));
+                warningCountInfo.setColorThree(color.get("threeColor"));
+                warningCountInfos.add(warningCountInfo);
+            }else{
+                List<String> types = new ArrayList<>(earlyWarningDao.findWarningTypes(ids));
+                List<String> warningTypes = Arrays.asList(String.join(",", types).replace("01,02,03","01").replace("01,02","01").replace("01,03","01").replace("02,03","01").replace("02","01").replace("03","01").split(","));
+                for (String type : warningTypes) {
+                    if("01".equals(type)){
+                        ids = mapId.stream().filter((Map map) -> "01".equals(map.get("warningType").toString()) || "02".equals(map.get("warningType").toString()) || "03".equals(map.get("warningType").toString())).map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
+                    }else {
+                        ids = mapId.stream().filter((Map map) -> type.equals(map.get("warningType").toString())).map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
+                    }
+                    WarningCountVo warningCountInfo = earlyWarningDao.findEarlyWarningCountByWarningType(ids,ids.size());
+                    warningCountInfo.setWarningName(getWarningType(type).get("warningType"));
+                    warningCountInfo.setWarningType(type);
+                    warningCountInfo.setColorOne(color.get("oneColor"));
+                    warningCountInfo.setColorTwo(color.get("twoColor"));
+                    warningCountInfo.setColorThree(color.get("threeColor"));
+                    warningCountInfos.add(warningCountInfo);
+                }
             }
         }
-        return new Result<>(true, StatusCode.OK, "查询成功",warningCount);
+        return new Result(true, StatusCode.OK, "查询成功",warningCountInfos);
     }
 
     @Override
@@ -531,26 +520,10 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map<String, Date> month = GetBetweenDayUtils.getMonth(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime());
         earlyWarningDto.setStartTime(month.get("startTime"));
         earlyWarningDto.setEndTime(month.get("endTime"));
+        List<Integer> ids = earlyWarningDao.findIdsByWarning(earlyWarningDto).stream().map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
         Map<String, String> color = earlyWarningDao.findColor();
-        if(warningType.equals("01")){
-            earlyWarningVos = earlyWarningDao.findEarlyWarningByOne(earlyWarningDto);
-            earlyWarningVos.forEach(earlyWarningVo -> {
-                earlyWarningVo.setWarningNews("设备故障");
-                earlyWarningVo.setWarningType("01");
-            });
-        }else{
-            earlyWarningVos = earlyWarningDao.findEarlyWarningByNotOne(earlyWarningDto);
-        }
-        earlyWarningVos = earlyWarningVos.stream().filter((EarlyWarningVo earlyWarningVo) -> !"0".equals(earlyWarningVo.getAffirm())).collect(Collectors.toList());
+        earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningType(ids,ids.size(),warningType);
         earlyWarningVos.forEach(earlyWarningVo -> {
-            switch (earlyWarningVo.getAffirm()){
-                case "1":
-                    earlyWarningVo.setAffirmName("正在处理");
-                    break;
-                case "2":
-                    earlyWarningVo.setAffirmName("未处理");
-                    break;
-            }
             earlyWarningVo.setNodeName(getNodeType(earlyWarningVo.getNodeType()));
             earlyWarningVo.setColor(getColor(earlyWarningVo.getWarningGrade(), color).get("color"));
         });
@@ -574,65 +547,85 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
         earlyWarningDto.setBeginTime(time.get("startTime"));
         earlyWarningDto.setFinishTime(time.get("endTime"));
-        //最新报警时间
-        String newTime = earlyWarningDao.findNewTime(isAffirm, warningGrade, warningType, pidRoute);
-        List<Map<String,String>> user = new ArrayList<>();
+        List<Map> warningNews  = earlyWarningDao.findWarningDataWarningType(isAffirm,pidRoute,warningType);
         List<Map> warningDatas = new ArrayList<>();
         List<Map> warningInfos = new ArrayList<>();
-        Long taskId = 0L;
-        if (warningType.equals("01")){
-            warningDatas = earlyWarningDao.findWarningDataWarningTypeIsOne(isAffirm,pidRoute);
-        }else{
-            warningDatas = earlyWarningDao.findWarningDataWarningTypeIsNotOne(isAffirm,warningType, pidRoute);
-            taskId = taskManagementDao.findTaskId(pidRoute, warningType);
-        }
-        Map<String,Object> map = new HashMap<>();
-        if(ToolUtil.isNotEmpty(warningDatas)) {
-            String siteName = "";
-            String materialCode = "";
-            if(ToolUtil.isNotEmpty(stackId)){
-                materialCode = maintainPlanDao.findMaintainMaxIdByStackId(stackId);
-                siteName = warehouseDao.findStackById(stackId).getSiteName();
-            }
-            if(ToolUtil.isNotEmpty(areaId)){
-                siteName = warehouseDao.findWareArea(areaId).getSiteName();
-            }
+        List<EarlyWarningVo> warningVos = new ArrayList<>();
+        if(ToolUtil.isNotEmpty(warningNews)) {
+            //最新报警时间
+            Map<String,Object> map = new HashMap<>();
             Map<String, String> typeMap = getWarningType(warningType);
-            map = getMap(Arrays.asList("warningTime","materialCode","siteName","warningName"),Arrays.asList(newTime,materialCode,siteName, typeMap.get("warningType")));
-            if (!warningType.equals("01")) {
-                map.put("taskId", taskId);
-                map.put("warningType", warningType);
+            map.put("warningTime",earlyWarningDao.findNewTime(isAffirm, warningType, pidRoute));
+            map.put("warningName",typeMap.get("warningType"));
+            map.put("warningType", warningType);
+            if (!warningType.equals("01")){
+                map.put("taskId", taskManagementDao.findTaskId(pidRoute, warningType));
             }
-            String name = typeMap.get("name");
+            List<Map<String,String>> user = new ArrayList<>();
+            Map<String, String> color = earlyWarningDao.findColor();
+            if (ToolUtil.isNotEmpty(stackId)) {
+                map.put("materialCode", maintainPlanDao.findMaintainMaxIdByStackId(stackId));
+                map.put("siteName", warehouseDao.findStackById(stackId).getSiteName());
+            } else {
+                map.put("siteName", warehouseDao.findWareArea(areaId).getSiteName());
+            }
+            EarlyWarningVo earlyWarningInfo = getEarlyWarningVo(warningType, pidRoute, stackId);
+            for (Map warningData : warningNews) {
+                if(ToolUtil.isNotEmpty(stackId)) {
+                    warningData.put("stackId", stackId);
+                }else {
+                    warningData.put("areaId", areaId);
+                }
+                List<String> warningVals = new ArrayList<>();
+                int size = 0;
+                if ("01".equals(warningData.get("warningType")) || "02".equals(warningData.get("warningType")) || "03".equals(warningData.get("warningType"))) {
+                    warningData.put("warningName", getWarningType("0" + warningData.get("warningType").toString()).get("warningType"));
+                    warningData.put("deal", getWarningType("0" + warningData.get("warningType").toString()).get("deal"));
+                    warningData.remove("warningVal");
+                }else{
+                    String warningName = earlyWarningInfo.getWarningName();
+                    warningVals = Arrays.asList(warningData.get("warningVal").toString().split(","));
+                    size = warningVals.size();
+                    String name = typeMap.get("name");
+                    warningData.put("warningVal", warningName + "当前值:" + warningData.get("warningVal").toString());
+                    warningData.put("valOne", warningName + "上限一级:" + earlyWarningInfo.getUpperOne());
+                    warningData.put("valTwo", warningName + "上限二级:" + earlyWarningInfo.getUpperTwo());
+                    warningData.put("valThree", warningName + "上限三级:" + earlyWarningInfo.getUpperThree());
+                    warningData.put("low", warningName + "下限:" + earlyWarningInfo.getLower());
+                    EarlyWarningVo warningVo = earlyWarningDao.findById(warningData.get("id").toString());
+                    Map<String, String> colorMap = getColor("1", color);
+                    warningInfos.add(getMap(Arrays.asList("name", "color", "warningTime", "warningVal"), Arrays.asList(colorMap.get("name"), colorMap.get("color"), warningVo.getWarningTimeOne(), warningVo.getWarningValOne() + name)));
+                    colorMap = getColor("2", color);
+                    warningInfos.add(getMap(Arrays.asList("name", "color", "warningTime", "warningVal"), Arrays.asList(colorMap.get("name"), colorMap.get("color"), warningVo.getWarningTimeTwo(), warningVo.getWarningValTwo() + name)));
+                    colorMap = getColor("3", color);
+                    warningInfos.add(getMap(Arrays.asList("name", "color", "warningTime", "warningVal"), Arrays.asList(colorMap.get("name"), colorMap.get("color"), warningVo.getWarningTimeThree(), warningVo.getWarningValThree() + name)));
+                }
+                warningData.put("nodeName", getNodeType(warningData.get("nodeType").toString()));
+                List<String> nodeIds = new ArrayList<>();
+                List<Map> maps = new ArrayList<>();
+                if (!"13".equals(warningType) || !"19".equals(warningType)) {
+                    nodeIds = Arrays.asList(warningData.get("nodeId").toString().split(","));
+                    maps = earlyWarningDao.findsiteXYZByNodeIds(nodeIds);
+                    size = nodeIds.size();
+                }
+                for (int i = 0; i < size; i++) {
+                    Map warningInfo = new HashMap();
+                    warningInfo.putAll(warningData);
+                    if(ToolUtil.isNotEmpty(warningVals)) {
+                        warningInfo.put("warningVal", warningVals.get(i));
+                    }
+                    if (ToolUtil.isNotEmpty(nodeIds)) {
+                        warningInfo.put("nodeId", nodeIds.get(i));
+                        warningInfo.putAll(maps.get(i));
+                    }
+                    warningDatas.add(warningInfo);
+                }
+            }
+        }
+        /*
             List<Integer> ids = new ArrayList<>();
             warningDatas.forEach(warningData -> {
                 ids.add(Integer.parseInt(warningData.get("id").toString()));
-                String route = warningData.get("pidRoute").toString();
-                if(warningData.get("pidRoute").toString().contains("05")){
-                    warningData.put("stackId",stackId);
-                }else{
-                    warningData.put("stackId",areaId);
-                }
-                warningData.put("warningName", getWarningType("0"+warningData.get("warningType").toString()).get("warningType"));
-                warningData.put("deal", getWarningType("0"+warningData.get("warningType").toString()).get("deal"));
-                warningData.put("nodeName", getNodeType(warningData.get("nodeType").toString()));
-                if (!"01".equals(warningType)) {
-                    EarlyWarningVo earlyWarningInfo = getEarlyWarningVo(warningType, pidRoute, stackId);
-                    String warningName = earlyWarningInfo.getWarningName();
-                    warningData.put("warningVal", warningName + "当前值:" + warningData.get("warningVal").toString());
-                    switch (warningData.get("warningGrade").toString()){
-                        case "1":
-                            warningData.put("val", warningName + "上限:" + earlyWarningInfo.getUpperOne());
-                            break;
-                        case "2":
-                            warningData.put("val", warningName + "上限:" + earlyWarningInfo.getUpperTwo());
-                            break;
-                        case "3":
-                            warningData.put("val", warningName + "上限:" + earlyWarningInfo.getUpperThree());
-                            break;
-                    }
-                    warningData.put("low", warningName + "下限:" + earlyWarningInfo.getLower());
-                }
             });
             List<EarlyWarningVo> warningVos = earlyWarningDao.findByIds(ids);
             Map<String, String> color = earlyWarningDao.findColor();
@@ -691,26 +684,27 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     user.add(userName);
                 });
             }
-        }
+        }*/
+        //Map map2 = new HashMap();
         map1.put("warningInfo",warningInfos);
-        map1.put("earlyWarningVo",map);
+        //map1.put("earlyWarningVo",map);
         map1.put("warningDatas",warningDatas);
-        map1.put("user",user);
+        //map1.put("user",user);
         return new Result<>(true, StatusCode.OK, "查询成功",map1);
     }
 
-    public Map<String,String> getColor(Integer warningGrade,Map<String, String> color){
+    public Map<String,String> getColor(String warningGrade,Map<String, String> color){
         Map<String,String> map = new HashMap<>();
         switch (warningGrade){
-            case 1:
+            case "1":
                 map.put("color",color.get("oneColor"));
                 map.put("name", "一级预警");
                 break;
-            case 2:
+            case "2":
                 map.put("color",color.get("twoColor"));
                 map.put("name", "二级预警");
                 break;
-            case 3:
+            case "3":
                 map.put("color",color.get("threeColor"));
                 map.put("name", "三级预警");
                 break;
@@ -883,13 +877,16 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
 
     public Map findAppWarningInfoByWarningType(String warningType, String warningGrade){
         Map<String, Object> map = new HashMap<>();
+        if("04".equals(warningGrade)){
+            warningGrade = null;
+        }
         String appCount = earlyWarningDao.findAppCountByWarningType(warningType, warningGrade);
         if(ToolUtil.isEmpty(appCount)){
-            appCount = "0";
-            map.put("count", appCount);
+            map.put("count", "0");
             map.put("warningInfo",new ArrayList<>());
             return map;
         }
+
         map.put("count", appCount);
         return map;
     }

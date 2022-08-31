@@ -709,4 +709,14 @@
             #{id}
         </foreach>
     </select>
+    <select id="findAllNodeHistory" resultType="java.lang.String">
+        select distinct node_id from tb_node_temp_core_history where transfer_time between #{begin} and #{end}
+        union all
+        select distinct node_id from tb_node_o2_history  where transfer_time between #{begin} and #{end}
+        union all
+        select distinct node_id from tb_node_env_history  where transfer_time between #{begin} and #{end}
+    </select>
+    <select id="findEnterStackNodeId" resultType="java.lang.String">
+        select node_id from tb_node where status = 1
+    </select>
 </mapper>

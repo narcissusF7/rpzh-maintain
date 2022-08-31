@@ -29,7 +29,7 @@ public class EarlyWarningDto implements Serializable {
 
     private String pidRoute;
 
-    private BigDecimal warningVal;
+    private String warningVal;
 
     private LocalDateTime warningTime;
 

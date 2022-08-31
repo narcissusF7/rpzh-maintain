@@ -469,25 +469,68 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     private Integer decideEarlyWarning(PestBoardVo pestBoardVo, Integer level, Integer data, String warningType,boolean addOrFind) {
 
-        //获取数据库中未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(pestBoardVo.getPestBoardId(), warningType);
+        //获取数据库中该位置下未处理的预警
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(pestBoardVo.getSiteRoute(), warningType);
 
         EarlyWarning earlyWarning = new EarlyWarning();
 
         //如果存在
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
+            //获取nodeIds
+            String[] nodeIds = earlyWarningVo.getNodeId().split(",");
+            //获取预警值
+            String[] warningVals = earlyWarningVo.getWarningVal().split(",");
+            //获取预警等级
+            String[] levels = earlyWarningVo.getWarningGrade().split(",");
 
-            //如果当前预警等级更高
-            if (earlyWarningVo.getWarningGrade() < level) {
-                //设置等级
-                dataHandler.setLevel(earlyWarning, level, data.doubleValue());
-                //设置主键id
-                earlyWarning.setId(earlyWarningVo.getId());
-                //更新数据
-                earlyWarningDao.updateWarning(earlyWarning);
-            } else {
-                earlyWarning.setWarningGrade(earlyWarningVo.getWarningGrade());
+            boolean flag = true;
+            for (int i = 0; i < nodeIds.length; i++) {
+                //判断当前虫情板属于该条预警的第几位
+                if (nodeIds[i].equals(pestBoardVo.getPestBoardId())){
+                    flag = false;
+                    //如果当前预警等级更高
+                    if (Integer.parseInt(levels[i]) < level) {
+                        //设置等级
+                        levels[i] =  level+"";
+                        warningVals[i] = data+"";
+                        //新的预警值集合
+                        String warningVal = warningVals[0];
+                        //新的预警等级集合
+                        String level1 =  levels[0];
+                        for (int i1 = 1; i1 < levels.length; i1++) {
+                            warningVal = warningVal+","+warningVals[i1];
+                            level1 =level1+","+levels[i1];
+                        }
+                        //赋值
+                        earlyWarning.setWarningGrade(level1);
+                        earlyWarning.setWarningVal(warningVal);
+                        //设置主键id
+                        earlyWarning.setId(earlyWarningVo.getId());
+
+                        //判断是哪一级预警
+                        dataHandler.setEarlyLevel(earlyWarning,level,earlyWarningVo,data.doubleValue());
+
+                        //更新数据
+                        earlyWarningDao.updateWarning(earlyWarning);
+                    } else {
+                        level = Integer.parseInt(levels[i]);
+                    }
+                }
             }
+            //存在预警但不包含当前虫情点位
+            if (flag){
+                if (level>0){
+                    earlyWarning.setId(earlyWarningVo.getId());
+                    earlyWarning.setWarningVal(earlyWarningVo.getWarningVal()+","+data);
+                    earlyWarning.setNodeId(earlyWarningVo.getNodeId()+","+pestBoardVo.getPestBoardId());
+                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade()+","+level);
+                    //判断哪一等级的预警
+                    dataHandler.setEarlyLevel(earlyWarning,level,earlyWarningVo,data.doubleValue());
+                    //更新数据
+                    earlyWarningDao.updateWarning(earlyWarning);
+                }
+            }
+
 
         } else {//如果不存在
             if (addOrFind) {
@@ -518,16 +561,18 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                     Map taskMap = addTask(pestBoardVo, warningType);
                     earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                     earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
+                    //判断哪一等级的预警
+                    dataHandler.setEarlyLevel(earlyWarning,level,earlyWarningVo,data.doubleValue());
                     //将该预警记录插入到数据库中
                     earlyWarningDao.insertWarning(earlyWarning);
                 } else {
-                    earlyWarning.setWarningGrade(0);
+                    level = 0;
                 }
             } else {
                 return level;
             }
         }
-        return earlyWarning.getWarningGrade();
+        return level;
     }
 
     /**
@@ -844,16 +889,28 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      */
     public Integer setWarningLevel(String warningType,PestData pestData){
         //虫情点位id和预警类型找对应的未处理的预警数据
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(pestData.getPestBoardId(), warningType);
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(pestData.getSiteRoute(), warningType);
+
         //如果存在
         if (!ToolUtil.isEmpty(earlyWarningVo)){
-            //给当前的虫情数据设置预警等级
-            if (warningType.equals(WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING)){
-                pestData.setMealwormLevel(earlyWarningVo.getWarningGrade());
-            }else {
-                pestData.setBeetleLevel(earlyWarningVo.getWarningGrade());
+            //获取nodeIds
+            String[] nodeIds = earlyWarningVo.getNodeId().split(",");
+            //获取预警值
+            String[] warningVals = earlyWarningVo.getWarningVal().split(",");
+            //获取预警等级
+            String[] levels = earlyWarningVo.getWarningGrade().split(",");
+            for (int i = 0; i < nodeIds.length; i++) {
+                //判断当前虫情板属于该条预警的第几位
+                if (nodeIds[i].equals(pestData.getPestBoardId())) {
+                    //给当前的虫情数据设置预警等级
+                    if (warningType.equals(WarningTypeConstant.WARE_MEALWORM_OVERRUN_WARNING)) {
+                        pestData.setMealwormLevel(Integer.parseInt(levels[i]));
+                    } else {
+                        pestData.setBeetleLevel(Integer.parseInt(levels[i]));
+                    }
+                    return Integer.parseInt(levels[i]);
+                }
             }
-            return earlyWarningVo.getWarningGrade();
         }
         return 0;
     }
