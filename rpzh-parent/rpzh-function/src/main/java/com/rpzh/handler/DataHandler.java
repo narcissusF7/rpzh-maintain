@@ -161,7 +161,6 @@ public class DataHandler {
         Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
 
         NodeVo nodeVo = getNodeVo(cacheNodeData,parseData.getNodeId());
-
         //如果设备处于是解垛状态  数据不做任何处理
         if (ToolUtil.isEmpty(nodeVo)||!nodeVo.getStatus().equals("1")){
             return;
