@@ -590,7 +590,7 @@
         </if>
     </select>
     <select id="findTaskId" resultType="java.lang.Long">
-        select id from tb_task where site_route = #{siteRoute} and type = #{warningType} and status = '0'
+        select id from tb_task where site_route = #{siteRoute} and type = #{warningType} and status in ('0','3')
     </select>
     <!--
     <select id="findTaskFromMonitored" resultMap="findTask">

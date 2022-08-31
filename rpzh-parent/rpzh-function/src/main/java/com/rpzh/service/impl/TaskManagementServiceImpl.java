@@ -295,7 +295,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String siteRoute = taskDetail.getSiteRoute();
         String principal = taskDetail.getPrincipal();
         //除了设备故障外的所有预警类型
-        if(!"01,02,03".contains(type) && ToolUtil.isNotEmpty(nowTime)){
+        if(!"01,02,03".contains(type)){
             //更新到预警表中
             int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime);
         }

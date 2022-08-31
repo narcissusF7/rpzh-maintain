@@ -57,6 +57,7 @@ public interface EarlyWarningDao {
     List<Map> findWarningDataWarningType(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute,@Param("warningType") String warningType);
 
     List<Map> findsiteXYZByNodeIds(@Param("nodeIds")List<String> nodeIds);
+
     List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
     int updateTackId(@Param("affirm") String affirm, @Param("taskId")String taskId, @Param("dealTime") String dealTime);
@@ -88,7 +89,6 @@ public interface EarlyWarningDao {
     String findAppCountByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
 
     EarlyWarningVo findUndoEarlyWarningBySiteRoute(@Param("siteRoute") String siteRoute, @Param("warningType") String coreTempOverrunStackWarning);
-
 
     Integer findUndoStatusByNodeId(@Param("nodeId") String nodeId);
 }

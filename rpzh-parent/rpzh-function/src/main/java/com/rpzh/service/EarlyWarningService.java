@@ -3,7 +3,6 @@ import com.github.pagehelper.PageInfo;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
 import com.rpzh.vo.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +24,7 @@ public interface EarlyWarningService {
 
     Integer misreport(Integer id);
 
-
     List<RepairDataVo> getRepairData(Integer stackId, Integer areaId);
-
 
     Result findNodeData(EarlyWarningDto earlyWarningDto);
 

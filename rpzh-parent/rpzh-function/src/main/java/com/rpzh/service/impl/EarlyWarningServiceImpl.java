@@ -562,6 +562,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             map.put("warningName", typeMap.get("warningType"));
             map.put("warningType", warningType);
             map.put("taskId", taskManagementDao.findTaskId(pidRoute, warningType));
+            map.put("id",warningNews.get(0).get("id"));
             Map<String, String> color = earlyWarningDao.findColor();
             if (ToolUtil.isNotEmpty(stackId)) {
                 map.put("materialCode", maintainPlanDao.findMaintainMaxIdByStackId(stackId));
@@ -636,7 +637,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 userName.put("number", phonenumber);
                 user.add(userName);
             }
-            map1.put("id",warningNews.get(0).get("id"));
         }
         map1.put("warningInfo",warningInfos);
         map1.put("earlyWarningVo",map);
