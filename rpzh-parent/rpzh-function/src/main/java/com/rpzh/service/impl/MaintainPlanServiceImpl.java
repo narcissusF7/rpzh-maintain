@@ -187,6 +187,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setPrincipalIds(ids);
             maintainPlanDto1.setMaintenceStyle("常规整仓养护方式");
             maintainPlanDto1.setPhases("充氮杀虫阶段");
+            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2019,RPZH2020"));
             maintainPlanDto1.setMaintainDays(17);
             maintainPlanDto1.setAftercareDateStart("2022-09-02");
             maintainPlanDto1.setMaintainCount(146d);
@@ -217,6 +218,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaintenceStyle("常规整仓养护方式");
             maintainPlanDto1.setPhases("充氮杀虫阶段");
             maintainPlanDto1.setStackId(152);
+            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2019,RPZH2020"));
             maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:16],[04:36],[05:152]");
             insertMaintainPlan1(maintainPlanDto1);
         }
