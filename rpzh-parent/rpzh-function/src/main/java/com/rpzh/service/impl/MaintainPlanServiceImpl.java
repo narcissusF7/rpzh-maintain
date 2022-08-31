@@ -181,7 +181,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         if(maintainPlanDao.findCountByMaintainPlan()==0){
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
             maintainPlanDto1.setStackId(150);
-            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2019,RPZH2020"));
             maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:16],[04:36],[05:150]");
             List<Integer> ids = new ArrayList<>();
             ids.add(1);
@@ -218,7 +217,6 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             maintainPlanDto1.setMaintenceStyle("常规整仓养护方式");
             maintainPlanDto1.setPhases("充氮杀虫阶段");
             maintainPlanDto1.setStackId(152);
-            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2021,RPZH2022"));
             maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:16],[04:36],[05:152]");
             insertMaintainPlan1(maintainPlanDto1);
         }
@@ -250,7 +248,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setPrincipalName(getUsername(principalIds));
         //将物料代码转成字符串,并设置到maintainPlanDto中
         List<String> materialCodes = maintainPlanDto.getMaterialCodes();
-        maintainPlanDto.setMaterialCode(String.join(",",maintainPlanDto.getMaterialCodes()));
+        if(ToolUtil.isNotEmpty(materialCodes)) {
+            maintainPlanDto.setMaterialCode(String.join(",", maintainPlanDto.getMaterialCodes()));
+        }
         //获取创建人
         String createUser = TokenDecode.getUserInfo().get("username");
         //设置创建人
