@@ -50,6 +50,11 @@ spring:
           username: default
           password:
           driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+        db2:
+          url: jdbc:db2://10.154.74.199:50000/TRADECTR
+          username: nb_yzh
+          password: 3tsg5Rw#
+          driver-class-name: com.ibm.db2.jcc.DB2Driver
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       initial-size: 10
