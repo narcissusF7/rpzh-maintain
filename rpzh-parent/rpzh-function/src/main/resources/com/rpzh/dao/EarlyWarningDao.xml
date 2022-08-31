@@ -74,8 +74,8 @@
         FROM tb_early_warning where 1=1 <if test="size!=0">and id in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach></if>
          ORDER BY is_affirm DESC
     </select>
-    <select id="findNewTime" resultType="java.lang.String">
-    select warning_time from tb_early_warning where is_affirm = #{affirm} and warning_type = #{warningType} and site_route = #{siteRoute}
+    <select id="findNewTime" resultType="java.util.Map">
+    select to_char(warning_time,'yyyy-MM-dd HH:mm:ss') as "time",principal as "principal" from tb_early_warning where is_affirm = #{affirm} and warning_type = #{warningType} and site_route = #{siteRoute}
 </select>
     <select id="findWarningDataWarningType" resultType="java.util.Map">
         SELECT
@@ -194,9 +194,9 @@
         FROM tb_early_warning
         WHERE is_affirm = '0' <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
     </select>
-    <select id="findById" resultType="com.rpzh.vo.EarlyWarningVo">
-        select warning_val_one as warningValOne,warning_val_two as warningValTwo,warning_val_three as warningValThree,
-        warning_time_one as warningTimeOne,warning_time_two as warningTimeTwo,warning_time_three as warningTimeThree from  tb_early_warning where id= #{id}
+    <select id="findById" resultType="java.util.Map">
+        select warning_val_one as "warningValOne",warning_val_two as "warningValTwo",warning_val_three as "warningValThree",to_char(warning_time_one,'yyyy-MM-dd HH:mm:ss') as "warningTimeOne",
+        to_char(warning_time_two,'yyyy-MM-dd HH:mm:ss') as "warningTimeTwo",to_char(warning_time_three,'yyyy-MM-dd HH:mm:ss') as "warningTimeThree" from  tb_early_warning where id= #{id}
     </select>
     <delete id="misreport">
         delete from tb_early_warning where id = #{id}

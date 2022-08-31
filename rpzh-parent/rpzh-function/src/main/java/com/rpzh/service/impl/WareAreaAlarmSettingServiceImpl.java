@@ -159,25 +159,9 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
             List<Integer> warehouseIds = new ArrayList<>(warehouseDao.findAllWarehouseIds());
             List<Integer> siteIds = new ArrayList<>(wareAreaAlarmSettingDao.findWarehouseIds());
             warehouseIds.removeAll(siteIds);
+            String username = TokenDecode.getUserInfo().get("username");
             for (Integer warehouseId : warehouseIds) {
-                WareAreaAlarmSettingDto wareAreaAlarmSettingDto1 = new WareAreaAlarmSettingDto();
-                wareAreaAlarmSettingDto1.setSiteType("01");
-                wareAreaAlarmSettingDto1.setStackId(warehouseId);
-                wareAreaAlarmSettingDto1.setCreateUser(TokenDecode.getUserInfo().get("username"));
-                wareAreaAlarmSettingDto1.setUpdateUser(TokenDecode.getUserInfo().get("username"));
-                wareAreaAlarmSettingDto1.setPidRoute("[00:0],[01:" + warehouseId + "]");
-                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperOne(10d);
-                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperTwo(11d);
-                wareAreaAlarmSettingDto1.setWarehouseMoistureUpperThree(12d);
-                wareAreaAlarmSettingDto1.setWarehouseMoistureLower(9d);
-                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperOne(20d);
-                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperTwo(21d);
-                wareAreaAlarmSettingDto1.setWarehouseOxygenUpperThree(22d);
-                wareAreaAlarmSettingDto1.setWarehouseOxygenLower(19d);
-                wareAreaAlarmSettingDto1.setWarehouseTempUpperOne(32d);
-                wareAreaAlarmSettingDto1.setWarehouseTempUpperTwo(33d);
-                wareAreaAlarmSettingDto1.setWarehouseTempUpperThree(34d);
-                wareAreaAlarmSettingDto1.setWarehouseTempLower(31d);
+                WareAreaAlarmSettingDto wareAreaAlarmSettingDto1 = new WareAreaAlarmSettingDto(10d,11d,12d,9d,20d,21d,22d,19d,32d,33d,34d,31d,"01",warehouseId,username,username);
                 wareAreaAlarmSettingDao.insertWareAreaAlarmSetting(wareAreaAlarmSettingDto1);
             }
         }

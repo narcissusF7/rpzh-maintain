@@ -66,4 +66,28 @@ public class WareAreaAlarmSettingDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String endTime;
 
+    public WareAreaAlarmSettingDto(){}
+
+    public WareAreaAlarmSettingDto(Double warehouseMoistureUpperOne,Double warehouseMoistureUpperTwo,Double warehouseMoistureUpperThree,Double warehouseMoistureLower,
+                                   Double warehouseTempUpperOne,Double warehouseTempUpperTwo,Double warehouseTempUpperThree,Double warehouseTempLower,
+                                   Double warehouseOxygenUpperOne,Double warehouseOxygenUpperTwo,Double warehouseOxygenUpperThree,Double warehouseOxygenLower,
+                                   String siteType,Integer stackId,String createUser,String updateUser){
+        this.warehouseMoistureUpperOne = warehouseMoistureUpperOne;
+        this.warehouseMoistureUpperTwo = warehouseMoistureUpperTwo;
+        this.warehouseMoistureUpperThree = warehouseMoistureUpperThree;
+        this.warehouseMoistureLower = warehouseMoistureLower;
+        this.warehouseTempUpperOne = warehouseTempUpperOne;
+        this.warehouseTempUpperTwo = warehouseTempUpperTwo;
+        this.warehouseTempUpperThree = warehouseTempUpperThree;
+        this.warehouseTempLower = warehouseTempLower;
+        this.warehouseOxygenUpperOne = warehouseOxygenUpperOne;
+        this.warehouseOxygenUpperTwo = warehouseOxygenUpperTwo;
+        this.warehouseOxygenUpperThree = warehouseOxygenUpperThree;
+        this.warehouseOxygenLower = warehouseOxygenLower;
+        this.siteType = siteType;
+        this.stackId = stackId;
+        this.pidRoute = "[00:0],[01:" + stackId + "]";
+        this.createUser = createUser;
+        this.updateUser = updateUser;
+    }
 }

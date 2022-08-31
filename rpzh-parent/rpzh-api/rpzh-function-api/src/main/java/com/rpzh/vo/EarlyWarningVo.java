@@ -62,6 +62,7 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes = "预警值集合")
     private String warningVal;
     @ApiModelProperty(notes = "最新预警时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTime;
     @ApiModelProperty(notes = "处理措施")
     private String dealSuggestion;
@@ -83,9 +84,12 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes = "三级预警值")
     private Double warningValThree;
     @ApiModelProperty(notes = "一级预警时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeOne;
     @ApiModelProperty(notes = "二级预警时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeTwo;
     @ApiModelProperty(notes = "三级预警时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeThree;
 }

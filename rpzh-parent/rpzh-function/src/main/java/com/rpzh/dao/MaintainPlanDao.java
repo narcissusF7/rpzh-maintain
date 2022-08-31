@@ -73,7 +73,7 @@ public interface MaintainPlanDao {
 
     List<MaintainCountVo> findMaintainCountBySiteName(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("tableColumn") String tableColumn);
 
-    List<MaintainCountVo> findFirst(@Param("maintainCountDto") MaintainCountDto maintainCountDto);
+    List<MaintainCountVo> findFirst(@Param("ids")List<Integer> ids);
 
     Double findCount(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("tableColumn") String tableColumn);
 
@@ -81,13 +81,13 @@ public interface MaintainPlanDao {
 
     int updateMaintainCount(@Param("maintainPlanDto") MaintainPlanDto maintainPlanDto);
 
-    List<MaintainCountVo> findTwo(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+    List<MaintainCountVo> findTwo(@Param("ids")List<Integer> ids,@Param("siteIds") Set<Integer> siteIds);
 
-    List<MaintainCountVo> findThree(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+    List<MaintainCountVo> findThree(@Param("ids")List<Integer> ids, @Param("siteIds") Set<Integer> siteIds);
 
-    List<MaintainCountVo> findFour(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+    List<MaintainCountVo> findFour(@Param("ids")List<Integer> ids, @Param("siteIds") Set<Integer> siteIds);
 
-    List<MaintainCountVo> findFive(@Param("maintainCountDto") MaintainCountDto maintainCountDto, @Param("siteIds") Set<Integer> siteIds);
+    List<MaintainCountVo> findFive(@Param("ids")List<Integer> ids, @Param("siteIds") Set<Integer> siteIds);
 
     List<String> findSite(@Param("materialCode") String materialCode);
 
@@ -115,4 +115,6 @@ public interface MaintainPlanDao {
     Map<String, String> findStackById(@Param("stackId") Integer stackId);
 
     Integer findCountByMaintainPlan();
+
+    List<Integer> findIds(@Param("maintainCountDto")MaintainCountDto maintainCountDto);
 }

@@ -1,5 +1,6 @@
 package com.rpzh.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -42,16 +43,20 @@ public class EarlyWarning {
     //一级预警值
     private Double warningValOne;
     //一级预警时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeOne;
     //二级预警值
     private Double warningValTwo;
     //二级预警时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeTwo;
     //三级预警值
     private Double warningValThree;
     //三级预警时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTimeThree;
     //预警时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warningTime;
     //位置路由
     private String siteRoute;

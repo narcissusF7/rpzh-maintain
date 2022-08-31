@@ -863,21 +863,22 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
                 map.put("list",new PageInfo(maintainCountVos));
                 return map;
             }
+            List<Integer> ids = maintainPlanDao.findIds(maintainCountDto);
             PageHelper.startPage(maintainCountDto.getPage(), maintainCountDto.getSize());
-            maintainCountVos = maintainPlanDao.findFirst(maintainCountDto);
+            maintainCountVos = maintainPlanDao.findFirst(ids);
             List<MaintainCountVo> maintainCountOnes = new PageInfo<MaintainCountVo>(maintainCountVos).getList();
             Set<Integer> buildingIds = new HashSet<>();
             maintainCountOnes.forEach(maintainCountOne -> { buildingIds.add(maintainCountOne.getBuildingId()); });
-            List<MaintainCountVo> maintainCountTwos = maintainPlanDao.findTwo(maintainCountDto,buildingIds);
+            List<MaintainCountVo> maintainCountTwos = maintainPlanDao.findTwo(ids,buildingIds);
             Set<Integer> floorIds = new HashSet<>();
             maintainCountTwos.forEach(maintainCountTwo -> { floorIds.add(maintainCountTwo.getFloorId()); });
-            List<MaintainCountVo> maintainCountThrees = maintainPlanDao.findThree(maintainCountDto,floorIds);
+            List<MaintainCountVo> maintainCountThrees = maintainPlanDao.findThree(ids,floorIds);
             Set<Integer> areaIds = new HashSet<>();
             maintainCountThrees.forEach(maintainCountThree -> { areaIds.add(maintainCountThree.getAreaId()); });
-            List<MaintainCountVo> maintainCountFours = maintainPlanDao.findFour(maintainCountDto,areaIds);
+            List<MaintainCountVo> maintainCountFours = maintainPlanDao.findFour(ids,areaIds);
             Set<Integer> stackIds = new HashSet<>();
             maintainCountFours.forEach(maintainCountFour -> { stackIds.add(maintainCountFour.getStackId()); });
-            List<MaintainCountVo> maintainCountFives = maintainPlanDao.findFive(maintainCountDto,stackIds);
+            List<MaintainCountVo> maintainCountFives = maintainPlanDao.findFive(ids,stackIds);
             maintainCountFives.forEach(maintainCountVo -> {
                 maintainCountVo.setId("05"+maintainCountVo.getId());
             });

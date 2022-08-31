@@ -115,7 +115,7 @@ public class AlarmValueSettingDto {
     private String updateUser;
     //预警规则表id
     private Integer alarmValueSettingId;
-
+    private Integer flag;
     private Integer size=10;
     private Integer page=1;
     //开始时间
@@ -200,5 +200,6 @@ public class AlarmValueSettingDto {
         this.phases=phases;
         this.updateUser = updateUser;
         this.alarmValueSettingId = alarmValueSettingId;
+        this.flag = 0;
     }
 }

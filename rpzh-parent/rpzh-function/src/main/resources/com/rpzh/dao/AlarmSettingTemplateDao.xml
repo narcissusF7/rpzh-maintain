@@ -47,6 +47,7 @@
         t2.material_code as materialCode,
         t2.maintence_style as maintenceStyle,
         t2.create_user as createUser,
+        t2.default_flag as flag,
         t1.updated_time as updatedTime
         from (select max(a1.alarm_template_stage_id) as stage_id,max(a1.updated_time) as updated_time from tb_setting_template_stage a1
         left join tb_alarm_setting_template a2 on a2.id = a1.alarm_template_stage_id where 1=1
@@ -117,6 +118,7 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp,</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases,</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">alarm_template_stage_id,</if>
+        <if test="alarmValueSettingDto.flag != null and alarmValueSettingDto.flag != ''">default_flag,</if>
         updated_time,update_user
         )
         values
@@ -143,6 +145,7 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">#{alarmValueSettingDto.alarmValueSettingId},</if>
+        <if test="alarmValueSettingDto.flag != null and alarmValueSettingDto.flag != ''">#{alarmValueSettingDto.flag},</if>
         sysdate,#{alarmValueSettingDto.updateUser}
         )
     </insert>
@@ -274,6 +277,7 @@ FROM tb_general_setting where rownum = 1
        select
        maintence_style as maintenceStyle,
        material_code as materialCode,
+       default_flag as flag,
        early_warning_rule_name as earlyWarningRuleName
        from tb_alarm_setting_template
        where id = #{alarmValueSettingId}

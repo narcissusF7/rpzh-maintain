@@ -293,14 +293,10 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     public AlarmValueSettingVo findAlarmSettingTemplate(Integer id) {
         //根据id查询预警设置值
         AlarmValueSettingVo alarmValueSetting = alarmSettingTemplateDao.findAlarmSettingTemplateById(id);
-        //只需预警id、预警规则名称、物料代码(数组类型)返回给前端
-        AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
-        alarmValueSettingVo.setAlarmValueSettingId(alarmValueSetting.getAlarmValueSettingId());
-        alarmValueSettingVo.setEarlyWarningRuleName(alarmValueSetting.getEarlyWarningRuleName());
         if(ToolUtil.isNotEmpty(alarmValueSetting.getMaterialCode())) {
-            alarmValueSettingVo.setMaterialCodes(Arrays.asList(alarmValueSetting.getMaterialCode().split(",")));
+            alarmValueSetting.setMaterialCodes(Arrays.asList(alarmValueSetting.getMaterialCode().split(",")));
         }
-        alarmValueSettingVo.setMaintenceStyle(alarmValueSetting.getMaintenceStyle());
-        return alarmValueSettingVo;
+        alarmValueSetting.setMaintenceStyle(alarmValueSetting.getMaintenceStyle());
+        return alarmValueSetting;
     }
 }

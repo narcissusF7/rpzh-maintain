@@ -99,6 +99,7 @@ public class AlarmValueSettingVo {
     private Date updatedTime;
     @ApiModelProperty(notes = "养护阶段")
     private String phases;
+    private Integer flag;
 
     @ApiModelProperty(notes = "位置类型,1:仓库, 2: 楼号, 3: 层, 4: 区")
     private Integer siteType;

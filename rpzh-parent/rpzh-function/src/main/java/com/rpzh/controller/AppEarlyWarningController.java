@@ -47,7 +47,7 @@ public class AppEarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
                 "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "warningGrade", value = "预警等级:1:一级等级,2:二级等级,3:三级等级", dataType = "String",required = true)
+            @ApiImplicitParam(name = "warningGrade", value = "预警等级:1:一级等级,2:二级等级,3:三级等级,4:全部", dataType = "String",required = true)
     })
     public Result findAppWarningInfoByWarningType(@RequestParam(name =  "warningType",required = false) String warningType, @RequestParam(name = "warningGrade",required = false)String warningGrade){
         Map appMap = earlyWarningService.findAppWarningInfoByWarningType(warningType,warningGrade);

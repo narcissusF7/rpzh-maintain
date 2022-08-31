@@ -32,7 +32,7 @@ public interface EarlyWarningDao {
 
     List<Integer> findIds(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    EarlyWarningVo findById(@Param("id")String id);
+    Map findById(@Param("id")String id);
 
     Integer misreport(@Param("id") Integer id);
 
@@ -52,7 +52,7 @@ public interface EarlyWarningDao {
 
     List<WarningCountVo> findEarlyWarningCountByNotOne(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
-    String findNewTime(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
+    Map<String,String> findNewTime(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
     List<Map> findWarningDataWarningType(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute,@Param("warningType") String warningType);
 
