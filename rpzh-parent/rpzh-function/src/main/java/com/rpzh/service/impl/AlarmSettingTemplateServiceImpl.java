@@ -48,6 +48,7 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     public PageInfo<AlarmValueSettingVo> findAlarmSettingTemplateTable(AlarmValueSettingDto alarmValueSettingDto) {
         Integer size = alarmValueSettingDto.getSize();
         Integer page = alarmValueSettingDto.getPage();
+        createDefaultRule();
         PageHelper.startPage(page, size);
         //分页查询预警信息
         List<AlarmValueSettingVo> alarmValueSettingVos = alarmSettingTemplateDao.findAlarmSettingTemplateTable(alarmValueSettingDto);

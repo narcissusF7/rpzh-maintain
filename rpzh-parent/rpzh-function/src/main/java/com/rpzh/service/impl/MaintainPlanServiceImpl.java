@@ -64,6 +64,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Autowired
     private WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
 
+    @Resource
+    private AlarmSettingTemplateServiceImpl alarmSettingTemplateService;
     /**
      * 新增养护计划
      *
@@ -174,23 +176,23 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      */
     @Override
     public PageInfo<MaintainPlanVo> findMaintainPlanInfo(MaintainPlanDto maintainPlanDto) {
-        //AlarmSettingTemplateServiceImpl.createDefaultRule()
         //宁波测试用
+        alarmSettingTemplateService.createDefaultRule();
         if(maintainPlanDao.findCountByMaintainPlan()==0){
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto();
-            maintainPlanDto1.setStackId(86);
-            maintainPlanDto1.setMaterialCodes(Arrays.asList("11111111,22222222"));
-            maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:14],[04:32],[05:86]");
+            maintainPlanDto1.setStackId(150);
+            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2019,RPZH2020"));
+            maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:16],[04:36],[05:150]");
             List<Integer> ids = new ArrayList<>();
-            ids.add(161);
+            ids.add(1);
             maintainPlanDto1.setPrincipalIds(ids);
             maintainPlanDto1.setMaintenceStyle("常规整仓养护方式");
             maintainPlanDto1.setPhases("充氮杀虫阶段");
-            maintainPlanDto1.setMaintainDays(11);
-            maintainPlanDto1.setAftercareDateStart("2022-08-23");
+            maintainPlanDto1.setMaintainDays(17);
+            maintainPlanDto1.setAftercareDateStart("2022-09-02");
             maintainPlanDto1.setMaintainCount(146d);
-            maintainPlanDto1.setOxygenReductionTime("8");
-            maintainPlanDto1.setExpireTime("2022-08-26");
+            maintainPlanDto1.setOxygenReductionTime("11");
+            maintainPlanDto1.setExpireTime("2022-09-09");
             maintainPlanDto1.setEarlyWarningRuleName("默认模板-常规整仓养护方式");
             maintainPlanDto1.setStackOxygenUpperOne(14d);
             maintainPlanDto1.setStackOxygenUpperTwo(15d);
@@ -215,9 +217,9 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             insertMaintainPlan1(maintainPlanDto1);
             maintainPlanDto1.setMaintenceStyle("常规整仓养护方式");
             maintainPlanDto1.setPhases("充氮杀虫阶段");
-            maintainPlanDto1.setStackId(26);
-            maintainPlanDto1.setMaterialCodes(Arrays.asList("33333333,44444444"));
-            maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:12],[04:26],[05:26]");
+            maintainPlanDto1.setStackId(152);
+            maintainPlanDto1.setMaterialCodes(Arrays.asList("RPZH2021,RPZH2022"));
+            maintainPlanDto1.setPidRoute("[00:0],[01:2],[02:4],[03:16],[04:36],[05:152]");
             insertMaintainPlan1(maintainPlanDto1);
         }
         //获取位置路由
