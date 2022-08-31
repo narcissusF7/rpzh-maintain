@@ -17,7 +17,7 @@ import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.handler.DataHandler;
+import com.rpzh.handler.MaintainDataHandler;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.PestData;
@@ -67,7 +67,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
     WarehouseServiceImpl warehouseService;
 
     @Autowired
-    DataHandler dataHandler;
+    MaintainDataHandler dataHandler;
 
     public static final String SPECIAL_SITE_ROUTE = "SPECIAL_SITE_ROUTE";
     public static final String GENERAL_PEST_WARNING_VALUE = "GENERAL_PEST_WARNING_VALUE";

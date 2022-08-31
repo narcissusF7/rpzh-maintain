@@ -9,16 +9,13 @@ import com.rpzh.dto.NodeOperationDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeOperationEnum;
-import com.rpzh.handler.DataHandler;
+import com.rpzh.handler.MaintainDataHandler;
 import com.rpzh.service.NodeOperationService;
 import com.rpzh.util.StringUtils;
 import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.NodeVo;
 import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.aspectj.lang.annotation.Before;
@@ -29,9 +26,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.activation.DataHandler;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -217,18 +214,18 @@ public class NodeOperateAspect {
         //移除缓存中的设备数据
         if (!StringUtils.isEmpty(nodeDto.getNodeId())){
             nodeOperationDto.setNodeId(nodeDto.getNodeId());
-            redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeDto.getNodeId());
+            redisTemplate.delete(MaintainDataHandler.MAINTAIN_CACHE_NODE+nodeDto.getNodeId());
         }else if (ToolUtil.isNotEmpty(nodeDto.getIds())){
 
             List<String> nodeIds = nodeDao.findNodeIdByIds(nodeDto.getIds());
             for (int i = 0; i <nodeIds.size() ; i++) {
-                redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
+                redisTemplate.delete(MaintainDataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
             }
         }else if (ToolUtil.isNotEmpty(nodeDto.getId())){
             Integer[] ids  = {nodeDto.getId()};
             List<String> nodeIds = nodeDao.findNodeIdByIds(ids);
             for (int i = 0; i <nodeIds.size() ; i++) {
-                redisTemplate.delete(DataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
+                redisTemplate.delete(MaintainDataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
             }
         }
         if (nodeDto.getSiteId()!=null){

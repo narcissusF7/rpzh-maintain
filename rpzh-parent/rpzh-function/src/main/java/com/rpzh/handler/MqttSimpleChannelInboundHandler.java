@@ -32,7 +32,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
     private RedisUtil redisUtil;
 
     @Resource
-    private DataHandler dataHandler;
+    private MaintainDataHandler dataHandler;
 
     /**
      * 接收MQTT传入的消息
@@ -51,7 +51,6 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
         Map map = JSONObject.parseObject(message.getPayload().toString(), Map.class);
         if ("uplink".equals(mqttReceivedTopics.get(1))) {
             ParseData parseData = new ParseData(map,mqttReceivedTopics.get(2));
-
             //获取缓存中的帧计数器
             Object redisFcnt = redisUtil.get(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"));
             if (ToolUtil.isNotEmpty(redisFcnt)){

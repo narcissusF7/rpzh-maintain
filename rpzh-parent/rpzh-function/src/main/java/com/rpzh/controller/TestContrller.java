@@ -10,7 +10,7 @@ import com.rpzh.entity.ExcelUtils;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
-import com.rpzh.handler.DataHandler;
+import com.rpzh.handler.MaintainDataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.service.DataReportService;
 import com.rpzh.service.NodeService;
@@ -21,7 +21,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +64,7 @@ public class TestContrller{
     private NodeService nodeService;
 
     @Autowired
-    private DataHandler dataHandler;
+    private MaintainDataHandler dataHandler;
 
     @Autowired
     private PestMonitoringDao pestMonitoringDao;

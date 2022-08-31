@@ -2,12 +2,11 @@ package com.rpzh.Task;
 
 import com.alibaba.fastjson.JSONObject;
 import com.rpzh.dao.NodeDao;
-import com.rpzh.handler.DataHandler;
+import com.rpzh.handler.MaintainDataHandler;
 import com.rpzh.parse.ParseData;
 import com.rpzh.util.PortDataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,7 +18,7 @@ public class AirConditionerTask {
     RedisTemplate redisTemplate;
 
     @Autowired
-    DataHandler dataHandler;
+    MaintainDataHandler dataHandler;
 
     //TODO 需要接口地址
     private static String airConditionUrl = "";

@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  * @create 2022/4/30
  */
 @Component
-public class DataHandler {
+public class MaintainDataHandler {
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -208,7 +208,7 @@ public class DataHandler {
         decideFault(parseData.getVoltage(),voltage,WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN,parseData);
 
         //判断信号强度
-        decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
+       // decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
@@ -301,20 +301,23 @@ public class DataHandler {
 
             //过滤 选择环境温湿度设备 取温度
             double evnTemp = getAvg(nodeVos,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
-            //计算差值
-            double v = avg - evnTemp;
+            if(evnTemp<10){
+                //计算差值
+                double v = avg - evnTemp;
 
-            //获取缓存中的对应字段的值
-            alarmColumns = AlarmValueSettingVo.getStackColumn();
-            list.clear();
-            for (String alarmColumn : alarmColumns) {
-                list.add((Double) redisTemplate.opsForHash().get(redisHashKey, alarmColumn));
+                //获取缓存中的对应字段的值
+                alarmColumns = AlarmValueSettingVo.getStackColumn();
+                list.clear();
+                for (String alarmColumn : alarmColumns) {
+                    list.add((Double) redisTemplate.opsForHash().get(redisHashKey, alarmColumn));
+                }
+                //判断等级
+                int level = decideValue(v, list);
+
+                //处理
+                avgCoreHandle(nodeVo, level, parseData, v);
             }
-            //判断等级
-            int level = decideValue(v, list);
 
-            //处理
-            avgCoreHandle(nodeVo, level, parseData, v);
         }
 
     }

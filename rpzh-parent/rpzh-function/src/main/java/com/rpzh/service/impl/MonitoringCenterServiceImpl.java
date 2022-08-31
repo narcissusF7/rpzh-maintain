@@ -6,12 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
-import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
 
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
-import com.rpzh.handler.DataHandler;
 import com.rpzh.pojo.GeneralSetting;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
@@ -23,8 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+
+import com.rpzh.handler.MaintainDataHandler;
+
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,8 +55,8 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     @Autowired
     GeneralSettingDao generalSettingDao;
 
-    @Autowired
-    DataHandler dataHandler;
+    @Resource
+    private MaintainDataHandler dataHandler;
 
     public MonitoringCenterServiceImpl() {
     }
@@ -71,14 +72,14 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         int pageSize = monitorCondition.getSize();
 
         //判断位置路由是否为空
-        if (!ToolUtil.isEmpty(monitorCondition.getPidRoute())){
+        if (!ToolUtil.isEmpty(monitorCondition.getPidRoute())) {
             //拼接真实的位置路由
-            monitorCondition.setPidRoute(monitorCondition.getPidRoute()+",[0"+monitorCondition.getPidRoute().split(",").length+":"+monitorCondition.getSiteId()+"]");
+            monitorCondition.setPidRoute(monitorCondition.getPidRoute() + ",[0" + monitorCondition.getPidRoute().split(",").length + ":" + monitorCondition.getSiteId() + "]");
         }
 
         List<NodeVo> nodeVos;
         //判断是否包含仓间的温湿度设备
-        if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())&& Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)){
+        if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType()) && Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)) {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
             //查询 温湿度设备
             nodeVos = nodeDao.findHumitureDevice(monitorCondition);
@@ -87,16 +88,16 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 //            nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
             //再排序
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
-        }else{
+        } else {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
             nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
         }
 
         //添加筛选完后的数据
-        nodeDataVos =setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus());
+        nodeDataVos = setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus());
 
-        Stream<NodeDataVo> stream =nodeDataVos.stream();
-        if (monitorCondition.getSortCondition() == 1){
+        Stream<NodeDataVo> stream = nodeDataVos.stream();
+        if (monitorCondition.getSortCondition() == 1) {
             //按预警等级排序
             stream = stream.sorted(Comparator.comparing(NodeDataVo::getAlertLevel).reversed());
         }
@@ -109,36 +110,36 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         for (int i = 0; i < collect.size(); i++) {
             collect.get(i).setWarningName();
             //设置预警颜色
-            NodeServiceImpl.setWarningColor(collect.get(i),entries);
+            NodeServiceImpl.setWarningColor(collect.get(i), entries);
             //如果物料等级不为空
             String materialCode = collect.get(i).getMaterialCode();
-            if (ToolUtil.isNotEmpty(materialCode)){
-                collect.get(i).setMaterialCode(materialCode.replace(",","、"));
+            if (ToolUtil.isNotEmpty(materialCode)) {
+                collect.get(i).setMaterialCode(materialCode.replace(",", "、"));
             }
             //温湿度设备额外对添加温度湿度预警颜色
-            if(NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(collect.get(i).getType())){
-                if (ToolUtil.isEmpty(collect.get(i).getTempLevel())){
+            if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(collect.get(i).getType())) {
+                if (ToolUtil.isEmpty(collect.get(i).getTempLevel())) {
                     collect.get(i).setTempLevel(0);
                 }
-                if (collect.get(i).getTempLevel()==1){
+                if (collect.get(i).getTempLevel() == 1) {
                     collect.get(i).setTempColor(entries.get("one").toString());
-                }else if (collect.get(i).getTempLevel()==2){
+                } else if (collect.get(i).getTempLevel() == 2) {
                     collect.get(i).setTempColor(entries.get("two").toString());
-                }else if (collect.get(i).getTempLevel()==3){
+                } else if (collect.get(i).getTempLevel() == 3) {
                     collect.get(i).setTempColor(entries.get("three").toString());
-                }else {
+                } else {
                     collect.get(i).setTempColor("");
                 }
-                if (ToolUtil.isEmpty(collect.get(i).getHumidityLevel())){
+                if (ToolUtil.isEmpty(collect.get(i).getHumidityLevel())) {
                     collect.get(i).setHumidityLevel(0);
                 }
-                if (collect.get(i).getHumidityLevel()==1){
+                if (collect.get(i).getHumidityLevel() == 1) {
                     collect.get(i).setHumidityColor(entries.get("one").toString());
-                }else if (collect.get(i).getHumidityLevel()==2){
+                } else if (collect.get(i).getHumidityLevel() == 2) {
                     collect.get(i).setHumidityColor(entries.get("two").toString());
-                }else if (collect.get(i).getHumidityLevel()==3){
+                } else if (collect.get(i).getHumidityLevel() == 3) {
                     collect.get(i).setHumidityColor(entries.get("three").toString());
-                }else {
+                } else {
                     collect.get(i).setHumidityColor("");
                 }
             }
@@ -146,7 +147,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         List<NodeDataVo> list = new ArrayList();
 
         //判断是否是第一页且包含温湿度设备  是的话需要添加天气数据
-        if (pageNum==1&&Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)&&NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())){
+        if (pageNum == 1 && Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE) && NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType())) {
             pageSize++;
             WeatherDataVo nowWeather = findNowWeather();
             nowWeather.setHumiture(nowWeather.getHumidity());
@@ -173,6 +174,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     /**
      * 查询故障设备
+     *
      * @return 预警设备列表
      */
     @Override
@@ -188,15 +190,15 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     public Map<String, String> findWarningThreshold() {
         HashMap<String, String> thresholdMap = new HashMap<>();
         //缓存中获取预警升级阈值
-        Object oneToTwo = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo");
-        Object twoToThree = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+"twoToThree");
-        if (ToolUtil.isEmpty(oneToTwo)||ToolUtil.isEmpty(twoToThree)) {
+        Object oneToTwo = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN + "oneToTwo");
+        Object twoToThree = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN + "twoToThree");
+        if (ToolUtil.isEmpty(oneToTwo) || ToolUtil.isEmpty(twoToThree)) {
             //查询通用表的数据
             List<String> thresholds = earlyWarningDao.findWarningThreshold("warningThreshold");
             oneToTwo = thresholds.get(0);
-            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+"oneToTwo", oneToTwo);
+            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN + "oneToTwo", oneToTwo);
             twoToThree = thresholds.get(1);
-            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+"twoToThree", twoToThree);
+            redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN + "twoToThree", twoToThree);
         }
 
         thresholdMap.put("oneToTwo", oneToTwo.toString());
@@ -206,24 +208,25 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     /**
      * 查询预警值
+     *
      * @param nodeData
      * @return
      */
     @Override
-    public Map<String,String> findAlarmValue(NodeData nodeData) {
+    public Map<String, String> findAlarmValue(NodeData nodeData) {
         //该设备需要预警的字段
         String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), nodeData.getSiteType());
         //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         //如果是仓间设备
-        if (NodeConstant.NODE_WARE_AREA.equals(nodeData.getSiteType())){
+        if (NodeConstant.NODE_WARE_AREA.equals(nodeData.getSiteType())) {
             //将位置路由转成map 然后再拼接kv 作为redis的对象名
             List<String> hashKeys = dataHandler.getHashKeys(nodeData.getSiteRoute());
             //判断缓存中存在该对象名 存在 获取 不存在 从数据库中向上查找 存到缓存中 并返回对象名
             String redisHashKey = dataHandler.putAlarmValueToCache(hashKeys, column[0]);
             //获取这些字段的预警值
-            setWarningColumn(column,map,redisHashKey);
-        }else {
+            setWarningColumn(column, map, redisHashKey);
+        } else {
             Boolean hasKey = redisTemplate.opsForHash().hasKey(CACHE_KEY_REDIS_MAINTAIN + nodeData.getMaintainStageId(), column[0]);
             //如果不存在
             if (!hasKey) {
@@ -235,7 +238,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                     try {
                         //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
                         //强制反射
-                        if (!field.getName().contains("ware")){
+                        if (!field.getName().contains("ware")) {
                             field.setAccessible(true);
                             redisTemplate.opsForHash().put("MAINTAIN_" + nodeData.getMaintainStageId(), field.getName(), field.get(alarmValueSettingVo));
                         }
@@ -245,50 +248,51 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 }
             }
             //获取这些字段的预警值
-            setWarningColumn(column,map,CACHE_KEY_REDIS_MAINTAIN  + nodeData.getMaintainStageId());
+            setWarningColumn(column, map, CACHE_KEY_REDIS_MAINTAIN + nodeData.getMaintainStageId());
         }
         GeneralSetting generalSetting = new GeneralSetting();
         generalSetting.setSettingKey("color");
         List<GeneralSetting> generalSettings = generalSettingDao.findGeneralSetting(generalSetting);
-        for (int i = 0; i <generalSettings.size() ; i++) {
-            map.put(generalSettings.get(i).getSettingName(),generalSettings.get(i).getSettingValue());
+        for (int i = 0; i < generalSettings.size(); i++) {
+            map.put(generalSettings.get(i).getSettingName(), generalSettings.get(i).getSettingValue());
         }
         return map;
     }
 
     /**
      * 设置预警等级
+     *
      * @param nodeDataVos 设备数据集
-     * @param nodeVos  设备集
-     * @param status 状态
+     * @param nodeVos     设备集
+     * @param status      状态
      * @return
      */
-    public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos , List<NodeVo> nodeVos ,Integer status) {
+    public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos, List<NodeVo> nodeVos, Integer status) {
         for (NodeVo nodeVo : nodeVos) {
             //TODO 获取缓存中该设备的数据 空调数据暂时没有 sql暂用只找仓间温湿度的数据
-            Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId());
+            Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN + nodeVo.getNodeId());
 
             NodeDataVo nodeDataVo;
-            if (!ToolUtil.isEmpty(data)){
+            if (!ToolUtil.isEmpty(data)) {
                 nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
-                NodeData nodeData =JSON.parseObject(data.toString(), NodeData.class);
-                if (!ToolUtil.isEmpty(nodeData.getFrequency())){
+                NodeData nodeData = JSON.parseObject(data.toString(), NodeData.class);
+                if (!ToolUtil.isEmpty(nodeData.getFrequency())) {
                     try {
                         //传输时间的时间戳
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                         long time = sdf.parse(nodeDataVo.getTransferTime()).getTime();
                         //当前时间和传输时间的差值
-                        long intervalTime = System.currentTimeMillis() -time;
+                        long intervalTime = System.currentTimeMillis() - time;
                         //根据频率求出丢包个数
-                        if (intervalTime/(nodeData.getFrequency()*1000)>0){
-                            if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
+                        if (intervalTime / (nodeData.getFrequency() * 1000) > 0) {
+                            /*if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
                                 nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
                             }else {
                                 if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
                                     nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
                                 }
-                            }
+                            }*/
                         }
 
                     } catch (ParseException e) {
@@ -296,14 +300,14 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                     }
                 }
                 nodeDataVos.add(nodeDataVo);
-            }else {
+            } else {
                 //如果设备数据不在缓存中
                 nodeDataVo = nodeDao.findNodeNowData(nodeVo.getNodeId(), NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName());
-                if (!ToolUtil.isEmpty(nodeDataVo)){
+                if (!ToolUtil.isEmpty(nodeDataVo)) {
                     //将该数据存放到缓存中
-                    redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId(),JSONObject.toJSONString(nodeDataVo));
+                    redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN + nodeVo.getNodeId(), JSONObject.toJSONString(nodeDataVo));
                     nodeDataVos.add(nodeDataVo);
-                }else {
+                } else {
                     nodeDataVo = new NodeDataVo();
                     nodeDataVo.setNodeId(nodeVo.getNodeId());
                     nodeDataVo.setType(nodeVo.getNodeType());
@@ -319,13 +323,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
         }
         //监控状态筛选 1.预警  2.正常
-        if (status==2){
+        if (status == 2) {
             nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-                    nodeDataVo.getAlertLevel() ==0
+                    nodeDataVo.getAlertLevel() == 0
             ).collect(Collectors.toList());
-        }else if (status==1){
+        } else if (status == 1) {
             nodeDataVos = nodeDataVos.stream().filter(nodeDataVo ->
-                    nodeDataVo.getAlertLevel() >0
+                    nodeDataVo.getAlertLevel() > 0
             ).collect(Collectors.toList());
         }
 
@@ -334,6 +338,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     /**
      * 查询当前天气数据
+     *
      * @return
      */
     @Override
@@ -341,7 +346,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         //从缓存中获取
         Object o = redisTemplate.opsForValue().get("MAINTAIN_WEATHER");
         //如果缓存中不存在
-        if (ToolUtil.isEmpty(o)){
+        if (ToolUtil.isEmpty(o)) {
             //从数据库中获取
             WeatherDataVo weatherDataVo = weatherDao.findNowWeather();
             //存放到缓存中
@@ -349,12 +354,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             return weatherDataVo;
         }
         //类型转换
-        WeatherDataVo weatherDataVo = JSONObject.parseObject(o.toString(),WeatherDataVo.class);
+        WeatherDataVo weatherDataVo = JSONObject.parseObject(o.toString(), WeatherDataVo.class);
         return weatherDataVo;
     }
 
     /**
      * 查询天气历史数据
+     *
      * @param monitorCondition
      * @return
      */
@@ -370,6 +376,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     /**
      * 查询天气数据 按天统计
+     *
      * @param monitorCondition
      * @return
      */
@@ -385,19 +392,19 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         paramTreeMap.forEach((k, value) -> {//过滤完后 求最大 最小 平均值
             HashMap<String, String> map = new HashMap();
             //温度最大值
-            map.put("max", value.stream().map(WeatherDataVo::getTemp).max(Double::compareTo).get()+"");
+            map.put("max", value.stream().map(WeatherDataVo::getTemp).max(Double::compareTo).get() + "");
             //温度最小值
-            map.put("min", value.stream().map(WeatherDataVo::getTemp).min(Double::compareTo).get()+"");
+            map.put("min", value.stream().map(WeatherDataVo::getTemp).min(Double::compareTo).get() + "");
             //温度平均值
-            map.put("avg", value.stream().mapToDouble(WeatherDataVo::getTemp).average().getAsDouble()+"");
+            map.put("avg", value.stream().mapToDouble(WeatherDataVo::getTemp).average().getAsDouble() + "");
             //湿度最大值
-            map.put("humitureMax", value.stream().map(WeatherDataVo::getHumidity).max(Double::compareTo).get()+"");
+            map.put("humitureMax", value.stream().map(WeatherDataVo::getHumidity).max(Double::compareTo).get() + "");
             //湿度最小值
-            map.put("humitureMin", value.stream().map(WeatherDataVo::getHumidity).min(Double::compareTo).get()+"");
+            map.put("humitureMin", value.stream().map(WeatherDataVo::getHumidity).min(Double::compareTo).get() + "");
             //湿度平均值
-            map.put("humitureAvg", value.stream().mapToDouble(WeatherDataVo::getHumidity).average().getAsDouble()+"");
-            map.put("date",k);
-            map.put("humitureDate",k);
+            map.put("humitureAvg", value.stream().mapToDouble(WeatherDataVo::getHumidity).average().getAsDouble() + "");
+            map.put("date", k);
+            map.put("humitureDate", k);
             historyGraphData.add(map);
         });
         return historyGraphData;
@@ -405,39 +412,41 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
 
     /**
      * 向缓存添加预警颜色
+     *
      * @return
      */
     @Override
-    public Map putCacheWarningColor(){
+    public Map putCacheWarningColor() {
         Map entries = redisTemplate.opsForHash().entries(GENERAL_SETTING_VALUE + "COLOR");
-        if (ToolUtil.isEmpty(entries)){
+        if (ToolUtil.isEmpty(entries)) {
             GeneralSetting generalSetting = new GeneralSetting();
             generalSetting.setSettingKey("color");
             List<GeneralSetting> generalSettings = generalSettingDao.findGeneralSetting(generalSetting);
             entries = new HashMap();
-            entries.put("one",generalSettings.get(0).getSettingValue());
-            entries.put("two",generalSettings.get(1).getSettingValue());
-            entries.put("three",generalSettings.get(2).getSettingValue());
+            entries.put("one", generalSettings.get(0).getSettingValue());
+            entries.put("two", generalSettings.get(1).getSettingValue());
+            entries.put("three", generalSettings.get(2).getSettingValue());
         }
         return entries;
     }
 
     /**
      * 给map设置统一的返回键one two three 代表预警等级颜色  upper1 upper2 upper3 lower代表预警阈值 upperTwo1 代表湿度1一级阈值
+     *
      * @param column
      * @param map
      * @param redisHashKey
      */
-    public void setWarningColumn(String[] column ,Map<String,String> map,String redisHashKey){
+    public void setWarningColumn(String[] column, Map<String, String> map, String redisHashKey) {
         for (int i = 0; i < column.length; i++) {
-            if (i<4){
-                String value = "upper"+(3-i);
-                value = value.equals("upper0")? "lower" :value;
-                map.put(value,Objects.requireNonNull(redisTemplate.opsForHash().get(redisHashKey, column[i]))+"");
-            }else {
-                String value = "upperTwo"+(7-i);
-                value = value.equals("upperTwo0")? "lowerTwo" :value;
-                map.put(value,Objects.requireNonNull(redisTemplate.opsForHash().get(redisHashKey, column[i]))+"");
+            if (i < 4) {
+                String value = "upper" + (3 - i);
+                value = value.equals("upper0") ? "lower" : value;
+                map.put(value, Objects.requireNonNull(redisTemplate.opsForHash().get(redisHashKey, column[i])) + "");
+            } else {
+                String value = "upperTwo" + (7 - i);
+                value = value.equals("upperTwo0") ? "lowerTwo" : value;
+                map.put(value, Objects.requireNonNull(redisTemplate.opsForHash().get(redisHashKey, column[i])) + "");
             }
         }
     }

@@ -4,7 +4,7 @@ spring:
   application:
     name: rpzh-function
   cloud:
-    nacos:  # 注册中心地址
+    nacos: # 注册中心地址
       discovery:
         server-addr: 10.46.150.170:11808,10.46.150.171:11809,10.46.150.172:11810
       config: # 配置中心地址
@@ -100,15 +100,15 @@ ribbon:
 # mqtt 连接配置
 mqtt:
   host: tcp://10.46.150.170
-  port: 1883
+  port: 7426
   qos: 0
   timeout: 2000
   keepalive: 20
   rx-topic: maintain/#
   tx-topic: applicationserver/#
   client-id: rpiot-client-${random.uuid}
-  username: admin
-  password: admin1234.
+  #username: admin
+  #password: admin1234.
 rocketmq:
   name-server: 10.46.150.172:9876
   topic: messageTopic # mq主题
@@ -119,7 +119,7 @@ node:
   voltage: 3.0
   signalStrength: -15
 time:
-  cron : 0 0/2 0 * * *
+  cron: 0 0/2 0 * * *
 
 pagehelper:
   auto-runtime-dialect: true
