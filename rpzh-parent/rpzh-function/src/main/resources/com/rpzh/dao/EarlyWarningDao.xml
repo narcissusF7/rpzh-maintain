@@ -102,7 +102,7 @@
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null"> node_id,</if>
         <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">node_type,</if>
         <if test="earlyWarning.warningVal != '' and earlyWarning.warningVal != null">warning_val,warning_time,</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_time_one,warning_time_one,</if>
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one,warning_time_one,</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two,warning_time_two,</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three,warning_time_three,</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade,</if>
