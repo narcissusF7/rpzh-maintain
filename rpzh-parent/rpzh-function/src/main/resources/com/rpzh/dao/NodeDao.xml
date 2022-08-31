@@ -720,4 +720,25 @@
     <select id="findEnterStackNodeId" resultType="java.lang.String">
         select node_id from tb_node where status = 1
     </select>
+    <select id="findNodeByOne" resultType="com.rpzh.vo.NodeVo">
+        SELECT id                             id,
+               node_id                        nodeId,
+               node_type                      nodeType,
+               STATUS                         status,
+               gather_site                    gatherSite,
+               stack                          stack,
+               site_type                      siteType,
+               site_id                        siteId,
+               site_x                         siteX,
+               site_y                         siteY,
+               site_z                         siteZ,
+               site_route                     siteRoute,
+               into_stack_time                intoStackTime,
+               created_time                   createdTime,
+               created_user                   createdUser,
+               last_updated_time              lastUpdateTime,
+               last_updated_user              lastUpdateUser,
+               stack_id                       stackId
+               from tb_node where node_id =#{nodeId}
+    </select>
 </mapper>

@@ -67,6 +67,9 @@ public class DataHandler {
     @Autowired
     IdWorker idWorker;
 
+    @Autowired
+    MaterialDao materialDao;
+
     @Value("${node.voltage}")
     Double voltage;
     @Value("${node.signalStrength}")
@@ -160,9 +163,43 @@ public class DataHandler {
         //通过设备id找到对应的设备
         Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN_CACHE_NODE + parseData.getNodeId());
 
-        NodeVo nodeVo = getNodeVo(cacheNodeData,parseData.getNodeId());
+//        NodeVo nodeVo = getNodeVo(cacheNodeData,parseData.getNodeId());
+        NodeVo nodeVo;
+        //缓存中改设备是否为空
+        if (ToolUtil.isEmpty(cacheNodeData)) {
+            //从数据库中获取
+            nodeVo = nodeDao.findNodeByOne(parseData.getNodeId());
+            //如果设备处于是解垛状态  数据不做任何处理
+            if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
+                return;
+            }
+            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+            //如果这个垛位存在养护计划
+            if (ToolUtil.isNotEmpty(maintainPlanVo)){
+                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
+            }else {
+                //不存在养护计划
+                //根据丢包个数判断需要循环几次
+                int loopCount = parseData.getPacketLossNum() > 2 ? 2 : parseData.getPacketLossNum();
+                //根据丢包个数处理
+                for (int i = loopCount; i >= 0; --i) {
+                    //将需要存到数据库中的数据放到NodeData中
+                    NodeData nodeData = new NodeData(parseData, nodeVo, i);
+                    nodeData.setAlertLevel(0);
+                    //向数据库插入当前数据
+                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
+                    //最后一条数据需要存放到redis中
+                    if (i==0){
+                        redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(),JSON.toJSONString(nodeData));
+                    }
+                }
+                return;
+            }
+        }else {
+            nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);
+        }
         //如果设备处于是解垛状态  数据不做任何处理
-        if (ToolUtil.isEmpty(nodeVo)||!nodeVo.getStatus().equals("1")){
+        if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
             return;
         }
 

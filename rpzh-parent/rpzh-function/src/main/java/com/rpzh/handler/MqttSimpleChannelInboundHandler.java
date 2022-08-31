@@ -60,7 +60,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
                 //缓存中的帧计数器
                 int oldfCnt = Integer.parseInt(redisFcnt.toString());
                 //相减的值-1为丢包个数
-                parseData.setPacketLossNum(nowfCnt-oldfCnt);
+                parseData.setPacketLossNum(nowfCnt-oldfCnt-1);
             }else {
 
                 parseData.setPacketLossNum(0);

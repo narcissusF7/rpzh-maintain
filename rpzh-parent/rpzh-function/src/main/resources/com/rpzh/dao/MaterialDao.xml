@@ -31,4 +31,8 @@ material_code as materialCode,
     <select id="findAllMaterialCodes" resultType="java.lang.String">
         select distinct material_code from tb_material
     </select>
+    <select id="findMaterialCodeByStackId" resultType="java.lang.String">
+        select LISTAGG(to_char(material_code), ',') WITHIN GROUP ( ORDER BY id)
+                       listagg from TB_MATERIAL where STACK_ID =#{stackId}
+    </select>
 </mapper>

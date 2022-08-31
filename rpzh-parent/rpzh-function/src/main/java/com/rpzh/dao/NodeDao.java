@@ -256,4 +256,6 @@ public interface NodeDao {
     List<String> findAllNodeHistory(@Param("begin") Date begin, @Param("end") Date end);
 
     List<String> findEnterStackNodeId();
+
+    NodeVo findNodeByOne(@Param("nodeId") String nodeId);
 }

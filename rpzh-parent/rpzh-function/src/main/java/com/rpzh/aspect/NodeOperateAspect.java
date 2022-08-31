@@ -72,11 +72,16 @@ public class NodeOperateAspect {
         List<NodeDto> nodeDtos1 =  nodeDao.findNodeVos(nodeDto.getIds());
         for (int i = 0; i < nodeDtos1.size(); i++) {
             setValue("unbindStack",nodeDtos1.get(i),"设备"+nodeDtos1.get(i).getNodeId() +"从"+nodeDtos1.get(i).getGatherSite()+"解垛",username,nodeOperationDtos);
+            redisTemplate.delete("MAINTAIN_CACHE_NODE_"+nodeDtos1.get(i).getNodeId());
+            redisTemplate.delete("MAINTAIN_"+nodeDtos1.get(i).getNodeId());
+            redisTemplate.delete("RPZH_MAINTAIN_FCNT_"+nodeDtos1.get(i).getNodeId());
+
         }
 
         if (nodeOperationDtos.size()>0){
             operationService.insertNodeOperation(nodeOperationDtos);
         }
+
     }
 
 
