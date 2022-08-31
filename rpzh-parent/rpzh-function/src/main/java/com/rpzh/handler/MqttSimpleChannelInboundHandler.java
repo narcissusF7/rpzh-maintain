@@ -55,16 +55,18 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
             //获取缓存中的帧计数器
             Object redisFcnt = redisUtil.get(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"));
             if (ToolUtil.isNotEmpty(redisFcnt)){
-                //当前的真计数器
+                //当前的帧计数器
                 int nowfCnt = Integer.parseInt(map.get("fCnt").toString());
                 //缓存中的帧计数器
                 int oldfCnt = Integer.parseInt(redisFcnt.toString());
+                //相减的值-1为丢包个数
                 parseData.setPacketLossNum(nowfCnt-oldfCnt);
             }else {
-                //将帧计数器放置到缓存中
-                redisUtil.set(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"),map.get("fCnt"));
+
                 parseData.setPacketLossNum(0);
             }
+            //将帧计数器放置到缓存中
+            redisUtil.set(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"),map.get("fCnt"));
                 dataHandler.handlerData(parseData);
         }
     }

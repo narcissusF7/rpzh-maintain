@@ -328,7 +328,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         wareAreaDto.setUpdateUser(username);
         String principalName = wareAreaDto.getPrincipalName();
         if (ToolUtil.isNotEmpty(principalName)) {
-            wareAreaDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+            if (principalName.contains("(")){
+                wareAreaDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+            }else {
+                wareAreaDto.setPrincipalName(principalName);
+            }
+
         }
 
         int updateFlag = warehouseDao.updateWarearea(wareAreaDto);
