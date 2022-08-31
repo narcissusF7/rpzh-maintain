@@ -94,6 +94,21 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!--db2数据库驱动-->
+        <dependency>
+            <groupId>com.ibm.db2</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>11.1.4.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ibm.db2</groupId>
+            <artifactId>db2jcc_license_cu</artifactId>
+            <version>11.1.4.4</version>
+        </dependency>
+
+
+
         <!--oracle数据库-->
         <dependency>
             <groupId>com.oracle</groupId>

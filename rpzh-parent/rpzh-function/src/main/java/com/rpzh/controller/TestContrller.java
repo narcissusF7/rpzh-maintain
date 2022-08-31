@@ -3,6 +3,7 @@ package com.rpzh.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.PestMonitoringDao;
+import com.rpzh.dao.TestDb2Dao;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.PestBoardDto;
 import com.rpzh.entity.ExcelUtils;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,6 +72,9 @@ public class TestContrller{
 
     @Autowired
     DataReportService dataReportService;
+
+    @Autowired
+    private TestDb2Dao testDb2Dao;
 
     @ApiOperation(value = "测试用例方法", tags = "测试用例方法")
     @PostMapping("/one")
@@ -337,6 +342,14 @@ public class TestContrller{
             pestMonitoringDao.addPestBoard(pestBoardDto);
         }
         return new Result<>(true, StatusCode.OK, "addPestBoard");
+    }
+
+
+    //http://10.46.150.170:16900/maintain/test/testdb2
+    @RequestMapping("/testdb2")
+    public List<Map> testdb2(){
+        List<Map> mapList = testDb2Dao.findCount();
+        return mapList;
     }
 
 
