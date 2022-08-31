@@ -304,6 +304,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                     redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN+nodeVo.getNodeId(),JSONObject.toJSONString(nodeDataVo));
                     nodeDataVos.add(nodeDataVo);
                 }else {
+                    nodeDataVo = new NodeDataVo();
+                    nodeDataVo.setNodeId(nodeVo.getNodeId());
+                    nodeDataVo.setType(nodeVo.getNodeType());
+                    nodeDataVo.setAlertLevel(0);
+                    nodeDataVo.setGatherSite(nodeVo.getGatherSite());
+                    nodeDataVo.setTransferTime("--");
+                    nodeDataVos.add(nodeDataVo);
                     continue;
                 }
 

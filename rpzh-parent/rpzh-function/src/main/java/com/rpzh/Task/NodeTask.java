@@ -1,6 +1,10 @@
 package com.rpzh.Task;
 
+import com.rpzh.dao.EarlyWarningDao;
 import com.rpzh.dao.NodeDao;
+import com.rpzh.entity.ToolUtil;
+import com.rpzh.pojo.EarlyWarning;
+import com.rpzh.vo.EarlyWarningVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,6 +19,9 @@ public class NodeTask {
 
     @Autowired
     private NodeDao nodeDao;
+
+    @Autowired
+    private EarlyWarningDao earlyWarningDao;
 
     /**
      * 用来查询丢包是否
@@ -43,7 +50,11 @@ public class NodeTask {
         //如果存在未收到数据的入垛设备 则判定为设备故障
         if (enterStackNodeIds.size()>0){
             enterStackNodeIds.forEach(nodeId->{
+                EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(nodeId, "03");
+                if (ToolUtil.isEmpty(earlyWarningVo)){
+                    EarlyWarning earlyWarning = new EarlyWarning();
 
+                }
             });
         }
 

@@ -326,9 +326,9 @@
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
 
         <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            SELECT t.id as id , t.nodeId as nodeId,t.stackId as stackId, t.nodeType as nodeType from (
+            SELECT t.id as id , t.nodeId as nodeId,t.stackId as stackId, t.nodeType as nodeType,gather_site gatherSite from (
         </if>
-        select id id,node_id nodeId,stack_id stackId ,node_type nodeType from tb_node tnode
+        select id id,node_id nodeId,stack_id stackId ,node_type nodeType ,gather_site gatherSite from tb_node tnode
         <where>
             <if test="monitorCondition.pidRoute!=null and monitorCondition.pidRoute!=''">
                 and site_route like concat(concat('%', #{monitorCondition.pidRoute}),'%')
@@ -493,7 +493,8 @@
         SELECT
         node_id AS nodeId,
         site_route siteRoute,
-        node_type nodeType
+        node_type nodeType,
+        gather_site gatherSite
         FROM
         tb_node
         WHERE
