@@ -36,6 +36,8 @@ public interface EarlyWarningDao {
 
     Integer misreport(@Param("id") Integer id);
 
+    Integer findTaskId(@Param("id") Integer id);
+
     Integer updateWarningType(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
     List<Map> findWarningCountByDay(@Param("ids") List<Integer> ids, @Param("dateType") String dateType);
@@ -60,7 +62,7 @@ public interface EarlyWarningDao {
 
     List<Map> findWarningDataWarningTypeIsNotOne(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    int updateTackId(@Param("affirm") String affirm, @Param("taskId")String taskId, @Param("dealTime") String dealTime);
+    int updateTackId(@Param("affirm") String affirm, @Param("taskId")String taskId, @Param("dealTime") String dealTime, @Param("principal") String principal);
 
     Map<String, String> findColor();
 
