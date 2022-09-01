@@ -521,12 +521,14 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         earlyWarningDto.setStartTime(month.get("startTime"));
         earlyWarningDto.setEndTime(month.get("endTime"));
         List<Integer> ids = earlyWarningDao.findIdsByWarning(earlyWarningDto).stream().map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
-        Map<String, String> color = earlyWarningDao.findColor();
-        earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningType(ids,ids.size(),warningType);
-        earlyWarningVos.forEach(earlyWarningVo -> {
-            earlyWarningVo.setNodeName(getNodeType(earlyWarningVo.getNodeType()));
-            earlyWarningVo.setColor(getColor(earlyWarningVo.getWarningGrade(), color).get("color"));
-        });
+        if(ToolUtil.isNotEmpty(ids)) {
+            Map<String, String> color = earlyWarningDao.findColor();
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningType(ids, ids.size(), warningType);
+            earlyWarningVos.forEach(earlyWarningVo -> {
+                earlyWarningVo.setNodeName(getNodeType(earlyWarningVo.getNodeType()));
+                earlyWarningVo.setColor(getColor(earlyWarningVo.getWarningGrade(), color).get("color"));
+            });
+        }
         return new Result<>(true, StatusCode.OK, "查询成功",earlyWarningVos);
     }
 
