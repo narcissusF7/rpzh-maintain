@@ -50,7 +50,7 @@ hystrix:
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
 
 rocketmq:
-  name-server: 192.168.3.36:9876
+  name-server: 192.168.3.37:9876
   topic: messageTopic # mq主题
   producer:
     group: MessageGroup
