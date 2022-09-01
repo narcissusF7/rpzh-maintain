@@ -301,7 +301,8 @@ public class MaintainDataHandler {
 
             //过滤 选择环境温湿度设备 取温度
             double evnTemp = getAvg(nodeVos,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
-            if(evnTemp<10){
+
+            if(evnTemp>0){
                 //计算差值
                 double v = avg - evnTemp;
 
