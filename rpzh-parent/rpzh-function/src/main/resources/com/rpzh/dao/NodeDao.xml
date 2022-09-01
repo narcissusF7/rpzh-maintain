@@ -326,7 +326,7 @@
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
 
         <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            SELECT t.id as id , t.nodeId as nodeId,t.stackId as stackId, t.nodeType as nodeType,gather_site gatherSite from (
+            SELECT t.id as id , t.nodeId as nodeId,t.stackId as stackId, t.nodeType as nodeType,t.gatherSite gatherSite from (
         </if>
         select id id,node_id nodeId,stack_id stackId ,node_type nodeType ,gather_site gatherSite from tb_node tnode
         <where>
