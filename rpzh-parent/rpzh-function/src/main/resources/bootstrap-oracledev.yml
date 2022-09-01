@@ -43,7 +43,7 @@ spring:
           password: root
           driver-class-name: oracle.jdbc.driver.OracleDriver
         clickhouse:
-          url: jdbc:clickhouse://183.250.89.188:8123/default
+          url: jdbc:clickhouse://192.168.3.37:8123/default
           username: default
           password:
           driver-class-name: ru.yandex.clickhouse.ClickHouseDriver

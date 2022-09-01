@@ -28,7 +28,7 @@ spring:
       max-request-size: 10MB   #文件传输大小
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@192.168.3.36:1521:helowin
+    url: jdbc:oracle:thin:@192.168.3.37:1521:helowin
     username: RPZH_FUNCTION
     password: root
 
