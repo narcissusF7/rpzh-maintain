@@ -96,52 +96,52 @@
     <insert id="insertAlarmSettingTemplateStage">
         insert into tb_setting_template_stage
         (
-        <if test="alarmValueSettingDto.stackOxygenUpperOne != null and alarmValueSettingDto.stackOxygenUpperOne != ''">stack_oxygen_upper_one,</if>
-        <if test="alarmValueSettingDto.stackOxygenUpperTwo != null and alarmValueSettingDto.stackOxygenUpperTwo != ''">stack_oxygen_upper_two,</if>
-        <if test="alarmValueSettingDto.stackOxygenUpperThree != null and alarmValueSettingDto.stackOxygenUpperThree != ''">stack_oxygen_upper_three,</if>
-        <if test="alarmValueSettingDto.stackOxygenLower != null and alarmValueSettingDto.stackOxygenLower != ''">stack_oxygen_lower,</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperOne != null and alarmValueSettingDto.tempCoreChipUpperOne != ''">temp_core_chip_upper_one,</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperTwo != null and alarmValueSettingDto.tempCoreChipUpperTwo != ''">temp_core_chip_upper_two,</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperThree != null and alarmValueSettingDto.tempCoreChipUpperThree != ''">temp_core_chip_upper_three,</if>
-        <if test="alarmValueSettingDto.tempCoreChipLower != null and alarmValueSettingDto.tempCoreChipLower != ''">temp_core_chip_lower,</if>
-        <if test="alarmValueSettingDto.stackTempUpperOne != null and alarmValueSettingDto.stackTempUpperOne != ''">stack_temp_upper_one,</if>
-        <if test="alarmValueSettingDto.stackTempUpperTwo != null and alarmValueSettingDto.stackTempUpperTwo != ''">stack_temp_upper_two,</if>
-        <if test="alarmValueSettingDto.stackTempUpperThree != null and alarmValueSettingDto.stackTempUpperThree != ''">stack_temp_upper_three,</if>
-        <if test="alarmValueSettingDto.stackTempLower != null and alarmValueSettingDto.stackTempLower != ''">stack_temp_lower,</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperOne != null and alarmValueSettingDto.stackMoistureUpperOne != ''">stack_moisture_upper_one,</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperTwo != null and alarmValueSettingDto.stackMoistureUpperTwo != ''">stack_moisture_upper_two,</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperThree != null and alarmValueSettingDto.stackMoistureUpperThree != ''">stack_moisture_upper_three,</if>
-        <if test="alarmValueSettingDto.stackMoistureLower != null and alarmValueSettingDto.stackMoistureLower != ''">stack_moisture_lower,</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempOne != null and alarmValueSettingDto.coreTempHighEnvTempOne != ''">core_temp_high_env_temp_one,</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">core_temp_high_env_temp_two,</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">core_temp_high_env_temp_three,</if>
-        <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp,</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperOne>=0">stack_oxygen_upper_one,</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperTwo>=0">stack_oxygen_upper_two,</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperThree>=0">stack_oxygen_upper_three,</if>
+        <if test="alarmValueSettingDto.stackOxygenLower>=0">stack_oxygen_lower,</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperOne>=0">temp_core_chip_upper_one,</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperTwo>=0">temp_core_chip_upper_two,</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperThree>=0">temp_core_chip_upper_three,</if>
+        <if test="alarmValueSettingDto.tempCoreChipLower>=0">temp_core_chip_lower,</if>
+        <if test="alarmValueSettingDto.stackTempUpperOne>=0">stack_temp_upper_one,</if>
+        <if test="alarmValueSettingDto.stackTempUpperTwo>=0">stack_temp_upper_two,</if>
+        <if test="alarmValueSettingDto.stackTempUpperThree>=0">stack_temp_upper_three,</if>
+        <if test="alarmValueSettingDto.stackTempLower>=0">stack_temp_lower,</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperOne>=0">stack_moisture_upper_one,</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperTwo>=0">stack_moisture_upper_two,</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperThree>=0">stack_moisture_upper_three,</if>
+        <if test="alarmValueSettingDto.stackMoistureLower>=0">stack_moisture_lower,</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempOne>=0">core_temp_high_env_temp_one,</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempTwo>=0">core_temp_high_env_temp_two,</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempThree>=0">core_temp_high_env_temp_three,</if>
+        <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">core_temp_low_env_temp,</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases,</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">alarm_template_stage_id,</if>
         updated_time,update_user
         )
         values
         (
-        <if test="alarmValueSettingDto.stackOxygenUpperOne != null and alarmValueSettingDto.stackOxygenUpperOne != ''">#{alarmValueSettingDto.stackOxygenUpperOne},</if>
-        <if test="alarmValueSettingDto.stackOxygenUpperTwo != null and alarmValueSettingDto.stackOxygenUpperTwo != ''">#{alarmValueSettingDto.stackOxygenUpperTwo},</if>
-        <if test="alarmValueSettingDto.stackOxygenUpperThree != null and alarmValueSettingDto.stackOxygenUpperThree != ''">#{alarmValueSettingDto.stackOxygenUpperThree},</if>
-        <if test="alarmValueSettingDto.stackOxygenLower != null and alarmValueSettingDto.stackOxygenLower != ''">#{alarmValueSettingDto.stackOxygenLower},</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperOne != null and alarmValueSettingDto.tempCoreChipUpperOne != ''">#{alarmValueSettingDto.tempCoreChipUpperOne},</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperTwo != null and alarmValueSettingDto.tempCoreChipUpperTwo != ''">#{alarmValueSettingDto.tempCoreChipUpperTwo},</if>
-        <if test="alarmValueSettingDto.tempCoreChipUpperThree != null and alarmValueSettingDto.tempCoreChipUpperThree != ''">#{alarmValueSettingDto.tempCoreChipUpperThree},</if>
-        <if test="alarmValueSettingDto.tempCoreChipLower != null and alarmValueSettingDto.tempCoreChipLower != ''">#{alarmValueSettingDto.tempCoreChipLower},</if>
-        <if test="alarmValueSettingDto.stackTempUpperOne != null and alarmValueSettingDto.stackTempUpperOne != ''">#{alarmValueSettingDto.stackTempUpperOne},</if>
-        <if test="alarmValueSettingDto.stackTempUpperTwo != null and alarmValueSettingDto.stackTempUpperTwo != ''">#{alarmValueSettingDto.stackTempUpperTwo},</if>
-        <if test="alarmValueSettingDto.stackTempUpperThree != null and alarmValueSettingDto.stackTempUpperThree != ''">#{alarmValueSettingDto.stackTempUpperThree},</if>
-        <if test="alarmValueSettingDto.stackTempLower != null and alarmValueSettingDto.stackTempLower != ''">#{alarmValueSettingDto.stackTempLower},</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperOne != null and alarmValueSettingDto.stackMoistureUpperOne != ''">#{alarmValueSettingDto.stackMoistureUpperOne},</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperTwo != null and alarmValueSettingDto.stackMoistureUpperTwo != ''">#{alarmValueSettingDto.stackMoistureUpperTwo},</if>
-        <if test="alarmValueSettingDto.stackMoistureUpperThree != null and alarmValueSettingDto.stackMoistureUpperThree != ''">#{alarmValueSettingDto.stackMoistureUpperThree},</if>
-        <if test="alarmValueSettingDto.stackMoistureLower != null and alarmValueSettingDto.stackMoistureLower != ''">#{alarmValueSettingDto.stackMoistureLower},</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempOne != null and alarmValueSettingDto.coreTempHighEnvTempOne != ''">#{alarmValueSettingDto.coreTempHighEnvTempOne},</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
-        <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
-        <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperOne>=0">#{alarmValueSettingDto.stackOxygenUpperOne},</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperTwo>=0">#{alarmValueSettingDto.stackOxygenUpperTwo},</if>
+        <if test="alarmValueSettingDto.stackOxygenUpperThree>=0">#{alarmValueSettingDto.stackOxygenUpperThree},</if>
+        <if test="alarmValueSettingDto.stackOxygenLower>=0">#{alarmValueSettingDto.stackOxygenLower},</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperOne>=0">#{alarmValueSettingDto.tempCoreChipUpperOne},</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperTwo>=0">#{alarmValueSettingDto.tempCoreChipUpperTwo},</if>
+        <if test="alarmValueSettingDto.tempCoreChipUpperThree>=0">#{alarmValueSettingDto.tempCoreChipUpperThree},</if>
+        <if test="alarmValueSettingDto.tempCoreChipLower>=0">#{alarmValueSettingDto.tempCoreChipLower},</if>
+        <if test="alarmValueSettingDto.stackTempUpperOne>=0">#{alarmValueSettingDto.stackTempUpperOne},</if>
+        <if test="alarmValueSettingDto.stackTempUpperTwo>=0">#{alarmValueSettingDto.stackTempUpperTwo},</if>
+        <if test="alarmValueSettingDto.stackTempUpperThree>=0">#{alarmValueSettingDto.stackTempUpperThree},</if>
+        <if test="alarmValueSettingDto.stackTempLower>=0">#{alarmValueSettingDto.stackTempLower},</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperOne>=0">#{alarmValueSettingDto.stackMoistureUpperOne},</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperTwo>=0">#{alarmValueSettingDto.stackMoistureUpperTwo},</if>
+        <if test="alarmValueSettingDto.stackMoistureUpperThree>=0">#{alarmValueSettingDto.stackMoistureUpperThree},</if>
+        <if test="alarmValueSettingDto.stackMoistureLower>=0">#{alarmValueSettingDto.stackMoistureLower},</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempOne>=0">#{alarmValueSettingDto.coreTempHighEnvTempOne},</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempTwo>=0">#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
+        <if test="alarmValueSettingDto.coreTempHighEnvTempThree>=0">#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
+        <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">#{alarmValueSettingDto.alarmValueSettingId},</if>
         sysdate,#{alarmValueSettingDto.updateUser}
@@ -245,26 +245,26 @@ FROM tb_general_setting where rownum = 1
     <update id="updateAlarmSettingTemplateStage">
         update tb_setting_template_stage
         <set>
-            <if test="alarmValueSettingDto.stackOxygenUpperOne != null and alarmValueSettingDto.stackOxygenUpperOne != ''">stack_oxygen_upper_one=#{alarmValueSettingDto.stackOxygenUpperOne},</if>
-            <if test="alarmValueSettingDto.stackOxygenUpperTwo != null and alarmValueSettingDto.stackOxygenUpperTwo != ''">stack_oxygen_upper_two=#{alarmValueSettingDto.stackOxygenUpperTwo},</if>
-            <if test="alarmValueSettingDto.stackOxygenUpperThree != null and alarmValueSettingDto.stackOxygenUpperThree != ''">stack_oxygen_upper_three=#{alarmValueSettingDto.stackOxygenUpperThree},</if>
-            <if test="alarmValueSettingDto.stackOxygenLower != null and alarmValueSettingDto.stackOxygenLower != ''">stack_oxygen_lower=#{alarmValueSettingDto.stackOxygenLower},</if>
-            <if test="alarmValueSettingDto.tempCoreChipUpperOne != null and alarmValueSettingDto.tempCoreChipUpperOne != ''">temp_core_chip_upper_one=#{alarmValueSettingDto.tempCoreChipUpperOne},</if>
-            <if test="alarmValueSettingDto.tempCoreChipUpperTwo != null and alarmValueSettingDto.tempCoreChipUpperTwo != ''">temp_core_chip_upper_two=#{alarmValueSettingDto.tempCoreChipUpperTwo},</if>
-            <if test="alarmValueSettingDto.tempCoreChipUpperThree != null and alarmValueSettingDto.tempCoreChipUpperThree != ''">temp_core_chip_upper_three=#{alarmValueSettingDto.tempCoreChipUpperThree},</if>
-            <if test="alarmValueSettingDto.tempCoreChipLower != null and alarmValueSettingDto.tempCoreChipLower != ''">temp_core_chip_lower=#{alarmValueSettingDto.tempCoreChipLower},</if>
-            <if test="alarmValueSettingDto.stackTempUpperOne != null and alarmValueSettingDto.stackTempUpperOne != ''">stack_temp_upper_one=#{alarmValueSettingDto.stackTempUpperOne},</if>
-            <if test="alarmValueSettingDto.stackTempUpperTwo != null and alarmValueSettingDto.stackTempUpperTwo != ''">stack_temp_upper_two=#{alarmValueSettingDto.stackTempUpperTwo},</if>
-            <if test="alarmValueSettingDto.stackTempUpperThree != null and alarmValueSettingDto.stackTempUpperThree != ''">stack_temp_upper_three=#{alarmValueSettingDto.stackTempUpperThree},</if>
-            <if test="alarmValueSettingDto.stackTempLower != null and alarmValueSettingDto.stackTempLower != ''">stack_temp_lower=#{alarmValueSettingDto.stackTempLower},</if>
-            <if test="alarmValueSettingDto.stackMoistureUpperOne != null and alarmValueSettingDto.stackMoistureUpperOne != ''">stack_moisture_upper_one=#{alarmValueSettingDto.stackMoistureUpperOne},</if>
-            <if test="alarmValueSettingDto.stackMoistureUpperTwo != null and alarmValueSettingDto.stackMoistureUpperTwo != ''">stack_moisture_upper_two=#{alarmValueSettingDto.stackMoistureUpperTwo},</if>
-            <if test="alarmValueSettingDto.stackMoistureUpperThree != null and alarmValueSettingDto.stackMoistureUpperThree != ''">stack_moisture_upper_three=#{alarmValueSettingDto.stackMoistureUpperThree},</if>
-            <if test="alarmValueSettingDto.stackMoistureLower != null and alarmValueSettingDto.stackMoistureLower != ''">stack_moisture_lower=#{alarmValueSettingDto.stackMoistureLower},</if>
-            <if test="alarmValueSettingDto.coreTempHighEnvTempOne != null and alarmValueSettingDto.coreTempHighEnvTempOne != ''">core_temp_high_env_temp_one=#{alarmValueSettingDto.coreTempHighEnvTempOne},</if>
-            <if test="alarmValueSettingDto.coreTempHighEnvTempTwo != null and alarmValueSettingDto.coreTempHighEnvTempTwo != ''">core_temp_high_env_temp_two=#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
-            <if test="alarmValueSettingDto.coreTempHighEnvTempThree != null and alarmValueSettingDto.coreTempHighEnvTempThree != ''">core_temp_high_env_temp_three=#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
-            <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp = #{alarmValueSettingDto.coreTempLowEnvTemp},</if>
+            <if test="alarmValueSettingDto.stackOxygenUpperOne>=0">stack_oxygen_upper_one=#{alarmValueSettingDto.stackOxygenUpperOne},</if>
+            <if test="alarmValueSettingDto.stackOxygenUpperTwo>=0">stack_oxygen_upper_two=#{alarmValueSettingDto.stackOxygenUpperTwo},</if>
+            <if test="alarmValueSettingDto.stackOxygenUpperThree>=0">stack_oxygen_upper_three=#{alarmValueSettingDto.stackOxygenUpperThree},</if>
+            <if test="alarmValueSettingDto.stackOxygenLower>=0">stack_oxygen_lower=#{alarmValueSettingDto.stackOxygenLower},</if>
+            <if test="alarmValueSettingDto.tempCoreChipUpperOne>=0">temp_core_chip_upper_one=#{alarmValueSettingDto.tempCoreChipUpperOne},</if>
+            <if test="alarmValueSettingDto.tempCoreChipUpperTwo>=0">temp_core_chip_upper_two=#{alarmValueSettingDto.tempCoreChipUpperTwo},</if>
+            <if test="alarmValueSettingDto.tempCoreChipUpperThree>=0">temp_core_chip_upper_three=#{alarmValueSettingDto.tempCoreChipUpperThree},</if>
+            <if test="alarmValueSettingDto.tempCoreChipLower>=0">temp_core_chip_lower=#{alarmValueSettingDto.tempCoreChipLower},</if>
+            <if test="alarmValueSettingDto.stackTempUpperOne>=0">stack_temp_upper_one=#{alarmValueSettingDto.stackTempUpperOne},</if>
+            <if test="alarmValueSettingDto.stackTempUpperTwo>=0">stack_temp_upper_two=#{alarmValueSettingDto.stackTempUpperTwo},</if>
+            <if test="alarmValueSettingDto.stackTempUpperThree>=0">stack_temp_upper_three=#{alarmValueSettingDto.stackTempUpperThree},</if>
+            <if test="alarmValueSettingDto.stackTempLower>=0">stack_temp_lower=#{alarmValueSettingDto.stackTempLower},</if>
+            <if test="alarmValueSettingDto.stackMoistureUpperOne>=0">stack_moisture_upper_one=#{alarmValueSettingDto.stackMoistureUpperOne},</if>
+            <if test="alarmValueSettingDto.stackMoistureUpperTwo>=0">stack_moisture_upper_two=#{alarmValueSettingDto.stackMoistureUpperTwo},</if>
+            <if test="alarmValueSettingDto.stackMoistureUpperThree>=0">stack_moisture_upper_three=#{alarmValueSettingDto.stackMoistureUpperThree},</if>
+            <if test="alarmValueSettingDto.stackMoistureLower>=0">stack_moisture_lower=#{alarmValueSettingDto.stackMoistureLower},</if>
+            <if test="alarmValueSettingDto.coreTempHighEnvTempOne>=0">core_temp_high_env_temp_one=#{alarmValueSettingDto.coreTempHighEnvTempOne},</if>
+            <if test="alarmValueSettingDto.coreTempHighEnvTempTwo>=0">core_temp_high_env_temp_two=#{alarmValueSettingDto.coreTempHighEnvTempTwo},</if>
+            <if test="alarmValueSettingDto.coreTempHighEnvTempThree>=0">core_temp_high_env_temp_three=#{alarmValueSettingDto.coreTempHighEnvTempThree},</if>
+            <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">core_temp_low_env_temp = #{alarmValueSettingDto.coreTempLowEnvTemp},</if>
             <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases = #{alarmValueSettingDto.phases},</if>
             <if test="alarmValueSettingDto.updateUser != null and alarmValueSettingDto.updateUser != ''">update_user=#{alarmValueSettingDto.updateUser},</if>
             updated_time=#{alarmValueSettingDto.updatedTime}

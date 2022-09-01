@@ -21,6 +21,7 @@ import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.LogAlarmSettingVo;
 import com.rpzh.vo.WareAreaAlarmSettingVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -170,6 +171,8 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
 
     @Resource
     private WarehouseDao warehouseDao;
+    @Resource
+    private RedisTemplate redisTemplate;
     @Override
     public Result findWareAreaAlarmSettingById(WareAreaAlarmSettingDto wareAreaAlarmSettingDto) {
         Integer id = wareAreaAlarmSettingDto.getId();
@@ -189,11 +192,24 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         if(get(wareAreaAlarmSettingDto)){
             return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
+        System.out.println(wareAreaAlarmSettingDto.getWarehouseMoistureLower());
+        System.out.println(wareAreaAlarmSettingDto.getWarehouseOxygenLower());
+        System.out.println(wareAreaAlarmSettingDto.getWarehouseTempLower());
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         wareAreaAlarmSettingDto.setUpdateUser(updateUser);
         wareAreaAlarmSettingDto.setUpdatedTime(date);
+        WareAreaAlarmSettingVo wareAreaAlarmSetting = wareAreaAlarmSettingDao.findSiteIdAndSiteType(wareAreaAlarmSettingDto.getId());
         wareAreaAlarmSettingDao.updateWareAreaAlarmSetting(wareAreaAlarmSettingDto);
+        List<String> fieldNames = new ArrayList<>(Arrays.asList("warehouseOxygenUpperThree","warehouseOxygenUpperTwo","warehouseOxygenUpperOne","warehouseOxygenLower","warehouseTempUpperThree","warehouseTempUpperTwo","warehouseTempUpperOne","warehouseTempLower","warehouseMoistureUpperThree","warehouseMoistureUpperTwo","warehouseMoistureUpperOne","warehouseMoistureLower"));
+        List<Double> nodeDatas = new ArrayList<>(Arrays.asList(wareAreaAlarmSettingDto.getWarehouseOxygenUpperThree(),wareAreaAlarmSettingDto.getWarehouseOxygenUpperTwo(),wareAreaAlarmSettingDto.getWarehouseOxygenUpperOne(),wareAreaAlarmSettingDto.getWarehouseOxygenLower(),wareAreaAlarmSettingDto.getWarehouseTempUpperThree(),wareAreaAlarmSettingDto.getWarehouseTempUpperTwo(),
+                wareAreaAlarmSettingDto.getWarehouseTempUpperOne(),wareAreaAlarmSettingDto.getWarehouseTempLower(),wareAreaAlarmSettingDto.getWarehouseMoistureUpperThree(),wareAreaAlarmSettingDto.getWarehouseMoistureUpperTwo(),wareAreaAlarmSettingDto.getWarehouseMoistureUpperOne(),wareAreaAlarmSettingDto.getWarehouseMoistureLower()));
+        String key = "MAINTAIN_" + wareAreaAlarmSetting.getSiteType() + wareAreaAlarmSetting.getStackId();
+        if(redisTemplate.hasKey(key)){
+            for (int i = 0; i < fieldNames.size(); i++) {
+                redisTemplate.opsForHash().put(key, fieldNames.get(i), nodeDatas.get(i));
+            }
+        }
         LogAlarmSettingDto logAlarmSettingDto = new LogAlarmSettingDto();
         String ipAddr = IpUtils.getIpAddr(Objects.requireNonNull(IpUtils.getRequest()));
         logAlarmSettingDto.setLogDate(date);

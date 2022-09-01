@@ -29,36 +29,36 @@
     <insert id="insertWareAreaAlarmSetting">
     insert into tb_ware_area_alarm_setting
         (
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne != null and wareAreaAlarmSettingDto.warehouseOxygenUpperOne != ''">warehouse_oxygen_upper_one,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != null and wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != ''">warehouse_oxygen_upper_two,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree != null and wareAreaAlarmSettingDto.warehouseOxygenUpperThree != ''">warehouse_oxygen_upper_three,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenLower != null and wareAreaAlarmSettingDto.warehouseOxygenLower != ''">warehouse_oxygen_lower,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne != null and wareAreaAlarmSettingDto.warehouseTempUpperOne != ''">warehouse_temp_upper_one,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo != null and wareAreaAlarmSettingDto.warehouseTempUpperTwo != ''">warehouse_temp_upper_two,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree != null and wareAreaAlarmSettingDto.warehouseTempUpperThree != ''">warehouse_temp_upper_three,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempLower != null and wareAreaAlarmSettingDto.warehouseTempLower != ''">warehouse_temp_lower,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne != null and wareAreaAlarmSettingDto.warehouseMoistureUpperOne != ''">warehouse_moisture_upper_one,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != null and wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != ''">warehouse_moisture_upper_two,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree != null and wareAreaAlarmSettingDto.warehouseMoistureUpperThree != ''">warehouse_moisture_upper_three,</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureLower != null and wareAreaAlarmSettingDto.warehouseMoistureLower != ''">warehouse_moisture_lower,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne>=0">warehouse_oxygen_upper_one,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo>=0">warehouse_oxygen_upper_two,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree>=0">warehouse_oxygen_upper_three,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenLower>=0">warehouse_oxygen_lower,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne>=0">warehouse_temp_upper_one,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo>=0">warehouse_temp_upper_two,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree>=0">warehouse_temp_upper_three,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempLower>=0">warehouse_temp_lower,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne>=0">warehouse_moisture_upper_one,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo>=0">warehouse_moisture_upper_two,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree>=0">warehouse_moisture_upper_three,</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureLower>=0">warehouse_moisture_lower,</if>
         <if test="wareAreaAlarmSettingDto.stackId != null and wareAreaAlarmSettingDto.stackId != ''">site_id,</if>
         <if test="wareAreaAlarmSettingDto.siteType != null and wareAreaAlarmSettingDto.siteType != ''">site_type,</if>
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">pid_route,</if>
         created_time,create_user,updated_time,update_user
         )
         values(
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne != null and wareAreaAlarmSettingDto.warehouseOxygenUpperOne != ''">#{wareAreaAlarmSettingDto.warehouseOxygenUpperOne},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != null and wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != ''">#{wareAreaAlarmSettingDto.warehouseOxygenUpperTwo},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree != null and wareAreaAlarmSettingDto.warehouseOxygenUpperThree != ''">#{wareAreaAlarmSettingDto.warehouseOxygenUpperThree},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseOxygenLower != null and wareAreaAlarmSettingDto.warehouseOxygenLower != ''">#{wareAreaAlarmSettingDto.warehouseOxygenLower},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne != null and wareAreaAlarmSettingDto.warehouseTempUpperOne != ''">#{wareAreaAlarmSettingDto.warehouseTempUpperOne},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo != null and wareAreaAlarmSettingDto.warehouseTempUpperTwo != ''">#{wareAreaAlarmSettingDto.warehouseTempUpperTwo},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree != null and wareAreaAlarmSettingDto.warehouseTempUpperThree != ''">#{wareAreaAlarmSettingDto.warehouseTempUpperThree},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseTempLower != null and wareAreaAlarmSettingDto.warehouseTempLower != ''">#{wareAreaAlarmSettingDto.warehouseTempLower},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne != null and wareAreaAlarmSettingDto.warehouseMoistureUpperOne != ''">#{wareAreaAlarmSettingDto.warehouseMoistureUpperOne},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != null and wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != ''">#{wareAreaAlarmSettingDto.warehouseMoistureUpperTwo},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree != null and wareAreaAlarmSettingDto.warehouseMoistureUpperThree != ''">#{wareAreaAlarmSettingDto.warehouseMoistureUpperThree},</if>
-        <if test="wareAreaAlarmSettingDto.warehouseMoistureLower != null and wareAreaAlarmSettingDto.warehouseMoistureLower != ''">#{wareAreaAlarmSettingDto.warehouseMoistureLower},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne>=0">#{wareAreaAlarmSettingDto.warehouseOxygenUpperOne},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo>=0">#{wareAreaAlarmSettingDto.warehouseOxygenUpperTwo},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree>=0">#{wareAreaAlarmSettingDto.warehouseOxygenUpperThree},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseOxygenLower>=0">#{wareAreaAlarmSettingDto.warehouseOxygenLower},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne>=0">#{wareAreaAlarmSettingDto.warehouseTempUpperOne},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo>=0">#{wareAreaAlarmSettingDto.warehouseTempUpperTwo},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree>=0">#{wareAreaAlarmSettingDto.warehouseTempUpperThree},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseTempLower>=0">#{wareAreaAlarmSettingDto.warehouseTempLower},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne>=0">#{wareAreaAlarmSettingDto.warehouseMoistureUpperOne},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo>=0">#{wareAreaAlarmSettingDto.warehouseMoistureUpperTwo},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree>=0">#{wareAreaAlarmSettingDto.warehouseMoistureUpperThree},</if>
+        <if test="wareAreaAlarmSettingDto.warehouseMoistureLower>=0">#{wareAreaAlarmSettingDto.warehouseMoistureLower},</if>
         <if test="wareAreaAlarmSettingDto.stackId != null and wareAreaAlarmSettingDto.stackId != ''">#{wareAreaAlarmSettingDto.stackId},</if>
         <if test="wareAreaAlarmSettingDto.siteType != null and wareAreaAlarmSettingDto.siteType != ''">#{wareAreaAlarmSettingDto.siteType},</if>
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">#{wareAreaAlarmSettingDto.pidRoute},</if>
@@ -111,21 +111,25 @@
         tb_ware_area_alarm_setting
         where id = #{wareAreaAlarmSettingDto.id}
     </select>
+    <select id="findSiteIdAndSiteType" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
+        select site_id as stackId,site_type as siteType from tb_ware_area_alarm_setting
+        where id = #{id}
+    </select>
     <update id="updateWareAreaAlarmSetting">
         update tb_ware_area_alarm_setting
         <set>
-            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne != null and wareAreaAlarmSettingDto.warehouseOxygenUpperOne != ''">warehouse_oxygen_upper_one = #{wareAreaAlarmSettingDto.warehouseOxygenUpperOne},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != null and wareAreaAlarmSettingDto.warehouseOxygenUpperTwo != ''">warehouse_oxygen_upper_two = #{wareAreaAlarmSettingDto.warehouseOxygenUpperTwo},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree != null and wareAreaAlarmSettingDto.warehouseOxygenUpperThree != ''">warehouse_oxygen_upper_three=#{wareAreaAlarmSettingDto.warehouseOxygenUpperThree},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseOxygenLower != null and wareAreaAlarmSettingDto.warehouseOxygenLower != ''">warehouse_oxygen_lower = #{wareAreaAlarmSettingDto.warehouseOxygenLower},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne != null and wareAreaAlarmSettingDto.warehouseTempUpperOne != ''">warehouse_temp_upper_one = #{wareAreaAlarmSettingDto.warehouseTempUpperOne},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo != null and wareAreaAlarmSettingDto.warehouseTempUpperTwo != ''">warehouse_temp_upper_two = #{wareAreaAlarmSettingDto.warehouseTempUpperTwo},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree != null and wareAreaAlarmSettingDto.warehouseTempUpperThree != ''">warehouse_temp_upper_three = #{wareAreaAlarmSettingDto.warehouseTempUpperThree},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseTempLower != null and wareAreaAlarmSettingDto.warehouseTempLower != ''">warehouse_temp_lower = #{wareAreaAlarmSettingDto.warehouseTempLower},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne != null and wareAreaAlarmSettingDto.warehouseMoistureUpperOne != ''">warehouse_moisture_upper_one = #{wareAreaAlarmSettingDto.warehouseMoistureUpperOne},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != null and wareAreaAlarmSettingDto.warehouseMoistureUpperTwo != ''">warehouse_moisture_upper_two = #{wareAreaAlarmSettingDto.warehouseMoistureUpperTwo},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree != null and wareAreaAlarmSettingDto.warehouseMoistureUpperThree != ''">warehouse_moisture_upper_three = #{wareAreaAlarmSettingDto.warehouseMoistureUpperThree},</if>
-            <if test="wareAreaAlarmSettingDto.warehouseMoistureLower != null and wareAreaAlarmSettingDto.warehouseMoistureLower != ''">warehouse_moisture_lower = #{wareAreaAlarmSettingDto.warehouseMoistureLower},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperOne>=0">warehouse_oxygen_upper_one = #{wareAreaAlarmSettingDto.warehouseOxygenUpperOne},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperTwo>=0">warehouse_oxygen_upper_two = #{wareAreaAlarmSettingDto.warehouseOxygenUpperTwo},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseOxygenUpperThree>=0">warehouse_oxygen_upper_three=#{wareAreaAlarmSettingDto.warehouseOxygenUpperThree},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseOxygenLower>=0">warehouse_oxygen_lower = #{wareAreaAlarmSettingDto.warehouseOxygenLower},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseTempUpperOne>=0">warehouse_temp_upper_one = #{wareAreaAlarmSettingDto.warehouseTempUpperOne},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseTempUpperTwo>=0">warehouse_temp_upper_two = #{wareAreaAlarmSettingDto.warehouseTempUpperTwo},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseTempUpperThree>=0">warehouse_temp_upper_three = #{wareAreaAlarmSettingDto.warehouseTempUpperThree},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseTempLower>=0">warehouse_temp_lower = #{wareAreaAlarmSettingDto.warehouseTempLower},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperOne>=0">warehouse_moisture_upper_one = #{wareAreaAlarmSettingDto.warehouseMoistureUpperOne},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperTwo>=0">warehouse_moisture_upper_two = #{wareAreaAlarmSettingDto.warehouseMoistureUpperTwo},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseMoistureUpperThree>=0">warehouse_moisture_upper_three = #{wareAreaAlarmSettingDto.warehouseMoistureUpperThree},</if>
+            <if test="wareAreaAlarmSettingDto.warehouseMoistureLower>=0">warehouse_moisture_lower = #{wareAreaAlarmSettingDto.warehouseMoistureLower},</if>
             updated_time = #{wareAreaAlarmSettingDto.updatedTime} ,update_user = #{wareAreaAlarmSettingDto.updateUser}
         </set>
         where id = #{wareAreaAlarmSettingDto.id}

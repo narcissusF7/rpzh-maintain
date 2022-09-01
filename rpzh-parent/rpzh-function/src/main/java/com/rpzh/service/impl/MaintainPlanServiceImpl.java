@@ -955,12 +955,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
      * 向上查找仓间预警数值
      * */
     public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute){
-        List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
-        pidRoutes.sort((v1, v2) -> v2.compareTo(v1));
         AlarmValueSettingVo alarmValueSettingVo1=null;
         //从下往上找
-        for (String routes : pidRoutes) {
-            String[] route = routes.split(":");
+        List<String> pidRoutes = Arrays.asList(pidRoute.split(","));
+        for (int i = pidRoutes.size()-1; i >= 0; i--) {
+            String[] route = org.apache.commons.lang3.StringUtils.strip(pidRoutes.get(i), "[]").split(":");
             alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
             if(ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
                 break;
