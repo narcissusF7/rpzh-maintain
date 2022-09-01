@@ -277,6 +277,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //获取处理结果
         String dealResult = taskDto.getDealResult();
         String affirm = "";
+        String user = TokenDecode.getUserInfo().get("username");
         //如果处理结果为空,状态为处理中
         if (ToolUtil.isEmpty(dealResult)) {
             //设置任务状态为正在处理
@@ -297,8 +298,9 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //除了设备故障外的所有预警类型
         if(!"01,02,03".contains(type)){
             //更新到预警表中
-            int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime);
+            int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime,user);
         }
+        taskDto.setPrincipal(user);
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;
     }

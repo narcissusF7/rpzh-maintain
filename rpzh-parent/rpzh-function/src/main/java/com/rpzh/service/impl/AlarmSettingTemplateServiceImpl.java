@@ -61,27 +61,27 @@ public class AlarmSettingTemplateServiceImpl implements AlarmSettingTemplateServ
     public void createDefaultRule(){
         String createUser = TokenDecode.getUserInfo().get("username");
         if(alarmSettingTemplateDao.findAlarmSettingTemplateCount("默认模板-常规整仓养护方式")==0){
-            AlarmValueSettingDto alarmValueSettingInfo = new AlarmValueSettingDto("默认模板-常规整仓养护方式", "常规整仓养护方式",  createUser);
+            AlarmValueSettingDto alarmValueSettingInfo = new AlarmValueSettingDto("默认模板-常规整仓养护方式", "常规整仓养护方式",  createUser,0);
             alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingInfo);
             Integer alarmValueSettingId = alarmValueSettingInfo.getAlarmValueSettingId()+1;
-            AlarmValueSettingDto alarmValueSetting = new AlarmValueSettingDto(12d, 13d, 14d, 11d, 22d, 23d, 24d, 21d, 32d, 33d, 34d, 31d, 42d, 43d, 44d, 41d, 2d, 3d, 4d, 1d, "养护阶段", createUser,alarmValueSettingId);
+            AlarmValueSettingDto alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "养护阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
-            alarmValueSetting = new AlarmValueSettingDto(14d, 15d, 16d, 13d, 23d, 24d, 25d, 22d, 33d, 34d, 35d, 32d, 43d, 44d, 45d, 42d, 3d, 4d, 5d, 2d, "充氮杀虫阶段", createUser,alarmValueSettingId);
+            alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "充氮杀虫阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
-            alarmValueSetting = new AlarmValueSettingDto(16d, 17d, 18d, 15d, 24d, 25d, 26d, 23d, 34d, 35d, 36d, 33d, 44d, 45d, 46d, 43d, 4d, 5d, 6d, 3d, "磷化铝杀虫阶段", createUser,alarmValueSettingId);
+            alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "磷化铝杀虫阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
         }
         if(alarmSettingTemplateDao.findAlarmSettingTemplateCount("默认模板-机械调控方式")==0){
-            AlarmValueSettingDto alarmValueSettingInfo = new AlarmValueSettingDto("默认模板-机械调控方式", "机械调控方式",  createUser);
+            AlarmValueSettingDto alarmValueSettingInfo = new AlarmValueSettingDto("默认模板-机械调控方式", "机械调控方式",  createUser,0);
             alarmSettingTemplateDao.insertAlarmSettingTemplate(alarmValueSettingInfo);
             Integer alarmValueSettingId = alarmValueSettingInfo.getAlarmValueSettingId()+1;
-            AlarmValueSettingDto alarmValueSetting = new AlarmValueSettingDto(12d, 13d, 14d, 11d, 22d, 23d, 24d, 21d, 32d, 33d, 34d, 31d, 42d, 43d, 44d, 41d, 2d, 3d, 4d, 1d,  "养护阶段", createUser,alarmValueSettingId);
+            AlarmValueSettingDto alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "养护阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
-            alarmValueSetting = new AlarmValueSettingDto(14d, 15d, 16d, 13d, 23d, 24d, 25d, 22d, 33d, 34d, 35d, 32d, 43d, 44d, 45d, 42d, 3d, 4d, 5d, 2d,  "充氮杀虫阶段", createUser,alarmValueSettingId);
+            alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "充氮杀虫阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
-            alarmValueSetting = new AlarmValueSettingDto(16d, 17d, 18d, 15d, 24d, 25d, 26d, 23d, 34d, 35d, 36d, 33d, 44d, 45d, 46d, 43d, 4d, 5d, 6d, 3d, "磷化铝杀虫阶段", createUser,alarmValueSettingId);
+            alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d, "磷化铝杀虫阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
-            alarmValueSetting = new AlarmValueSettingDto(17d, 18d, 19d, 16d, 25d, 26d, 27d, 24d, 35d, 36d, 37d, 34d, 45d, 46d, 47d, 44d, 5d, 6d, 7d, 4d,  "充氮保质阶段", createUser,alarmValueSettingId);
+            alarmValueSetting = new AlarmValueSettingDto(2d, 5d, 7d, 0d, 65d, 68d, 71d, 0d, 32d, 33d, 34d, 0d, 32d, 33d, 34d, 0d, 3d, 4d, 5d, 2d,  "充氮保质阶段", createUser,alarmValueSettingId);
             alarmSettingTemplateDao.insertAlarmSettingTemplateStage(alarmValueSetting);
         }
     }

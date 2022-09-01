@@ -153,6 +153,9 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="delete">
+        DELETE FROM tb_task WHERE id = #{id}
+    </delete>
     <select id="findTaskDetail" resultMap="findTask">
   SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,
   deal_method,deal_result,evaluate,move_stack_target_siteroute,move_stack_target_name,target_siteid

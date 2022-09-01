@@ -83,14 +83,14 @@
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name,</if>
         <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">material_code,</if>
         <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">maintence_style,</if>
-        created_time,create_user,id
+        DEFAULT_FLAG,created_time,create_user,id
         )
         values
         (
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">#{alarmValueSettingDto.earlyWarningRuleName},</if>
         <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">#{alarmValueSettingDto.materialCode},</if>
         <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">#{alarmValueSettingDto.maintenceStyle},</if>
-        sysdate,#{alarmValueSettingDto.createUser},SEIINGTEMPLATE.CURRVAL
+        #{alarmValueSettingDto.flag},sysdate,#{alarmValueSettingDto.createUser},SEIINGTEMPLATE.CURRVAL
         )
     </insert>
     <insert id="insertAlarmSettingTemplateStage">
@@ -118,7 +118,6 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">core_temp_low_env_temp,</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">phases,</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">alarm_template_stage_id,</if>
-        <if test="alarmValueSettingDto.flag != null and alarmValueSettingDto.flag != ''">default_flag,</if>
         updated_time,update_user
         )
         values
@@ -145,7 +144,6 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp != null and alarmValueSettingDto.coreTempLowEnvTemp != ''">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">#{alarmValueSettingDto.alarmValueSettingId},</if>
-        <if test="alarmValueSettingDto.flag != null and alarmValueSettingDto.flag != ''">#{alarmValueSettingDto.flag},</if>
         sysdate,#{alarmValueSettingDto.updateUser}
         )
     </insert>
