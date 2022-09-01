@@ -297,7 +297,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //除了设备故障外的所有预警类型
         if(!"01,02,03".contains(type)){
             //更新到预警表中
-            int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime);
+            int i = earlyWarningDao.updateTackId(affirm, taskDto.getId(), nowTime,user);
         }
         int updateFlag = taskManagementDao.taskDispose(taskDto);
         return updateFlag;
