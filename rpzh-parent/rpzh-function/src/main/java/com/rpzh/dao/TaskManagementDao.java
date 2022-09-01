@@ -53,6 +53,11 @@ public interface TaskManagementDao {
      */
     int delTask(@Param("ids") Long[] ids);
 
+    /*
+    * 点击误报时删除相关任务
+    * */
+    int delete(@Param("id") Integer id);
+
     /**
      * 查询任务详情
      *

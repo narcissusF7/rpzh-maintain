@@ -238,6 +238,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     //误报
     @Override
     public Integer misreport(Integer id) {
+        Integer taskId = earlyWarningDao.findTaskId(id);
+        taskManagementDao.delete(taskId);//点击误报时删除相关任务
         return earlyWarningDao.misreport(id);
     }
 

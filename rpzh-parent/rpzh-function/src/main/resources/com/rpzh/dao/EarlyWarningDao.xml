@@ -9,7 +9,7 @@
     </select>
     <update id="updateTackId">
         UPDATE tb_early_warning
-        SET is_affirm = #{affirm}<if test="dealTime!=null and dealTime!=''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        SET is_affirm = #{affirm},principal = #{principal}<if test="dealTime!=null and dealTime!=''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
         WHERE task_id = #{taskId}
     </update>
     <update id="updateRepairId" parameterType="java.util.List">
@@ -149,14 +149,15 @@
     </select>
     <select id="findHistoryWarningData" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
-        t.node_id as nodeId,t.warning_type as warningType,t.warning_grade as warningGrade,t.warning_val as warningVal,t.principal as principalName,t.deal_time as dealTime,
-        t.stack_id as stackId,t.area_id as areaId,a.deal_method as dealSuggestion,a.deal_result as remark
-        FROM tb_early_warning t
-        left join tb_task a on a.id = t.task_id
+        t.node_id as nodeId,t.warning_type as warningType,t.warning_val as warningVal,t.principal as principalName,t.deal_time as dealTime,
+        t.stack_id as stackId,t.area_id as areaId,a.deal_method as dealSuggestion,a.deal_result as remark,
+        CASE WHEN instr(t.warning_grade, '3') > 0 THEN '3' WHEN instr(t.warning_grade, '2') > 0 and instr(t.warning_grade, '3') = 0 THEN '2' WHEN
+        instr(t.warning_grade, '1') > 0 and instr(t.warning_grade, '2') = 0 and instr(t.warning_grade, '3') = 0 THEN '1' END as warningGrade FROM tb_early_warning t left join tb_task a on a.id = t.task_id
         WHERE is_affirm = '0'
         <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and t.site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t.warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and t.warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and CASE WHEN instr(t.warning_grade, '3') > 0 THEN '3' WHEN instr(t.warning_grade, '2') > 0 and instr(t.warning_grade, '3') = 0 THEN '2' WHEN
+            instr(t.warning_grade, '1') > 0 and instr(t.warning_grade, '2') = 0 and instr(t.warning_grade, '3') = 0 THEN '1' END = #{earlyWarningDto.warningGrade}</if>
         <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t.node_id like concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t.principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
         <if test="earlyWarningDto.startTime != null">and t.deal_time >= #{earlyWarningDto.startTime}</if>
@@ -171,7 +172,8 @@
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
         <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= TO_DATE(#{earlyWarningDto.beginTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
         <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= TO_DATE(#{earlyWarningDto.finishTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and warning_grade = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
+            instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{earlyWarningDto.warningGrade}</if>
     </select>
     <select id="findWarningCountByDay" resultType="java.util.Map">
         SELECT count(is_affirm) as "sum",COALESCE(count(DECODE(TO_CHAR(is_affirm), '0' , 1, NULL)),0) AS "deal",count(is_affirm) - COALESCE(count(DECODE(TO_CHAR(is_affirm), '0' , 1, NULL)),0) AS "noDeal",
@@ -201,6 +203,9 @@
     <delete id="misreport">
         delete from tb_early_warning where id = #{id}
     </delete>
+    <select id="findTaskId" resultType="java.lang.Integer">
+        select task_id from tb_early_warning where id = #{id}
+    </select>
     <select id="findUndoStatusByNodeId" resultType="java.lang.Integer">
         select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm in (1,2)
     </select>
