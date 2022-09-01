@@ -224,7 +224,6 @@ public class MaintainDataHandler {
             //redis中的对象名
             redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
         }else {//垛内设备
-
             List<String> hashKeys = Arrays.asList(nodeVo.getMaintainStageId().toString());
 
             redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0], nodeVo.getAlermValueSettingId());
