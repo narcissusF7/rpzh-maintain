@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,8 +81,10 @@ public class ParseData{
         this.nodeId = map.get("deviceAddress").toString();
         List<Double> listData = new ArrayList<>();
         List<String> listDate = new ArrayList<>();
+        this.frequency = (int)Double.parseDouble(map.get("frequency").toString());
+        //当前的时间戳
+        long  timeNew =  System.currentTimeMillis();
         SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         switch (nodeType) {
             // 温度
             case "temp":
@@ -89,9 +92,10 @@ public class ParseData{
                 for (int i = 2; i >=0; --i) {
                     Double envData = ((BigDecimal)((List) map.get("tempData")).get(i)).doubleValue();
                     listData.add(envData);
-                    String tempDate = ((List<String>) map.get("tempDateTime")).get(i);
+                    long times = timeNew-((2-i)*frequency*1000L);
+                    String tempDate = sm.format( new Date(times));
 
-                    listDate.add(sm.format(simpleDateFormat.parse(tempDate)));
+                    listDate.add(tempDate);
                 }
                 break;
             // 氧气
@@ -99,8 +103,9 @@ public class ParseData{
                 for (int i = 2; i >=0; --i) {
                     Double envData = ((BigDecimal)((List) map.get("o2Data")).get(i)).doubleValue();
                     listData.add(envData);
-                    String o2Date = ((List<String>) map.get("o2DateTime")).get(i);
-                    listDate.add(sm.format(simpleDateFormat.parse(o2Date)));
+                    long times = timeNew-((2-i)*frequency*1000L);
+                    String o2Date = sm.format( new Date(times));
+                    listDate.add(o2Date);
                 }
                 this.nodeType = "01";
                 break;
@@ -109,14 +114,16 @@ public class ParseData{
                 for (int i = 2; i >=0; --i) {
                     List<BigDecimal> envData = (List<BigDecimal>)((List) map.get("envData")).get(i);
                     listData.add(envData.get(0).doubleValue());
-                    String envDate = ((List<String>) map.get("envDateTime")).get(i);
-                    listDate.add(sm.format(simpleDateFormat.parse(envDate)));
+                    long times = timeNew-((2-i)*frequency*1000L);
+                    String envDate = sm.format( new Date(times));
+                    listDate.add(envDate);
                 }
                 for (int i = 2; i >=0; --i) {
                     List<BigDecimal> envData = (List<BigDecimal>)((List) map.get("envData")).get(i);
                     listData.add(envData.get(1).doubleValue());
-                    String envDate = ((List<String>) map.get("envDateTime")).get(i);
-                    listDate.add(sm.format(simpleDateFormat.parse(envDate)));
+                    long times = timeNew-((2-i)*frequency*1000L);
+                    String envDate = sm.format( new Date(times));
+                    listDate.add(envDate);
                 }
                 this.nodeType = "03";
                 break;
@@ -126,7 +133,7 @@ public class ParseData{
 
         this.Data = listData;
         this.DateTime = listDate;
-        this.frequency = (int)Double.parseDouble(map.get("frequency").toString());
+
         this.voltage = Double.parseDouble(map.get("voltage").toString());
         this.signalStrength = (int)Double.parseDouble(map.get("snr").toString());
 

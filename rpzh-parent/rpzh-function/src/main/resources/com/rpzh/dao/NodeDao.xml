@@ -474,7 +474,7 @@
         <if test="nodeData.humiture!=null and nodeData.humiture!=''">#{nodeData.humiture},</if>
         <if test="nodeData.humidityLevel!=null and nodeData.humidityLevel!=''">#{nodeData.humidityLevel},</if>
         <if test="nodeData.oxygen!=null and nodeData.oxygen!=''">#{nodeData.oxygen},</if>
-        <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">now(),</if>
+        <if test="nodeData.transferTime!=null and nodeData.transferTime!=''">#{nodeData.transferTime},</if>
         <if test="nodeData.alertLevel!=null and nodeData.alertLevel!=''">#{nodeData.alertLevel},</if>
         <if test="nodeData.siteRoute!=null and nodeData.siteRoute!=''">#{nodeData.siteRoute},</if>
         <if test="nodeData.siteX!=null and nodeData.siteX!=''">#{nodeData.siteX},</if>

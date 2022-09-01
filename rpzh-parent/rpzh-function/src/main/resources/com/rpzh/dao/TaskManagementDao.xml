@@ -631,7 +631,7 @@
 </update>
     <select id="findMaintainPlan" resultType="int">
   SELECT count(1) FROM TB_MAINTAIN_PLAN
-  WHERE STACK_ID = #{siteId}
+  WHERE STACK_ID = #{siteId} and IS_END = 0
 </select>
     <select id="findSystemType" resultType="java.lang.String">
         SELECT task_num

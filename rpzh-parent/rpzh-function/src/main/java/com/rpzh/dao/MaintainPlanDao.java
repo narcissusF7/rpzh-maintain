@@ -117,4 +117,6 @@ public interface MaintainPlanDao {
     Integer findCountByMaintainPlan();
 
     List<Integer> findIds(@Param("maintainCountDto")MaintainCountDto maintainCountDto);
+
+    String findPrincipalById(@Param("maintainPlanId") Integer maintainPlanId);
 }

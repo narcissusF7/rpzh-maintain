@@ -179,6 +179,7 @@ public class MaintainDataHandler {
                 nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
                 nodeVo.setMaintainPlanId(maintainPlanVo.getId());
                 nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
             }else {
                 //不存在养护计划
                 //根据丢包个数判断需要循环几次
@@ -819,9 +820,20 @@ public class MaintainDataHandler {
             }else{
                 nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
             }
-            Map<String, Object> map = warehouseService.getSitePrincipal(siteType, nodeVo.getSiteId());
-            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),map.get("username")+"",DateUtil.offsetDay(DateUtil.date(), 3).toString());
+
+            String principal = "";
+
+            Integer maintainPlanId = nodeVo.getMaintainPlanId();
+            if (ToolUtil.isNotEmpty(maintainPlanId)){
+                principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
+            }else {
+                Map<String, Object> map = warehouseService.getSitePrincipal(siteType, nodeVo.getSiteId());
+                principal = map.get("username")+"";
+            }
+
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),principal,DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
+            taskDto.setCreatedUser("系统生成");
             taskManagementService.addDataHandTask(taskDto);
             Map taskMap = new HashMap();
             taskMap.put("principal",taskDto.getPrincipal());

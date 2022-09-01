@@ -497,4 +497,8 @@
     <select id="findCountByMaintainPlan" resultType="java.lang.Integer">
         select count(*) from tb_maintain_plan
     </select>
+    <select id="findPrincipalById" resultType="java.lang.String">
+        select PRINCIPAL_NAME from tb_maintain_plan where id = #{maintainPlanId}
+    </select>
+
 </mapper>
