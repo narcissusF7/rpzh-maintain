@@ -177,6 +177,8 @@ public class MaintainDataHandler {
             //如果这个垛位存在养护计划
             if (ToolUtil.isNotEmpty(maintainPlanVo)){
                 nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
+                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
+                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
             }else {
                 //不存在养护计划
                 //根据丢包个数判断需要循环几次
@@ -250,6 +252,7 @@ public class MaintainDataHandler {
                 //判断当前数据所属等级
                 int tempLevel = decideValue(data, list);
                 tempLevel = tempLevel==-1 ? 1:tempLevel;
+                nodeVo.setTempLevel(tempLevel);
                 //温度处理
                 earlyWarningHandle(nodeVo, tempLevel, parseData, data, "temp");
                 //设置温度预警等级
@@ -259,6 +262,7 @@ public class MaintainDataHandler {
 
                 //湿度数据等级
                 int humidityLevel = decideValue(data, list.subList(4, 8));
+                nodeVo.setHumidityLevel(humidityLevel);
                 humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
                 //湿度处理
                 earlyWarningHandle(nodeVo, humidityLevel, parseData, data, "humidity");

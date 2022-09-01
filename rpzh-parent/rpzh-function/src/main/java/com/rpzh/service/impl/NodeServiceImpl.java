@@ -477,6 +477,7 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
                 nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
             }
+
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
 
             nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
@@ -484,11 +485,14 @@ public class NodeServiceImpl implements NodeService {
                 nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
             }
 
-
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
+
+
             }
+
+
 
             return nodeDataVos;
         }
@@ -501,14 +505,41 @@ public class NodeServiceImpl implements NodeService {
      * @param map
      */
     public static void setWarningColor(NodeDataVo nodeDataVo,Map map){
-            if (nodeDataVo.getAlertLevel()==1){
-                nodeDataVo.setWarningColor(map.get("one").toString());
-            }else if (nodeDataVo.getAlertLevel()==2){
-                nodeDataVo.setWarningColor(map.get("two").toString());
-            }else if (nodeDataVo.getAlertLevel()==3){
-                nodeDataVo.setWarningColor(map.get("three").toString());
-            }else {
-                nodeDataVo.setWarningColor("");
+        if (nodeDataVo.getAlertLevel()==1){
+            nodeDataVo.setWarningColor(map.get("one").toString());
+        }else if (nodeDataVo.getAlertLevel()==2){
+            nodeDataVo.setWarningColor(map.get("two").toString());
+        }else if (nodeDataVo.getAlertLevel()==3){
+            nodeDataVo.setWarningColor(map.get("three").toString());
+        }else {
+            nodeDataVo.setWarningColor("");
+        }
+        //温湿度设备额外对添加温度湿度预警颜色
+        if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDataVo.getType())) {
+            if (ToolUtil.isEmpty(nodeDataVo.getTempLevel())) {
+                nodeDataVo.setTempLevel(0);
+            }
+            if (nodeDataVo.getTempLevel() == 1) {
+                nodeDataVo.setTempColor(map.get("one").toString());
+            } else if (nodeDataVo.getTempLevel() == 2) {
+                nodeDataVo.setTempColor(map.get("two").toString());
+            } else if (nodeDataVo.getTempLevel() == 3) {
+                nodeDataVo.setTempColor(map.get("three").toString());
+            } else {
+                nodeDataVo.setTempColor("");
+            }
+            if (ToolUtil.isEmpty(nodeDataVo.getHumidityLevel())) {
+                nodeDataVo.setHumidityLevel(0);
+            }
+            if (nodeDataVo.getHumidityLevel() == 1) {
+                nodeDataVo.setHumidityColor(map.get("one").toString());
+            } else if (nodeDataVo.getHumidityLevel() == 2) {
+                nodeDataVo.setHumidityColor(map.get("two").toString());
+            } else if (nodeDataVo.getHumidityLevel() == 3) {
+                nodeDataVo.setHumidityColor(map.get("three").toString());
+            } else {
+                nodeDataVo.setHumidityColor("");
+            }
         }
     }
 

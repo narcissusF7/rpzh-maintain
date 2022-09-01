@@ -232,19 +232,31 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             if (!hasKey) {
                 //数据库获取
                 AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findByMaintainStageId(nodeData.getMaintainStageId());
-                //获取所有的字段
-                Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
-                for (Field field : fields) {
-                    try {
-                        //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                        //强制反射
-                        if (!field.getName().contains("ware")) {
-                            field.setAccessible(true);
-                            redisTemplate.opsForHash().put("MAINTAIN_" + nodeData.getMaintainStageId(), field.getName(), field.get(alarmValueSettingVo));
+                if (ToolUtil.isNotEmpty(alarmValueSettingVo)){
+                    //获取所有的字段
+                    Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
+                    for (Field field : fields) {
+                        try {
+                            //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                            //强制反射
+                            if (!field.getName().contains("ware")) {
+                                field.setAccessible(true);
+                                redisTemplate.opsForHash().put("MAINTAIN_" + nodeData.getMaintainStageId(), field.getName(), field.get(alarmValueSettingVo));
+                            }
+                        } catch (IllegalAccessException exception) {
+                            exception.printStackTrace();
                         }
-                    } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
                     }
+                }else{
+                    map.put("one","");
+                    map.put("two","");
+                    map.put("three","");
+                    map.put("upper1","");
+                    map.put("upper2","");
+                    map.put("upper3","");
+                    map.put("lower","");
+
+                    return map;
                 }
             }
             //获取这些字段的预警值
