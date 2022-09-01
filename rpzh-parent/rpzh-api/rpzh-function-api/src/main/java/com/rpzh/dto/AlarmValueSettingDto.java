@@ -115,7 +115,7 @@ public class AlarmValueSettingDto {
     private String updateUser;
     //预警规则表id
     private Integer alarmValueSettingId;
-    private Integer flag;
+    private Integer flag=1;
     private Integer size=10;
     private Integer page=1;
     //开始时间
@@ -167,10 +167,11 @@ public class AlarmValueSettingDto {
       this.createUser = maintainPlanDto.getCreateUser();
       this.alarmValueSettingId = maintainPlanDto.getAlarmValueSettingId();
     }
-    public AlarmValueSettingDto(String earlyWarningRuleName,String maintenceStyle,String createUser){
+    public AlarmValueSettingDto(String earlyWarningRuleName,String maintenceStyle,String createUser,Integer flag){
         this.earlyWarningRuleName=earlyWarningRuleName;
         this.maintenceStyle=maintenceStyle;
         this.createUser = createUser;
+        this.flag = flag;
     }
     public AlarmValueSettingDto(Double stackOxygenUpperOne,Double stackOxygenUpperTwo,Double stackOxygenUpperThree,Double stackOxygenLower,
                                 Double stackMoistureUpperOne,Double stackMoistureUpperTwo,Double stackMoistureUpperThree,Double stackMoistureLower,
@@ -200,6 +201,5 @@ public class AlarmValueSettingDto {
         this.phases=phases;
         this.updateUser = updateUser;
         this.alarmValueSettingId = alarmValueSettingId;
-        this.flag = 0;
     }
 }
