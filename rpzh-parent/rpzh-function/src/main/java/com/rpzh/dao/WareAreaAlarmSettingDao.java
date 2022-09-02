@@ -23,6 +23,8 @@ public interface WareAreaAlarmSettingDao {
 
     WareAreaAlarmSettingVo findWareAreaAlarmSettingById(@Param("wareAreaAlarmSettingDto") WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
 
+    WareAreaAlarmSettingVo findSiteIdAndSiteType(@Param("id")Integer id);
+
     int updateWareAreaAlarmSetting(@Param("wareAreaAlarmSettingDto") WareAreaAlarmSettingDto wareAreaAlarmSettingDto);
 
     List<LogAlarmSettingVo> findLogData(@Param("logAlarmSettingDto") LogAlarmSettingDto logAlarmSettingDto);
