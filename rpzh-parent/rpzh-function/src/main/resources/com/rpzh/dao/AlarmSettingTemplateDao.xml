@@ -58,7 +58,7 @@
         <if test = "alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">and t2.material_code like concat(concat('%',#{alarmValueSettingDto.materialCode}),'%')</if>
         <if test = "alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">and t2.maintence_style = #{alarmValueSettingDto.maintenceStyle}</if>
         <if test = "alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">and t2.create_user = #{alarmValueSettingDto.createUser}</if>
-        order by t2.id desc
+        order by t1.updated_time desc
     </select>
     <delete id="deleteStage">
         delete from tb_setting_template_stage where

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -52,5 +53,19 @@ public class AppEarlyWarningController {
     public Result findAppWarningInfoByWarningType(@RequestParam(name =  "warningType",required = false) String warningType, @RequestParam(name = "warningGrade",required = false)String warningGrade){
         Map appMap = earlyWarningService.findAppWarningInfoByWarningType(warningType,warningGrade);
         return new Result<>(true, StatusCode.OK, "查询成功",appMap);
+    }
+
+    @PostMapping("/appMisreport")
+    @ApiOperation(value = "误报")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
+    })
+    @PreAuthorize("hasAnyAuthority('f:e:mp')")
+    public Result appMisreport(Integer id){
+        if(ToolUtil.isEmpty(id)){
+            return new Result<>(false, StatusCode.ERROR, "预警id不能为空");
+        }
+        earlyWarningService.misreport(id);
+        return new Result<>(true, StatusCode.OK, "处理误报成功");
     }
 }
