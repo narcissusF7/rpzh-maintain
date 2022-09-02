@@ -228,6 +228,7 @@ public class NodeOperateAspect {
                 redisTemplate.delete(MaintainDataHandler.MAINTAIN_CACHE_NODE+nodeIds.get(i));
             }
         }
+
         if (nodeDto.getSiteId()!=null){
             nodeOperationDto.setSiteId(nodeDto.getSiteId());
         }
