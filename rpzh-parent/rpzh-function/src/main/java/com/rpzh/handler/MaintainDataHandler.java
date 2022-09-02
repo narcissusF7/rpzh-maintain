@@ -180,23 +180,6 @@ public class MaintainDataHandler {
                 nodeVo.setMaintainPlanId(maintainPlanVo.getId());
                 nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
                 nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
-            }else {
-                //不存在养护计划
-                //根据丢包个数判断需要循环几次
-                int loopCount = parseData.getPacketLossNum() > 2 ? 2 : parseData.getPacketLossNum();
-                //根据丢包个数处理
-                for (int i = loopCount; i >= 0; --i) {
-                    //将需要存到数据库中的数据放到NodeData中
-                    NodeData nodeData = new NodeData(parseData, nodeVo, i);
-                    nodeData.setAlertLevel(0);
-                    //向数据库插入当前数据
-                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
-                    //最后一条数据需要存放到redis中
-                    if (i==0){
-                        redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(),JSON.toJSONString(nodeData));
-                    }
-                }
-                return;
             }
         }else {
             nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);
@@ -225,10 +208,27 @@ public class MaintainDataHandler {
             //redis中的对象名
             redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
         }else {//垛内设备
-            List<String> hashKeys = Arrays.asList(nodeVo.getMaintainStageId().toString());
-
-            redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0], nodeVo.getAlermValueSettingId());
-
+            if(ToolUtil.isEmpty(nodeVo.getMaintainStageId())){
+                //不存在养护计划
+                //根据丢包个数判断需要循环几次
+                int loopCount = parseData.getPacketLossNum() > 2 ? 2 : parseData.getPacketLossNum();
+                //根据丢包个数处理
+                for (int i = loopCount; i >= 0; --i) {
+                    //将需要存到数据库中的数据放到NodeData中
+                    NodeData nodeData = new NodeData(parseData, nodeVo, i);
+                    nodeData.setAlertLevel(0);
+                    //向数据库插入当前数据
+                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
+                    //最后一条数据需要存放到redis中
+                    if (i==0){
+                        redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(),JSON.toJSONString(nodeData));
+                    }
+                }
+                return;
+            }else {
+                List<String> hashKeys = Arrays.asList(nodeVo.getMaintainStageId().toString());
+                redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0], nodeVo.getAlermValueSettingId());
+            }
         }
 
         //从缓存中获取预警阈值
