@@ -12,8 +12,6 @@ import java.util.Map;
 
 @Mapper
 public interface EarlyWarningDao {
-    String findVal(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
-
     List<EarlyWarningVo> findEarlyWarningByWarningType(@Param("ids")List<Integer> ids,@Param("size")Integer size,@Param("warningType")String warningType);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
@@ -72,11 +70,19 @@ public interface EarlyWarningDao {
 
     String findMaxId(@Param("deviceId") String deviceId,@Param("warningType")String warningType);
 
-    List<Map> findThreeEarlyData(@Param("siteRoute") String siteRoute, @Param("warningType") String warningType);
+    List<Map> findSiteRoute();
 
-    List<String> findNodeFaultEarlyData(@Param("siteRoute") String siteRoute);
+    //根据位置路由查询未处理的预警信息
+    List<Map> findWarningInfoBySiteRoute(@Param("ids")List<String> ids,@Param("size")Integer size);
 
-    List<String> findSiteRoute();
+    //获取所有未处理的位置路由
+    Map findBySiteRoute(@Param("siteRoute") String siteRoute);
+
+    //查询垛位名称
+    String findStackById(@Param("stackId") String stackId);
+
+    //查询仓间名称
+    String findWareAreaById(@Param("areaId") String areaId);
 
     String findDeviceId(@Param("id") String id);
 

@@ -486,14 +486,6 @@
     <select id="findStackIdBySiteRoute" resultType="java.lang.Integer">
     select id from tb_stack where pid_route like concat(concat('%',#{siteRoute}),'%')
   </select>
-    <select id="findStackById" resultType="java.util.Map">
-    SELECT
-      ts.site_name as "siteName",
-      tm.principal_name as "name"
-    FROM tb_stack ts
-    inner join tb_maintain_plan tm on tm.stack_id = ts.id and tm.is_end = '0'
-    where ts.id = #{stackId}
-  </select>
     <select id="findCountByMaintainPlan" resultType="java.lang.Integer">
         select count(*) from tb_maintain_plan
     </select>

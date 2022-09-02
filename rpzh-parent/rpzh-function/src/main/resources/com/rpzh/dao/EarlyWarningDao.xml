@@ -51,9 +51,6 @@
     <select id="findWarningTypes" resultType="java.lang.String">
         select warning_type from tb_early_warning where id in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach> group by warning_type order by warning_type
     </select>
-    <select id="findVal" resultType="java.lang.String">
-        select warning_val  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = '3' and warning_type = #{warningType}
-    </select>
     <select id="findEarlyWarningByWarningType" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
         id AS id,
@@ -94,7 +91,7 @@
         AND is_affirm = #{affirm} and t.site_route = #{siteRoute}
     </select>
     <select id="findUndoCount" resultType="java.lang.Integer">
-        select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm = 2 and warning_type = #{warningType}
+        select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm in (1,2) and warning_type = #{warningType}
     </select>
     <insert id="insertWarning">
         insert into tb_early_warning (
@@ -164,7 +161,6 @@
         <if test="earlyWarningDto.endTime != null">and t.deal_time &lt;= #{earlyWarningDto.endTime}</if>
         ORDER BY t.deal_time desc
     </select>
-
     <select id="findIds" resultType="java.lang.Integer">
         SELECT id FROM tb_early_warning where 1=1
         <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%') </if>
@@ -218,15 +214,24 @@
         (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as "threeColor"
         from tb_general_setting where rownum =1
     </select>
-    <select id="findThreeEarlyData" resultType="java.util.Map">
-        select node_id as "nodeId",warning_val as "warningVal" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type = #{warningType} and warning_grade = '3'
+    <select id="findBySiteRoute" resultType="java.util.Map">
+        select distinct site_route as "route",principal as "principal",stack_id as "stackId",area_id as "areaId" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
-    <select id="findNodeFaultEarlyData" resultType="java.lang.String">
-        select node_id  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_type in ('01','02','03')
+    <select id="findSiteRoute" resultType="java.util.Map">
+        select LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) as "id",t.site_route as "siteRoute" from (select id,site_route from tb_early_warning where is_affirm = '2' and instr(warning_grade, '3') > 0
+        union select id,site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
-    <select id="findSiteRoute" resultType="java.lang.String">
-        select t.site_route from (select site_route from tb_early_warning where is_affirm = '2' and warning_grade = '3'
-        union select site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
+    <select id="findStackById" resultType="java.lang.String">
+    SELECT site_name  FROM tb_stack where id = #{stackId}
+  </select>
+    <select id = "findWareAreaById" resultType="java.lang.String">
+    select site_name from tb_ware_area where id = #{areaId}
+  </select>
+    <select id="findWarningInfoBySiteRoute" resultType="java.util.Map">
+        select warning_type as "warningType",node_id as "nodeId",
+        CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END as "warningVal"
+        from tb_early_warning where is_affirm = '2' <if test="size !=0">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach> </if>
     </select>
     <select id="findPestWarningCount" resultType="java.lang.Integer">
         select count(*) from tb_early_warning where node_id in (select pest_board_id from tb_pest_board where id in

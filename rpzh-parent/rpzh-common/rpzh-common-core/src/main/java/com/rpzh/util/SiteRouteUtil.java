@@ -49,4 +49,42 @@ public class SiteRouteUtil {
         }
         return null;
     }
+
+    /*
+    * 获取预警名称
+    * */
+    public static String getWarningName(String warningType){
+        switch (warningType){
+            case "01":
+                return "设备电量故障";
+            case "02":
+                return "设备信号强度故障";
+            case "03":
+                return "设备丢包故障";
+            case "04":
+                return "垛内甲虫预警";
+            case "05":
+                return "仓间甲虫预警";
+            case "06":
+                return "垛内氧气预警";
+            case "07":
+                return "仓间氧气预警";
+            case "08":
+                return "垛内温度预警";
+            case "09":
+                return "仓间温度预警";
+            case "10":
+                return "垛内湿度预警";
+            case "11":
+                return "仓间湿度预警";
+            case "12":
+                return "包芯温度预警";
+            case "13":
+                return "平均包芯高于环境预警";
+            case "14":
+                return "仓间粉螟预警";
+            default:
+                return "平均包芯低于环境预警";
+        }
+    }
 }

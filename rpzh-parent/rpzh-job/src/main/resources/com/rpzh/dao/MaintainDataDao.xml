@@ -1,56 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.MaintainDataDao">
-    <select id="findBySiteRoute" resultType="java.lang.String">
-        select site_route from tb_early_warning where is_affirm = '2' group by site_route
+    <select id="findBySiteRoute" resultType="java.util.Map">
+        select distinct site_route as "route",principal as "principal",stack_id as "stackId",area_id as "areaId" from tb_early_warning where is_affirm = '2'
     </select>
-    <select id="findCountEarly" resultType="java.lang.Integer">
-        select count(*) from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+    <select id="findStackById" resultType="java.lang.String">
+    SELECT site_name  FROM tb_stack where id = #{stackId}
+  </select>
+    <select id = "findWareAreaById" resultType="java.lang.String">
+    select site_name from tb_ware_area where id = #{areaId}
+  </select>
+    <select id="findWarningInfoBySiteRoute" resultType="java.util.Map">
+        select warning_type as "warningType",node_id as "nodeId",
+        CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END as "warningVal",
+        CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS "warningGrade"
+        from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
-    <select id="findCountWarningGrade" resultType="java.lang.Integer">
-        select count(1) from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
-    </select>
-    <select id="findEarlyData" resultType="java.lang.String">
-        select node_id  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade}
-        <if test="warningType != null and warningType != ''">and ${warningType}</if>
-    </select>
-    <select id="findVal" resultType="java.lang.String">
-        select warning_val  from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute} and warning_grade = #{warningGrade} and warning_type = #{warningType}
-    </select>
-    <select id="findStackById" resultType="java.util.Map">
-    SELECT
-      ts.site_name as "siteName",
-      tm.principal_name as "name"
-    FROM tb_stack ts
-    inner join tb_maintain_plan tm on tm.stack_id = ts.id and tm.is_end = '0'
-    where ts.id = #{stackId}
-  </select>
-    <select id = "findWareAreaPrincipalName" resultType="java.util.Map">
-    select
-      principal_name as "principalName",
-      site_name as "siteName",
-      floor_id as "floorId"
-    from tb_ware_area
-    where id = #{areaId}
-  </select>
-    <select id = "findFloorPrincipalName" resultType="java.util.Map">
-    select
-      principal_name as "principalName",
-      building_id as "buildingId"
-    from tb_floor
-    where id = #{floorId}
-  </select>
-    <select id = "findBuildingPrincipalName" resultType="java.util.Map">
-    select
-      principal_name as "principalName",
-      warehouse_id as "warehouseId"
-    from tb_building
-    where id = #{buildingId}
-  </select>
-    <select id = "findWarehousePrincipalName" resultType="java.lang.String">
-    select
-      principal_name as "principalName"
-    from tb_warehouse
-    where id = #{warehouseId}
-  </select>
 </mapper>
