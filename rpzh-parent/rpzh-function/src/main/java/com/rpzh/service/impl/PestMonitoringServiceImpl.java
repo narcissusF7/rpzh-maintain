@@ -94,10 +94,10 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //拼接成自己的路由id
         pestBoardDto.setSiteRoute(pestBoardDto.getSiteRoute() + ",[0" + siteLevel + ":" + pestBoardDto.getSiteId() + "]");
         //判断所在的垛位是否存在虫情板
-        if (siteLevel.equals("5")){
+        if (siteLevel ==5){
             int count = pestMonitoringDao.findCountBySiteRoute(pestBoardDto.getSiteRoute());
             if (count>0){
-                new Result(false, StatusCode.ERROR, "该位置已存在虫情板");
+                return new Result(false, StatusCode.ERROR, "该位置已存在虫情板");
             }
         }
         synchronized (this) {
