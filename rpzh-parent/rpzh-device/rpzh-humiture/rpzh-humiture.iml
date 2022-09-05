@@ -842,7 +842,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../../../../../../../../repositorytwo/com/mchange/c3p0/0.9.5.4/c3p0-0.9.5.4.jar!/" />
+          <root url="jar://D:/../../../../../../../../repositorytwo/com/mchange/c3p0/0.9.5.4/c3p0-0.9.5.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -860,7 +860,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../../../../../../../../../repositorytwo/com/zaxxer/HikariCP-java7/2.4.13/HikariCP-java7-2.4.13.jar!/" />
+          <root url="jar://D:/../../../../../../../../repositorytwo/com/zaxxer/HikariCP-java7/2.4.13/HikariCP-java7-2.4.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -1983,6 +1983,8 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.3" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.3.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security.oauth:spring-security-oauth2:2.3.4.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.3.6.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.3.6.RELEASE" level="project" />
@@ -1990,8 +1992,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-jwt:1.0.9.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
     <orderEntry type="module" module-name="rpzh-common-db" />
     <orderEntry type="library" name="Maven: tk.mybatis:mapper-spring-boot-starter:2.0.4" level="project" />
     <orderEntry type="library" name="Maven: tk.mybatis:mapper-core:1.0.5" level="project" />
