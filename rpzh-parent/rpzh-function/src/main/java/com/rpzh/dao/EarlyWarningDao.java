@@ -1,18 +1,20 @@
 package com.rpzh.dao;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Mapper
 public interface EarlyWarningDao {
-    List<EarlyWarningVo> findEarlyWarningByWarningType(@Param("ids")List<Integer> ids,@Param("size")Integer size,@Param("warningType")String warningType);
+    List<EarlyWarningVo> findEarlyWarningByWarningType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
+    List<EarlyWarningVo> findEarlyWarningByWarningFault(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
@@ -54,7 +56,7 @@ public interface EarlyWarningDao {
 
     Map<String,String> findNewTime(@Param("affirm") String affirm, @Param("warningType") String warningType, @Param("siteRoute") String siteRoute);
 
-    List<Map> findWarningDataWarningType(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute,@Param("warningType") String warningType);
+    List<Map> findWarningDataWarningType(@Param("affirm") String affirm, @Param("siteRoute") String siteRoute,@Param("warningType") String warningType,@Param("nodeType")String nodeType);
 
     List<Map> findsiteXYZByNodeIds(@Param("nodeIds")List<String> nodeIds);
 
@@ -99,4 +101,10 @@ public interface EarlyWarningDao {
     EarlyWarningVo findUndoEarlyWarningBySiteRoute(@Param("siteRoute") String siteRoute, @Param("warningType") String coreTempOverrunStackWarning);
 
     Integer findUndoStatusByNodeId(@Param("nodeId") String nodeId);
+
+    List<Map> findAppWarningInfoByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
+
+    Map findPestCount(@Param("nodeId")String nodeId);
+
+    String findAppPrincipalById(@Param("id")String id);
 }

@@ -18,6 +18,7 @@ import java.util.*;
  * 节点管理
  *
  * @Author liubc
+ * @Author liubc
  * @create 2022/3/3 10:58
  * @Description: good good study,day day up
  */
@@ -258,4 +259,6 @@ public interface NodeDao {
     List<String> findEnterStackNodeId();
 
     NodeVo findNodeByOne(@Param("nodeId") String nodeId);
+
+    List<String> findNodeBySiteRoute(@Param("siteRoute")String siteRoute,@Param("nodeType")String nodeType);
 }

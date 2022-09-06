@@ -192,9 +192,6 @@ public class WareAreaAlarmSettingServiceImpl implements WareAreaAlarmSettingServ
         if(get(wareAreaAlarmSettingDto)){
             return new Result(false, StatusCode.ERROR, "下限预警低于上限一级预警，上限一级预警低于上限二级预警，上限二级预警低于上限三级预警!");
         }
-        System.out.println(wareAreaAlarmSettingDto.getWarehouseMoistureLower());
-        System.out.println(wareAreaAlarmSettingDto.getWarehouseOxygenLower());
-        System.out.println(wareAreaAlarmSettingDto.getWarehouseTempLower());
         Date date = new Date();
         String updateUser = TokenDecode.getUserInfo().get("username");
         wareAreaAlarmSettingDto.setUpdateUser(updateUser);

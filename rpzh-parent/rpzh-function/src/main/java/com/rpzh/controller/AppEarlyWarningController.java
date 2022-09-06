@@ -51,6 +51,9 @@ public class AppEarlyWarningController {
             @ApiImplicitParam(name = "warningGrade", value = "预警等级:1:一级等级,2:二级等级,3:三级等级,4:全部", dataType = "String",required = true)
     })
     public Result findAppWarningInfoByWarningType(@RequestParam(name =  "warningType",required = false) String warningType, @RequestParam(name = "warningGrade",required = false)String warningGrade){
+        if(ToolUtil.isEmpty(warningType)){
+            return new Result<>(true, StatusCode.OK, "预警类型不能为空");
+        }
         Map appMap = earlyWarningService.findAppWarningInfoByWarningType(warningType,warningGrade);
         return new Result<>(true, StatusCode.OK, "查询成功",appMap);
     }
@@ -67,5 +70,22 @@ public class AppEarlyWarningController {
         }
         earlyWarningService.misreport(id);
         return new Result<>(true, StatusCode.OK, "处理误报成功");
+    }
+
+    @PostMapping("/findAppWarningInfoBySiteRoute")
+    @ApiOperation(value = "APP根据预警类型和位置查询预警详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "warningType", value = "预警类型:01:设备故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警," +
+                    "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "warningGrade", value = "预警等级:1:一级等级,2:二级等级,3:三级等级", dataType = "String",required = true),
+            @ApiImplicitParam(name = "siteRoute", value = "位置路由", required = true,dataType = "String"),
+            @ApiImplicitParam(name = "nowData", value = "当前值", dataType = "String",required = true),
+            @ApiImplicitParam(name = "warningTime", value = "预警时间", dataType = "String",required = true),
+            @ApiImplicitParam(name = "warningVal", value = "预警值", dataType = "String",required = true),
+            @ApiImplicitParam(name = "nodeType", value = "设备类型", dataType = "String",required = true),
+            @ApiImplicitParam(name = "id", value = "预警id", dataType = "String",required = true)
+    })
+    public Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
+        return null;
     }
 }

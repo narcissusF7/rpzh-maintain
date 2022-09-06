@@ -35,4 +35,6 @@ public interface EarlyWarningService {
     Map findAppWarningIndex();
 
     Map findAppWarningInfoByWarningType(String warningType, String warningGrade);
+
+    Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id);
 }

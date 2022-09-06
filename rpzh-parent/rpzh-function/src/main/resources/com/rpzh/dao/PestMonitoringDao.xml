@@ -248,13 +248,13 @@
     </select>
 
     <select id="findPestStackMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
-        select prewarning_value_one as upperOne
+        select prewarning_value_one as upperOne,prewarning_value_two as upperTwo,prewarning_value_three as upperThree
         from tb_pest_stack_monitor where site_route = #{pidRoute}
     </select>
     <select id="findPestMonitor" resultType="com.rpzh.vo.EarlyWarningVo">
-        select prewarning_value_one as "upperOne",
-               prewarning_value_two as "upperTwo",
-               prewarning_value_three as  "upperThree"
+        select prewarning_value_one as upperOne,
+               prewarning_value_two as upperTwo,
+               prewarning_value_three as  upperThree
         from tb_pest_monitor
     </select>
     <select id="findCountByPestBoradId" resultType="java.lang.Integer">

@@ -252,31 +252,31 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         String column = "";
         if(warningType.equals("06") || warningType.equals("08") || warningType.equals("10") || warningType.equals("12") || warningType.equals("13")){
             if(warningType.equals("06")){
-                column = "stack_oxygen_upper_one as upperOne,stack_oxygen_lower as lower";
+                column = "stack_oxygen_upper_one upperOne,stack_oxygen_upper_two upperTwo,stack_oxygen_upper_three upperThree,stack_oxygen_lower lower";
                 warningName = "垛内氧气";
             }else if(warningType.equals("08")){
-                column = "stack_temp_upper_one as upperOne,stack_temp_lower as lower";
+                column = "stack_temp_upper_one as upperOne,stack_temp_upper_two as upperTwo,stack_temp_upper_three as upperThree,stack_temp_lower as lower";
                 warningName = "垛内温度";
             }else if(warningType.equals("10")){
-                column = "stack_moisture_upper_one as upperOne,stack_moisture_lower as lower";
+                column = "stack_moisture_upper_one as upperOne,stack_moisture_upper_two as upperTwo,stack_moisture_upper_one as upperThree,stack_moisture_lower as lower";
                 warningName = "垛内湿度";
             }else if(warningType.equals("12")){
-                column = "temp_core_chip_upper_one as upperOne,temp_core_chip_lower as lower";
+                column = "temp_core_chip_upper_one as upperOne,temp_core_chip_upper_two as upperTwo,temp_core_chip_upper_three as upperThree,temp_core_chip_lower as lower";
                 warningName = "包芯温度";
             }else if(warningType.equals("13")){
-                column = "core_temp_high_env_temp_one as upperOne,core_temp_low_env_temp as lower";
+                column = "core_temp_high_env_temp_one as upperOne,core_temp_high_env_temp_two as upperTwo,core_temp_high_env_temp_three as upperThree,core_temp_low_env_temp as lower";
                 warningName = "平均包芯高于环境";
             }
             earlyWarningInfo = alarmValueSettingDao.findAlarmValueSettingByStackId(column,stackId);
         }else if(warningType.equals("07") || warningType.equals("09") || warningType.equals("11")){
             if(warningType.equals("07")){
-                column = "warehouse_oxygen_upper_one as upperOne,warehouse_oxygen_lower as lower";
+                column = "warehouse_oxygen_upper_one as upperOne,warehouse_oxygen_upper_two as upperTwo,warehouse_oxygen_upper_three as upperThree,warehouse_oxygen_lower as lower";
                 warningName = "仓间氧气";
             }else if(warningType.equals("09")){
-                column = "warehouse_temp_upper_one as upperOne,warehouse_temp_lower as lower";
+                column = "warehouse_temp_upper_one as upperOne,warehouse_temp_upper_two as upperThree,warehouse_temp_upper_three as upperThree,warehouse_temp_lower as lower";
                 warningName = "仓间温度";
             }else if(warningType.equals("11")){
-                column = "warehouse_moisture_upper_one as upperOne,warehouse_moisture_lower as lower";
+                column = "warehouse_moisture_upper_one as upperOne,warehouse_moisture_upper_two as upperTwo,warehouse_moisture_upper_three as upperThree,warehouse_moisture_lower as lower";
                 warningName = "仓间湿度";
             }
             List<String> pidRoutes = Arrays.asList(pidRoute.replaceAll("\\[","").replaceAll("\\]","").split(","));
@@ -291,25 +291,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
         }else {
             warningName = "虫数";
-            earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(pidRoute);
             String[] pidRoutes = pidRoute.split(",");
-            if (ToolUtil.isEmpty(earlyWarningInfo)) {
-                if (ToolUtil.isNotEmpty(stackId)) {
-                    pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3] + "," + pidRoutes[4];
-                    earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(pidRoute);
+            List<String> siteRoutes = Arrays.asList(pidRoute,pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3] + "," + pidRoutes[4],pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3],pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2],pidRoutes[0] + "," + pidRoutes[1]);
+            for (String siteRoute : siteRoutes) {
+                if (ToolUtil.isEmpty(earlyWarningInfo)) {
+                    earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(siteRoute);
+                    break;
                 }
-            }
-            if (ToolUtil.isEmpty(earlyWarningInfo)) {
-                pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3];
-                earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(pidRoute);
-            }
-            if (ToolUtil.isEmpty(earlyWarningInfo)) {
-                pidRoute = pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2];
-                earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(pidRoute);
-            }
-            if (ToolUtil.isEmpty(earlyWarningInfo)) {
-                pidRoute = pidRoutes[0] + "," + pidRoutes[1];
-                earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(pidRoute);
             }
             if (ToolUtil.isEmpty(earlyWarningInfo)) {
                 earlyWarningInfo = pestMonitoringDao.findPestMonitor();
@@ -522,10 +510,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map<String, Date> month = GetBetweenDayUtils.getMonth(earlyWarningDto.getStartTime(), earlyWarningDto.getEndTime());
         earlyWarningDto.setStartTime(month.get("startTime"));
         earlyWarningDto.setEndTime(month.get("endTime"));
-        List<Integer> ids = earlyWarningDao.findIdsByWarning(earlyWarningDto).stream().map((Map map) -> Integer.parseInt(map.get("id").toString())).collect(Collectors.toList());
-        if(ToolUtil.isNotEmpty(ids)) {
+        if("01".equals(warningType)){
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningFault(earlyWarningDto);
+        }else{
+            earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningType(earlyWarningDto);
+        }
+        if(ToolUtil.isNotEmpty(earlyWarningVos)) {
             Map<String, String> color = earlyWarningDao.findColor();
-            earlyWarningVos = earlyWarningDao.findEarlyWarningByWarningType(ids, ids.size(), warningType);
             earlyWarningVos.forEach(earlyWarningVo -> {
                 earlyWarningVo.setNodeName(getNodeType(earlyWarningVo.getNodeType()));
                 earlyWarningVo.setColor(getColor(earlyWarningVo.getWarningGrade(), color).get("color"));
@@ -542,6 +533,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         String pidRoute = earlyWarningDto.getPidRoute();
         Integer stackId = earlyWarningDto.getStackId();
         Integer areaId = earlyWarningDto.getAreaId();
+        String nodeType = earlyWarningDto.getNodeType();
         List<EarlyWarningVo> earlyWarningVos = new ArrayList<>();
         Map<String,Object> map1 = new HashMap<>();
         if(ToolUtil.isEmpty(warningType) || ToolUtil.isEmpty(isAffirm)){
@@ -551,7 +543,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
         earlyWarningDto.setBeginTime(time.get("startTime"));
         earlyWarningDto.setFinishTime(time.get("endTime"));
-        List<Map> warningNews  = earlyWarningDao.findWarningDataWarningType(isAffirm,pidRoute,warningType);
+        List<Map> warningNews  = earlyWarningDao.findWarningDataWarningType(isAffirm,pidRoute,warningType,nodeType);
         List<Map> warningDatas = new ArrayList<>();
         List<Map> warningInfos = new ArrayList<>();
         List<EarlyWarningVo> warningVos = new ArrayList<>();
@@ -562,11 +554,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             //最新报警时间
             Map<String, String> newInfo = earlyWarningDao.findNewTime(isAffirm, warningType, pidRoute);
             String principal = newInfo.get("principal");
-            map.put("warningTime", newInfo.get("time"));
-            map.put("warningName", typeMap.get("warningType"));
-            map.put("warningType", warningType);
-            map.put("taskId", taskManagementDao.findTaskId(pidRoute, warningType));
-            map.put("id",warningNews.get(0).get("id"));
+            map = getMap(Arrays.asList("warningTime","warningName","warningType","taskId","id"),Arrays.asList(newInfo.get("time"),typeMap.get("warningType"),warningType,taskManagementDao.findTaskId(pidRoute, warningType),warningNews.get(0).get("id")));
             Map<String, String> color = earlyWarningDao.findColor();
             if (ToolUtil.isNotEmpty(stackId)) {
                 map.put("materialCode", maintainPlanDao.findMaintainMaxIdByStackId(stackId));
@@ -576,18 +564,15 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
             EarlyWarningVo earlyWarningInfo = getEarlyWarningVo(warningType, pidRoute, stackId);
             for (Map warningData : warningNews) {
-                if (ToolUtil.isNotEmpty(stackId)) {
-                    warningData.put("stackId", stackId);
-                } else {
-                    warningData.put("areaId", areaId);
-                }
                 List<String> warningVals = new ArrayList<>();
                 int size = 0;
                 if ("01".equals(warningData.get("warningType")) || "02".equals(warningData.get("warningType")) || "03".equals(warningData.get("warningType"))) {
                     warningData.put("warningName", getWarningType("0" + warningData.get("warningType").toString()).get("warningType"));
                     warningData.put("deal", getWarningType("0" + warningData.get("warningType").toString()).get("deal"));
                     warningData.remove("warningVal");
-                    warningInfos.add(getMap(Arrays.asList("name", "warningTime", "warningVal"), Arrays.asList("故障报警",newInfo.get("time"), "故障")));
+                    if(warningInfos.size()==0) {
+                        warningInfos.add(getMap(Arrays.asList("name", "warningTime", "warningVal"), Arrays.asList("故障报警", newInfo.get("time"), "故障")));
+                    }
                 } else {
                     String warningName = earlyWarningInfo.getWarningName();
                     warningVals = Arrays.asList((warningName + "当前值:"+ warningData.get("warningVal").toString()).replaceAll(",",","+warningName + "当前值:").split(","));
@@ -831,6 +816,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return map;
     }
 
+    @Override
     public Map findAppWarningInfoByWarningType(String warningType, String warningGrade){
         Map<String, Object> map = new HashMap<>();
         if("04".equals(warningGrade)){
@@ -842,8 +828,106 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             map.put("warningInfo",new ArrayList<>());
             return map;
         }
-
+        List<Map> warningInfos = earlyWarningDao.findAppWarningInfoByWarningType(warningType, warningGrade);
+        for (Map warningInfo : warningInfos) {
+            List<String> principals = Arrays.asList(warningInfo.get("principal").toString().split(","));
+            String username = "";
+            for (int i = 0; i < principals.size(); i++) {
+                if(i==0){
+                    username = principals.get(i) +"/"+redisUtil.hget("USER_"+principals.get(i),"phonenumber").toString();
+                }else{
+                    username = username + ","+ principals.get(i) +"/"+redisUtil.hget("USER_"+principals.get(i),"phonenumber").toString();
+                }
+            }
+            warningInfo.put("username",username);
+            if("13".equals(warningType) || "19".equals(warningType)){
+                List<String> nodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"04");
+                Double coreTemp = 0d;
+                for (String nodeId : nodeIds) {
+                    coreTemp = coreTemp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId).toString());
+                }
+                List<String> nIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"03");
+                Double temp = 0d;
+                for (String nodeId : nIds) {
+                    temp = temp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"01").toString());
+                }
+                warningInfo.put("nowData",coreTemp/nodeIds.size() - temp/nIds.size());
+                warningInfo.put("nodeId",null);
+            } else {
+                List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
+                int i = Arrays.asList(warningInfo.get("grade").toString().split(",")).indexOf(warningInfo.get("warningGrade"));
+                String nodeId = nodeIds.get(i);
+                if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
+                    warningInfo.put("nodeName",getNodeType(warningInfo.get("nodeType").toString()));
+                    warningInfo.put("nodeId",null);
+                }else if("04".equals(warningType) || "05".equals(warningType) || "14".equals(warningType)){
+                    Map pestCount = earlyWarningDao.findPestCount(nodeId);
+                    if("04".equals(warningType) || "05".equals(warningType)){
+                        warningInfo.put("nowData",pestCount.get("beetle"));
+                    }else{
+                        warningInfo.put("nowData",pestCount.get("mealworm"));
+                    }
+                    warningInfo.put("nodeId",null);
+                }else{
+                    warningInfo.put("nodeId",null);
+                    if("06".equals(warningType) || "07".equals(warningType) || "12".equals(warningType)){
+                        warningInfo.put("nowData",redisUtil.hget("MAINTAIN_NODE_NEW",nodeId));
+                        if("12".equals(warningType) || "07".equals(warningType)){
+                            warningInfo.put("nodeId",nodeId);
+                        }
+                    }else if("08".equals(warningType) || "09".equals(warningType)){
+                        warningInfo.put("nowData",redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"01"));
+                    }else{
+                        warningInfo.put("nowData",redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"02"));
+                    }
+                }
+            }
+            warningInfo.remove("principal");
+            warningInfo.remove("grade");
+        }
+        map.put("warningInfo",warningInfos);
         map.put("count", appCount);
+        return map;
+    }
+
+    @Override
+    public Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
+        Map map = new HashMap();
+        String principal = earlyWarningDao.findAppPrincipalById(id);
+        List<String> principals = Arrays.asList(principal.split(","));
+        List<Map> userMap = new ArrayList<>();
+        for (String name : principals) {
+            Map<String, String> userName = new HashMap<>();
+            userName.put("username", (String)redisUtil.hget("USER_"+name,"nickname") + "(" + name + ")");
+            userName.put("roleName", (String)redisUtil.hget("USER_"+name,"roleName"));
+            userMap.add(userName);
+        }
+        map.put("userBase",userMap);
+        //if()
+        Map baseMap = new HashMap();
+        baseMap.put("warningGrade",warningGrade);
+        baseMap.put("warningVal",warningVal);
+        baseMap.put("warningTime",warningTime);
+        Integer stackId=null;
+        if(siteRoute.contains("05")){
+            stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
+            baseMap.put("siteName",warehouseDao.findStackById(stackId).getSiteName());
+        }else{
+            baseMap.put("siteName",warehouseDao.findWareArea(Integer.parseInt(siteRoute.split("04:")[1].split("]")[0])).getSiteName());
+        }
+        map.put("base",baseMap);
+        Map warningMap = new HashMap();
+        warningMap.put("nowData",nowData);
+        Map<String, String> color = earlyWarningDao.findColor();
+        EarlyWarningVo earlyWarningVo = getEarlyWarningVo(warningType, siteRoute, stackId);
+        warningMap.put("earlyWarningOne",earlyWarningVo.getUpperOne());
+        warningMap.put("oneColor",color.get("oneColor"));
+        warningMap.put("earlyWarningTwo",earlyWarningVo.getUpperTwo());
+        warningMap.put("twoColor",color.get("twoColor"));
+        warningMap.put("earlyWarningThree",earlyWarningVo.getUpperThree());
+        warningMap.put("threeColor",color.get("threeColor"));
+        warningMap.put("earlyWarningLow",earlyWarningVo.getLower());
+        map.put("warningMap", warningMap);
         return map;
     }
 }
