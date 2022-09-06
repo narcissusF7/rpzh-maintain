@@ -12,6 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import springfox.documentation.spring.web.json.Json;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Component
 public class WeatherTask {
 
@@ -28,6 +31,7 @@ public class WeatherTask {
      */
     @Scheduled(cron="${time.cron}")
     void insertWeatherData() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s = PortDataUtils.GetPortData(weatherUrl);
         JSONObject dataOfJson = JSONObject.parseObject(s); // json天气数据
         JSONObject nowWeather = JSONObject.parseObject(dataOfJson.getString("now"));
@@ -44,6 +48,7 @@ public class WeatherTask {
         weatherDataVo.setWeatherName(weatherName);
         weatherDataVo.setHumidity(humidity);
         weatherDataVo.setPrecip(precip);
+        weatherDataVo.setCreatedTime(sdf.format(new Date()));
 
         redisTemplate.opsForValue().set("MAINTAIN_WEATHER", JSON.toJSONString(weatherDataVo));
 
