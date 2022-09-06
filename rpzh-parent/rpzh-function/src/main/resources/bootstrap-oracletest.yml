@@ -1,0 +1,117 @@
+server:
+  port: 16900
+spring:
+  application:
+    name: rpzh-function
+  cloud:
+    nacos:  # 注册中心地址
+      discovery:
+        server-addr: 192.168.1.4:8898
+      config: # 配置中心地址
+        server-addr: 192.168.1.4:8898
+        # 配置文件格式
+        file-extension: yml
+  redis:
+    host: 192.168.1.4
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 32
+        max-idle: 32
+        min-idle: 0
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq: #RabbitMq配置
+    host: 192.168.1.3
+    port: 5672
+    password: guest
+    username: guest
+  #将druid自动配置剔除
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  datasource:
+    dynamic:
+      #默认这里选择默认数据
+      primary: oracle
+      strict: false
+      datasource:
+        #可以配置多个
+        oracle:
+          url: jdbc:oracle:thin:@192.168.1.3:1521:helowin
+          username: RPZH_FUNCTION
+          password: root
+          driver-class-name: oracle.jdbc.driver.OracleDriver
+        clickhouse:
+          url: jdbc:clickhouse://192.168.1.3:8123/default
+          username: default
+          password:
+          driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 10
+      min-idle: 10
+      max-active: 500
+      max-wait: 60000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 30000
+      validation-query: select 'x'
+      max-open-prepared-statements: 50
+      max-pool-prepared-statement-per-connection-size: 20
+      #druid不支持clickhouse需要将防火墙去掉
+      filters: config,stat
+  #  datasource:
+  #    driver-class-name: com.mysql.jdbc.Driver
+  #    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+  #    username: root
+  #    password: root
+logging:
+  level:
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+    root: info
+    org.springframework: info
+    com.rpzh.dao: DEBUG  #sql日志打印
+printTime:
+  cron: 0/10 * * * * ?
+
+#hystrix 配置
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 6000   #连接超时时间
+          strategy: SEMAPHORE              #线程池隔离采用信号量隔离
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+# mqtt 连接配置
+mqtt:
+  host: tcp://192.168.1.3
+  port: 1883
+  qos: 0
+  timeout: 2000
+  keepalive: 20
+  rx-topic: maintain/#
+  tx-topic: applicationserver/#
+  client-id: rpiot-client-${random.uuid}
+  username: admin
+  password: admin1234.
+rocketmq:
+  name-server: 192.168.1.3:9876
+  topic: messageTopic # mq主题
+  producer:
+    group: MessageGroup
+
+node:
+  voltage: 3.0
+  signalStrength: -15
+time:
+  cron : 0 0/2 0 * * *
+
+pagehelper:
+  auto-runtime-dialect: true
