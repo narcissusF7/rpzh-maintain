@@ -273,7 +273,7 @@ public class MaintainDataHandler {
 
                 //如果是其他设备
             } else {
-                data = parseData.getData().get(0);
+                data = parseData.getData().get(i);
                 //判断当前数据所属等级
                 int level = decideValue(data, list);
                 level = level==-1 ? 1:level;
@@ -650,6 +650,8 @@ public class MaintainDataHandler {
                     if (Integer.parseInt(levels[i]) < level) {
                         flag=true;
                     } else {
+                        //如果数据库里面的等级更高
+                        level = Integer.parseInt(levels[i]);
                         int frequency = parseData.getFrequency();
                         //通过频率计算升级所需的连续预警次数
                         Map<String, String> warningThreshold = monitoringCenterService.findWarningThreshold();
@@ -780,7 +782,7 @@ public class MaintainDataHandler {
         }
     }
 
-    public NodeVo getNodeVo(Object cacheNodeData ,String nodeId){
+    /*public NodeVo getNodeVo(Object cacheNodeData ,String nodeId){
         NodeVo nodeVo;
         if (ToolUtil.isEmpty(cacheNodeData)){
             nodeVo = nodeDao.findByNodeId(nodeId);
@@ -806,7 +808,7 @@ public class MaintainDataHandler {
             nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);
         }
         return nodeVo;
-    }
+    }*/
 
     //添加任务
     public Map addTask(NodeVo nodeVo ,String type){
