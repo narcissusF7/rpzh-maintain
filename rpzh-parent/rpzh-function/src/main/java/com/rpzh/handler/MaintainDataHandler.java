@@ -496,7 +496,7 @@ public class MaintainDataHandler {
             earlyWarning.setStackId(nodeVo.getStackId());
         }
 
-        decideEarlyWarning(earlyWarningVo,earlyWarning,parseData,level,data,evnType,nodeVo.getSiteType());
+        level = decideEarlyWarning(earlyWarningVo,earlyWarning,parseData,level,data,evnType,nodeVo.getSiteType());
 
         nodeVo.setAlertLevel(level);
 

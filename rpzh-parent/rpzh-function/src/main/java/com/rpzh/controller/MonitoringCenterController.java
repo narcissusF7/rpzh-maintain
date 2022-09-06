@@ -336,7 +336,7 @@ public class MonitoringCenterController {
                 if (!ToolUtil.isEmpty(nodeDto.getNodeType())&&NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
                     map.put("humitureMax", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get().toString());
                     map.put("humitureMin", value.stream().map(NodeDataVo::getHumiture).min(Double::compareTo).get().toString());
-                    map.put("humitureAvg", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble()+"");
+                    map.put("humitureAvg", String.format("%.2f", value.stream().mapToDouble(NodeDataVo::getHumiture).average().getAsDouble()));
                     map.put("humitureDate",k);
                 }
                 historyGraphData.add(map);
