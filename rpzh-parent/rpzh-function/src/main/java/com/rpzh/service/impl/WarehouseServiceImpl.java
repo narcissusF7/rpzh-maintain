@@ -111,7 +111,11 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         String principalName = warehouseDto.getPrincipalName();
         if (ToolUtil.isNotEmpty(principalName)) {
-            warehouseDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+            if(principalName.contains("(")) {
+                warehouseDto.setPrincipalName(principalName.substring(principalName.indexOf("(") + 1, principalName.indexOf(")")));
+            }else {
+                warehouseDto.setPrincipalName(principalName);
+            }
         }
 
         int updateFlag = warehouseDao.updateWarehouse(warehouseDto);
@@ -205,7 +209,11 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         String principalName = buildingDto.getPrincipalName();
         if (ToolUtil.isNotEmpty(principalName)) {
-            buildingDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+            if(principalName.contains("(")) {
+                buildingDto.setPrincipalName(principalName.substring(principalName.indexOf("(") + 1, principalName.indexOf(")")));
+            }else {
+                buildingDto.setPrincipalName(principalName);
+            }
         }
 
         int updateFlag = warehouseDao.updateBuilding(buildingDto);
@@ -268,7 +276,11 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         String principalName = floorDto.getPrincipalName();
         if (ToolUtil.isNotEmpty(principalName)) {
-            floorDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+            if(principalName.contains("(")) {
+                floorDto.setPrincipalName(principalName.substring(principalName.indexOf("(") + 1, principalName.indexOf(")")));
+            }else {
+                floorDto.setPrincipalName(principalName);
+            }
         }
 
         int updateFlag = warehouseDao.updateFloor(floorDto);
@@ -393,8 +405,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         String username = userInfo.get("username");
         stackDto.setLastUpdatedUser(username);
         String principalName = stackDto.getPrincipalName();
-        if (ToolUtil.isNotEmpty(principalName)) {
+        if(principalName.contains("(")) {
             stackDto.setPrincipalName(principalName.substring(principalName.indexOf("(")+1,principalName.indexOf(")")));
+        }else {
+            stackDto.setPrincipalName(principalName);
         }
         int updateFlag = warehouseDao.updateStack(stackDto);
         updatePrincipal(stackDto.getPrincipalName(),stackDto.getStackId(),stackDto.getPidRoute(),5);
