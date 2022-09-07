@@ -2,8 +2,13 @@ package com.rpzh.pojo;
 
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.parse.ParseData;
+import com.rpzh.vo.AirConditionVo;
 import com.rpzh.vo.NodeVo;
 import lombok.Data;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @Author: ljj
  * @Date: 2022/05/18/15:30
@@ -63,7 +68,7 @@ public class NodeData{
     private String nodeName;
     private Double count=0d;
     private String color;
-
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public NodeData() {
     }
 
@@ -108,5 +113,17 @@ public class NodeData{
                 this.temp = parseData.getData().get(0);
 
         }
+    }
+    public NodeData(AirConditionVo airConditionVo){
+        this.nodeId = airConditionVo.getAirConditionCode();
+        this.type = "04";
+        this.gatherSite = airConditionVo.getTagCN();
+        this.siteRoute = airConditionVo.getSiteRoute();
+        this.humiture = airConditionVo.getHumidityVal();
+        this.temp = airConditionVo.getTempVal();
+        this.transferTime = sdf.format(new Date());
+        this.tempLevel = 0;
+        this.humidityLevel = 0;
+        this.alertLevel = 0;
     }
 }

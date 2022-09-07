@@ -50,7 +50,7 @@ public class WarningTypeConstant {
         }else {//温湿度设备
             if (NodeConstant.NODE_WARE_AREA.equals(siteType)){//仓间温湿度
                 switch (evnType){
-                    //如果是仓间氧气设备
+                    //如果是仓间温度设备
                     case "temp" :
                         return WARE_TEMP_OVERRUN_WARNING;
                     default:

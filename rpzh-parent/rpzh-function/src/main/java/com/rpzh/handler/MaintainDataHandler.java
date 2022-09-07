@@ -103,43 +103,65 @@ public class MaintainDataHandler {
         //分组处理
         Map<String, List<AirConditionVo>> collect = list.stream().collect(Collectors.groupingBy(AirConditionVo::getSiteRoute));
 
-        collect.forEach((siteRoute, airConditionDtos) ->{
+        collect.forEach((siteRoute, airConditionDtos) -> {
             String siteRoute1 = siteRoute.split(",\\[04")[0];
             String siteRoute2 = siteRoute.split(",\\[03")[0];
             String siteRoute3 = siteRoute.split(",\\[02")[0];
             //判断位置路由下是否存在预警规则
-            WareAreaAlarmSettingVo alarmValueSettingVo =  wareAreaAlarmSettingDao.findAlarmValueSettingBySiteRoute(siteRoute,siteRoute1,siteRoute2,siteRoute3);
+            WareAreaAlarmSettingVo alarmValueSettingVo = wareAreaAlarmSettingDao.findAlarmValueSettingBySiteRoute(siteRoute, siteRoute1, siteRoute2, siteRoute3);
             //如果预警规则为空
-            if (ToolUtil.isEmpty(alarmValueSettingVo)){
-                NodeData nodeData = new NodeData();
-                //向数据库插入当前数据
-                Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
 
-                //将该数据放入到缓存中
-//                redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
+            if (ToolUtil.isEmpty(alarmValueSettingVo)) {
+                airConditionDtos.forEach(airConditionVo -> {
+                    NodeData nodeData = new NodeData(airConditionVo);
+                    nodeData.setNodeId(airConditionVo.getAirConditionCode());
+                    //向数据库插入当前数据
+                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history", Long.toHexString(idWorker.nextId()));
+
+                    //将该数据放入到缓存中
+                    redisTemplate.opsForValue().set(MAINTAIN + airConditionVo.getAirConditionCode(), JSON.toJSONString(nodeData));
+                });
+            } else {
+                List<Double> tempList = new ArrayList<>();
+                List<Double> humidityList = new ArrayList<>();
+                tempList.add(Double.valueOf(alarmValueSettingVo.getWarehouseTempUpperOne()));
+                tempList.add(Double.valueOf(alarmValueSettingVo.getWarehouseTempUpperTwo()));
+                tempList.add(Double.valueOf(alarmValueSettingVo.getWarehouseTempUpperThree()));
+                tempList.add(Double.valueOf(alarmValueSettingVo.getWarehouseTempLower()));
+                humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureUpperOne()));
+                humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureUpperTwo()));
+                humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureUpperThree()));
+                humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureLower()));
+                airConditionDtos.forEach(airConditionVo -> {
+                    //温度数据
+                    Double tempVal = airConditionVo.getTempVal();
+                    //温度等级
+                    int tempLevel = decideValue(tempVal, tempList);
+                    tempLevel = tempLevel==-1 ? 1:tempLevel;
+
+                    //温度处理
+                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp");
+
+                    //湿度数据
+                    Double humidityVal = airConditionVo.getHumidityVal();
+                    //湿度等级
+                    int humidityLevel = decideValue(humidityVal,humidityList);
+                    humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
+
+                    //湿度处理
+                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"humidity");
+
+                    //预警等级
+                    int level = humidityLevel>tempLevel ? humidityLevel:tempLevel;
+
+                });
             }
-        } );
 
-        //该设备需要预警的字段
-        String[] alarmColumns = AlarmValueSettingVo.getColumn(NodeConstant.NODE_WARE_AREA,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
+        });
 
-//
-//        //将位置路由转成map 后 key value 拼接
-//        List<String> hashKeys = getHashKeys(siteRoute);
-//        //redis中的对象名
-//        String  redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
-//
-//        //从缓存中获取预警阈值
-//        List<Double> list = new ArrayList<>();
-//        for (String alarmColumn : alarmColumns) {
-//            list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
-//        }
-//
-//        NodeData nodeData = new NodeData();
-//
-//
-//        //温度数据
-//        Double data = parseData.getData().get(0);
+        NodeData nodeData = new NodeData();
+
+
 //        //判断当前数据所属等级
 //        int level = decideValue(data, list);
 //        level = level==-1 ? 1:level;
@@ -169,18 +191,13 @@ public class MaintainDataHandler {
 //        nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
 //        nodeData.setSiteRoute(siteRoute);
 //        nodeData.setWarningType(warningType.substring(1));
-//
-//        //向数据库插入当前数据
-//        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
-//
-//        //将该数据放入到缓存中
-//        redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
 
 
     }
 
     /**
      * 正常数据处理
+     *
      * @param parseData
      */
     public void handlerData(ParseData parseData) {
@@ -197,16 +214,18 @@ public class MaintainDataHandler {
             if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
                 return;
             }
-            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
-            //如果这个垛位存在养护计划
-            if (ToolUtil.isNotEmpty(maintainPlanVo)){
-                nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
-                nodeVo.setMaintainPlanId(maintainPlanVo.getId());
-                nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
-                nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+            if (ToolUtil.isNotEmpty(nodeVo.getStackId())){
+                MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainStackId(nodeVo.getStackId());
+                //如果这个垛位存在养护计划
+                if (ToolUtil.isNotEmpty(maintainPlanVo)) {
+                    nodeVo.setMaterialCode(maintainPlanVo.getMaterialCode());
+                    nodeVo.setMaintainPlanId(maintainPlanVo.getId());
+                    nodeVo.setMaintainStageId(maintainPlanVo.getStageId());
+                    nodeVo.setAlermValueSettingId(maintainPlanVo.getAlarmValueSettingId());
+                }
             }
-        }else {
-            nodeVo = JSON.parseObject(cacheNodeData.toString(),NodeVo.class);
+        } else {
+            nodeVo = JSON.parseObject(cacheNodeData.toString(), NodeVo.class);
         }
         //如果设备处于是解垛状态  数据不做任何处理
         if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
@@ -215,24 +234,24 @@ public class MaintainDataHandler {
 
         warningType = "";
         //判断电量
-        decideFault(parseData.getVoltage(),voltage,WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN,parseData);
+        decideFault(parseData.getVoltage(), voltage, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData);
 
         //判断信号强度
-       // decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
+        // decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
 
         String redisHashKey;
 
-        if(NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())){//如果是仓间设备
+        if (NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())) {//如果是仓间设备
 
             //将位置路由转成map 后 key value 拼接
             List<String> hashKeys = getHashKeys(nodeVo.getSiteRoute());
             //redis中的对象名
-            redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
-        }else {//垛内设备
-            if(ToolUtil.isEmpty(nodeVo.getMaintainStageId())){
+            redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0]);
+        } else {//垛内设备
+            if (ToolUtil.isEmpty(nodeVo.getMaintainStageId())) {
                 //不存在养护计划
                 //根据丢包个数判断需要循环几次
                 int loopCount = parseData.getPacketLossNum() > 2 ? 2 : parseData.getPacketLossNum();
@@ -242,14 +261,14 @@ public class MaintainDataHandler {
                     NodeData nodeData = new NodeData(parseData, nodeVo, i);
                     nodeData.setAlertLevel(0);
                     //向数据库插入当前数据
-                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
+                    Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
                     //最后一条数据需要存放到redis中
-                    if (i==0){
-                        redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(),JSON.toJSONString(nodeData));
+                    if (i == 0) {
+                        redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(), JSON.toJSONString(nodeData));
                     }
                 }
                 return;
-            }else {
+            } else {
                 List<String> hashKeys = Arrays.asList(nodeVo.getMaintainStageId().toString());
                 redisHashKey = putAlarmValueToCache(hashKeys, alarmColumns[0], nodeVo.getAlermValueSettingId());
             }
@@ -275,7 +294,7 @@ public class MaintainDataHandler {
                 data = parseData.getData().get(i);
                 //判断当前数据所属等级
                 int tempLevel = decideValue(data, list);
-                tempLevel = tempLevel==-1 ? 1:tempLevel;
+                tempLevel = tempLevel == -1 ? 1 : tempLevel;
                 nodeVo.setTempLevel(tempLevel);
                 //温度处理
                 earlyWarningHandle(nodeVo, tempLevel, parseData, data, "temp");
@@ -287,34 +306,34 @@ public class MaintainDataHandler {
                 //湿度数据等级
                 int humidityLevel = decideValue(data, list.subList(4, 8));
                 nodeVo.setHumidityLevel(humidityLevel);
-                humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
+                humidityLevel = humidityLevel == -1 ? 1 : humidityLevel;
                 //湿度处理
                 earlyWarningHandle(nodeVo, humidityLevel, parseData, data, "humidity");
                 //设置湿度预警等
                 nodeVo.setHumidityLevel(humidityLevel);
                 //设置该设备预警等级
-                nodeVo.setAlertLevel(tempLevel>humidityLevel?tempLevel:humidityLevel);
+                nodeVo.setAlertLevel(tempLevel > humidityLevel ? tempLevel : humidityLevel);
 
                 //如果是其他设备
             } else {
                 data = parseData.getData().get(i);
                 //判断当前数据所属等级
                 int level = decideValue(data, list);
-                level = level==-1 ? 1:level;
+                level = level == -1 ? 1 : level;
                 //处理该设备数据
                 earlyWarningHandle(nodeVo, level, parseData, data);
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);
-            if (!ToolUtil.isEmpty(warningType)){
+            if (!ToolUtil.isEmpty(warningType)) {
                 nodeData.setWarningType(warningType.substring(1));
             }
             //向数据库插入当前数据
-            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(),Long.toHexString(idWorker.nextId()));
+            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
 
             //最后一条数据需要存放到redis中
-            if (i==0){
-                redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(),JSON.toJSONString(nodeData));
+            if (i == 0) {
+                redisTemplate.opsForValue().set(MAINTAIN + nodeVo.getNodeId(), JSON.toJSONString(nodeData));
             }
         }
 
@@ -325,12 +344,12 @@ public class MaintainDataHandler {
             List<NodeVo> nodeVos = nodeDao.findNodeByStackId(nodeVo.getStackId());
 
             //过滤 选择包芯设备 取温度
-            double avg = getAvg(nodeVos,NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE);
+            double avg = getAvg(nodeVos, NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE);
 
             //过滤 选择环境温湿度设备 取温度
-            double evnTemp = getAvg(nodeVos,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
+            double evnTemp = getAvg(nodeVos, NodeConstant.HUMITURE_NODE_TYPE_VALUE);
 
-            if(evnTemp>0){
+            if (evnTemp > 0) {
                 //计算差值
                 double v = avg - evnTemp;
 
@@ -353,32 +372,34 @@ public class MaintainDataHandler {
 
     /**
      * 向缓存中存放预警值
-     * @param hashKeys 位置id和位置类型（位置类型,01:仓库, 02: 楼号, 03: 层, 04: 区）拼接的集合
+     *
+     * @param hashKeys    位置id和位置类型（位置类型,01:仓库, 02: 楼号, 03: 层, 04: 区）拼接的集合
      * @param alarmColumn 字段名称（用来判断缓存是否存在）
      * @return
      */
-    public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn){
-        return putAlarmValueToCache(hashKeys,alarmColumn,-1);
+    public String putAlarmValueToCache(List<String> hashKeys, String alarmColumn) {
+        return putAlarmValueToCache(hashKeys, alarmColumn, -1);
     }
-    public String putAlarmValueToCache(List<String> hashKeys,String alarmColumn,Integer alarmId){
 
-        for (int i = hashKeys.size()-1; i >=0 ; i--) {
+    public String putAlarmValueToCache(List<String> hashKeys, String alarmColumn, Integer alarmId) {
+
+        for (int i = hashKeys.size() - 1; i >= 0; i--) {
             //判断缓存是否存在
             Boolean hasKey = redisTemplate.opsForHash().hasKey(MAINTAIN + hashKeys.get(i), alarmColumn);
             if (hasKey) {
                 return MAINTAIN + hashKeys.get(i);
-            }else {
+            } else {
                 //不存在就从数据库中查找
                 AlarmValueSettingVo alarmValueSettingVo;
-                if(alarmId==-1){
-                    alarmValueSettingVo= wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
-                }else {
+                if (alarmId == -1) {
+                    alarmValueSettingVo = wareAreaAlarmSettingDao.findBySite(hashKeys.get(i));
+                } else {
                     alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmId);
                 }
 
 
                 //数据库中有就存在缓存中并跳出循环  没有就向上查找
-                if (!ToolUtil.isEmpty(alarmValueSettingVo)){
+                if (!ToolUtil.isEmpty(alarmValueSettingVo)) {
 
                     //获取 AlarmValueSettingVo中所有的字段
                     Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();
@@ -386,7 +407,7 @@ public class MaintainDataHandler {
                         try {
                             field.setAccessible(true);
                             //把每个字段的值存到redis中  对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                            if (field.get(alarmValueSettingVo)!=""||field.get(alarmValueSettingVo)!=null){
+                            if (field.get(alarmValueSettingVo) != "" || field.get(alarmValueSettingVo) != null) {
                                 redisTemplate.opsForHash().put(MAINTAIN + hashKeys.get(i), field.getName(), field.get(alarmValueSettingVo));
                             }
                         } catch (IllegalAccessException exception) {
@@ -407,29 +428,29 @@ public class MaintainDataHandler {
      * @param warningType   预警类型
      * @param warningValOne 一级预警的值
      */
-    public void  nodeMalfunction(ParseData parseData, String warningType, Double warningValOne) {
+    public void nodeMalfunction(ParseData parseData, String warningType, Double warningValOne) {
         //查询该设备在预警记录表中该类型的预警记录是否存在
         Integer count = earlyWarningDao.findUndoCount(parseData.getNodeId(), warningType);
         if (count < 1) {
             //获取缓存中该设备该预警类型的次数
             Object o = redisTemplate.opsForHash().get(FAULT + warningType, parseData.getNodeId());
-            if (!ToolUtil.isEmpty(o)){
+            if (!ToolUtil.isEmpty(o)) {
                 //如果缓存中存在次数
-                if ((Integer) o ==2){
+                if ((Integer) o == 2) {
                     //达到3次新增一条数据
-                    NodeVo nodeVo =nodeDao.findByNodeId(parseData.getNodeId());
-                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne+"", "1",nodeVo.getSiteRoute(),nodeVo.getSiteType(),nodeVo.getSiteId());
+                    NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne + "", "1", nodeVo.getSiteRoute(), nodeVo.getSiteType(), nodeVo.getSiteId());
                     Map taskMap = addTask(nodeVo, "20");
                     earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                     earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                     earlyWarningDao.insertWarning(earlyWarning);
-                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),0);
-                }else {
+                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), 0);
+                } else {
                     //否则次数加1
-                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),(Integer) o+1);
+                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), (Integer) o + 1);
                 }
-            }else {
-                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(),1);
+            } else {
+                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), 1);
             }
 
         }
@@ -452,8 +473,8 @@ public class MaintainDataHandler {
 
     //设置等级
     public void setLevel(EarlyWarning earlyWarning, Integer level, Double value) {
-        earlyWarning.setWarningGrade(level+"");
-        earlyWarning.setWarningVal(value+"");
+        earlyWarning.setWarningGrade(level + "");
+        earlyWarning.setWarningVal(value + "");
         switch (level) {
             case 1:
                 earlyWarning.setWarningValOne(value);
@@ -475,18 +496,32 @@ public class MaintainDataHandler {
     /**
      * 处理空调数据
      * @param level
-     * @param parseData
+     * @param airConditionVo
      * @param evnType
-     * @param areaId
+     * @return
      */
-    public Integer earlyWarningHandle(Integer level, ParseData parseData,String evnType,Integer areaId) {
-        String warningType = WarningTypeConstant.getWarningType(NodeConstant.NODE_WARE_AREA,NodeConstant.HUMITURE_NODE_TYPE_VALUE,evnType);
+    public Integer earlyWarningHandle(Integer level, AirConditionVo airConditionVo, String evnType) {
+        String warningType = WarningTypeConstant.getWarningType(NodeConstant.NODE_WARE_AREA, NodeConstant.HUMITURE_NODE_TYPE_VALUE, evnType);
         //查询数据库中该空调未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningByNodeId(parseData.getNodeId(),warningType);
-
-        EarlyWarning earlyWarning = new EarlyWarning();
-        earlyWarning.setId(areaId);
-        level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(airConditionVo.getSiteRoute(), warningType);
+        //如果不存在
+        if (ToolUtil.isEmpty(earlyWarningVo)){
+            EarlyWarning earlyWarning = new EarlyWarning();
+            earlyWarning.setWarningType(warningType);
+            earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
+            //获取位置路由
+            String siteRoute = airConditionVo.getSiteRoute();
+            //去掉位置路由的最后一个] ，然后截取:
+            String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[4];
+            //获取位置负责人
+            Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
+            //设置负责人
+            earlyWarning.setPrincipalName(sitePrincipal.get("userName").toString());
+            //TODO
+//            earlyWarning.setWarningVal();
+//            earlyWarning.set
+        }
+//        level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, parseData.getData().get(0), evnType, NodeConstant.NODE_WARE_AREA);
 
         return level;
     }
@@ -505,7 +540,7 @@ public class MaintainDataHandler {
 
         String warningType = WarningTypeConstant.getWarningType(nodeVo.getSiteType(), nodeVo.getNodeType(), evnType);
         //查询数据库中该位置未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(),warningType);
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), warningType);
 
         EarlyWarning earlyWarning = new EarlyWarning();
 
@@ -520,7 +555,7 @@ public class MaintainDataHandler {
             earlyWarning.setStackId(nodeVo.getStackId());
         }
 
-        level = decideEarlyWarning(earlyWarningVo,earlyWarning,parseData,level,data,evnType,nodeVo.getSiteType());
+        level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, data, evnType, nodeVo.getSiteType());
 
         nodeVo.setAlertLevel(level);
 
@@ -528,14 +563,15 @@ public class MaintainDataHandler {
 
     /**
      * 平均包芯
-     * @param nodeVo 设备数据
-     * @param level  预警等级
+     *
+     * @param nodeVo    设备数据
+     * @param level     预警等级
      * @param parseData 推送的数据
-     * @param data 数据值
+     * @param data      数据值
      */
     public void avgCoreHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data) {
         //查询数据库中该设备未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(),WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
+        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
@@ -549,20 +585,20 @@ public class MaintainDataHandler {
             if (Integer.parseInt(earlyWarningVo.getWarningGrade()) < level) {
                 setLevel(earlyWarning, level, data);
                 //判断是那一级预警
-                setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+                setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
                 earlyWarningDao.updateWarning(earlyWarning);
             }
         } else if (level > 0) {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
 
-            if (level==-1){
+            if (level == -1) {
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
                 Map taskMap = addTask(nodeVo, "19");
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                 earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
                 setLevel(earlyWarning, 1, data);
-            }else {
+            } else {
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
                 Map taskMap = addTask(nodeVo, "13");
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
@@ -571,7 +607,7 @@ public class MaintainDataHandler {
             }
 
             //判断哪一等级的预警
-            setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+            setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
             earlyWarningDao.insertWarning(earlyWarning);
 
@@ -580,21 +616,22 @@ public class MaintainDataHandler {
     }
 
     /**
-     *  将位置路由转成map 再将map的键值对拼接后 用于作为redis中的key
+     * 将位置路由转成map 再将map的键值对拼接后 用于作为redis中的key
+     *
      * @param siteRoute 位置路由
      * @return
      */
-    public List<String> getHashKeys(String siteRoute){
+    public List<String> getHashKeys(String siteRoute) {
         //将位置路由转成键值对 键:(垛 区 层 楼 仓库) 值 键对应的id
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         String[] strings = siteRoute.split(",");
         for (int i = 0; i < strings.length; i++) {
             String strip = StringUtils.strip(strings[i], "[]");
-            map.put(strip.split(":")[0],strip.split(":")[1]);
+            map.put(strip.split(":")[0], strip.split(":")[1]);
         }
         List<String> hashKeys = new ArrayList<>();
-        map.forEach((k,v) ->{
-            hashKeys.add(k+v);
+        map.forEach((k, v) -> {
+            hashKeys.add(k + v);
         });
 
         return hashKeys;
@@ -602,26 +639,27 @@ public class MaintainDataHandler {
 
     /**
      * 将一个垛位的所有设备通过过滤 分别取包芯设备 环境温湿度设备 取均值后用于判断预警
-     * @param nodeVos 指定垛位下的所有设备
+     *
+     * @param nodeVos  指定垛位下的所有设备
      * @param nodeType 设备类型
      * @return 该设备类型的数据均值
      */
-    private Double getAvg(List<NodeVo> nodeVos , String nodeType){
-        Stream<Double> stream = nodeVos.stream().filter(s -> nodeType.equals(s.getNodeType())).filter(s->{//过滤掉找不到数据的设备
+    private Double getAvg(List<NodeVo> nodeVos, String nodeType) {
+        Stream<Double> stream = nodeVos.stream().filter(s -> nodeType.equals(s.getNodeType())).filter(s -> {//过滤掉找不到数据的设备
             Object o = redisTemplate.opsForValue().get(MAINTAIN + s.getNodeId());
-            if (ToolUtil.isEmpty(o)){
-                NodeDataVo nodeDataVo = nodeDao.findNodeNowData(s.getNodeId(),NodeTypeEnum.getNodeType(s.getNodeType()).getTableName());
-                if (ToolUtil.isEmpty(nodeDataVo)){
+            if (ToolUtil.isEmpty(o)) {
+                NodeDataVo nodeDataVo = nodeDao.findNodeNowData(s.getNodeId(), NodeTypeEnum.getNodeType(s.getNodeType()).getTableName());
+                if (ToolUtil.isEmpty(nodeDataVo)) {
                     return false;
-                }else {
-                    redisTemplate.opsForValue().set(MAINTAIN + s.getNodeId(),JSON.toJSONString(nodeDataVo));
+                } else {
+                    redisTemplate.opsForValue().set(MAINTAIN + s.getNodeId(), JSON.toJSONString(nodeDataVo));
                     return true;
                 }
             }
             return true;
         }).map(vos -> {
             Object o = redisTemplate.opsForValue().get(MAINTAIN + vos.getNodeId());
-            NodeData nodeData = JSON.parseObject(o.toString(),NodeData.class);
+            NodeData nodeData = JSON.parseObject(o.toString(), NodeData.class);
             return nodeData.getTemp();
         });
         //取平均值
@@ -629,7 +667,6 @@ public class MaintainDataHandler {
     }
 
     /**
-     *
      * @param earlyWarningVo
      * @param earlyWarning
      * @param parseData
@@ -638,9 +675,9 @@ public class MaintainDataHandler {
      * @param evnType
      * @param siteType
      */
-    private Integer decideEarlyWarning(EarlyWarningVo earlyWarningVo ,EarlyWarning earlyWarning , ParseData parseData ,Integer level ,Double data ,String evnType ,String siteType){
-        if (level==0){
-            redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
+    private Integer decideEarlyWarning(EarlyWarningVo earlyWarningVo, EarlyWarning earlyWarning, ParseData parseData, Integer level, Double data, String evnType, String siteType) {
+        if (level == 0) {
+            redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, 0);
         }
         //如果存在未处理的预警
         if (ToolUtil.isNotEmpty(earlyWarningVo)) {
@@ -656,23 +693,23 @@ public class MaintainDataHandler {
             for (int i = 0; i < nodeIds.length; i++) {
                 //判断当前设备属于该条预警的第几位
                 if (nodeIds[i].equals(parseData.getNodeId())) {
-                    unContains =false;
-                    if (!warningType.contains(earlyWarningVo.getWarningType())){
-                        warningType = warningType+","+earlyWarningVo.getWarningType();
+                    unContains = false;
+                    if (!warningType.contains(earlyWarningVo.getWarningType())) {
+                        warningType = warningType + "," + earlyWarningVo.getWarningType();
                     }
                     //获取缓存中的连续预警次数
-                    Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId()+evnType);
+                    Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId() + evnType);
                     int j;
-                    if (ToolUtil.isEmpty(o)){
+                    if (ToolUtil.isEmpty(o)) {
                         j = 0;
-                    }else {
+                    } else {
                         j = Integer.parseInt(o.toString());
                     }
                     //用于判断当前数据判断后预警是否达到更高一级
                     boolean flag = false;
                     //如果当前预警等级更高
                     if (Integer.parseInt(levels[i]) < level) {
-                        flag=true;
+                        flag = true;
                     } else {
                         //如果数据库里面的等级更高
                         level = Integer.parseInt(levels[i]);
@@ -688,18 +725,18 @@ public class MaintainDataHandler {
                             level += 1;
                         }
                     }
-                    if (flag){
+                    if (flag) {
 
                         //设置等级
-                        levels[i] =  level+"";
-                        warningVals[i] = data+"";
+                        levels[i] = level + "";
+                        warningVals[i] = data + "";
                         //新的预警值集合
                         String warningVal = warningVals[0];
                         //新的预警等级集合
-                        String level1 =  levels[0];
+                        String level1 = levels[0];
                         for (int i1 = 1; i1 < levels.length; i1++) {
-                            warningVal = warningVal+","+warningVals[i1];
-                            level1 =level1+","+levels[i1];
+                            warningVal = warningVal + "," + warningVals[i1];
+                            level1 = level1 + "," + levels[i1];
                         }
                         //赋值
                         earlyWarning.setWarningGrade(level1);
@@ -707,30 +744,30 @@ public class MaintainDataHandler {
                         //设置主键id
                         earlyWarning.setId(earlyWarningVo.getId());
                         //判断是那一级预警
-                        setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+                        setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
                         //更新数据
                         earlyWarningDao.updateWarning(earlyWarning);
                     }
-                    if (level==3){
+                    if (level == 3) {
                         //达到3级 不用连续预警
-                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType,0);
-                    }else if (level>0){
+                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, 0);
+                    } else if (level > 0) {
                         //连续预警次数+1
-                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, j + 1);
+                        redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, j + 1);
                     }
                 }
             }
 
             //当前位置存在预警但不包含当前设备id
-            if (unContains){
-                if (level>0){
+            if (unContains) {
+                if (level > 0) {
                     earlyWarning.setId(earlyWarningVo.getId());
-                    earlyWarning.setWarningVal(earlyWarningVo.getWarningVal()+","+data);
-                    earlyWarning.setNodeId(earlyWarningVo.getNodeId()+","+parseData.getNodeId());
-                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade()+","+level);
+                    earlyWarning.setWarningVal(earlyWarningVo.getWarningVal() + "," + data);
+                    earlyWarning.setNodeId(earlyWarningVo.getNodeId() + "," + parseData.getNodeId());
+                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
                     //判断哪一等级的预警
-                    setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+                    setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
                     //更新数据
                     earlyWarningDao.updateWarning(earlyWarning);
@@ -742,13 +779,13 @@ public class MaintainDataHandler {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
             if (level > 0) {
                 String[] dexxx = dexxx(siteType, evnType, parseData.getNodeType());
-                String type=dexxx[0];
-                String taskType =dexxx[1];
+                String type = dexxx[0];
+                String taskType = dexxx[1];
                 earlyWarning.setWarningType(type);
-                if (!warningType.contains(type)){
-                    warningType = warningType+","+type;
+                if (!warningType.contains(type)) {
+                    warningType = warningType + "," + type;
                 }
-                NodeVo nodeVo1 =nodeDao.findByNodeId(parseData.getNodeId());
+                NodeVo nodeVo1 = nodeDao.findByNodeId(parseData.getNodeId());
                 String siteRoute = nodeVo1.getSiteRoute();
                 earlyWarning.setSiteRoute(siteRoute);
                 //设置设备id
@@ -756,19 +793,19 @@ public class MaintainDataHandler {
                 //设置设备类型
                 earlyWarning.setNodeType(parseData.getNodeType());
                 setLevel(earlyWarning, level, data);
-                Map taskMap = addTask(nodeVo1,taskType);
+                Map taskMap = addTask(nodeVo1, taskType);
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                 earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
 
                 //判断哪一等级的预警
-                setEarlyLevel(earlyWarning,level,earlyWarningVo,data);
+                setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
                 //插入数据库
                 earlyWarningDao.insertWarning(earlyWarning);
                 //往redis中设置连续预警次数为1
                 if (level < 3) {
-                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, 1);
-                }else {
-                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId()+evnType, 0);
+                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, 1);
+                } else {
+                    redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, 0);
                 }
             }
         }
@@ -777,30 +814,31 @@ public class MaintainDataHandler {
 
     /**
      * 故障预警信息处理
-     * @param v1 传入值
-     * @param v2 预警阈值
-     * @param type 类型
+     *
+     * @param v1        传入值
+     * @param v2        预警阈值
+     * @param type      类型
      * @param parseData
      */
-    public void decideFault(Double v1,Double v2,String type,ParseData parseData){
+    public void decideFault(Double v1, Double v2, String type, ParseData parseData) {
         if (v1 < v2) {
-            if (!warningType.contains(type)){
-                warningType = warningType+","+type;
+            if (!warningType.contains(type)) {
+                warningType = warningType + "," + type;
             }
             //判断数据库中该设备是否存在未处理的预警
             nodeMalfunction(parseData, type, v1);
 
-        }else{
+        } else {
             //获取缓存的该设备数据
             Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN + parseData.getNodeId());
-            if (!ToolUtil.isEmpty(cacheNodeData)){
+            if (!ToolUtil.isEmpty(cacheNodeData)) {
                 //转成NodeDataVo
                 NodeDataVo nodeDataVo = JSONObject.parseObject(cacheNodeData + "", NodeDataVo.class);
                 //获取预警类型
                 String warningType = nodeDataVo.getWarningType();
                 //如果包含当前校验的类型
-                if (!ToolUtil.isEmpty(warningType)&&warningType.contains(type)){
-                    earlyWarningDao.updateWarningType(parseData.getNodeId(),type);
+                if (!ToolUtil.isEmpty(warningType) && warningType.contains(type)) {
+                    earlyWarningDao.updateWarningType(parseData.getNodeId(), type);
                 }
             }
         }
@@ -835,35 +873,35 @@ public class MaintainDataHandler {
     }*/
 
     //添加任务
-    public Map addTask(NodeVo nodeVo ,String type){
+    public Map addTask(NodeVo nodeVo, String type) {
         //查询该垛位、仓间下该类型任务是否存在
-        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(),type);
-        if (ToolUtil.isEmpty(selectTaskMap)){
+        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(), type);
+        if (ToolUtil.isEmpty(selectTaskMap)) {
             int siteType = nodeVo.getSiteRoute().split(",").length - 1;
-            nodeVo.setSiteId(SiteRouteUtil.getSiteId(nodeVo.getSiteRoute(),"0"+siteType));
-            if(siteType==4){
+            nodeVo.setSiteId(SiteRouteUtil.getSiteId(nodeVo.getSiteRoute(), "0" + siteType));
+            if (siteType == 4) {
                 nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
-            }else{
+            } else {
                 nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
             }
 
             String principal = "";
 
             Integer maintainPlanId = nodeVo.getMaintainPlanId();
-            if (ToolUtil.isNotEmpty(maintainPlanId)){
+            if (ToolUtil.isNotEmpty(maintainPlanId)) {
                 principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
-            }else {
+            } else {
                 Map<String, Object> map = warehouseService.getSitePrincipal(siteType, nodeVo.getSiteId());
-                principal = map.get("username")+"";
+                principal = map.get("username") + "";
             }
 
-            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),principal,DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, nodeVo.getGatherSite(), nodeVo.getSiteRoute(), principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskDto.setCreatedUser("系统生成");
             taskManagementService.addDataHandTask(taskDto);
             Map taskMap = new HashMap();
-            taskMap.put("principal",taskDto.getPrincipal());
-            taskMap.put("id",Integer.parseInt(taskDto.getId()) + 1);
+            taskMap.put("principal", taskDto.getPrincipal());
+            taskMap.put("id", Integer.parseInt(taskDto.getId()) + 1);
             return taskMap;
         }
         return selectTaskMap;
@@ -871,34 +909,35 @@ public class MaintainDataHandler {
 
     /**
      * 判断 设备预警类型 任务类型
+     *
      * @param siteType
      * @param evnType
      * @param nodeType
      * @return
      */
-    public String[] dexxx(String siteType,String evnType,String nodeType ){
-        String type="";
-        String taskType ="";
+    public String[] dexxx(String siteType, String evnType, String nodeType) {
+        String type = "";
+        String taskType = "";
         //判断是否是仓间设备
-        boolean isNodeStack =  NodeConstant.NODE_STACK.equals(siteType);
+        boolean isNodeStack = NodeConstant.NODE_STACK.equals(siteType);
         //如果不为空即该设备为温湿度设备
 
         if (!ToolUtil.isEmpty(evnType)) {
             //温湿度 温度预警
             if ("temp".equals(evnType)) {
                 type = isNodeStack ? WarningTypeConstant.STACK_TEMP_OVERRUN_WARNING : WarningTypeConstant.WARE_TEMP_OVERRUN_WARNING;
-                taskType = isNodeStack ? "08":"09";
+                taskType = isNodeStack ? "08" : "09";
                 //温湿度 湿度预警
             } else if ("humidity".equals(evnType)) {
                 type = isNodeStack ? WarningTypeConstant.STACK_HUMIDITY_OVERRUN_WARNING : WarningTypeConstant.WARE_HUMIDITY_OVERRUN_WARNING;
-                taskType = isNodeStack ? "10":"11";
+                taskType = isNodeStack ? "10" : "11";
             }
         } else {
             switch (nodeType) {
                 //氧气设备
                 case NodeConstant.OXYGEN_NODE_TYPE_VALUE:
                     type = isNodeStack ? WarningTypeConstant.STACK_OXYGEN_OVERRUN_WARNING : WarningTypeConstant.WARE_OXYGEN_OVERRUN_WARNING;
-                    taskType = isNodeStack ? "06":"07";
+                    taskType = isNodeStack ? "06" : "07";
                     break;
                 //包芯温度设备
                 case NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE:
@@ -907,26 +946,26 @@ public class MaintainDataHandler {
                     break;
             }
         }
-        return new String[]{type,taskType};
+        return new String[]{type, taskType};
     }
 
-    public void setEarlyLevel(EarlyWarning earlyWarning ,Integer level,EarlyWarningVo earlyWarningVo,Double data){
+    public void setEarlyLevel(EarlyWarning earlyWarning, Integer level, EarlyWarningVo earlyWarningVo, Double data) {
         if (ToolUtil.isEmpty(earlyWarningVo)) {
             //判断哪一等级的预警
-            if (level==1){
+            if (level == 1) {
                 earlyWarning.setWarningValOne(data.doubleValue());
-            }else if (level==2){
+            } else if (level == 2) {
                 earlyWarning.setWarningValTwo(data.doubleValue());
-            }else if (level==3){
+            } else if (level == 3) {
                 earlyWarning.setWarningValThree(data.doubleValue());
             }
-        }else {
+        } else {
             //判断哪一等级的预警
-            if (ToolUtil.isEmpty(earlyWarningVo.getWarningValOne())&&level==1){
+            if (ToolUtil.isEmpty(earlyWarningVo.getWarningValOne()) && level == 1) {
                 earlyWarning.setWarningValOne(data.doubleValue());
-            }else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValTwo())&&level==2){
+            } else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValTwo()) && level == 2) {
                 earlyWarning.setWarningValTwo(data.doubleValue());
-            }else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValThree())&&level==3){
+            } else if (ToolUtil.isEmpty(earlyWarningVo.getWarningValThree()) && level == 3) {
                 earlyWarning.setWarningValThree(data.doubleValue());
             }
         }
