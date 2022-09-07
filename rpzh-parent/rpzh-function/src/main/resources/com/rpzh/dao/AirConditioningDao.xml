@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.AirConditioningDao">
-  <select id="findAirConditioningData" resultType="java.lang.String">
+    <insert id="insertAirCondtionTags">
+        insert ALL
+
+        <foreach collection="maps" item="map">
+        <if test="map.x1!=''and map.x1!=null"></if>
+            into tb_air_condition_tags (air_condition_code,tag_cn,site_route,temp_tag,humidity_tag) values (#{map.x1},#{map.x2},#{map.x3},#{map.x4},#{map.x5})
+        </foreach>
+        select 1 from dual
+    </insert>
+    <select id="findAirConditioningData" resultType="java.lang.String">
     select air_conditioning_no from tb_air_conditioning where ware_area_id = #{wareAreaId}
   </select>
+    <select id="findAllAirCondition" resultType="com.rpzh.vo.AirConditionVo">
+        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags
+    </select>
 </mapper>
