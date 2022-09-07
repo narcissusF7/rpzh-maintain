@@ -369,13 +369,13 @@ public class MonitoringCenterController {
             dataType = "String"
     )})
     @GetMapping({"/exportNodeHistory"})
-    public Result exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) {
+    public void exportNodeHistory(@ApiIgnore NodeDto nodeDto, HttpServletResponse response) throws Exception {
         if (ToolUtil.isEmpty(nodeDto.getNodeId())){
-            return new Result<>(false, StatusCode.ERROR, "设备id不能为空");
+            throw new Exception("设备id不能为空");
         }
 
         if (ToolUtil.isEmpty(nodeDto.getNodeType())){
-            return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
+            throw new Exception("设备类型不能为空");
         }
 
         List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
@@ -406,8 +406,6 @@ public class MonitoringCenterController {
             }
         });
         EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
-
-        return new Result(true,StatusCode.OK,"导出成功");
     }
 
     @ApiOperation(
