@@ -36,4 +36,6 @@ public interface WareAreaAlarmSettingDao {
     Integer findCountByWarehouseId();
 
     EarlyWarningVo findAlarmValueSettingByAreaId(@Param("column") String column, @Param("site") String site);
+
+    WareAreaAlarmSettingVo findAlarmValueSettingBySiteRoute(@Param("siteRoute") String siteRoute, @Param("siteRoute1") String siteRoute1, @Param("siteRoute2") String siteRoute2, @Param("siteRoute3") String siteRoute3);
 }

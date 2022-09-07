@@ -482,10 +482,10 @@ public class NodeServiceImpl implements NodeService {
             }
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
 
-            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
-            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){
-                nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
-            }
+//            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
+//            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){
+//                nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
+//            }
 
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
             for (int i = 0; i < nodeDataVos.size(); i++) {

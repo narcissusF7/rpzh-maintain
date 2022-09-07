@@ -12,6 +12,7 @@ import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.handler.MaintainDataHandler;
 import com.rpzh.parse.ParseData;
+import com.rpzh.service.AirConditionService;
 import com.rpzh.service.DataReportService;
 import com.rpzh.service.NodeService;
 import com.rpzh.util.RedisUtil;
@@ -71,6 +72,9 @@ public class TestContrller{
 
     @Autowired
     DataReportService dataReportService;
+
+    @Autowired
+    AirConditionService airConditionService;
 
     @Autowired
     private TestDb2Dao testDb2Dao;
@@ -352,8 +356,38 @@ public class TestContrller{
     }
 
 
-//    @GetMapping("export")
-//    public Result export(String pidRoutes, String comparisonType , Integer exportType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
-//        return dataReportService.exportComparisonData(pidRoutes,comparisonType,exportType,acquisitionTimeOne,acquisitionTimeTwo, response);
-//    }
+    @PostMapping("testAddKT")
+    public Result testAddKT(MultipartFile file){
+//读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
+        List<Map<String, String>> airTags = new ArrayList<>();
+        List<Map<Integer, String>> maps;
+        try {
+            maps = ExcelUtils.importExcel(file, 1 , 0, 4);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result<>(false, StatusCode.ERROR, "导入失败");
+        }
+
+        for (Map<Integer, String> map:maps ) {
+            if (ToolUtil.isEmpty(map.get(0))){
+                continue;
+            }
+            Map<String,String> tag = new HashMap<>();
+            String x1 = map.get(0);
+            String x2 = map.get(1);
+            String x3 = map.get(2);
+            String x4 = map.get(3);
+            String x5 = map.get(4);
+            tag.put("x1",x1);
+            tag.put("x2",x2);
+            tag.put("x3",x3);
+            tag.put("x4",x4);
+            tag.put("x5",x5);
+            airTags.add(tag);
+        }
+        airConditionService.insertAirCondtionTags(airTags);
+
+
+        return new Result<>(true, StatusCode.OK, "测试方法7");
+    }
 }

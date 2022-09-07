@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
+import com.rpzh.dto.AirConditionDto;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.IdWorker;
 import com.rpzh.entity.ToolUtil;
@@ -15,6 +16,7 @@ import com.rpzh.pojo.EarlyWarning;
 import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.TaskManagementService;
+import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.service.impl.WarehouseServiceImpl;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.*;
@@ -24,8 +26,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -64,6 +68,7 @@ public class MaintainDataHandler {
     @Autowired
     TaskManagementService taskManagementService;
 
+
     @Autowired
     IdWorker idWorker;
 
@@ -93,64 +98,83 @@ public class MaintainDataHandler {
      */
     /**
      * 用来处理空调数据  暂时还没用
-     * @param parseData
-     * @param siteRoute
      */
-    public void handlerData(ParseData parseData ,String siteRoute) {
+    public void handlerData(List<AirConditionVo> list) {
+        //分组处理
+        Map<String, List<AirConditionVo>> collect = list.stream().collect(Collectors.groupingBy(AirConditionVo::getSiteRoute));
+
+        collect.forEach((siteRoute, airConditionDtos) ->{
+            String siteRoute1 = siteRoute.split(",\\[04")[0];
+            String siteRoute2 = siteRoute.split(",\\[03")[0];
+            String siteRoute3 = siteRoute.split(",\\[02")[0];
+            //判断位置路由下是否存在预警规则
+            WareAreaAlarmSettingVo alarmValueSettingVo =  wareAreaAlarmSettingDao.findAlarmValueSettingBySiteRoute(siteRoute,siteRoute1,siteRoute2,siteRoute3);
+            //如果预警规则为空
+            if (ToolUtil.isEmpty(alarmValueSettingVo)){
+                NodeData nodeData = new NodeData();
+                //向数据库插入当前数据
+                Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
+
+                //将该数据放入到缓存中
+//                redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
+            }
+        } );
+
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(NodeConstant.NODE_WARE_AREA,NodeConstant.HUMITURE_NODE_TYPE_VALUE);
 
-        //将位置路由转成map 后 key value 拼接
-        List<String> hashKeys = getHashKeys(siteRoute);
-        //redis中的对象名
-        String  redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
-
-        //从缓存中获取预警阈值
-        List<Double> list = new ArrayList<>();
-        for (String alarmColumn : alarmColumns) {
-            list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
-        }
-
-        NodeData nodeData = new NodeData();
-
-
-        //温度数据
-        Double data = parseData.getData().get(0);
-        //判断当前数据所属等级
-        int level = decideValue(data, list);
-        level = level==-1 ? 1:level;
-        //siteRoute 例[00:0],[01:2],[02:1],[03:1],[04:1]
-        Integer areaId = Integer.parseInt(hashKeys.get(4).substring(2));
-        //温度处理
-        level =earlyWarningHandle(level, parseData,"temp",areaId);
-
-        nodeData.setAlertLevel(level);
-        //湿度数据
-        data = parseData.getData().get(1);
-
-        //湿度数据等级
-        level = decideValue(data, list.subList(4, 8));
-        level = level==-1 ? 1:level;
-        //湿度处理
-        level = earlyWarningHandle(level, parseData, "humidity", areaId);
-        if (nodeData.getAlertLevel()<level){
-            nodeData.setAlertLevel(level);
-        }
-        //给nodeData赋值
-        nodeData.setNodeId(parseData.getNodeId());
-        nodeData.setType(parseData.getNodeType());
-        nodeData.setTransferTime(parseData.getDateTime().get(0));
-        nodeData.setTemp(parseData.getData().get(0));
-        nodeData.setHumiture(parseData.getData().get(1));
-        nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
-        nodeData.setSiteRoute(siteRoute);
-        nodeData.setWarningType(warningType.substring(1));
-
-        //向数据库插入当前数据
-        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
-
-        //将该数据放入到缓存中
-        redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
+//
+//        //将位置路由转成map 后 key value 拼接
+//        List<String> hashKeys = getHashKeys(siteRoute);
+//        //redis中的对象名
+//        String  redisHashKey = putAlarmValueToCache(hashKeys,alarmColumns[0]);
+//
+//        //从缓存中获取预警阈值
+//        List<Double> list = new ArrayList<>();
+//        for (String alarmColumn : alarmColumns) {
+//            list.add(Double.parseDouble((String) redisTemplate.opsForHash().get(redisHashKey, alarmColumn)));
+//        }
+//
+//        NodeData nodeData = new NodeData();
+//
+//
+//        //温度数据
+//        Double data = parseData.getData().get(0);
+//        //判断当前数据所属等级
+//        int level = decideValue(data, list);
+//        level = level==-1 ? 1:level;
+//        //siteRoute 例[00:0],[01:2],[02:1],[03:1],[04:1]
+//        Integer areaId = Integer.parseInt(hashKeys.get(4).substring(2));
+//        //温度处理
+//        level =earlyWarningHandle(level, parseData,"temp",areaId);
+//
+//        nodeData.setAlertLevel(level);
+//        //湿度数据
+//        data = parseData.getData().get(1);
+//
+//        //湿度数据等级
+//        level = decideValue(data, list.subList(4, 8));
+//        level = level==-1 ? 1:level;
+//        //湿度处理
+//        level = earlyWarningHandle(level, parseData, "humidity", areaId);
+//        if (nodeData.getAlertLevel()<level){
+//            nodeData.setAlertLevel(level);
+//        }
+//        //给nodeData赋值
+//        nodeData.setNodeId(parseData.getNodeId());
+//        nodeData.setType(parseData.getNodeType());
+//        nodeData.setTransferTime(parseData.getDateTime().get(0));
+//        nodeData.setTemp(parseData.getData().get(0));
+//        nodeData.setHumiture(parseData.getData().get(1));
+//        nodeData.setSiteType(NodeConstant.NODE_WARE_AREA);
+//        nodeData.setSiteRoute(siteRoute);
+//        nodeData.setWarningType(warningType.substring(1));
+//
+//        //向数据库插入当前数据
+//        Integer insertFlag = nodeDao.insertNodeHistory(nodeData, "tb_air_conditioner_history",Long.toHexString(idWorker.nextId()));
+//
+//        //将该数据放入到缓存中
+//        redisTemplate.opsForValue().set(MAINTAIN + parseData.getNodeId(), JSON.toJSONString(nodeData));
 
 
     }
