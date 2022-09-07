@@ -48,7 +48,7 @@ public class WeatherTask {
         weatherDataVo.setWeatherName(weatherName);
         weatherDataVo.setHumidity(humidity);
         weatherDataVo.setPrecip(precip);
-        weatherDataVo.setCreatedTime(sdf.format(new Date()));
+        weatherDataVo.setTransferTime(sdf.format(new Date()));
 
         redisTemplate.opsForValue().set("MAINTAIN_WEATHER", JSON.toJSONString(weatherDataVo));
 

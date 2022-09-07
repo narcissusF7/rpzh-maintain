@@ -477,7 +477,9 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getEndTime())){
                 nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
             }
-
+            if (!ToolUtil.isEmpty(nodeDto.getStartTime())){
+                nodeDto.setStartTime(nodeDto.getStartTime().split(" ")[0]+" 00:00:00");
+            }
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
 
             nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());

@@ -380,7 +380,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     public List<WeatherDataVo> findWeatherData(MonitorCondition monitorCondition) {
         List<WeatherDataVo> weatherData = weatherDao.findWeatherData(monitorCondition);
         weatherData.forEach(weatherDataVo -> {
-            weatherDataVo.setTransferTime(weatherDataVo.getCreatedTime());
+            weatherDataVo.setTransferTime(weatherDataVo.getTransferTime());
             weatherDataVo.setHumiture(weatherDataVo.getHumidity());
         });
         return weatherData;
@@ -397,7 +397,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         List<WeatherDataVo> weatherDataVos = weatherDao.findWeatherData(monitorCondition);
 
         Map<String, List<WeatherDataVo>> collect = weatherDataVos.stream().collect(Collectors.groupingBy((item) -> (
-                item.getCreatedTime().split(" ")[0])));//截取空格前的数据 然后过滤
+                item.getTransferTime().split(" ")[0])));//截取空格前的数据 然后过滤
         //转成treeMap
         TreeMap<String, List<WeatherDataVo>> paramTreeMap = new TreeMap(collect);
         List<HashMap<String, String>> historyGraphData = new ArrayList<>();
@@ -408,13 +408,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             //温度最小值
             map.put("min", value.stream().map(WeatherDataVo::getTemp).min(Double::compareTo).get() + "");
             //温度平均值
-            map.put("avg", value.stream().mapToDouble(WeatherDataVo::getTemp).average().getAsDouble() + "");
+            map.put("avg", String.format("%.2f",value.stream().mapToDouble(WeatherDataVo::getTemp).average().getAsDouble()));
             //湿度最大值
             map.put("humitureMax", value.stream().map(WeatherDataVo::getHumidity).max(Double::compareTo).get() + "");
             //湿度最小值
             map.put("humitureMin", value.stream().map(WeatherDataVo::getHumidity).min(Double::compareTo).get() + "");
             //湿度平均值
-            map.put("humitureAvg", value.stream().mapToDouble(WeatherDataVo::getHumidity).average().getAsDouble() + "");
+            map.put("humitureAvg", String.format("%.2f", value.stream().mapToDouble(WeatherDataVo::getHumidity).average().getAsDouble()));
             map.put("date", k);
             map.put("humitureDate", k);
             historyGraphData.add(map);

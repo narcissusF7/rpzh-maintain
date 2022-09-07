@@ -331,7 +331,7 @@ public class MonitoringCenterController {
                 HashMap<String, String> map = new HashMap();
                 map.put("max", value.stream().map(NodeDataVo::getData).max(Double::compareTo).get().toString());
                 map.put("min", value.stream().map(NodeDataVo::getData).min(Double::compareTo).get().toString());
-                map.put("avg", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble()+"");
+                map.put("avg", String.format("%.2f", value.stream().mapToDouble(NodeDataVo::getData).average().getAsDouble()));
                 map.put("date",k);
                 if (!ToolUtil.isEmpty(nodeDto.getNodeType())&&NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
                     map.put("humitureMax", value.stream().map(NodeDataVo::getHumiture).max(Double::compareTo).get().toString());

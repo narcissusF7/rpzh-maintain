@@ -15,7 +15,7 @@ public class WeatherDataVo extends NodeDataVo {
     @ApiModelProperty(notes = "湿度")
     private Double humidity;
     @ApiModelProperty(notes = "时间")
-    private String createdTime;
+    private String transferTime;
     @ApiModelProperty(notes = "单位小时下雨量")
     private Double precip;
 }
