@@ -833,7 +833,7 @@ public class MaintainDataHandler {
                 principal = map.get("username")+"";
             }
 
-            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString(),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),principal,DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""),type,nodeVo.getGatherSite(),nodeVo.getSiteRoute(),principal,DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskDto.setCreatedUser("系统生成");
             taskManagementService.addDataHandTask(taskDto);
