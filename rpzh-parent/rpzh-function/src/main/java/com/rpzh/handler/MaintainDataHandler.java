@@ -85,7 +85,6 @@ public class MaintainDataHandler {
 
     String warningType = "";
 
-
     public static String MAINTAIN = "MAINTAIN_";
     public static String ALERT_NUM = "ALERT_NUM_";
     public static String MAINTAIN_CACHE_NODE = "MAINTAIN_CACHE_NODE_";
