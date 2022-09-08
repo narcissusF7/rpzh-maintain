@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.EarlyWarningDao">
     <select id="findRepairData" resultType="com.rpzh.vo.RepairDataVo">
-        select node_id as deviceId,node_type as deviceType,warning_type as repairReason
+        select node_id as deviceId,node_type as deviceType,case when warning_type = '01' then '设备电量低' when is_affirm = '02' then '设备信号强度差' when is_affirm = '02' then '设备丢' end as repairReasoncase
         from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03')
         <if test="areaId != null and areaId != ''">and area_id = #{areaId}</if>
         <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
@@ -59,7 +59,7 @@
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-         group by site_route,node_type) ORDER BY is_affirm DESC
+        group by site_route,node_type) ORDER BY is_affirm DESC
     </select>
     <select id="findEarlyWarningByWarningType" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT id AS id, area_id AS areaId, stack_id AS stackId, is_affirm AS affirm,warning_type AS warningType,node_type AS nodeType,
@@ -69,16 +69,17 @@
         CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
         instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END AS warningVal,
         case when is_affirm = '1' then '正在处理' when is_affirm = '2' then '未处理' end as affirmName
-        FROM tb_early_warning where 1=1
+        FROM tb_early_warning where is_affirm in ('01','02')
         <if test="earlyWarningDto.warningType !='' and earlyWarningDto.warningType != null">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
-         ORDER BY is_affirm DESC
+        ORDER BY is_affirm DESC
     </select>
     <select id="findNewTime" resultType="java.util.Map">
-    select to_char(warning_time,'SYYYY-MM-DD HH24:MI:SS') as "time",principal as "principal" from tb_early_warning where is_affirm = #{affirm} and warning_type = #{warningType} and site_route = #{siteRoute} and rownum = 1 order by warning_time
-</select>
+        select to_char(warning_time,'SYYYY-MM-DD HH24:MI:SS') as "time",principal as "principal" from tb_early_warning
+        where is_affirm = #{affirm} and <if test="warningType==01">warning_type in ('01','02','03')</if><if test="warningType!=01"> warning_type = #{warningType}</if> and site_route = #{siteRoute} and rownum = 1 order by warning_time
+    </select>
     <select id="findWarningDataWarningType" resultType="java.util.Map">
         SELECT id as "id",site_route as "pidRoute",node_id as "nodeId",node_type as "nodeType",warning_type as "warningType",
         warning_val as "warningVal",stack_id as "stackId",area_id as "areaId" FROM tb_early_warning
@@ -243,12 +244,11 @@
         <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>)
     </select>
     <select id="findAppCount" resultType="java.util.Map">
-        select
-        COALESCE(count(1),0) AS "count",
-        COALESCE(count(DECODE(TO_CHAR(warning_grade), '1' , 1, NULL)),0) AS "oneWarningCount",
-        COALESCE(count(DECODE(TO_CHAR(warning_grade), '2' , 1, NULL)),0) AS "twoWarningCount",
-        COALESCE(count(DECODE(TO_CHAR(warning_grade), '3' , 1, NULL)),0) AS "threeWarningCount"
-        from tb_early_warning where is_affirm = '2'
+        select COALESCE(count(1),0) AS "count",
+        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' end, '1' , 1, NULL)),0) AS "oneWarningCount",
+        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' end, '2' , 1, NULL)),0) AS "twoWarningCount",
+        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '3') > 0 THEN '3' end, '3' , 1, NULL)),0) AS "threeWarningCount"
+        from tb_early_warning where is_affirm in('1','2')
     </select>
     <select id="findAppDeviceFault" resultType="java.util.Map">
         select
@@ -259,8 +259,7 @@
         where is_affirm = '2' and warning_type in ('01','02','03')
     </select>
     <select id="findAppWarning" resultType="java.lang.String">
-        select COALESCE(count(1),0) from tb_early_warning
-        where is_affirm in ('1','2') and warning_type = #{warningType} GROUP BY warning_type
+        select COALESCE(count(1),0) from tb_early_warning where is_affirm in ('1','2') and warning_type = #{warningType} GROUP BY warning_type
     </select>
     <select id="findAppCountByWarningType" resultType="java.lang.String">
         select COALESCE(count(1),0) from tb_early_warning where is_affirm in('1','2')
@@ -269,15 +268,18 @@
             instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{warningGrade}</if>
         GROUP BY warning_type
     </select>
+    <select id="findAppCountByWarningFault" resultType="java.lang.String">
+        select COALESCE(count(1),0) from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03')
+    </select>
     <select id="findAppWarningInfoByWarningType" resultType="java.util.Map">
         select id as "id",node_type as "nodeType",area_id as "areaId",stack_id as "stackId",principal as "principal",site_route as "siteRoute",warning_grade as "grade",node_id as "nodeId",warning_type as "warningType",
         CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-            instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS "warningGrade",
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS "warningGrade",
         to_char(CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
         instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END,'FM999.00') AS "warningVal",
         to_char(CASE WHEN instr(warning_grade, '3') > 0 THEN warning_time_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_time_two WHEN
         instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_time_one END,'SYYYY-MM-DD HH24:MI:SS' ) AS "warningTime"
-        from tb_early_warning where is_affirm in('1','2') <if test="warningType==01">and warning_type in ('01','02','03')</if><if test="warningType != 01"> and warning_type = #{warningType}</if>
+        from tb_early_warning where is_affirm in('1','2') and warning_type = #{warningType}
         <if test="warningGrade != null and warningGrade != ''">and CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
             instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{warningGrade}</if>
     </select>
@@ -293,15 +295,12 @@
     <select id="findAppPrincipalById" resultType="java.lang.String">
         select principal from tb_early_warning where id = #{id}
     </select>
-    <!--
-    <select id="findAppwarningId" resultType="java.lang.Integer">
-        SELECT CASE when instr(LISTAGG(id, ',') WITHIN GROUP(ORDER BY warning_grade DESC),',') != 0 THEN substr(LISTAGG(id, ',') WITHIN GROUP(ORDER BY warning_grade DESC)
-        , 1, instr(LISTAGG(id, ',') WITHIN GROUP(ORDER BY warning_grade DESC), ',',1,1)-1) ELSE LISTAGG(id, ',') WITHIN GROUP(ORDER BY warning_grade DESC) END AS id from tb_early_warning
-        where is_affirm = '2' <if test="warningType==01">and warning_type in ('01','02','03')</if><if test="warningType != 01"> and warning_type = #{warningType}</if>
-        <if test="warningGrade != null and warningGrade != ''">and warning_grade = #{warningGrade}</if>  GROUP BY site_route
+    <select id="findAppWarningInfoByWarningFault" resultType="java.util.Map">
+        SELECT id AS "id",area_id AS "areaId",stack_id AS "stackId",is_affirm AS "affirm",node_type AS "nodeType",principal as "principal",
+    warning_grade as "warningGrade",site_route as "siteRoute",to_char(warning_time_one,'yyyy-MM-dd HH:mm:ss') AS "warningTime",warning_type as "warningType" FROM tb_early_warning
+    where id in (SELECT max(id) from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03') group by site_route,node_type,warning_type) ORDER BY is_affirm DESC
+</select>
+    <select id="findAppFaultNodeId" resultType="java.lang.String">
+        select node_id from tb_early_warning where site_route =#{siteRoute} and is_affirm = '2' and warning_type = #{warningType} and node_type = #{nodeType}
     </select>
-    <select id="findAppwarningInfo" resultType="com.rpzh.vo.EarlyWarningVo">
-        select warning_grade as warningGrade,warning_val as warningVal,principal as principalName,stack_id as stackid,area_id as areaId
-    </select>
-    -->
 </mapper>
