@@ -390,4 +390,27 @@ public class TestContrller{
 
         return new Result<>(true, StatusCode.OK, "测试方法7");
     }
+
+    @PostMapping("testKTDaTA")
+    public Result testKTDaTA(MultipartFile file){
+//读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
+        List<AirConditionVo> airTags = new ArrayList<>();
+        List<Map<Integer, String>> maps;
+        try {
+            maps = ExcelUtils.importExcel(file, 1 , 0, 6);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new Result<>(false, StatusCode.ERROR, "导入失败");
+        }
+
+        for (Map<Integer, String> map:maps ) {
+            if (ToolUtil.isEmpty(map.get(0))){
+                continue;
+            }
+            AirConditionVo airConditionVo = new AirConditionVo(map);
+            airTags.add(airConditionVo);
+        }
+        dataHandler.handlerData(airTags);
+        return new Result<>(true, StatusCode.OK, "测试空调数据流程");
+    }
 }

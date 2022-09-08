@@ -2,6 +2,8 @@ package com.rpzh.vo;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class AirConditionVo {
     //主键id
@@ -20,4 +22,17 @@ public class AirConditionVo {
     private String humidityTag;
     //湿度数据
     private Double humidityVal;
+
+    public AirConditionVo() {
+    }
+
+    public AirConditionVo(Map<Integer,String> map) {
+        this.airConditionCode = map.get(0);
+        this.tagCN = map.get(1);
+        this.siteRoute = map.get(2);
+        this.tempTag = map.get(3);
+        this.tempVal = Double.parseDouble(map.get(5));
+        this.humidityTag = map.get(4);
+        this.humidityVal = Double.parseDouble(map.get(6));
+    }
 }

@@ -68,10 +68,6 @@ public class AirConditionerTask {
             airConditionVo.setHumidityVal(Double.valueOf(String.format("%.2f",humidityVal)));
 
         });
-
-        String s = PortDataUtils.sendPost(TagDataUrl,new HashMap<>());
-        JSONObject dataOfJson = JSONObject.parseObject(s);
-        //数据整理成parseData
         dataHandler.handlerData(list);
     }
 }

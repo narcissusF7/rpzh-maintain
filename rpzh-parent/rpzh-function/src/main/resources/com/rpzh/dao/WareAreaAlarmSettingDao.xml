@@ -169,15 +169,15 @@
             warehouse_moisture_upper_one as warehouseMoistureUpperOne,
             warehouse_moisture_upper_two as warehouseMoistureUpperTwo,
             warehouse_moisture_upper_three as warehouseMoistureUpperThree,
-            warehouse_moisture_lower as warehouseMoistureLower
+            warehouse_moisture_lower as warehouseMoistureLower,
         	SITE_ID siteId,
         	SITE_TYPE siteType,
         	CREATED_TIME createTime,
-        	PID_ROUTE pidRoute
+        	PID_ROUTE siteName
         FROM
         	TB_WARE_AREA_ALARM_SETTING
         WHERE
-              PID_ROUTE IN (#{siteRoute},#{siteRoute1},#{siteRoute2},#{siteRoute3}) AND max(length(PID_ROUTE))) t
+              PID_ROUTE IN (#{siteRoute},#{siteRoute1},#{siteRoute2},#{siteRoute3}) order by PID_ROUTE desc) t
         WHERE ROWNUM =1
     </select>
 </mapper>
