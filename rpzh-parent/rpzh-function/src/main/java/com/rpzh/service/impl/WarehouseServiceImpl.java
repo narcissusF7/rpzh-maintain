@@ -809,7 +809,17 @@ public class WarehouseServiceImpl implements WarehouseService {
     public Result locatingMaintain() {
         //查询没有养护计划的垛位
         List<String> quickCodes = materialDao.findQuickCode();
-        List<StackVo> stackVos = maintainPlanDao.findStackNotInMaintainPlan(quickCodes);
+        List<StackVo> stackVos1 = maintainPlanDao.findStackNotInMaintainPlan(quickCodes);
+        if(stackVos1.size()==0){
+            return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
+        }
+        List<StackVo> stackVos = new ArrayList<>();
+        List<Integer> stackIds = maintainPlanDao.findStackIds();
+        for (StackVo stackVo : stackVos) {
+            if(!stackIds.contains(stackVo.getId())){
+                stackVos.add(stackVo);
+            }
+        }
         if(stackVos.size()==0){
             return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
         }

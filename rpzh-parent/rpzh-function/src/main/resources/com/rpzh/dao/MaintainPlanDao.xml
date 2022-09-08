@@ -470,10 +470,13 @@
       t.created_user as createdUser,t.last_updated_time as lastUpdatedTime,t.last_updated_user as lastUpdatedUser,
       t.area_id as areaId,t.pid_route as pidRoute,t.site_name as siteName,
       t.stack_type as stackType,t.remark as remark,t.principal_name as principalName
-      FROM tb_stack t inner join (select stack_id from tb_maintain_plan where is_end = '0') m on t.id = m.stack_id where t.stack_no in
+      FROM tb_stack t where t.stack_no in
       <foreach collection="quickCodes" item="quickCode" open="(" separator="," close=")">#{quickCode}</foreach>
       order by t.id
   </select>
+    <select id="findStackIds" resultType="java.lang.Integer">
+        select stack_id from tb_maintain_plan where is_end = '0'
+    </select>
     <select id="findStackIdBySiteRoute" resultType="java.lang.Integer">
     select id from tb_stack where pid_route like concat(concat('%',#{siteRoute}),'%')
   </select>

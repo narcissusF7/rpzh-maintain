@@ -18,6 +18,6 @@
         FROM MC.VW_MAINTAIN_INVENTORY WHERE QUICKCODE = #{nameCn} GROUP BY MATERIALCODE
     </select>
     <select id="findNameCn" resultType="java.lang.String">
-        select QUICKCODE from MC.VW_MAINTAIN_INVENTORY where MATERIALCODE like concat(concat('%',#{materialCode}),'%');
+        select QUICKCODE from MC.VW_MAINTAIN_INVENTORY where MATERIALCODE like concat(concat('%',#{materialCode}),'%')
     </select>
 </mapper>
