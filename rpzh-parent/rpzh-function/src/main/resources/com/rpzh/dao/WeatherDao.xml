@@ -11,7 +11,7 @@
         temp as temp,
         humidity as humidity ,
         precip as precip ,
-        created_time as createdTime
+        created_time as transferTime
         from tb_weather_history
         <where>
             <if test="monitorCondition.startTime!=null and monitorCondition.startTime!=''">

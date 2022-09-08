@@ -134,6 +134,13 @@ public class MaintainDataHandler {
                 humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureUpperTwo()));
                 humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureUpperThree()));
                 humidityList.add(Double.valueOf(alarmValueSettingVo.getWarehouseMoistureLower()));
+
+                //判断所在位置的预警
+                EarlyWarningVo tempWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(siteRoute, "09");
+                EarlyWarningVo humidityWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(siteRoute, "11");
+                EarlyWarning tempWarning = new EarlyWarning();
+                EarlyWarning humidityWarning = new EarlyWarning();
+
                 airConditionDtos.forEach(airConditionVo -> {
                     //温度数据
                     Double tempVal = airConditionVo.getTempVal();
@@ -142,7 +149,7 @@ public class MaintainDataHandler {
                     tempLevel = tempLevel==-1 ? 1:tempLevel;
 
                     //温度处理
-                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp");
+                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp",tempWarningVo,tempWarning);
 
                     //湿度数据
                     Double humidityVal = airConditionVo.getHumidityVal();
@@ -151,7 +158,7 @@ public class MaintainDataHandler {
                     humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
 
                     //湿度处理
-                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"humidity");
+                    humidityLevel =earlyWarningHandle(humidityLevel, airConditionVo,"humidity",humidityWarningVo,humidityWarning);
 
                     //预警等级
                     int level = humidityLevel>tempLevel ? humidityLevel:tempLevel;
@@ -374,7 +381,6 @@ public class MaintainDataHandler {
                     alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmId);
                 }
 
-
                 //数据库中有就存在缓存中并跳出循环  没有就向上查找
                 if (!ToolUtil.isEmpty(alarmValueSettingVo)) {
 
@@ -477,7 +483,7 @@ public class MaintainDataHandler {
      * @param evnType
      * @return
      */
-    public Integer earlyWarningHandle(Integer level, AirConditionVo airConditionVo, String evnType) {
+    public Integer earlyWarningHandle(Integer level, AirConditionVo airConditionVo, String evnType,EarlyWarningVo earlyWarningVo , EarlyWarning earlyWarning) {
         if (level == 0) {
             redisTemplate.opsForHash().put(ALERT_NUM, airConditionVo.getAirConditionCode() + evnType, 0);
             return 0;
@@ -493,34 +499,50 @@ public class MaintainDataHandler {
         }
 
         String warningType = WarningTypeConstant.getWarningType(NodeConstant.NODE_WARE_AREA, NodeConstant.HUMITURE_NODE_TYPE_VALUE, evnType);
-        //查询数据库中该空调未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(airConditionVo.getSiteRoute(), warningType);
         //如果不存在
         if (ToolUtil.isEmpty(earlyWarningVo)&&level>0){
-            EarlyWarning earlyWarning = new EarlyWarning();
-            earlyWarning.setWarningType(warningType);
-            earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
-            //获取位置路由
-            String siteRoute = airConditionVo.getSiteRoute();
-            //去掉位置路由的最后一个] ，然后截取:
-            String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[5];
-            earlyWarning.setAreaId(Integer.parseInt(siteId));
-            //获取位置负责人
-            Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
-            //设置负责人
-            String principal = sitePrincipal.get("userName").toString();
-            earlyWarning.setPrincipalName(principal);
+            //判断当前的预警pojo是不是为空
+            if (ToolUtil.isEmpty(earlyWarning)){
+                earlyWarning.setWarningType(warningType);
+                earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
+                //获取位置路由
+                String siteRoute = airConditionVo.getSiteRoute();
+                //去掉位置路由的最后一个] ，然后截取:
+                String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[5];
+                earlyWarning.setAreaId(Integer.parseInt(siteId));
+                //获取位置负责人
+                Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
+                //设置负责人
+                String principal = sitePrincipal.get("username").toString();
+                earlyWarning.setPrincipalName(principal);
 
-            //判断是哪个类型的预警
-            //设置预警值  及对应预警等级的预警值
-            setLevel(earlyWarning,level,data);
+                //判断是哪个类型的预警
+                //设置预警值  及对应预警等级的预警值
+                setLevel(earlyWarning,level,data);
 
+            }else {
+                earlyWarning.setWarningVal(earlyWarning.getWarningVal() + "," + data);
+                earlyWarning.setNodeId(earlyWarning.getNodeId() + "," + airConditionVo.getAirConditionCode());
+                earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
+                //判断哪一等级的预警
+                //判断哪一等级的预警
+                if (ToolUtil.isEmpty(earlyWarning.getWarningValOne()) && level == 1) {
+                    earlyWarning.setWarningValOne(data.doubleValue());
+                } else if (ToolUtil.isEmpty(earlyWarning.getWarningValTwo()) && level == 2) {
+                    earlyWarning.setWarningValTwo(data.doubleValue());
+                } else if (ToolUtil.isEmpty(earlyWarning.getWarningValThree()) && level == 3) {
+                    earlyWarning.setWarningValThree(data.doubleValue());
+                }
+
+
+
+
+            }
             //09 仓间温度预警  11 仓间湿度预警
-            Map map = addTask(airConditionVo, taskType, principal);
+            Map map = addTask(airConditionVo, taskType, earlyWarning.getPrincipalName());
             earlyWarning.setTaskId(Integer.parseInt(map.get("id").toString()));
             earlyWarningDao.insertWarning(earlyWarning);
         }else{
-            EarlyWarning earlyWarning = new EarlyWarning();
             //如果存在未处理的预警
                 //获取nodeIds
                 String[] nodeIds = earlyWarningVo.getNodeId().split(",");
