@@ -808,14 +808,14 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public Result locatingMaintain() {
         //查询没有养护计划的垛位
-        List<String> quickCodes = materialDao.findQuickCode();
+        List<String> quickCodes = Arrays.asList("F11199,F12203".split(","));
         List<StackVo> stackVos1 = maintainPlanDao.findStackNotInMaintainPlan(quickCodes);
         if(stackVos1.size()==0){
             return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
         }
         List<StackVo> stackVos = new ArrayList<>();
         List<Integer> stackIds = maintainPlanDao.findStackIds();
-        for (StackVo stackVo : stackVos) {
+        for (StackVo stackVo : stackVos1) {
             if(!stackIds.contains(stackVo.getId())){
                 stackVos.add(stackVo);
             }
