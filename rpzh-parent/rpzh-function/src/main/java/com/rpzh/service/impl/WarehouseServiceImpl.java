@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.MaintainPlanDao;
+import com.rpzh.dao.MaterialDao;
+import com.rpzh.dao.TestDb2Dao;
 import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.*;
 import com.rpzh.entity.Result;
@@ -801,10 +803,13 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Resource
     private MaintainPlanDao maintainPlanDao;
+    @Resource
+    private MaterialDao materialDao;
     @Override
     public Result locatingMaintain() {
         //查询没有养护计划的垛位
-        List<StackVo> stackVos = maintainPlanDao.findStackNotInMaintainPlan();
+        List<String> quickCodes = materialDao.findQuickCode();
+        List<StackVo> stackVos = maintainPlanDao.findStackNotInMaintainPlan(quickCodes);
         if(stackVos.size()==0){
             return new Result(false, StatusCode.ERROR, "垛位都有新建养护计划");
         }

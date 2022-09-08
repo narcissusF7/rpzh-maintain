@@ -107,7 +107,7 @@ public interface MaintainPlanDao {
 
     Integer findCountBySiteRoute(@Param("siteRoutes")List<String> siteRoutes);
 
-    List<StackVo> findStackNotInMaintainPlan();
+    List<StackVo> findStackNotInMaintainPlan(@Param("quickCodes")List<String> quickCodes);
 
     List<Integer> findStackIdBySiteRoute(@Param("siteRoute")String siteRoute);
 

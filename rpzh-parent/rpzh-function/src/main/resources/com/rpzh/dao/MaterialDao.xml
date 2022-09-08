@@ -1,38 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.MaterialDao">
-    <select id="getMaintainCount" resultType="java.lang.Double">
-    select
-    sum(stock_box) as maintainCount
-    from tb_material where stack_id = #{stackId} and is_end = '0'
-</select>
-    <select id="getMaterialBatch" resultType="java.lang.String">
-    select
-    distinct batch
-    from tb_material where stack_id = #{stackId} and is_end = '0'
-</select>
+    <select id="findQuickCode" resultType="java.lang.String">
+        select distinct QUICKCODE FROM MC.VW_MAINTAIN_INVENTORY
+    </select>
+    <select id="getAllMaintainCount" resultType="java.lang.Double">
+        select sum(INVOICEQTY) as maintainCount from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{nameCn}
+    </select>
     <select id="findMaterialCode" resultType="java.lang.String">
-    select
-    distinct material_code as materialCode
-    from tb_material where stack_id = #{stackId} and is_end = '0'
+    select distinct MATERIALCODE as materialCode from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{nameCn}
     </select>
-    <update id="updateMaterialStatus">
-        update tb_material set is_end = '1' where stack_id = #{stackId}
-    </update>
-    <select id="findCount" resultType="com.rpzh.vo.MaterialVo">
-    SELECT
-material_code as materialCode,
-    SUM(stock_box) AS maintainCount
-    FROM tb_material WHERE stack_id = #{stackId} AND
-    material_code IN <foreach collection="materialCodes" item="materialCode" open="(" separator="," close=")">
-        #{materialCode}
-    </foreach> AND is_end = '0' GROUP BY material_code
-</select>
     <select id="findAllMaterialCodes" resultType="java.lang.String">
-        select distinct material_code from tb_material
+        select distinct MATERIALCODE from MC.VW_MAINTAIN_INVENTORY
     </select>
-    <select id="findMaterialCodeByStackId" resultType="java.lang.String">
-        select LISTAGG(to_char(material_code), ',') WITHIN GROUP ( ORDER BY id)
-                       listagg from TB_MATERIAL where STACK_ID =#{stackId}
+    <select id="findCount" resultType="com.rpzh.vo.MaterialVo">
+        SELECT MATERIALCODE as materialCode, SUM(INVOICEQTY) AS maintainCount
+        FROM MC.VW_MAINTAIN_INVENTORY WHERE QUICKCODE = #{nameCn} GROUP BY MATERIALCODE
+    </select>
+    <select id="findNameCn" resultType="java.lang.String">
+        select QUICKCODE from MC.VW_MAINTAIN_INVENTORY where MATERIALCODE like concat(concat('%',#{materialCode}),'%');
     </select>
 </mapper>

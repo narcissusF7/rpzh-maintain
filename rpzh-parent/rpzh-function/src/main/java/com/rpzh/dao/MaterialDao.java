@@ -1,5 +1,6 @@
 package com.rpzh.dao;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.rpzh.vo.MaterialVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,17 +15,21 @@ import java.util.List;
 @Mapper
 public interface MaterialDao {
 
-    Double getMaintainCount(@Param("stackId") Integer stackId);
+    @DS("db2")
+    List<String> findQuickCode();
 
-    List<String> getMaterialBatch(@Param("stackId") Integer stackId);
+    @DS("db2")
+    List<String> findMaterialCode(@Param("nameCn")String nameCn);
 
-    List<String> findMaterialCode(@Param("stackId") Integer stackId);
+    @DS("db2")
+    Double getAllMaintainCount(@Param("nameCn")String nameCn);
 
-    int updateMaterialStatus(@Param("stackId") Integer stackId);
+    @DS("db2")
+    List<MaterialVo> findCount(@Param("nameCn")String nameCn);
 
-    List<MaterialVo> findCount(@Param("stackId") Integer stackId, @Param("materialCodes") List<String> materialCodes);
-
+    @DS("db2")
     List<String> findAllMaterialCodes();
 
-    List<String> findMaterialCodeByStackId(@Param("stackId") Integer stackId);
+    @DS("db2")
+    List<String> findNameCn(@Param("materialCode")String materialCode);
 }

@@ -135,4 +135,7 @@ public class NodeVo implements Serializable {
 
     @ApiModelProperty(notes = "湿度预警等级")
     private Integer humidityLevel;
+
+    @ApiModelProperty(notes = "垛位中文名称")
+    private String nameCn;
 }

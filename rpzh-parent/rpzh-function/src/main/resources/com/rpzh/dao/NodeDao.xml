@@ -346,8 +346,7 @@
         </where>
         order by site_route,site_x,site_y,site_z
         <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
-            ) t where t.stackId in (select stack_id from tb_material where material_code like concat(concat('%',
-            #{monitorCondition.materialCode}),'%'))
+            ) t where t.stackId in (select stack_id from tb_stack where name_cn in<foreach collection="nameCns" item="nameCn" open="(" separator="," close=")">#{nameCn}</foreach>)
         </if>
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
@@ -421,11 +420,10 @@
                tnode.last_updated_time              lastUpdateTime,
                tnode.last_updated_user              lastUpdateUser,
                tnode.stack_id                       stackId,
-               LISTAGG(to_char(tmate.material_code), ',') WITHIN GROUP ( ORDER BY tmate.material_code)
-                       OVER (PARTITION BY tnode.id) listagg
+               ts.name_cn                           nameCn
         FROM tb_node tnode
-                 left join tb_material tmate
-                           on tnode.stack_id = tmate.stack_id
+                 left join tb_stack ts
+                           on tnode.stack_id = ts.id
         where node_id = #{nodeId})where ROWNUM = 1
     </select>
 

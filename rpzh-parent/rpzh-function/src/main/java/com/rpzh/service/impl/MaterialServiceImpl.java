@@ -25,17 +25,16 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     public MaterialVo findMaterialInfo(Integer stackId) {
         MaterialVo materialVo = new MaterialVo();
-        Double maintainCount = materialDao.getMaintainCount(stackId);
-        materialVo.setMaintainCount(maintainCount);
-        if(materialVo==null){
-            return null;
+        StackVo stackVo = warehouseDao.findStackById(stackId);
+        String nameCn = stackVo.getNameCn();
+        List<String> materialCodes = materialDao.findMaterialCode(nameCn);
+        if(ToolUtil.isEmpty(materialCodes)){
+            return materialVo;
         }
-        List<String> materialCodes = materialDao.findMaterialCode(stackId);
-        if(materialCodes.size()>0) {
-            materialVo.setMaterialCodes(materialCodes);
-        }
+        materialVo.setMaintainCount(materialDao.getAllMaintainCount(nameCn));
+        materialVo.setMaterialCodes(materialCodes);
         materialVo.setPrincipalId(getPrincipalName(stackId));
-        materialVo.setPidRoute(SiteRouteUtil.route(warehouseDao.findPidRoute(stackId).getPidRoute(),stackId+""));
+        materialVo.setPidRoute(SiteRouteUtil.route(stackVo.getPidRoute(),stackId+""));
         return materialVo;
     }
 
@@ -48,7 +47,7 @@ public class MaterialServiceImpl implements MaterialService {
     private RedisUtil redisUtil;
     public Integer getPrincipalName(Integer stackId){
         StackVo stackVo = warehouseDao.findStackPrincipalName(stackId);
-        if (!ToolUtil.isEmpty(stackVo.getPrincipalName())) {
+        if (ToolUtil.isNotEmpty(stackVo.getPrincipalName())) {
             return Integer.parseInt(redisUtil.hget("USER_"+stackVo.getPrincipalName(),"userId").toString());
         }
         WareAreaVo wareAreaVo = warehouseDao.findWareAreaPrincipalName(stackVo.getAreaId());

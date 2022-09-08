@@ -56,6 +56,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     GeneralSettingDao generalSettingDao;
 
     @Resource
+    private MaterialDao materialDao;
+
+    @Resource
     private MaintainDataHandler dataHandler;
 
     public MonitoringCenterServiceImpl() {
@@ -90,7 +93,8 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
         } else {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
-            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition);
+            List<String> nameCns = materialDao.findNameCn(monitorCondition.getMaterialCode());
+            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition,nameCns);
         }
 
         //添加筛选完后的数据

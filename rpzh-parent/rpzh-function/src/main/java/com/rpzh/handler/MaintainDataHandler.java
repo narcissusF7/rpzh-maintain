@@ -72,9 +72,6 @@ public class MaintainDataHandler {
     @Autowired
     IdWorker idWorker;
 
-    @Autowired
-    MaterialDao materialDao;
-
 //    @Value("${time.frequency}")
     Integer frequency  =7200;
 

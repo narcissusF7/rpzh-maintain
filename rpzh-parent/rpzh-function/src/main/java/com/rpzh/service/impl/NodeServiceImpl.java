@@ -7,10 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
-import com.rpzh.dao.GeneralSettingDao;
-import com.rpzh.dao.NodeDao;
-import com.rpzh.dao.NodeOperationDao;
-import com.rpzh.dao.TaskManagementDao;
+import com.rpzh.dao.*;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.TaskDto;
@@ -463,6 +460,8 @@ public class NodeServiceImpl implements NodeService {
         return new Result<>(true,StatusCode.OK,"查询成功",taskVo);
     }
 
+    @Resource
+    private MaterialDao materialDao;
 
     /**
      * 查询设备历史记录
@@ -481,7 +480,8 @@ public class NodeServiceImpl implements NodeService {
                 nodeDto.setStartTime(nodeDto.getStartTime().split(" ")[0]+" 00:00:00");
             }
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
-
+            String materialCode = String.join(",",materialDao.findMaterialCode(nodeVo.getNameCn()));
+            nodeVo.setMaterialCode(materialCode);
 //            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
 //            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){
 //                nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
