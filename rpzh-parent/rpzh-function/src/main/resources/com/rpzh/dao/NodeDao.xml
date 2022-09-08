@@ -418,7 +418,7 @@
                tnode.last_updated_time              lastUpdateTime,
                tnode.last_updated_user              lastUpdateUser,
                tnode.stack_id                       stackId,
-               ts.name_cn                           nameCn
+               ts.stack_no                          stackNo
         FROM tb_node tnode
                  left join tb_stack ts
                            on tnode.stack_id = ts.id
