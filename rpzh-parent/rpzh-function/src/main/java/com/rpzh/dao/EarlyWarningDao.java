@@ -98,13 +98,19 @@ public interface EarlyWarningDao {
 
     String findAppCountByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
 
+    String findAppCountByWarningFault();
+
     EarlyWarningVo findUndoEarlyWarningBySiteRoute(@Param("siteRoute") String siteRoute, @Param("warningType") String coreTempOverrunStackWarning);
 
     Integer findUndoStatusByNodeId(@Param("nodeId") String nodeId);
 
     List<Map> findAppWarningInfoByWarningType(@Param("warningType")String warningType, @Param("warningGrade") String warningGrade);
 
+    List<Map> findAppWarningInfoByWarningFault();
+
     Map findPestCount(@Param("nodeId")String nodeId);
 
     String findAppPrincipalById(@Param("id")String id);
+
+    List<String> findAppFaultNodeId(@Param("siteRoute")String siteRoute,@Param("warningType")String warningType,@Param("nodeType")String nodeType);
 }
