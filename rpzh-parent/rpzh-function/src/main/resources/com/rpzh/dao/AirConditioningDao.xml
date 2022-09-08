@@ -14,6 +14,6 @@
     select air_conditioning_no from tb_air_conditioning where ware_area_id = #{wareAreaId}
   </select>
     <select id="findAllAirCondition" resultType="com.rpzh.vo.AirConditionVo">
-        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags
+        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags where avg_flag= 0
     </select>
 </mapper>

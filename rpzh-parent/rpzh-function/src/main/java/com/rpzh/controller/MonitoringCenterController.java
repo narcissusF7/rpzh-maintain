@@ -380,7 +380,7 @@ public class MonitoringCenterController {
         if (ToolUtil.isEmpty(nodeDto.getNodeId())&&ToolUtil.isEmpty(nodeDto.getNodeType())||("null".equals(nodeDto.getNodeId())&&"null".equals(nodeDto.getNodeType()))){
             //设备id和设备类型都为空  导出的为天气数据
                 MonitorCondition monitorCondition = new MonitorCondition();
-                monitorCondition.setPidRoute(monitorCondition.getStartTime()+" 00:00:00");
+                monitorCondition.setStartTime(monitorCondition.getStartTime()+" 00:00:00");
                 monitorCondition.setEndTime(monitorCondition.getEndTime()+" 23:59:59");
                 List<WeatherDataVo> weatherData = monitoringCenterService.findWeatherData(monitorCondition);
             EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();

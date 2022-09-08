@@ -391,7 +391,7 @@ public class TestContrller{
         return new Result<>(true, StatusCode.OK, "测试方法7");
     }
 
-    @PostMapping("testKTDaTA")
+    @PostMapping("testKTData")
     public Result testKTDaTA(MultipartFile file){
 //读取表格中的数据，file 文件，startRow:开始的行数   startCloumn:开始的列数，endCloumn:结束的列数
         List<AirConditionVo> airTags = new ArrayList<>();

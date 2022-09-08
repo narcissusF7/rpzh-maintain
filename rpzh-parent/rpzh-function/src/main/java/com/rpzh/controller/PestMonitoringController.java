@@ -133,7 +133,12 @@ public class PestMonitoringController {
         if (ToolUtil.isEmpty(pestMonitoringRuleDto.getValueThree())) {
             return new Result<>(false, StatusCode.ERROR, "三级预警值不能为空");
         }
-
+        if (pestMonitoringRuleDto.getValueOne()>=pestMonitoringRuleDto.getValueTwo()){
+            return new Result<>(false, StatusCode.ERROR, "二级预警值不能小于等于一级预警值");
+        }
+        if (pestMonitoringRuleDto.getValueTwo()>=pestMonitoringRuleDto.getValueThree()){
+            return new Result<>(false, StatusCode.ERROR, "三级预警值不能小于等于二级预警值");
+        }
         if (ToolUtil.isEmpty(pestMonitoringRuleDto.getColorOne())) {
             return new Result<>(false, StatusCode.ERROR, "一级预警颜色不能为空");
         }

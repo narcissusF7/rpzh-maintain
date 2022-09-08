@@ -148,6 +148,8 @@ public class MaintainDataHandler {
                     //温度处理
                     tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp",tempWarningVo,tempWarning);
 
+
+
                     //湿度数据
                     Double humidityVal = airConditionVo.getHumidityVal();
                     //湿度等级
@@ -156,6 +158,7 @@ public class MaintainDataHandler {
 
                     //湿度处理
                     humidityLevel =earlyWarningHandle(humidityLevel, airConditionVo,"humidity",humidityWarningVo,humidityWarning);
+
 
                     //预警等级
                     int level = humidityLevel>tempLevel ? humidityLevel:tempLevel;
@@ -172,6 +175,40 @@ public class MaintainDataHandler {
                     redisTemplate.opsForValue().set(MAINTAIN + airConditionVo.getAirConditionCode(), JSON.toJSONString(nodeData));
 
                 });
+                //如果数据库里面该位置不存在未处理预警
+                if (ToolUtil.isEmpty(tempWarningVo)){
+                    //如果传输的数据达到预警阈值
+                    if (ToolUtil.isNotEmpty(tempWarning)){
+                        //09 仓间温度预警  11 仓间湿度预警
+                        //创建任务
+                        Map map = addTask(siteRoute, "09", tempWarning.getPrincipalName(),airConditionDtos.get(0).getTagCN());
+                        //预警设置任务id
+                        tempWarning.setTaskId(Integer.parseInt(map.get("id").toString()));
+                        //生成预警
+                        earlyWarningDao.insertWarning(tempWarning);
+                    }
+                }else {
+                    //如果数据库该位置存在预警
+                    earlyWarningDao.updateWarning(tempWarning);
+                }
+
+                //如果数据库里面该位置不存在未处理预警
+                if (ToolUtil.isEmpty(humidityWarningVo)){
+                    //如果传输的数据达到预警阈值
+                    if (ToolUtil.isNotEmpty(humidityWarning)){
+                        //09 仓间温度预警  11 仓间湿度预警
+                        //创建任务
+                        Map map = addTask(siteRoute, "11", humidityWarning.getPrincipalName(),airConditionDtos.get(0).getTagCN());
+                        //预警设置任务id
+                        humidityWarning.setTaskId(Integer.parseInt(map.get("id").toString()));
+                        //生成预警
+                        earlyWarningDao.insertWarning(humidityWarning);
+                    }
+                }else {
+                    //如果数据库该位置存在预警
+                    earlyWarningDao.updateWarning(humidityWarning);
+                }
+
             }
         });
     }
@@ -531,10 +568,7 @@ public class MaintainDataHandler {
                     earlyWarning.setWarningValThree(data.doubleValue());
                 }
             }
-            //09 仓间温度预警  11 仓间湿度预警
-            Map map = addTask(airConditionVo, taskType, earlyWarning.getPrincipalName());
-            earlyWarning.setTaskId(Integer.parseInt(map.get("id").toString()));
-            earlyWarningDao.insertWarning(earlyWarning);
+
         }else{
             //如果存在未处理的预警
                 //获取nodeIds
@@ -601,7 +635,7 @@ public class MaintainDataHandler {
                             setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
                             //更新数据
-                            earlyWarningDao.updateWarning(earlyWarning);
+//                            earlyWarningDao.updateWarning(earlyWarning);
                         }
                         if (level == 3) {
                             //达到3级 不用连续预警
@@ -624,7 +658,7 @@ public class MaintainDataHandler {
                         setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
                         //更新数据
-                        earlyWarningDao.updateWarning(earlyWarning);
+//                        earlyWarningDao.updateWarning(earlyWarning);
                     }
                 }
             }
@@ -1013,11 +1047,11 @@ public class MaintainDataHandler {
     }
 
     //添加任务（空调设备专用）
-    public Map addTask(AirConditionVo airConditionVo, String type,String principal) {
+    public Map addTask(String siteRoute, String type,String principal,String airConditionTagCN) {
         //查询该垛位、仓间下该类型任务是否存在
-        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(airConditionVo.getSiteRoute(), type);
+        Map selectTaskMap = taskManagementService.findTaskBySiteRoute(siteRoute, type);
         if (ToolUtil.isEmpty(selectTaskMap)) {
-            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, airConditionVo.getTagCN(), airConditionVo.getSiteRoute(), principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
+            TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, airConditionTagCN.split("仓间")[0]+"仓间", siteRoute, principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskDto.setCreatedUser("系统生成");
             taskManagementService.addDataHandTask(taskDto);
