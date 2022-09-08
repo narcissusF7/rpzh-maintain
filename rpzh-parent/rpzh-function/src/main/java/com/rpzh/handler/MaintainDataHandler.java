@@ -100,7 +100,7 @@ public class MaintainDataHandler {
      * @param parseData
      */
     /**
-     * 用来处理空调数据  暂时还没用
+     * 用来处理空调数据
      */
     public void handlerData(List<AirConditionVo> list) {
         //分组处理
@@ -504,7 +504,7 @@ public class MaintainDataHandler {
             //获取位置路由
             String siteRoute = airConditionVo.getSiteRoute();
             //去掉位置路由的最后一个] ，然后截取:
-            String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[4];
+            String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[5];
             earlyWarning.setAreaId(Integer.parseInt(siteId));
             //获取位置负责人
             Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
