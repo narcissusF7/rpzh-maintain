@@ -148,8 +148,6 @@ public class MaintainDataHandler {
                     //温度处理
                     tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp",tempWarningVo,tempWarning);
 
-
-
                     //湿度数据
                     Double humidityVal = airConditionVo.getHumidityVal();
                     //湿度等级
