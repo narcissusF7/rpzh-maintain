@@ -94,7 +94,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         } else {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
             List<String> nameCns = materialDao.findNameCn(monitorCondition.getMaterialCode());
-            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition,nameCns);
+            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition,nameCns,nameCns.size());
         }
 
         //添加筛选完后的数据

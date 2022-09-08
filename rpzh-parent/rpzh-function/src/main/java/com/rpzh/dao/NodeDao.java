@@ -171,7 +171,7 @@ public interface NodeDao {
 
     int findNodeCountByNodeId(@Param("nodeId") String nodeId);
 
-    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,@Param("nameCns") List<String> nameCns);
+    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,@Param("nameCns") List<String> nameCns,@Param("size")Integer size);
 
     @DS("clickhouse")
     List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn,@Param("pidRoute")String pidRoute);
