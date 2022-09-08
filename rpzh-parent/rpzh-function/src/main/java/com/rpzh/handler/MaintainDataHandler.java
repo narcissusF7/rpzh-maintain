@@ -75,8 +75,8 @@ public class MaintainDataHandler {
     @Autowired
     MaterialDao materialDao;
 
-    @Value("${time.frequency}")
-    Integer frequency;
+//    @Value("${time.frequency}")
+    Integer frequency  =7200;
 
     @Value("${node.voltage}")
     Double voltage;
