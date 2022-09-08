@@ -518,10 +518,10 @@ public class MaintainDataHandler {
                 setLevel(earlyWarning,level,data);
 
             }else {
+                //数据库不存在预警  但这批数据中前几条出现预警
                 earlyWarning.setWarningVal(earlyWarning.getWarningVal() + "," + data);
                 earlyWarning.setNodeId(earlyWarning.getNodeId() + "," + airConditionVo.getAirConditionCode());
                 earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
-                //判断哪一等级的预警
                 //判断哪一等级的预警
                 if (ToolUtil.isEmpty(earlyWarning.getWarningValOne()) && level == 1) {
                     earlyWarning.setWarningValOne(data.doubleValue());
@@ -530,10 +530,6 @@ public class MaintainDataHandler {
                 } else if (ToolUtil.isEmpty(earlyWarning.getWarningValThree()) && level == 3) {
                     earlyWarning.setWarningValThree(data.doubleValue());
                 }
-
-
-
-
             }
             //09 仓间温度预警  11 仓间湿度预警
             Map map = addTask(airConditionVo, taskType, earlyWarning.getPrincipalName());

@@ -30,6 +30,6 @@
         humidity as humidity ,
         precip as precip ,
         created_time as transferTime
-        from tb_weather_history order by createdTime limit 1;
+        from tb_weather_history order by created_time limit 1;
     </select>
 </mapper>

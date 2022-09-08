@@ -377,35 +377,74 @@ public class MonitoringCenterController {
         if (ToolUtil.isEmpty(nodeDto.getNodeType())){
             throw new Exception("设备类型不能为空");
         }
+        if (ToolUtil.isEmpty(nodeDto.getNodeId())&&ToolUtil.isEmpty(nodeDto.getNodeType())||("null".equals(nodeDto.getNodeId())&&"null".equals(nodeDto.getNodeType()))){
+            //设备id和设备类型都为空  导出的为天气数据
+                MonitorCondition monitorCondition = new MonitorCondition();
+                monitorCondition.setPidRoute(monitorCondition.getStartTime()+" 00:00:00");
+                monitorCondition.setEndTime(monitorCondition.getEndTime()+" 23:59:59");
+                List<WeatherDataVo> weatherData = monitoringCenterService.findWeatherData(monitorCondition);
+            EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
+            easyPoiUtil.t = new NodeDataVo();
+            try {
+                easyPoiUtil.hihdColumn("nodeId", true);
+                easyPoiUtil.hihdColumn("typeName", true);
+                easyPoiUtil.hihdColumn("siteX", true);
+                easyPoiUtil.hihdColumn("siteY", true);
+                easyPoiUtil.hihdColumn("siteZ", true);
+                easyPoiUtil.hihdColumn("gatherSite", true);
+                easyPoiUtil.hihdColumn("transferTime", true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
-        EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
-        List<String> columns = new ArrayList<>();
-        //把要导出的字段添加到集合中
-        if (!ToolUtil.isEmpty(nodeDto.getNodeType())) {
-            columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
-            if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
-                columns.add("humiture");
+            String excelType = "宁波天气数据.xls";
+
+            EasyPoiUtil.exportExcel(weatherData,"宁波天气数据", "宁波天气数据", WeatherDataVo.class, excelType, true, response);
+            try {
+                easyPoiUtil.hihdColumn("nodeId", false);
+                easyPoiUtil.hihdColumn("typeName", false);
+                easyPoiUtil.hihdColumn("siteX", false);
+                easyPoiUtil.hihdColumn("siteY", false);
+                easyPoiUtil.hihdColumn("siteZ", false);
+                easyPoiUtil.hihdColumn("gatherSite", false);
+                easyPoiUtil.hihdColumn("transferTime", false);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+        }else {
+            List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
+            EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
+            List<String> columns = new ArrayList<>();
+            //把要导出的字段添加到集合中
+            if (!ToolUtil.isEmpty(nodeDto.getNodeType())) {
+                columns.add(NodeDataVo.getColumn(nodeDto.getNodeType()));
+                if (NodeConstant.HUMITURE_NODE_TYPE_VALUE.equals(nodeDto.getNodeType())) {
+                    columns.add("humiture");
+                }
+            }
+            //显示要导出的字段
+            easyPoiUtil.t = nodeHistory.get(0);
+
+            columns.forEach((column) -> {
+                try {
+                    easyPoiUtil.hihdColumn(column, false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
+
+            EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
+            columns.forEach((column) -> {
+                try {
+                    easyPoiUtil.hihdColumn(column, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
-        //显示要导出的字段
-        easyPoiUtil.t = nodeHistory.get(0);
-        columns.forEach((column) -> {
-            try {
-                easyPoiUtil.hihdColumn(column, false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        String excelType = NodeTypeEnum.getNodeType(nodeDto.getNodeType()).getName() + nodeDto.getNodeId() + ".xls";
-        columns.forEach((column) -> {
-            try {
-                easyPoiUtil.hihdColumn(column, true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        EasyPoiUtil.exportExcel(nodeHistory, nodeDto.getNodeId(), nodeDto.getNodeId(), NodeDataVo.class, excelType, true, response);
+
     }
 
     @ApiOperation(
