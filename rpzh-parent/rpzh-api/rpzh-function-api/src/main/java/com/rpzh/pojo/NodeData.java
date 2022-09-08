@@ -116,7 +116,7 @@ public class NodeData{
     }
     public NodeData(AirConditionVo airConditionVo){
         this.nodeId = airConditionVo.getAirConditionCode();
-        this.type = "04";
+        this.type = "03";
         this.gatherSite = airConditionVo.getTagCN();
         this.siteRoute = airConditionVo.getSiteRoute();
         this.humiture = airConditionVo.getHumidityVal();

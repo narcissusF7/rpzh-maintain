@@ -117,6 +117,7 @@ node:
   signalStrength: -15
 time:
   cron : 0 0 0/2 * * *
+  frequency : 7200
   nodeTask : 0 0 6,18 * * *
 
 pagehelper:

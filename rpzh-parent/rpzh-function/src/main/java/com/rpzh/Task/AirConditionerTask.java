@@ -72,7 +72,6 @@ public class AirConditionerTask {
         String s = PortDataUtils.sendPost(TagDataUrl,new HashMap<>());
         JSONObject dataOfJson = JSONObject.parseObject(s);
         //数据整理成parseData
-        String siteRoute="";
         dataHandler.handlerData(list);
     }
 }
