@@ -104,8 +104,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         //存储物料代码、养护数量、养护计划id、垛位id、仓间id、层id、楼栋id、仓库id的集合
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         //根据垛位编号查询各个物料代码的数量
-        String nameCn = warehouseDao.findStackById(stackId).getNameCn();
-        List<MaterialVo> materialVos = materialDao.findCount(nameCn);
+        String stackNo = warehouseDao.findStackById(stackId).getStackNo();
+        List<MaterialVo> materialVos = materialDao.findCount(stackNo);
         //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
         for (MaterialVo materialVo : materialVos) {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
@@ -302,10 +302,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVo.setPrincipalIds(getPrincipalIds(maintainPlanVo.getPrincipalName()));
         Integer stackId = maintainPlanVo.getStackId();
         //根据垛位编号获取最新的养护数量
-        String nameCn = maintainPlanVo.getNameCn();
-        maintainPlanVo.setMaintainCount(materialDao.getAllMaintainCount(nameCn));
+        String stackNo = maintainPlanVo.getStackNo();
+        maintainPlanVo.setMaintainCount(materialDao.getAllMaintainCount(stackNo));
         //获取最新的物料代码
-        maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(nameCn));
+        maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(stackNo));
         //根据垛位id查询位置路由
         String pidRoute = warehouseDao.findPidRoute(stackId).getPidRoute();
         //设置全位置路由
@@ -354,10 +354,10 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer stackId = maintainPlanVo.getStackId();
         maintainPlanVo.setPidRoute(SiteRouteUtil.route(maintainPlanVo.getPidRoute(), stackId +""));//拼接全位置路由
         //根据垛位编号获取最新的养护数量
-        String nameCn = maintainPlanVo.getNameCn();
-        maintainPlanVo.setMaintainCount(materialDao.getAllMaintainCount(nameCn));
+        String stackNo = maintainPlanVo.getStackNo();
+        maintainPlanVo.setMaintainCount(materialDao.getAllMaintainCount(stackNo));
         //获取最新的物料代码
-        maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(nameCn));//查询转段时的阶段所对应的物料代码(list)
+        maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(stackNo));//查询转段时的阶段所对应的物料代码(list)
         maintainPlanVo.setMaterialCode(StringUtils.join(maintainPlanVo.getMaterialCodes(),","));//查询转段时的阶段所对应的物料代码(string)
         maintainPlanVo.setStackName(maintainPlanVo.getStackName());//垛位名称
         maintainPlanVo.setPrincipalIds(getPrincipalIds(maintainPlanVo.getPrincipalName()));//负责人id
@@ -422,8 +422,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         Integer stackId = maintainPlanDto.getStackId();
         maintainPlanDao.deleteMaintainCount(ids);//删除养护数量表数据
         //根据垛位编号查询各个物料代码的数量
-        String nameCn = warehouseDao.findStackById(stackId).getNameCn();
-        List<MaterialVo> materialVos = materialDao.findCount(nameCn);
+        String stackNo = warehouseDao.findStackById(stackId).getStackNo();
+        List<MaterialVo> materialVos = materialDao.findCount(stackNo);
         //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
         for (MaterialVo materialVo : materialVos) {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
@@ -542,8 +542,8 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         maintainPlanDao.deleteMaintainCount(ids);//删除养护数量表数据
         //根据垛位编号查询各个物料代码的数量
-        String nameCn = warehouseDao.findStackById(stackId).getNameCn();
-        List<MaterialVo> materialVos = materialDao.findCount(nameCn);
+        String stackNo = warehouseDao.findStackById(stackId).getStackNo();
+        List<MaterialVo> materialVos = materialDao.findCount(stackNo);
         //将新建养护计划中的所有物料代码以及各自的数量插入到养护数量表中，方便养护数量模板的统计
         for (MaterialVo materialVo : materialVos) {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());

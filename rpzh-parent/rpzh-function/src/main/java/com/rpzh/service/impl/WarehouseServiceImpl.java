@@ -815,7 +815,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
         List<StackVo> stackVos = new ArrayList<>();
         List<Integer> stackIds = maintainPlanDao.findStackIds();
-        for (StackVo stackVo : stackVos) {
+        for (StackVo stackVo : stackVos1) {
             if(!stackIds.contains(stackVo.getId())){
                 stackVos.add(stackVo);
             }

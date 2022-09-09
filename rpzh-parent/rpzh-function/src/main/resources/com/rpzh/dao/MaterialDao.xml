@@ -5,17 +5,17 @@
         select distinct QUICKCODE FROM MC.VW_MAINTAIN_INVENTORY
     </select>
     <select id="getAllMaintainCount" resultType="java.lang.Double">
-        select sum(INVOICEQTY) as maintainCount from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{nameCn}
+        select sum(INVOICEQTY) as maintainCount from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{stackNo}
     </select>
     <select id="findMaterialCode" resultType="java.lang.String">
-    select distinct MATERIALCODE as materialCode from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{nameCn}
+    select distinct MATERIALCODE as materialCode from MC.VW_MAINTAIN_INVENTORY where QUICKCODE = #{stackNo}
     </select>
     <select id="findAllMaterialCodes" resultType="java.lang.String">
         select distinct MATERIALCODE from MC.VW_MAINTAIN_INVENTORY
     </select>
     <select id="findCount" resultType="com.rpzh.vo.MaterialVo">
         SELECT MATERIALCODE as materialCode, SUM(INVOICEQTY) AS maintainCount
-        FROM MC.VW_MAINTAIN_INVENTORY WHERE QUICKCODE = #{nameCn} GROUP BY MATERIALCODE
+        FROM MC.VW_MAINTAIN_INVENTORY WHERE QUICKCODE = #{stackNo} GROUP BY MATERIALCODE
     </select>
     <select id="findNameCn" resultType="java.lang.String">
         select QUICKCODE from MC.VW_MAINTAIN_INVENTORY where MATERIALCODE like concat(concat('%',#{materialCode}),'%')

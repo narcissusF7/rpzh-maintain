@@ -23,15 +23,15 @@
         order by created_time desc
     </select>
     <select id="findMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">
-        SELECT  t1.id as id,t1.material_code as materialCode,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.area_id as areaId,t3.site_name as stackName,
+        SELECT  t1.id as id,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.area_id as areaId,t3.site_name as stackName,
         t3.pid_route as pidRoute,t2.phases as phases,t2.maintain_days AS maintainDays,t2.aftercare_date_start AS aftercareDateStart,t2.oxygen_reduction_day AS oxygenReductionTime,
-        t2.created_time AS createdTime,t2.expire_time AS expireTime,t2.maintain_count as maintainCount,t2.id as stageId,t2.alarm_value_setting_id AS alarmValueSettingId,t3.name_cn as nameCn
+        t2.created_time AS createdTime,t2.expire_time AS expireTime,t2.maintain_count as maintainCount,t2.id as stageId,t2.alarm_value_setting_id AS alarmValueSettingId,t3.stack_no as stackNo
         FROM tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
-        left join (select id,site_name,pid_route as pid_route,area_id,name_cn from tb_stack) t3 on t3.id = t1.stack_id WHERE t1.id= #{id}
+        left join (select id,site_name,pid_route as pid_route,area_id,stack_no from tb_stack) t3 on t3.id = t1.stack_id WHERE t1.id= #{id}
     </select>
     <select id="beforeChangeMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">
-        SELECT t1.id as id,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.site_name as stackName,t3.pid_route as pidRoute,t3.name_cn as nameCn
-        FROM tb_maintain_plan t1 left join (select id,site_name,pid_route,name_cn as pid_route,area_id from tb_stack) t3 on t3.id = t1.stack_id WHERE t1.id= #{id}
+        SELECT t1.id as id,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.site_name as stackName,t3.pid_route as pidRoute,t3.stack_no as stackNo
+        FROM tb_maintain_plan t1 left join (select id,site_name,pid_route,stack_no as pid_route,area_id from tb_stack) t3 on t3.id = t1.stack_id WHERE t1.id= #{id}
     </select>
     <delete id="deleteMaintainPlanById" parameterType="java.lang.Integer">
         delete

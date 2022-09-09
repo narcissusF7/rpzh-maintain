@@ -26,12 +26,12 @@ public class MaterialServiceImpl implements MaterialService {
     public MaterialVo findMaterialInfo(Integer stackId) {
         MaterialVo materialVo = new MaterialVo();
         StackVo stackVo = warehouseDao.findStackById(stackId);
-        String nameCn = stackVo.getNameCn();
-        List<String> materialCodes = materialDao.findMaterialCode(nameCn);
+        String stackNo = stackVo.getStackNo();
+        List<String> materialCodes = materialDao.findMaterialCode(stackNo);
         if(ToolUtil.isEmpty(materialCodes)){
             return materialVo;
         }
-        materialVo.setMaintainCount(materialDao.getAllMaintainCount(nameCn));
+        materialVo.setMaintainCount(materialDao.getAllMaintainCount(stackNo));
         materialVo.setMaterialCodes(materialCodes);
         materialVo.setPrincipalId(getPrincipalName(stackId));
         materialVo.setPidRoute(SiteRouteUtil.route(stackVo.getPidRoute(),stackId+""));

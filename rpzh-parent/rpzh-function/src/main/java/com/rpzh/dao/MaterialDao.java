@@ -19,13 +19,13 @@ public interface MaterialDao {
     List<String> findQuickCode();
 
     @DS("db2")
-    List<String> findMaterialCode(@Param("nameCn")String nameCn);
+    List<String> findMaterialCode(@Param("stackNo")String stackNo);
 
     @DS("db2")
-    Double getAllMaintainCount(@Param("nameCn")String nameCn);
+    Double getAllMaintainCount(@Param("stackNo")String stackNo);
 
     @DS("db2")
-    List<MaterialVo> findCount(@Param("nameCn")String nameCn);
+    List<MaterialVo> findCount(@Param("stackNo")String stackNo);
 
     @DS("db2")
     List<String> findAllMaterialCodes();

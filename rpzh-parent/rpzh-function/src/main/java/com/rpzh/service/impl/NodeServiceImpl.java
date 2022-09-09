@@ -480,7 +480,7 @@ public class NodeServiceImpl implements NodeService {
                 nodeDto.setStartTime(nodeDto.getStartTime().split(" ")[0]+" 00:00:00");
             }
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
-            String materialCode = String.join(",",materialDao.findMaterialCode(nodeVo.getNameCn()));
+            String materialCode = String.join(",",materialDao.findMaterialCode(nodeVo.getStackNo()));
             nodeVo.setMaterialCode(materialCode);
 //            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
 //            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){

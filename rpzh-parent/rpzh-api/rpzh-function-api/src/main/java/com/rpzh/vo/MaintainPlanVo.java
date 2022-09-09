@@ -24,7 +24,7 @@ public class MaintainPlanVo {
 
     private Integer areaId;
 
-    private String nameCn;
+    private String stackNo;
 
     @ApiModelProperty(notes = "物料代码")
     private String materialCode;
