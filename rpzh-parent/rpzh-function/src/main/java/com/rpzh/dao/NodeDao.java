@@ -171,7 +171,10 @@ public interface NodeDao {
 
     int findNodeCountByNodeId(@Param("nodeId") String nodeId);
 
-    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,@Param("stackNos") List<String> stackNos,@Param("size")Integer size);
+    List<NodeVo> findNodeByMonitorCondition(@Param("monitorCondition") MonitorCondition monitorCondition,@Param("stackIds")List<Integer> stackIds,@Param("size") Integer size);
+
+    @DS("clickhouse")
+    List<Integer> findStackIdsByMaterialCode(@Param("materialCode")String materialCode,@Param("tableName") String tableName);
 
     @DS("clickhouse")
     List<NodeDataVo> findNodeDataHistory(@Param("nodeDto") NodeDto nodeDto, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn,@Param("pidRoute")String pidRoute);

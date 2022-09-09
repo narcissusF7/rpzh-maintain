@@ -80,7 +80,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             monitorCondition.setPidRoute(monitorCondition.getPidRoute() + ",[0" + monitorCondition.getPidRoute().split(",").length + ":" + monitorCondition.getSiteId() + "]");
         }
 
-        List<NodeVo> nodeVos;
+        List<NodeVo> nodeVos = new ArrayList<>();
         //判断是否包含仓间的温湿度设备
         if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType()) && Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)) {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
@@ -93,11 +93,31 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
         } else {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
-            List<String> stackNos = new ArrayList<>();
+            //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
+            List<Integer> stackIds = new ArrayList<>();
             if(ToolUtil.isNotEmpty(monitorCondition.getMaterialCode())) {
-                stackNos = materialDao.findNameCn(monitorCondition.getMaterialCode());
+                if(Arrays.asList(monitorCondition.getNodeTypes()).size()==2){
+                    stackIds = nodeDao.findStackIdsByMaterialCode(monitorCondition.getMaterialCode(),"tb_node_o2_history");
+                    List<Integer> ids = nodeDao.findStackIdsByMaterialCode(monitorCondition.getMaterialCode(),"tb_node_env_history");
+                    if(ToolUtil.isNotEmpty(ids)){
+                        stackIds.addAll(ids);
+                        stackIds = stackIds.stream().distinct().collect(Collectors.toList());
+                    }
+                }else{
+                    if(Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)){
+                        stackIds = nodeDao.findStackIdsByMaterialCode(monitorCondition.getMaterialCode(),"tb_node_env_history");
+                    }else if(Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE)){
+                        stackIds = nodeDao.findStackIdsByMaterialCode(monitorCondition.getMaterialCode(),"tb_node_temp_core_chip_history");
+                    }else{
+                        stackIds = nodeDao.findStackIdsByMaterialCode(monitorCondition.getMaterialCode(),"tb_node_o2_history");
+                    }
+                }
+                if(ToolUtil.isNotEmpty(stackIds)) {
+                    nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition, stackIds, stackIds.size());
+                }
+            }else{
+                nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition, stackIds, stackIds.size());
             }
-            nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition,stackNos,stackNos.size());
         }
 
         //添加筛选完后的数据
