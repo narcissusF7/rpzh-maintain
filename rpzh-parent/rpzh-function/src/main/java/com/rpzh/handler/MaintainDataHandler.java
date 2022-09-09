@@ -347,7 +347,7 @@ public class MaintainDataHandler {
                 nodeData.setWarningType(warningType.substring(1));
             }
             //向数据库插入当前数据
-//            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
+            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
 
             //最后一条数据需要存放到redis中
             if (i == 0) {
