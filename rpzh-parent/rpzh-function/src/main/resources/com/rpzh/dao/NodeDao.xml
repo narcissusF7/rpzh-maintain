@@ -396,7 +396,7 @@
         site_type siteType ,transfer_time transferTime , alert_level alertLevel ,pid_route siteRoute,site_x siteX,site_y
         siteY,site_z siteZ
         from ${tableName}
-        where node_id = #{nodeId} limit 1
+        where node_id = #{nodeId} order by transfer_time limit 1
     </select>
     <select id="findByNodeId" resultType="com.rpzh.vo.NodeVo">
 		select * from (
