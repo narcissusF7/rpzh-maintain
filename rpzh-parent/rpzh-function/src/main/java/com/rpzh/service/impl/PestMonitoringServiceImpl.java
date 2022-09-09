@@ -334,7 +334,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
 
             pestBoard.setBeetleLevel(levelMap.get("beetleLevel"));
 
-            pestBoard.setBeetleLevel(levelMap.get("mealwormLevel"));
+            pestBoard.setMealwormLevel(levelMap.get("mealwormLevel"));
 
             pestBoard.setAlertLevel(levelMap.get("level"));
             //如果是仓间虫情点位
