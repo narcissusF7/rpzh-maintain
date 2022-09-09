@@ -499,9 +499,6 @@ public class NodeServiceImpl implements NodeService {
 //            }
 
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
-            if (ToolUtil.isEmpty(nodeDataVos)){
-                nodeDataVos = new ArrayList<>();
-            }
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
             }
