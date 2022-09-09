@@ -93,7 +93,10 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
         } else {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
-            List<String> stackNos = materialDao.findNameCn(monitorCondition.getMaterialCode());
+            List<String> stackNos = new ArrayList<>();
+            if(ToolUtil.isNotEmpty(monitorCondition.getMaterialCode())) {
+                stackNos = materialDao.findNameCn(monitorCondition.getMaterialCode());
+            }
             nodeVos = nodeDao.findNodeByMonitorCondition(monitorCondition,stackNos,stackNos.size());
         }
 
