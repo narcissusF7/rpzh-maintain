@@ -325,7 +325,7 @@
     </select>
     <select id="findNodeByMonitorCondition" resultType="com.rpzh.vo.NodeVo">
 
-        <if test="monitorCondition.materialCode!=null and monitorCondition.materialCode!=''">
+        <if test="size!=0">
             SELECT t.id as id , t.nodeId as nodeId,t.stackId as stackId, t.nodeType as nodeType,t.gatherSite gatherSite from (
         </if>
         select id id,node_id nodeId,stack_id stackId ,node_type nodeType ,gather_site gatherSite from tb_node tnode
@@ -345,7 +345,7 @@
             and status = 1
         </where>
         order by site_route,site_x,site_y,site_z
-        <if test="size!=0">) t where t.stackId in (select stack_id from tb_stack where stack_no in<foreach collection="stackNos" item="stackNo" open="(" separator="," close=")">#{stackNo}</foreach>)</if>
+        <if test="size!=0">) t where t.stackId in (select id from tb_stack where stack_no in<foreach collection="stackNos" item="stackNo" open="(" separator="," close=")">#{stackNo}</foreach>)</if>
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
         select id, type, ${tableColumn},transfer_time as transferTime,node_id nodeId,
