@@ -345,7 +345,7 @@
             and status = 1
         </where>
         order by site_route,site_x,site_y,site_z
-        <if test="size!=0">) t where t.stackId in (select stack_id from tb_stack where name_cn in<foreach collection="nameCns" item="nameCn" open="(" separator="," close=")">#{nameCn}</foreach>)</if>
+        <if test="size!=0">) t where t.stackId in (select stack_id from tb_stack where stack_no in<foreach collection="stackNos" item="stackNo" open="(" separator="," close=")">#{stackNo}</foreach>)</if>
     </select>
     <select id="findNodeDataHistory" resultType="com.rpzh.vo.NodeDataVo">
         select id, type, ${tableColumn},transfer_time as transferTime,node_id nodeId,
