@@ -219,7 +219,7 @@ public class PestMonitoringController {
     @PostMapping("/fullExport")
     @PreAuthorize("hasAnyAuthority('f:p:fp')")
     public Result fullExport(){
-        return pestMonitoringService.fullExport();
+        return pestMonitoringService.fullExport(null);
     }
 
 

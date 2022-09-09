@@ -371,7 +371,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
      * @return
      */
     @Override
-    public Result fullExport() {
+    public Result fullExport(String siteRoute) {
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -379,7 +379,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         List<PestData> stackList = new ArrayList<>();
         List<PestData> wareList = new ArrayList<>();
         //获取该负责人的负责的所有虫情点位
-        List<Map<String, String>> list = pestMonitoringDao.findByPrincipalName(username);
+        List<Map<String, String>> list = pestMonitoringDao.findByPrincipalName(username,siteRoute);
         if (list.size()<1){
             new Result(true, StatusCode.OK, "一键导入失败，该用户没有负责的虫情点位");
         }
@@ -523,7 +523,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
                     earlyWarning.setId(earlyWarningVo.getId());
                     earlyWarning.setWarningVal(earlyWarningVo.getWarningVal()+","+data);
                     earlyWarning.setNodeId(earlyWarningVo.getNodeId()+","+pestBoardVo.getPestBoardId());
-                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade()+","+level);
+                    earlyWarning.setWarningGrade(earlyWarningVo.getWarningGrade()+","+level);
                     //判断哪一等级的预警
                     dataHandler.setEarlyLevel(earlyWarning,level,earlyWarningVo,data.doubleValue());
                     //更新数据

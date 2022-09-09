@@ -338,7 +338,7 @@ public class MaintainDataHandler {
                 level = level == -1 ? 1 : level;
                 //处理该设备数据
                 level = earlyWarningHandle(nodeVo, level, parseData, data);
-                nodeVo.setAlertLevel(0);
+                nodeVo.setAlertLevel(level);
             }
             //将需要存到数据库中的数据放到NodeData中
             NodeData nodeData = new NodeData(parseData, nodeVo, i);

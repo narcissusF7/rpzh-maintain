@@ -45,7 +45,7 @@ public interface PestMonitoringDao {
 
     Integer exportPestData(@Param("pestDataList") List<PestData> pestDataList,@Param("siteType") String siteType);
 
-    List<Map<String ,String>> findByPrincipalName(@Param("principalUser") String principalUser);
+    List<Map<String ,String>> findByPrincipalName(@Param("principalUser") String principalUser, @Param("siteRoute") String siteRoute);
 
     PestBoardVo findPestBoardByPestBoardId(@Param("pestBoardId") String pestBoardId);
 

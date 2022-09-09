@@ -403,6 +403,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         int insertPest = 0;
         for (String pestBoard : pestBoardList) {
             insertPest = taskManagementDao.oneButtonPestReport(pestBoard, taskAddress, nowTime);
+            pestMonitoringService.fullExport(siteRoute);
         }
         return insertPest;
     }

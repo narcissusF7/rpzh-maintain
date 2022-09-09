@@ -31,7 +31,7 @@ public interface PestMonitoringService {
 
     Result exportPestData(List<Map<Integer, String>> pestData,String siteType);
 
-    Result fullExport();
+    Result fullExport(String siteRoute);
 
     List<PestBoardVo> findPestBoard(PestBoardDto pestBoardDto);
 
