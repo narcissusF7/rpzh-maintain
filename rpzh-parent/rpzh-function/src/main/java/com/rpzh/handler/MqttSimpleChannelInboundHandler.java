@@ -71,7 +71,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
             if ("C066D19C".equals(parseData.getNodeId())){
                 dataHandler.handlerData(parseData);
             }
-
+            dataHandler.handlerData(parseData);
         }
     }
 }

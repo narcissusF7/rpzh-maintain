@@ -20,6 +20,7 @@ import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.service.impl.WarehouseServiceImpl;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
  * @create 2022/4/30
  */
 @Component
+@Slf4j
 public class MaintainDataHandler {
 
     @Autowired
@@ -176,7 +178,7 @@ public class MaintainDataHandler {
                 //如果数据库里面该位置不存在未处理预警
                 if (ToolUtil.isEmpty(tempWarningVo)){
                     //如果传输的数据达到预警阈值
-                    if (ToolUtil.isNotEmpty(tempWarning)){
+                    if (ToolUtil.isNotEmpty(tempWarning.getWarningVal())){
                         //09 仓间温度预警  11 仓间湿度预警
                         //创建任务
                         Map map = addTask(siteRoute, "09", tempWarning.getPrincipalName(),airConditionDtos.get(0).getTagCN());
@@ -193,7 +195,7 @@ public class MaintainDataHandler {
                 //如果数据库里面该位置不存在未处理预警
                 if (ToolUtil.isEmpty(humidityWarningVo)){
                     //如果传输的数据达到预警阈值
-                    if (ToolUtil.isNotEmpty(humidityWarning)){
+                    if (ToolUtil.isNotEmpty(humidityWarning.getWarningVal())){
                         //09 仓间温度预警  11 仓间湿度预警
                         //创建任务
                         Map map = addTask(siteRoute, "11", humidityWarning.getPrincipalName(),airConditionDtos.get(0).getTagCN());
@@ -345,7 +347,7 @@ public class MaintainDataHandler {
                 nodeData.setWarningType(warningType.substring(1));
             }
             //向数据库插入当前数据
-            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
+//            Integer insertFlag = nodeDao.insertNodeHistory(nodeData, NodeTypeEnum.getNodeType(nodeVo.getNodeType()).getTableName(), Long.toHexString(idWorker.nextId()));
 
             //最后一条数据需要存放到redis中
             if (i == 0) {
@@ -534,7 +536,7 @@ public class MaintainDataHandler {
         //如果不存在
         if (ToolUtil.isEmpty(earlyWarningVo)&&level>0){
             //判断当前的预警pojo是不是为空
-            if (ToolUtil.isEmpty(earlyWarning)){
+            if (ToolUtil.isEmpty(earlyWarning.getWarningVal())){
                 earlyWarning.setWarningType(warningType);
                 earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
                 //获取位置路由
@@ -691,9 +693,9 @@ public class MaintainDataHandler {
             //设置所在垛位
             earlyWarning.setStackId(nodeVo.getStackId());
         }
-
+        log.info("处理前预警等级："+level);
         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, data, evnType, nodeVo.getSiteType());
-
+        log.info("处理后预警等级："+level);
         nodeVo.setAlertLevel(level);
 
     }
@@ -707,7 +709,7 @@ public class MaintainDataHandler {
      * @param data      数据值
      */
     public void avgCoreHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data) {
-        //查询数据库中该设备未处理的预警
+        //查询数据库中该位置未处理的预警
         EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
@@ -1025,12 +1027,7 @@ public class MaintainDataHandler {
             String principal = "";
 
             Integer maintainPlanId = nodeVo.getMaintainPlanId();
-            if (ToolUtil.isNotEmpty(maintainPlanId)) {
-                principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
-            } else {
-                Map<String, Object> map = warehouseService.getSitePrincipal(siteType, nodeVo.getSiteId());
-                principal = map.get("username") + "";
-            }
+            principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
 
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, nodeVo.getGatherSite(), nodeVo.getSiteRoute(), principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
