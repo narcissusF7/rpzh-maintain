@@ -138,4 +138,7 @@ public class NodeVo implements Serializable {
 
     @ApiModelProperty(notes = "垛位编号")
     private String stackNo;
+
+    @ApiModelProperty(notes = "位置等级")
+    private Integer siteLevel;
 }

@@ -7,7 +7,11 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
-import com.rpzh.dao.*;
+import com.rpzh.dao.GeneralSettingDao;
+import com.rpzh.dao.NodeDao;
+import com.rpzh.dao.NodeOperationDao;
+import com.rpzh.dao.MaterialDao;
+import com.rpzh.dao.TaskManagementDao;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.TaskDto;
@@ -147,6 +151,13 @@ public class NodeServiceImpl implements NodeService {
             nodeDto.setEndTime(nodeDto.getEndTime().split(" ")[0]+" 23:59:59");
         }
         List<NodeVo> nodeVoList = nodeDao.findAllNodeList(nodeDto);
+        nodeVoList.forEach(nodeVo -> {
+            if(ToolUtil.isNotEmpty(nodeVo.getSiteRoute())){
+                nodeVo.setSiteLevel(nodeVo.getSiteRoute().split(",").length-1);
+            }else {
+                nodeVo.setSiteLevel(0);
+            }
+        });
         return new PageInfo<>(nodeVoList);
     }
 
@@ -488,13 +499,12 @@ public class NodeServiceImpl implements NodeService {
 //            }
 
             List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
+            if (ToolUtil.isEmpty(nodeDataVos)){
+                nodeDataVos = new ArrayList<>();
+            }
             for (int i = 0; i < nodeDataVos.size(); i++) {
                 setWarningColor(nodeDataVos.get(i),map);
-
-
             }
-
-
 
             return nodeDataVos;
         }

@@ -169,8 +169,13 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             //获取负责人账号
             String principal = taskVo.getPrincipal();
             //获取负责人名字
-            String nickname = (String) redisUtil.hget("USER_"+principal, "nickname");
-            taskVo.setPrincipal(nickname+"("+principal+")");
+            String[] split = taskVo.getPrincipal().split(",");
+            String nickname = "";
+            for (int i = 0; i < split.length; i++) {
+                nickname = nickname+ ","+ (String) redisUtil.hget("USER_"+principal, "nickname");
+            }
+
+            taskVo.setPrincipal(nickname.substring(1)+"("+principal+")");
         }
         return new PageInfo<TaskVo>(taskVoList);
     }
@@ -252,12 +257,27 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //静态分页
         PageHelper.startPage(page, size);
         List<TaskVo> taskVoList = taskManagementDao.findTaskByUser(taskDto);
+        //因为通过模糊查询  过滤掉以下这种情况  54321   54321xxx
+        taskVoList.stream().filter(taskVo -> {
+            String[] split = taskVo.getPrincipal().split(",");
+            for (int i = 0; i < split.length; i++) {
+                if (username.equals(split[i])){
+                    return true;
+                }
+            }
+            return false;
+        });
         for (TaskVo taskVo : taskVoList) {
             //获取负责人账号
             String principal = taskVo.getPrincipal();
+            String[] split = taskVo.getPrincipal().split(",");
+            String nickname = "";
+            for (int i = 0; i < split.length; i++) {
+                nickname = nickname+ ","+ (String) redisUtil.hget("USER_"+principal, "nickname");
+            }
             //获取负责人名字
-            String nickname = (String) redisUtil.hget("USER_"+principal, "nickname");
-            taskVo.setPrincipal(principal+"("+nickname+")");
+
+            taskVo.setPrincipal(principal+"("+nickname.substring(1)+")");
         }
         return new PageInfo<TaskVo>(taskVoList);
     }

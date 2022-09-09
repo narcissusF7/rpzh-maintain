@@ -65,13 +65,8 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
             }
             //将帧计数器放置到缓存中
             redisUtil.set(RPZH_MAINTAIN_FCNT + map.get("deviceAddress"),map.get("fCnt"));
-//            if ("F66F7C53".equals(parseData.getNodeId())){
-//                dataHandler.handlerData(parseData);
-//            }
-//            if ("C066D19C".equals(parseData.getNodeId())){
-//                dataHandler.handlerData(parseData);
-//            }
             dataHandler.handlerData(parseData);
+
         }
     }
 }

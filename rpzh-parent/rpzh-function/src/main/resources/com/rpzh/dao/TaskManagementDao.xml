@@ -180,7 +180,7 @@
                 AND type = #{taskDto.type}
             </if>
             <if test="taskDto.principal != null and taskDto.principal != ''">
-                AND principal = #{taskDto.principal}
+                AND principal like concat(concat('%',#{taskDto.principal}), '%')
             </if>
             <if test="taskDto.endTime != null and taskDto.endTime != ''">
                 AND end_time &lt;= TO_DATE(#{taskDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )
