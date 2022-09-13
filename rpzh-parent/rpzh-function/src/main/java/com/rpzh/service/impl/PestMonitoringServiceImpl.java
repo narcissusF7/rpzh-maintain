@@ -380,6 +380,18 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         List<PestData> wareList = new ArrayList<>();
         //获取该负责人的负责的所有虫情点位
         List<Map<String, String>> list = pestMonitoringDao.findByPrincipalName(username,siteRoute);
+
+        //过滤掉特殊情况 如 用户名 12345   123456
+        list.stream().filter(map->{
+            String[] principalUsers = map.get("principalUser").split(",");
+            for (int i = 0; i < principalUsers.length; i++) {
+                if (username.equals(principalUsers[i])){
+                    return true;
+                }
+            }
+            return false;
+        });
+
         if (list.size()<1){
             new Result(true, StatusCode.OK, "一键导入失败，该用户没有负责的虫情点位");
         }
@@ -433,7 +445,20 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
             pestBoardDto.setSiteRoute(siteRoute);
         }
         List<PestBoardVo> pestBoards = pestMonitoringDao.findPestBoard(pestBoardDto);
-        pestBoards.forEach(pestBoardVo -> pestBoardVo.setPrincipalName(pestBoardVo.getPrincipalName()+"("+pestBoardVo.getPrincipalUser()+")"));
+
+        pestBoards.forEach(pestBoardVo -> {
+            StringBuffer principaUserName = new StringBuffer();
+            String[] users = pestBoardVo.getPrincipalUser().split(",");
+
+            for (int i = 0; i < users.length; i++) {
+                String nickname = redisTemplate.opsForHash().get("USER_" + users[i], "nickname")+"";
+                principaUserName.append(",").append(nickname);
+            }
+            pestBoardVo.setPrincipalName(principaUserName.substring(1)+"("+pestBoardVo.getPrincipalUser()+")");
+
+        });
+
+
         return pestBoards;
     }
 

@@ -107,10 +107,13 @@
         from tb_pest_stack_monitor
     </select>
     <select id="findByPrincipalName" resultType="java.util.Map">
-        select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName",site_route "siteRoute",site_id "siteId" from tb_pest_board where principal_user = #{principalUser}
-        <if test="siteRoute!=null and siteRoute !=''">
-            and site_route like concat('%',concat(#{siteRoute},'%'))
-        </if>
+        select pest_board_id "pestBoardId" , site_type "siteType",site_name "siteName",site_route "siteRoute",site_id "siteId" ,principal_user "principalUser" from tb_pest_board
+        <where>
+            and  principal_user = like concat('%',concat(#{principalUser},'%'))
+            <if test="siteRoute!=null and siteRoute !=''">
+                and site_route like concat('%',concat(#{siteRoute},'%'))
+            </if>
+        </where>
     </select>
     <select id="findPestBoardByPestBoardId" resultType="com.rpzh.vo.PestBoardVo">
         select pest_board_id "pestBoardId", site_route "siteRoute",site_name "siteName",site_id "siteId",principal_user principalUser  from tb_pest_board where pest_board_id =#{pestBoardId}

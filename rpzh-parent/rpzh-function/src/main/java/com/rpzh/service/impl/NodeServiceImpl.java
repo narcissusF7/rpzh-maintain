@@ -490,20 +490,17 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getStartTime())){
                 nodeDto.setStartTime(nodeDto.getStartTime().split(" ")[0]+" 00:00:00");
             }
+            //从数据库找到该设备
             NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
-            String materialCode = String.join(",",materialDao.findMaterialCode(nodeVo.getStackNo()));
-            nodeVo.setMaterialCode(materialCode);
-//            nodeDto.setMaintainPlanId(nodeVo.getMaintainPlanId());
-//            if (ToolUtil.isNotEmpty(nodeVo.getMaintainStageId())){
-//                nodeDto.setMaintainStage(nodeVo.getMaintainStageId()+"");
-//            }
 
-            List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
-            for (int i = 0; i < nodeDataVos.size(); i++) {
-                setWarningColor(nodeDataVos.get(i),map);
+            if (ToolUtil.isNotEmpty(nodeVo)){
+                List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
+                for (int i = 0; i < nodeDataVos.size(); i++) {
+                    setWarningColor(nodeDataVos.get(i),map);
+                }
+                return nodeDataVos;
             }
 
-            return nodeDataVos;
         }
         return null;
     }

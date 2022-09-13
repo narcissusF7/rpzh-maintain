@@ -272,8 +272,10 @@ public class MonitoringCenterController {
             Page<NodeDataVo> nodeDataPage = ManuallyPageUtil.manuallyPage(nodeDataVos, page, size);
             return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataPage));
         }
+
         if (ToolUtil.isEmpty(nodeDataVos)){
-            return new Result<>(true, StatusCode.OK, "查询成功",null);
+            nodeDataVos = new ArrayList<>();
+            return new Result<>(true, StatusCode.OK, "查询成功",new PageInfo<>(nodeDataVos));
         }
         return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataVos));
     }
@@ -322,10 +324,11 @@ public class MonitoringCenterController {
 
 
         List<NodeDataVo> nodeDataVos = nodeService.findNodeHistory(nodeDto);
+        List<HashMap<String, String>> historyGraphData = new ArrayList<>();
         if (!ToolUtil.isEmpty(nodeDataVos)){
             Map<String, List<NodeDataVo>> collect = nodeDataVos.stream().collect(Collectors.groupingBy((item) -> (
                     item.getTransferTime().split(" ")[0])));
-            List<HashMap<String, String>> historyGraphData = new ArrayList<>();
+
             TreeMap<String, List<NodeDataVo>> treeMap = new TreeMap<>(collect);
             treeMap.forEach((k, value) -> {
                 HashMap<String, String> map = new HashMap();
@@ -343,7 +346,7 @@ public class MonitoringCenterController {
             });
             return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
         }
-        return new Result<>(true, StatusCode.OK, "", null);
+        return new Result<>(true, StatusCode.OK, "查询成功", historyGraphData);
     }
 
     @ApiOperation(
@@ -379,10 +382,10 @@ public class MonitoringCenterController {
         }
         if (ToolUtil.isEmpty(nodeDto.getNodeId())&&ToolUtil.isEmpty(nodeDto.getNodeType())||("null".equals(nodeDto.getNodeId())&&"null".equals(nodeDto.getNodeType()))){
             //设备id和设备类型都为空  导出的为天气数据
-                MonitorCondition monitorCondition = new MonitorCondition();
-                monitorCondition.setStartTime(nodeDto.getStartTime()+" 00:00:00");
-                monitorCondition.setEndTime(nodeDto.getEndTime()+" 23:59:59");
-                List<WeatherDataVo> weatherData = monitoringCenterService.findWeatherData(monitorCondition);
+            MonitorCondition monitorCondition = new MonitorCondition();
+            monitorCondition.setStartTime(nodeDto.getStartTime()+" 00:00:00");
+            monitorCondition.setEndTime(nodeDto.getEndTime()+" 23:59:59");
+            List<WeatherDataVo> weatherData = monitoringCenterService.findWeatherData(monitorCondition);
             EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
             easyPoiUtil.t = new NodeDataVo();
             try {
