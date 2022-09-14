@@ -39,7 +39,7 @@ spring:
         #可以配置多个
         oracle:
           url: jdbc:oracle:thin:@10.46.150.173:1521:helowin
-          username: RPZH_FUNCTION
+          username: TEST_FUNCTION
           password: rpzh123456.
           driver-class-name: oracle.jdbc.driver.OracleDriver
         clickhouse:

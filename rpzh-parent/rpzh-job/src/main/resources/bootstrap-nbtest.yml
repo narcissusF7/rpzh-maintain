@@ -28,7 +28,7 @@ spring:
       max-request-size: 10MB   #文件传输大小
   datasource:
     url: jdbc:oracle:thin:@10.46.150.173:1521:helowin
-    username: RPZH_FUNCTION
+    username: TEST_FUNCTION
     password: rpzh123456.
     driver-class-name: oracle.jdbc.driver.OracleDriver
 logging:
