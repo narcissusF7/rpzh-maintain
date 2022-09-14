@@ -1,6 +1,9 @@
 package com.rpzh.dao;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.AirConditionVo;
+import com.rpzh.vo.NodeDataVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +22,11 @@ public interface AirConditioningDao {
     Integer insertAirCondtionTags(@Param("maps") List<Map<String,String>> integerStringMap);
 
     List<AirConditionVo> findAllAirCondition();
+
+    List<AirConditionVo> findAirCondition(@Param("siteRoute") String siteRoute);
+
+    @DS("clickhouse")
+    NodeDataVo findAirConditionNowData(@Param("airConditionCode") String airConditionCode);
+    @DS("clickhouse")
+    List<NodeDataVo> findDataHistory(@Param("nodeId") String nodeId);
 }

@@ -7,11 +7,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.rpzh.constant.NodeConstant;
-import com.rpzh.dao.GeneralSettingDao;
-import com.rpzh.dao.NodeDao;
-import com.rpzh.dao.NodeOperationDao;
-import com.rpzh.dao.MaterialDao;
-import com.rpzh.dao.TaskManagementDao;
+import com.rpzh.dao.*;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.dto.TaskDto;
@@ -62,6 +58,9 @@ public class NodeServiceImpl implements NodeService {
 
     @Autowired
     TaskManagementDao taskManagementDao;
+
+    @Autowired
+    AirConditioningDao airConditioningDao;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -490,16 +489,25 @@ public class NodeServiceImpl implements NodeService {
             if (!ToolUtil.isEmpty(nodeDto.getStartTime())){
                 nodeDto.setStartTime(nodeDto.getStartTime().split(" ")[0]+" 00:00:00");
             }
+            NodeVo nodeVo;
             //从数据库找到该设备
-            NodeVo nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
+            List<NodeDataVo> nodeDataVos = null;
+            if (nodeDto.getNodeId().contains("FAIENG")){
+                nodeDataVos = airConditioningDao.findDataHistory(nodeDto.getNodeId());
 
-            if (ToolUtil.isNotEmpty(nodeVo)){
-                List<NodeDataVo> nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
+            }else {
+                nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());
+                if (ToolUtil.isNotEmpty(nodeVo)){
+                    nodeDataVos = nodeDao.findNodeDataHistory(nodeDto, nodeType.getTableName(), nodeType.getTableColumn(),nodeVo.getSiteRoute());
+                }
+            }
+            if (ToolUtil.isNotEmpty(nodeDataVos)){
                 for (int i = 0; i < nodeDataVos.size(); i++) {
                     setWarningColor(nodeDataVos.get(i),map);
                 }
-                return nodeDataVos;
             }
+
+            return nodeDataVos;
 
         }
         return null;

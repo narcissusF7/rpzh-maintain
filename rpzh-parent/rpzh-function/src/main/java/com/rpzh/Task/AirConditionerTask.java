@@ -23,8 +23,6 @@ import java.util.Map;
 
 @Component
 public class AirConditionerTask {
-    @Resource
-    NodeDao nodeDao;
 
     @Autowired
     RedisTemplate redisTemplate;

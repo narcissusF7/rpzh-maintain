@@ -127,16 +127,10 @@ public class MonitoringCenterController {
     @ApiImplicitParams({@ApiImplicitParam(
             name = "maintainStageId",
             value = "养护计划阶段Id",
-            dataType = "Integer",
-            required = true
+            dataType = "Integer"
     ),@ApiImplicitParam(
             name = "type",
             value = "设备类型  01氧气 03温湿度 04 包芯氧气",
-            dataType = "String",
-            required = true
-    ),@ApiImplicitParam(
-            name = "siteType",
-            value = "采集位置类型",
             dataType = "String",
             required = true
     ),@ApiImplicitParam(
@@ -147,14 +141,8 @@ public class MonitoringCenterController {
     )})
     @PostMapping("/findAlarmValue")
     public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData,String pidRoute){
-        if (ToolUtil.isEmpty(nodeData.getMaintainStageId())){
-            return new Result<>(false, StatusCode.ERROR, "养护阶段id不能为空");
-        }
         if (ToolUtil.isEmpty(nodeData.getType())){
             return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
-        }
-        if (ToolUtil.isEmpty(nodeData.getSiteType())){
-            return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
         }
         if (ToolUtil.isEmpty(pidRoute)){
             return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");

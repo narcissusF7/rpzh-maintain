@@ -1,5 +1,6 @@
 package com.rpzh.dto;
 
+import com.rpzh.vo.NodeVo;
 import lombok.Data;
 
 import java.util.List;
@@ -128,31 +129,57 @@ public class TaskDto {
         this.endTime = endTime;
         switch (type){
             case "06":
-                this.detail = "垛内氧气";
-                break;
             case "07":
-                this.detail = "仓间氧气";
+                this.detail = getTaskAddress() + "氧气预警";
                 break;
             case "08":
-                this.detail = "垛内温度";
-                break;
             case "09":
-                this.detail = "仓间温度";
+                this.detail = getTaskAddress() + "温度预警";
                 break;
             case "10":
-                this.detail = "垛内湿度";
-                break;
             case "11":
-                this.detail = "仓间湿度";
+                this.detail = getTaskAddress() + "湿度预警";
                 break;
             case "12":
-                this.detail = "包芯温度";
+                this.detail = getTaskAddress() + "包芯温度预警";
                 break;
             case "13":
-                this.detail = "平均包芯高于环境";
+                this.detail = getTaskAddress() + "平均包芯温度高于环境温度";
                 break;
             case "19":
-                this.detail = "平均包芯低于环境";
+                this.detail = getTaskAddress() + "平均包芯温度低于环境温度";
+                break;
+        }
+    }
+    public TaskDto(String taskNum, String type, NodeVo nodeVo, String principal, String endTime) {
+        this.taskNum = taskNum;
+        this.type = type;
+        this.taskAddress = nodeVo.getGatherSite();
+        this.taskSiteRoute = nodeVo.getSiteRoute();
+        this.principal = principal;
+        this.endTime = endTime;
+
+        switch (type){
+            case "06":
+            case "07":
+                this.detail = getTaskAddress() + "氧气预警";
+                break;
+            case "08":
+            case "09":
+                this.detail = getTaskAddress() + "温度预警";
+                break;
+            case "10":
+            case "11":
+                this.detail = getTaskAddress() + "湿度预警";
+                break;
+            case "12":
+                this.detail = getTaskAddress() + "包芯温度预警";
+                break;
+            case "13":
+                this.detail = getTaskAddress() + "平均包芯温度高于环境温度";
+                break;
+            case "19":
+                this.detail = getTaskAddress() + "平均包芯温度低于环境温度";
                 break;
         }
     }

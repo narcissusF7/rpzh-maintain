@@ -55,6 +55,9 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
     @Autowired
     GeneralSettingDao generalSettingDao;
 
+    @Autowired
+    AirConditioningDao airConditioningDao;
+
     @Resource
     private MaterialDao materialDao;
 
@@ -81,6 +84,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         }
 
         List<NodeVo> nodeVos = new ArrayList<>();
+        List<AirConditionVo> airConditionVos = null;
         //判断是否包含仓间的温湿度设备
         if (NodeConstant.NODE_WARE_AREA.equals(monitorCondition.getSiteType()) && Arrays.asList(monitorCondition.getNodeTypes()).contains(NodeConstant.HUMITURE_NODE_TYPE_VALUE)) {
             //通过条件查询对应的所有设备（采集位置、采集位置类型（仓间、非仓间）、设备类别（可以多个）、物料代码）
@@ -88,6 +92,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             nodeVos = nodeDao.findHumitureDevice(monitorCondition);
             //TODO 空调
             //查询空调设备
+            airConditionVos = airConditioningDao.findAirCondition(monitorCondition.getPidRoute());
 //            nodeVos.addAll(nodeDao.findAirConditioner(monitorCondition));
             //再排序
             nodeVos = nodeVos.stream().sorted(Comparator.comparing(NodeVo::getSiteRoute)).collect(Collectors.toList());
@@ -120,7 +125,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
         }
 
         //添加筛选完后的数据
-        nodeDataVos = setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus());
+        nodeDataVos = setNodeDataVos(nodeDataVos, nodeVos, monitorCondition.getMonitorStatus(),airConditionVos);
 
         Stream<NodeDataVo> stream = nodeDataVos.stream();
         if (monitorCondition.getSortCondition() == 1) {
@@ -240,12 +245,13 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      */
     @Override
     public Map<String, String> findAlarmValue(NodeData nodeData) {
+        String siteType = "0"+ (nodeData.getSiteRoute().split(",").length-1);
         //该设备需要预警的字段
-        String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), nodeData.getSiteType());
+        String[] column = AlarmValueSettingVo.getColumn(nodeData.getType(), siteType);
         //通过这个字段查询缓存中这个养护计划阶段的预警规则是否存在
         Map<String, String> map = new HashMap<>();
         //如果是仓间设备
-        if (NodeConstant.NODE_WARE_AREA.equals(nodeData.getSiteType())) {
+        if (NodeConstant.NODE_WARE_AREA.equals(siteType)||ToolUtil.isEmpty(nodeData.getMaintainStageId())) {
             //将位置路由转成map 然后再拼接kv 作为redis的对象名
             List<String> hashKeys = dataHandler.getHashKeys(nodeData.getSiteRoute());
             //判断缓存中存在该对象名 存在 获取 不存在 从数据库中向上查找 存到缓存中 并返回对象名
@@ -305,7 +311,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
      * @param status      状态
      * @return
      */
-    public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos, List<NodeVo> nodeVos, Integer status) {
+    public List<NodeDataVo> setNodeDataVos(List<NodeDataVo> nodeDataVos, List<NodeVo> nodeVos, Integer status,List<AirConditionVo> airConditionVos) {
         for (NodeVo nodeVo : nodeVos) {
             //TODO 获取缓存中该设备的数据 空调数据暂时没有 sql暂用只找仓间温湿度的数据
             Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN + nodeVo.getNodeId());
@@ -314,7 +320,7 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
             if (!ToolUtil.isEmpty(data)) {
                 nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
                 NodeData nodeData = JSON.parseObject(data.toString(), NodeData.class);
-                if (!ToolUtil.isEmpty(nodeData.getFrequency())) {
+                /*if (!ToolUtil.isEmpty(nodeData.getFrequency())) {
                     try {
                         //传输时间的时间戳
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -324,19 +330,19 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                         long intervalTime = System.currentTimeMillis() - time;
                         //根据频率求出丢包个数
                         if (intervalTime / (nodeData.getFrequency() * 1000) > 0) {
-                            /*if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
+                            if (ToolUtil.isEmpty(nodeDataVo.getWarningType())){
                                 nodeDataVo.setWarningType(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
                             }else {
                                 if (!nodeDataVo.getWarningType().contains(WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN)){
                                     nodeDataVo.setWarningType(nodeDataVo.getWarningType()+","+WarningTypeConstant.NODE_PACKET_LOSS_BREAKDOWN);
                                 }
-                            }*/
+                            }
                         }
 
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                }
+                }*/
                 nodeDataVos.add(nodeDataVo);
             } else {
                 //如果设备数据不在缓存中
@@ -357,8 +363,38 @@ public class MonitoringCenterServiceImpl implements MonitoringCenterService {
                 }
 
             }
-
-
+        }
+        //空调设备集合是否为空
+        if(ToolUtil.isNotEmpty(airConditionVos)){
+            NodeDataVo nodeDataVo;
+            //遍历
+            for (AirConditionVo airConditionVo : airConditionVos) {
+                //从缓存中获取该空调数据
+                Object data = redisTemplate.opsForValue().get(CACHE_KEY_REDIS_MAINTAIN + airConditionVo.getAirConditionCode());
+                if (ToolUtil.isNotEmpty(data)){
+                    //类型转换
+                    nodeDataVo = JSON.parseObject(data.toString(), NodeDataVo.class);
+                    //放置到集合里面
+                    nodeDataVos.add(nodeDataVo);
+                }else{
+                    //如果设备数据不在缓存中
+                    nodeDataVo = airConditioningDao.findAirConditionNowData(airConditionVo.getAirConditionCode());
+                    if (!ToolUtil.isEmpty(nodeDataVo)) {
+                        //将该数据存放到缓存中
+                        redisTemplate.opsForValue().set(CACHE_KEY_REDIS_MAINTAIN + airConditionVo.getAirConditionCode(), JSONObject.toJSONString(nodeDataVo));
+                        nodeDataVos.add(nodeDataVo);
+                    } else {
+                        nodeDataVo = new NodeDataVo();
+                        nodeDataVo.setNodeId(airConditionVo.getAirConditionCode());
+                        nodeDataVo.setType("06");
+                        nodeDataVo.setAlertLevel(0);
+                        nodeDataVo.setGatherSite(airConditionVo.getTagCN());
+                        nodeDataVo.setTransferTime("--");
+                        nodeDataVos.add(nodeDataVo);
+                        continue;
+                    }
+                }
+            }
         }
         //监控状态筛选 1.预警  2.正常
         if (status == 2) {

@@ -14,6 +14,29 @@
     select air_conditioning_no from tb_air_conditioning where ware_area_id = #{wareAreaId}
   </select>
     <select id="findAllAirCondition" resultType="com.rpzh.vo.AirConditionVo">
-        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags where avg_flag= 0
+        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags
+    </select>
+    <select id="findAirCondition" resultType="com.rpzh.vo.AirConditionVo">
+        select id ,air_condition_code airConditionCode,tag_cn tagCN,site_route siteRoute,temp_tag tempTag,humidity_tag humidityTag from tb_air_condition_tags
+        <where>
+            <if test="siteRoute!=null and siteRoute!=''">
+                and site_route like concat(concat('%', #{siteRoute}),'%')
+            </if>
+        </where>
+        order by site_route
+    </select>
+    <select id="findAirConditionNowData" resultType="com.rpzh.vo.NodeDataVo">
+        SELECT id, type, temp, humiture, node_id nodeId, gather_site gatherSite, site_type siteType, transfer_time transferTime, alert_level alertLevel, pid_route siteRoute, createdTime, warning_type warningType, humidity_level humidityLevel, temp_level tempLevel FROM tb_air_conditioner_history
+        <where>
+            node_id =#{airConditionCode}
+        </where>
+        order by transfer_time desc limit 1
+    </select>
+    <select id="findDataHistory" resultType="com.rpzh.vo.NodeDataVo">
+        SELECT id, type, temp, humiture, node_id nodeId, gather_site gatherSite, site_type siteType, transfer_time transferTime, alert_level alertLevel, pid_route siteRoute, createdTime, warning_type warningType, humidity_level humidityLevel, temp_level tempLevel FROM tb_air_conditioner_history
+        <where>
+            node_id =#{nodeId}
+        </where>
+        order by transfer_time desc
     </select>
 </mapper>
