@@ -35,8 +35,10 @@
     <select id="findDataHistory" resultType="com.rpzh.vo.NodeDataVo">
         SELECT id, type, temp, humiture, node_id nodeId, gather_site gatherSite, site_type siteType, transfer_time transferTime, alert_level alertLevel, pid_route siteRoute, createdTime, warning_type warningType, humidity_level humidityLevel, temp_level tempLevel FROM tb_air_conditioner_history
         <where>
-            node_id =#{nodeId}
+            and node_id =#{nodeDto.nodeId}
+            <if test="nodeDto.startTime!=null and nodeDto.startTime!=''">and transfer_time >=#{nodeDto.startTime}</if>
+            <if test="nodeDto.endTime!=null and nodeDto.endTime!=''">and transfer_time &lt;=#{nodeDto.endTime}</if>
         </where>
-        order by transfer_time desc
+        order by transfer_time
     </select>
 </mapper>

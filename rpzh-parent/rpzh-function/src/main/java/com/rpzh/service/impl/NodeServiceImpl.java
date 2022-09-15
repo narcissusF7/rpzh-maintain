@@ -493,7 +493,7 @@ public class NodeServiceImpl implements NodeService {
             //从数据库找到该设备
             List<NodeDataVo> nodeDataVos = null;
             if (nodeDto.getNodeId().contains("FAIENG")){
-                nodeDataVos = airConditioningDao.findDataHistory(nodeDto.getNodeId());
+                nodeDataVos = airConditioningDao.findDataHistory(nodeDto);
 
             }else {
                 nodeVo = nodeDao.findByNodeId(nodeDto.getNodeId());

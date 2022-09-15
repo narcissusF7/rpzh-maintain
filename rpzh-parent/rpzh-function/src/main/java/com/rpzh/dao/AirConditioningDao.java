@@ -1,6 +1,7 @@
 package com.rpzh.dao;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.rpzh.dto.NodeDto;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.AirConditionVo;
 import com.rpzh.vo.NodeDataVo;
@@ -28,5 +29,5 @@ public interface AirConditioningDao {
     @DS("clickhouse")
     NodeDataVo findAirConditionNowData(@Param("airConditionCode") String airConditionCode);
     @DS("clickhouse")
-    List<NodeDataVo> findDataHistory(@Param("nodeId") String nodeId);
+    List<NodeDataVo> findDataHistory(@Param("nodeDto")NodeDto nodeDto);
 }
