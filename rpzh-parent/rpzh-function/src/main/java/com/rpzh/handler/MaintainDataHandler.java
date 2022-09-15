@@ -74,8 +74,8 @@ public class MaintainDataHandler {
     @Autowired
     IdWorker idWorker;
 
-    //    @Value("${time.frequency}")
-    Integer frequency  =7200;
+    @Value("${time.frequency}")
+    Integer frequency;
 
     @Value("${node.voltage}")
     Double voltage;

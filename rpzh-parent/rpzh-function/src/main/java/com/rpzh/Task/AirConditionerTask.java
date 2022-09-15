@@ -35,7 +35,7 @@ public class AirConditionerTask {
 
 
     private static String TagDataUrl = "http://10.46.150.174/api/TagDatas";
-//    @Scheduled(cron="${time.cron}")
+    @Scheduled(cron="${time.cron}")
     void handleAirConditionerData() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
