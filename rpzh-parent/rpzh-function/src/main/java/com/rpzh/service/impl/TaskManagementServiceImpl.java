@@ -172,7 +172,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             String[] split = taskVo.getPrincipal().split(",");
             String nickname = "";
             for (int i = 0; i < split.length; i++) {
-                nickname = nickname+ ","+ (String) redisUtil.hget("USER_"+principal, "nickname");
+                nickname = nickname+ ","+ (String) redisUtil.hget("USER_"+split[i], "nickname");
             }
 
             taskVo.setPrincipal(nickname.substring(1)+"("+principal+")");
