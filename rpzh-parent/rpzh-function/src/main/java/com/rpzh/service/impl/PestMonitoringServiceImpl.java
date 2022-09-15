@@ -966,6 +966,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //查询该垛位、仓间下该类型任务是否存在
         Map selectTaskMap = taskManagementService.findTaskBySiteRoute(pestBoardVo.getSiteRoute(),type);
         if (ToolUtil.isEmpty(selectTaskMap)){
+
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""),type,pestBoardVo.getSiteName(),pestBoardVo.getSiteRoute(),pestBoardVo.getPrincipalUser(), DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskManagementService.addDataHandTask(taskDto);
