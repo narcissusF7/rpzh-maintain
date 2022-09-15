@@ -23,7 +23,7 @@
                 and site_route like concat(concat('%', #{siteRoute}),'%')
             </if>
         </where>
-        order by site_route
+        order by site_route , tag_cn
     </select>
     <select id="findAirConditionNowData" resultType="com.rpzh.vo.NodeDataVo">
         SELECT id, type, temp, humiture, node_id nodeId, gather_site gatherSite, site_type siteType, transfer_time transferTime, alert_level alertLevel, pid_route siteRoute, createdTime, warning_type warningType, humidity_level humidityLevel, temp_level tempLevel FROM tb_air_conditioner_history

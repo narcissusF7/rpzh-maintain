@@ -17,11 +17,11 @@
             <if test="monitorCondition.startTime!=null and monitorCondition.startTime!=''">
                 and created_time &gt;= #{monitorCondition.startTime}
             </if>
-
             <if test="monitorCondition.endTime!=null and monitorCondition.endTime!=''">
                 and created_time &lt;= #{monitorCondition.endTime}
             </if>
         </where>
+        order by created_time
     </select>
     <select id="findNowWeather"  resultType="com.rpzh.vo.WeatherDataVo">
         select

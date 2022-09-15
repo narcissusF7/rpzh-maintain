@@ -27,6 +27,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,8 @@ public class MonitoringCenterController {
     MonitoringCenterService monitoringCenterService;
     @Resource
     NodeService nodeService;
+
+    SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @ApiOperation(
             value = "查询监控数据列表"
@@ -178,6 +182,22 @@ public class MonitoringCenterController {
     @GetMapping("/findWeatherData")
     public Result<List<WeatherDataVo>> findWeatherData(@ApiIgnore MonitorCondition monitorCondition){
         PageHelper.startPage(monitorCondition.getPage(),monitorCondition.getSize());
+        if (ToolUtil.isEmpty(monitorCondition.getStartTime())){
+            if (ToolUtil.isEmpty(monitorCondition.getEndTime())){
+                monitorCondition.setEndTime(sdf.format(new Date()));
+            }
+            Calendar calendar = Calendar.getInstance();
+            try {
+                Date date = sdf.parse(monitorCondition.getEndTime());
+                calendar.setTime(date);
+                calendar.add(Calendar.DAY_OF_YEAR, -7);
+                monitorCondition.setStartTime(sdf.format(calendar.getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
         List<WeatherDataVo> weatherDataVos = monitoringCenterService.findWeatherData(monitorCondition);
 
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(weatherDataVos));
@@ -257,7 +277,9 @@ public class MonitoringCenterController {
         if (!ToolUtil.isEmpty(nodeDto.getPage())&&!ToolUtil.isEmpty(nodeDto.getSize())){
             int page = nodeDto.getPage();
             int size = nodeDto.getSize();
-            Page<NodeDataVo> nodeDataPage = ManuallyPageUtil.manuallyPage(nodeDataVos, page, size);
+            //列表和曲线图排序相反
+            List<NodeDataVo> collect = nodeDataVos.stream().sorted((e1, e2) -> e2.getTransferTime().compareTo(e1.getTransferTime())).collect(Collectors.toList());
+            Page<NodeDataVo> nodeDataPage = ManuallyPageUtil.manuallyPage(collect, page, size);
             return new Result<>(true, StatusCode.OK, "查询成功", new PageInfo<>(nodeDataPage));
         }
 
