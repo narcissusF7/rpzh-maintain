@@ -23,7 +23,7 @@
         order by created_time desc
     </select>
     <select id="findMaintainPlan" resultType="com.rpzh.vo.MaintainPlanVo">
-        SELECT  t1.id as id,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.area_id as areaId,t3.site_name as stackName,
+        SELECT  t1.id as id,t1.stack_id as stackId,t1.maintence_style as maintenceStyle,t1.principal_name as principalName,t3.area_id as areaId,t3.site_name as stackName,t1.material_code as materialCode,
         t3.pid_route as pidRoute,t2.phases as phases,t2.maintain_days AS maintainDays,t2.aftercare_date_start AS aftercareDateStart,t2.oxygen_reduction_day AS oxygenReductionTime,
         t2.created_time AS createdTime,t2.expire_time AS expireTime,t2.maintain_count as maintainCount,t2.id as stageId,t2.alarm_value_setting_id AS alarmValueSettingId,t3.stack_no as stackNo
         FROM tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
