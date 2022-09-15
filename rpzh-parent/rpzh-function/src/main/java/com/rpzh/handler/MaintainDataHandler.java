@@ -521,11 +521,9 @@ public class MaintainDataHandler {
         }
 
         Double data;
-        String taskType = "09";
         if ("temp".equals(evnType)){
             data =airConditionVo.getTempVal();
         }else {
-            taskType = "11";
             data = airConditionVo.getHumidityVal();
         }
 

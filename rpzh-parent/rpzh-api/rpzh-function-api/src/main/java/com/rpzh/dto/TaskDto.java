@@ -119,7 +119,7 @@ public class TaskDto {
 
     Integer createType;
 
-    public TaskDto (){};
+    public TaskDto (){}
     public TaskDto(String taskNum, String type, String taskAddress, String siteRoute, String principal,String endTime) {
         this.taskNum = taskNum;
         this.type = type;
@@ -128,26 +128,33 @@ public class TaskDto {
         this.principal = principal;
         this.endTime = endTime;
         switch (type){
+            case "04":
+            case "05":
+                this.detail = getTaskAddress() + "甲虫虫数达到预警，请及时处理";
+                break;
             case "06":
             case "07":
-                this.detail = getTaskAddress() + "氧气预警";
+                this.detail = getTaskAddress() + "氧气浓度达到预警，请及时处理";
                 break;
             case "08":
             case "09":
-                this.detail = getTaskAddress() + "温度预警";
+                this.detail = getTaskAddress() + "温度达到预警，请及时处理";
                 break;
             case "10":
             case "11":
-                this.detail = getTaskAddress() + "湿度预警";
+                this.detail = getTaskAddress() + "湿度达到预警，请及时处理";
                 break;
             case "12":
-                this.detail = getTaskAddress() + "包芯温度预警";
+                this.detail = getTaskAddress() + "包芯温度达到预警，请及时处理";
                 break;
             case "13":
-                this.detail = getTaskAddress() + "平均包芯温度高于环境温度";
+                this.detail = getTaskAddress() + "平均包芯温度高于环境温度，请及时处理";
+                break;
+            case "14":
+                this.detail = getTaskAddress() + "粉螟虫数达到预警，请及时处理";
                 break;
             case "19":
-                this.detail = getTaskAddress() + "平均包芯温度低于环境温度";
+                this.detail = getTaskAddress() + "平均包芯温度低于环境温度，请及时处理";
                 break;
         }
     }
@@ -162,24 +169,24 @@ public class TaskDto {
         switch (type){
             case "06":
             case "07":
-                this.detail = getTaskAddress() + "氧气预警";
+                this.detail = getTaskAddress() + "氧气浓度达到预警，请及时处理";
                 break;
             case "08":
             case "09":
-                this.detail = getTaskAddress() + "温度预警";
+                this.detail = getTaskAddress() + "温度达到预警，请及时处理";
                 break;
             case "10":
             case "11":
-                this.detail = getTaskAddress() + "湿度预警";
+                this.detail = getTaskAddress() + "湿度达到预警，请及时处理";
                 break;
             case "12":
-                this.detail = getTaskAddress() + "包芯温度预警";
+                this.detail = getTaskAddress() + "包芯温度达到预警，请及时处理";
                 break;
             case "13":
-                this.detail = getTaskAddress() + "平均包芯温度高于环境温度";
+                this.detail = getTaskAddress() + "平均包芯温度高于环境温度，请及时处理";
                 break;
             case "19":
-                this.detail = getTaskAddress() + "平均包芯温度低于环境温度";
+                this.detail = getTaskAddress() + "平均包芯温度低于环境温度，请及时处理";
                 break;
         }
     }
