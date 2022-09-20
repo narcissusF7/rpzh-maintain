@@ -107,14 +107,5 @@ rocketmq:
   producer:
     group: MessageGroup
 
-node:
-  voltage: 3.0
-  signalStrength: -15
-time:
-  cron: 0 0/2 0 * * *
-  frequency: 7200
-  nodeTask: 0 0 6,18 * * *
-
-
 pagehelper:
   auto-runtime-dialect: true

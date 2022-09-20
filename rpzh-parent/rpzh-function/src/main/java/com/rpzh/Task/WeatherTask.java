@@ -29,7 +29,7 @@ public class WeatherTask {
     /**
      * 天气数据redis 存放规则  redisTemplate.opsForValue().set("MAINTAIN_WEATHER",weatherDataVo);
      */
-    @Scheduled(cron="${time.cron}")
+    @Scheduled(cron="0 0 0/2 * * ?")
     void insertWeatherData() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s = PortDataUtils.GetPortData(weatherUrl);

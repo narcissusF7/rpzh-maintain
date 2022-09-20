@@ -8,6 +8,7 @@ import com.rpzh.parse.ParseData;
 import com.rpzh.pojo.AirCondition;
 import com.rpzh.util.PortDataUtils;
 import com.rpzh.vo.AirConditionVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class AirConditionerTask {
 
     @Autowired
@@ -35,8 +37,9 @@ public class AirConditionerTask {
 
 
     private static String TagDataUrl = "http://10.46.150.174/api/TagDatas";
-    @Scheduled(cron="${time.cron}")
-    void handleAirConditionerData() {
+    @Scheduled(cron="0 0 0/2 * * ?")
+    public void handleAirConditionerData() {
+        log.error("进来定时任务了");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
         List<AirConditionVo> list = airConditioningDao.findAllAirCondition();

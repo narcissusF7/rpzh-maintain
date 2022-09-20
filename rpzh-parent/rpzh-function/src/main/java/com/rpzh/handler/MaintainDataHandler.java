@@ -73,13 +73,10 @@ public class MaintainDataHandler {
     @Autowired
     IdWorker idWorker;
 
-    @Value("${time.frequency}")
-    Integer frequency;
+    Integer frequency = 7200;
 
-    @Value("${node.voltage}")
-    Double voltage;
-    @Value("${node.signalStrength}")
-    Integer signalStrength;
+    Double voltage =3.0;
+    Integer signalStrength =-15;
 
     String warningType = "";
 
@@ -687,9 +684,7 @@ public class MaintainDataHandler {
             //设置所在垛位
             earlyWarning.setStackId(nodeVo.getStackId());
         }
-        log.error("处理前预警等级："+level);
         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, data, evnType, nodeVo.getSiteType(),nodeVo);
-        log.error("处理后预警等级："+level);
         return level;
 
     }

@@ -106,9 +106,3 @@ rocketmq:
   topic: messageTopic # mq主题
   producer:
     group: MessageGroup
-
-node:
-  voltage: 3.0
-  signalStrength: -15
-time:
-  cron : 0 0/2 0 * * *
