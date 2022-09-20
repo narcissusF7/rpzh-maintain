@@ -19,7 +19,7 @@ public class EarlyWarningVo {
     @ApiModelProperty(notes ="主键id")
     private Integer id;
     @ApiModelProperty(notes ="上限一级")
-    private Double upperOne;
+    private Double upperOne=0d;
     @ApiModelProperty(notes ="上限二级")
     private Double upperTwo;
     @ApiModelProperty(notes ="上限三级")
