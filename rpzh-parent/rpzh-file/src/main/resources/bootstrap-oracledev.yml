@@ -50,4 +50,4 @@ hystrix:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
 fastdfs:
-  ip: 120.24.91.199:8080
+  ip: 192.168.3.37:8080

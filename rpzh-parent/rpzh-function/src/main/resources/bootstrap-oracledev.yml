@@ -23,7 +23,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   rabbitmq: #RabbitMq配置
-    host: 120.24.91.199
+    host: 192.168.3.37
     port: 5672
     password: guest
     username: guest
@@ -45,7 +45,7 @@ spring:
         clickhouse:
           url: jdbc:clickhouse://192.168.3.37:8123/default
           username: default
-          password:
+          password: rpzh123456.
           driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -111,7 +111,10 @@ node:
   voltage: 3.0
   signalStrength: -15
 time:
-  cron : 0 0/2 0 * * *
+  cron: 0 0/2 0 * * *
+  frequency: 7200
+  nodeTask: 0 0 6,18 * * *
+
 
 pagehelper:
   auto-runtime-dialect: true
