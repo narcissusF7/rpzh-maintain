@@ -63,7 +63,6 @@ public class AppEarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
     })
-    @PreAuthorize("hasAnyAuthority('f:e:mp')")
     public Result appMisreport(Integer id){
         if(ToolUtil.isEmpty(id)){
             return new Result<>(false, StatusCode.ERROR, "预警id不能为空");

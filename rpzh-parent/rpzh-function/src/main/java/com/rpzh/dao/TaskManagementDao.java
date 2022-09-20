@@ -36,6 +36,10 @@ public interface TaskManagementDao {
      */
     List<TaskVo> findTask(@Param("taskDto") TaskDto taskDto);
 
+    int findWarmimgCountBySiteId(@Param("siteId") Integer siteId);
+
+    int findMaintainCountBySiteId(@Param("siteId") Integer siteId);
+
     /**
      * mq修改任务状态
      *

@@ -751,4 +751,7 @@
     <select id="findNodeBySiteRoute" resultType="java.lang.String">
         select node_id from tb_node where site_route = #{siteRoute} and node_type = #{nodeType}
      </select>
+    <select id="findNodeNode" resultType="java.lang.Double">
+        select ${column} from ${table} where transfer_time in (select max(transfer_time) from ${table} where node_id = #{nodeId}) limit 1
+    </select>
 </mapper>

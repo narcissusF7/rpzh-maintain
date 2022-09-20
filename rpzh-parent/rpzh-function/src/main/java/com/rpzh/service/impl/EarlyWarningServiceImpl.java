@@ -798,17 +798,25 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 warningInfo.put("siteName",getSiteName(warningInfo.get("siteRoute").toString()));
                 warningInfo.put("username",getPrincipal(warningInfo.get("principal").toString()));
                 if("13".equals(warningType) || "19".equals(warningType)){
-                    List<String> nodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"04");
+                    List<String> coreNodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"04");
                     Double coreTemp = 0d;
-                    for (String nodeId : nodeIds) {
-                        coreTemp = coreTemp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId).toString());
+                    for (String nodeId : coreNodeIds) {
+                        log.info(nodeId);
+                        System.out.println(nodeId);
+                        Double nodeNode = nodeDao.findNodeNode("temp", "tb_node_temp_core_chip_history", nodeId);
+                        if(ToolUtil.isNotEmpty(nodeNode)) {
+                            coreTemp = coreTemp + nodeNode;
+                        }
                     }
-                    List<String> nIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"03");
+                    List<String> envNodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"03");
                     Double temp = 0d;
-                    for (String nodeId : nIds) {
-                        temp = temp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"01").toString());
+                    for (String nodeId : envNodeIds) {
+                        Double nodeNode = nodeDao.findNodeNode("temp", "tb_node_env_history", nodeId);
+                        if(ToolUtil.isNotEmpty(nodeNode)) {
+                            temp = temp + nodeNode;
+                        }
                     }
-                    warningInfo.put("nowData",coreTemp/nodeIds.size() - temp/nIds.size());
+                    warningInfo.put("nowData",coreTemp/coreNodeIds.size() - temp/envNodeIds.size());
                 } else {
                     List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
                     int i = Arrays.asList(warningInfo.get("grade").toString().split(",")).indexOf(warningInfo.get("warningGrade"));
