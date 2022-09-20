@@ -83,7 +83,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         "/dataReport/exportStackComparisonData",
                         "/dataReport/export",
                         "/maintain/maintainPlan/export",
-                        "/maintain/monitoringCenter/exportNodeHistory"
+                        "/maintain/monitoringCenter/exportNodeHistory",
+                        "/maintain/pestMonitoring/downloadTemplate"
 //                        ,"/*/**"
                 ). //配置地址放行,"/*/**"放行所有的路径
                 permitAll()
