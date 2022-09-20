@@ -53,7 +53,7 @@ public class AirConditionerTask {
             //转成json字符串获取value值
             JSONObject jsonObject = JSONObject.parseObject(tempData);
             String tempVal = jsonObject.getJSONArray("Data").getJSONObject(0).getString("Value");
-            airConditionVo.setTempVal(Double.valueOf(String.format("%.2f",tempVal)));
+            airConditionVo.setTempVal(Double.valueOf(String.format("%.2f",Double.valueOf(tempVal))));
 
             map.put("TagName",airConditionVo.getHumidityTag());
 
@@ -63,7 +63,7 @@ public class AirConditionerTask {
             //转成json字符串获取value值
             JSONObject jsonObject1 = JSONObject.parseObject(humidityData);
             String humidityVal = jsonObject1.getJSONArray("Data").getJSONObject(0).getString("Value");
-            airConditionVo.setHumidityVal(Double.valueOf(String.format("%.2f",humidityVal)));
+            airConditionVo.setHumidityVal(Double.valueOf(String.format("%.2f",Double.valueOf(humidityVal))));
 
         });
         dataHandler.handlerData(list);

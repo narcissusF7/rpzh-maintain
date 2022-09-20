@@ -2,6 +2,7 @@ package com.rpzh.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.AirConditioningDao;
 import com.rpzh.dao.PestMonitoringDao;
 import com.rpzh.dao.TestDb2Dao;
 import com.rpzh.dto.NodeDto;
@@ -15,6 +16,7 @@ import com.rpzh.parse.ParseData;
 import com.rpzh.service.AirConditionService;
 import com.rpzh.service.DataReportService;
 import com.rpzh.service.NodeService;
+import com.rpzh.util.PortDataUtils;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.vo.*;
 import io.swagger.annotations.Api;
@@ -35,6 +37,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import com.rpzh.util.SendMessageUtil;
+
+import javax.annotation.Resource;
 
 /**
  * @Author liubc
@@ -78,6 +82,9 @@ public class TestContrller{
 
     @Autowired
     private TestDb2Dao testDb2Dao;
+
+    @Resource
+    AirConditioningDao airConditioningDao;
 
     @ApiOperation(value = "测试用例方法", tags = "测试用例方法")
     @PostMapping("/one")
@@ -412,5 +419,41 @@ public class TestContrller{
         }
         dataHandler.handlerData(airTags);
         return new Result<>(true, StatusCode.OK, "测试空调数据流程");
+    }
+
+    private static String TagDataUrl = "http://10.46.150.174/api/TagDatas";
+    @PostMapping("handleAirConditionerData")
+    public Result handleAirConditionerData() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+        List<AirConditionVo> list = airConditioningDao.findAllAirCondition();
+        list.forEach(airConditionVo -> {
+            //设置属性
+            HashMap<String, String> map = new HashMap<>();
+            map.put("TagName",airConditionVo.getTempTag());
+            map.put("SamplesCount","1");
+            map.put("DtSt",sdf.format(new Date()));
+            map.put("DtEnd",sdf.format(new Date()));
+            //获取数据
+            String tempData = PortDataUtils.sendPost(TagDataUrl,map);
+
+            //转成json字符串获取value值
+            JSONObject jsonObject = JSONObject.parseObject(tempData);
+            String tempVal = jsonObject.getJSONArray("Data").getJSONObject(0).getString("Value");
+            airConditionVo.setTempVal(Double.valueOf(String.format("%.2f",Double.valueOf(tempVal))));
+
+            map.put("TagName",airConditionVo.getHumidityTag());
+
+            //获取数据
+            String humidityData = PortDataUtils.sendPost(TagDataUrl,map);
+
+            //转成json字符串获取value值
+            JSONObject jsonObject1 = JSONObject.parseObject(humidityData);
+            String humidityVal = jsonObject1.getJSONArray("Data").getJSONObject(0).getString("Value");
+            airConditionVo.setHumidityVal(Double.valueOf(String.format("%.2f",Double.valueOf(humidityVal))));
+
+        });
+        dataHandler.handlerData(list);
+        return new Result(true,200,"处理成功");
     }
 }

@@ -83,8 +83,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         "/dataReport/exportStackComparisonData",
                         "/dataReport/export",
                         "/maintain/maintainPlan/export",
-                        "/maintain/monitoringCenter/exportNodeHistory",
-                        "/maintain/test/testKTData"). //配置地址放行,"/*/**"放行所有的路径
+                        "/maintain/monitoringCenter/exportNodeHistory"
+//                        ,"/*/**"
+                ). //配置地址放行,"/*/**"放行所有的路径
                 permitAll()
                 .anyRequest().
                 authenticated();    //其他地址需要认证授权
