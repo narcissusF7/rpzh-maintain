@@ -264,4 +264,7 @@ public interface NodeDao {
     NodeVo findNodeByOne(@Param("nodeId") String nodeId);
 
     List<String> findNodeBySiteRoute(@Param("siteRoute")String siteRoute,@Param("nodeType")String nodeType);
+
+    @DS("clickhouse")
+    Double findNodeNode(@Param("column")String column,@Param("table")String table,@Param("nodeId")String nodeId);
 }

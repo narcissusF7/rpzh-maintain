@@ -654,9 +654,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map<String,String> map = new HashMap<>();
         map.put("name","");
         if("04".equals(warningType)){
-            map.put("warningType","垛内虫数预警");
+            map.put("warningType","垛内甲虫预警");
         }else if("05".equals(warningType)){
-            map.put("warningType","仓间虫数预警");
+            map.put("warningType","仓间甲虫预警");
         }else if("06".equals(warningType)){
             map.put("warningType","垛内氧气预警");
             map.put("name","%");
@@ -710,29 +710,57 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
      * */
     @Override
     public void warningSend(String number,String username,String siteRoute){
-        //earlyWarningDao.findThreeBySiteRoute()
-        String message = "123434";
+        //时间格式化
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Map warningInfo = earlyWarningDao.findSendBySiteRoute(siteRoute);
+        String siteName = "";
+        //判断该位置是仓间还是垛位
+        if (ToolUtil.isNotEmpty(warningInfo.get("stackId"))) {
+            //查询垛位名称
+            siteName = earlyWarningDao.findStackById(warningInfo.get("stackId").toString());
+        } else {
+            //查询垛位名称
+            siteName = earlyWarningDao.findWareAreaById(warningInfo.get("areaId").toString());
+        }
+        List<String> ids = earlyWarningDao.findRoute(siteRoute);
+        List<Map> warningInfos = earlyWarningDao.findWarningInfoBySiteRoute(ids, ids.size());
+        //短信内容
+        String message = "位置:" + siteName + "。";
+        for (Map info : warningInfos) {
+            message = message + SiteRouteUtil.getWarningName(info.get("warningType").toString());
+            if (!"13".equals(info.get("warningType").toString()) && !"19".equals(info.get("warningType").toString())) {
+                message = message + "的设备有" + info.get("nodeId").toString();
+            }
+            if (!"01".equals(info.get("warningType").toString()) && !"02".equals(info.get("warningType").toString()) && !"02".equals(info.get("warningType").toString())) {
+                message = message + ",预警值为" + info.get("warningVal").toString() + "。";
+            }
+        }
+        message  = message + ",请尽快处理";
         Map map = new HashMap();
-        map.put("username",username);
+        //用户账号
+        map.put("username", username);
+        //短信类型
         map.put("type", "16");
-        map.put("data", "发送养护预警短信内容");
-        map.put("phone", number);
-        map.put("createTime",sdf.format(new Date()));
-        if(message.length()<=460){
-            get(message,map,number);
-        }else{
-            String oneMessage = message.substring(0,460);
-            get(oneMessage,map,number);
-            String twoMessage = message.substring(460,message.length());
-            get(twoMessage,map,number);
+        //发送目标手机号
+        map.put("number", number);
+        //发送短信时间
+        map.put("createTime", sdf.format(new Date()));
+        if (message.length() <= 460) {
+            //长度不大于460,发送一次短信
+            get(message, map, map.get("number").toString());
+        } else {
+            //长度大于460,不大于920,发送两次短信
+            String oneMessage = message.substring(0, 460);
+            get(oneMessage, map, map.get("number").toString());
+            String twoMessage = message.substring(460, message.length());
+            get(twoMessage, map, map.get("number").toString());
         }
     }
 
     public void get(String message,Map map,String number) {
         try {
             map.put("content", message);
-            //SendMessageUtil.sendSms(number, message, "h2");
+            SendMessageUtil.sendSms(number, message, "h2");
             //系统标识,标识是哪个系统发送的消息,养护系统发送
             rocketMQTemplate.send(topic + ":" , MessageBuilder.withPayload(map).build()) ;
             Thread.sleep(1500);
@@ -798,17 +826,25 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 warningInfo.put("siteName",getSiteName(warningInfo.get("siteRoute").toString()));
                 warningInfo.put("username",getPrincipal(warningInfo.get("principal").toString()));
                 if("13".equals(warningType) || "19".equals(warningType)){
-                    List<String> nodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"04");
+                    List<String> coreNodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"04");
                     Double coreTemp = 0d;
-                    for (String nodeId : nodeIds) {
-                        coreTemp = coreTemp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId).toString());
+                    for (String nodeId : coreNodeIds) {
+                        log.info(nodeId);
+                        System.out.println(nodeId);
+                        Double nodeNode = nodeDao.findNodeNode("temp", "tb_node_temp_core_chip_history", nodeId);
+                        if(ToolUtil.isNotEmpty(nodeNode)) {
+                            coreTemp = coreTemp + nodeNode;
+                        }
                     }
-                    List<String> nIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"03");
+                    List<String> envNodeIds = nodeDao.findNodeBySiteRoute(warningInfo.get("siteRoute").toString(),"03");
                     Double temp = 0d;
-                    for (String nodeId : nIds) {
-                        temp = temp + Double.parseDouble(redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"01").toString());
+                    for (String nodeId : envNodeIds) {
+                        Double nodeNode = nodeDao.findNodeNode("temp", "tb_node_env_history", nodeId);
+                        if(ToolUtil.isNotEmpty(nodeNode)) {
+                            temp = temp + nodeNode;
+                        }
                     }
-                    warningInfo.put("nowData",coreTemp/nodeIds.size() - temp/nIds.size());
+                    warningInfo.put("nowData",coreTemp/coreNodeIds.size() - temp/envNodeIds.size());
                 } else {
                     List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
                     int i = Arrays.asList(warningInfo.get("grade").toString().split(",")).indexOf(warningInfo.get("warningGrade"));

@@ -22,6 +22,10 @@ public interface TaskManagementService {
      */
     int addTask(TaskDto taskDto);
 
+    int findWarmimgCountBySiteId(Integer siteId);
+
+    int findMaintainCountBySiteId(Integer siteId);
+
     /**
      * 查询任务列表
      * @param taskDto

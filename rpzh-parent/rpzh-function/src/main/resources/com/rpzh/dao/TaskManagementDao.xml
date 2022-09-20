@@ -109,6 +109,12 @@
         <result property="pictureGroup" column="picture_group"/>
         <result property="pictureFilename" column="picture_filename"/>
     </resultMap>
+    <select id="findWarmimgCountBySiteId" resultType="java.lang.Integer">
+        select count(*) from tb_early_warning where is_affirm in('1','2') and stack_id = #{siteId}
+    </select>
+    <select id="findMaintainCountBySiteId" resultType="java.lang.Integer">
+        select count(*) from tb_maintain_plan where is_end = '0' and stack_id = #{siteId}
+    </select>
     <select id="findTask" resultMap="findTask">
         SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,
         deal_result,move_stack_target_siteroute,move_stack_target_name,target_siteid

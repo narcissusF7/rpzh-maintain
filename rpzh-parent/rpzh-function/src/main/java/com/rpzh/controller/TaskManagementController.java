@@ -111,13 +111,19 @@ public class TaskManagementController {
             if (ToolUtil.isEmpty(taskDto.getTargetSiteName()) || ToolUtil.isEmpty(taskDto.getTargetSiteRoute()) || ToolUtil.isEmpty(taskDto.getTargetSiteId())){
                 return new Result(false,StatusCode.ERROR,"移垛任务中目标位置,目标路径,目标位置id不能为空");
             }
-        }
-        if ("03".equals(taskDto.getType())){
             String route = SiteRouteUtil.route(taskDto.getTargetSiteRoute(), taskDto.getTargetSiteId());
             if (!(route.contains("05"))){
                 return new Result(false, StatusCode.ERROR, "请选择到垛位");
             }
             taskDto.setTargetSiteRoute(route);
+            int warmimgCount = taskManagementService.findWarmimgCountBySiteId(Integer.parseInt(taskDto.getSiteId()));
+            if(warmimgCount>0){
+                return new Result(false, StatusCode.ERROR, "该垛位有预警任务,请处理后再创建移垛任务");
+            }
+            int maintainCount = taskManagementService.findMaintainCountBySiteId(Integer.parseInt(taskDto.getTargetSiteId()));
+            if(maintainCount>0){
+                return new Result(false, StatusCode.ERROR, "目标垛位有养护计划,请选择一个没有养护计划的垛位,再创建移垛任务");
+            }
         }
         int addFlag = taskManagementService.addTask(taskDto);
         return new Result(true,StatusCode.OK,"添加任务成功");

@@ -152,6 +152,15 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         return addFlag;
     }
 
+    @Override
+    public int findWarmimgCountBySiteId(Integer siteId){
+        return taskManagementDao.findWarmimgCountBySiteId(siteId);
+    }
+
+    @Override
+    public int findMaintainCountBySiteId(Integer siteId){
+        return taskManagementDao.findMaintainCountBySiteId(siteId);
+    }
     /**
      * 查询任务列表
      *

@@ -74,11 +74,15 @@ public interface EarlyWarningDao {
 
     List<Map> findSiteRoute();
 
+    List<String> findRoute(@Param("siteRoute")String siteRoute);
+
     //根据位置路由查询未处理的预警信息
     List<Map> findWarningInfoBySiteRoute(@Param("ids")List<String> ids,@Param("size")Integer size);
 
     //获取所有未处理的位置路由
     Map findBySiteRoute(@Param("siteRoute") String siteRoute);
+
+    Map findSendBySiteRoute(@Param("siteRoute") String siteRoute);
 
     //查询垛位名称
     String findStackById(@Param("stackId") String stackId);
