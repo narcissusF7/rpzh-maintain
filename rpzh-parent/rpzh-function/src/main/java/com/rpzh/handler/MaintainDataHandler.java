@@ -687,9 +687,9 @@ public class MaintainDataHandler {
             //设置所在垛位
             earlyWarning.setStackId(nodeVo.getStackId());
         }
-        log.info("处理前预警等级："+level);
+        log.error("处理前预警等级："+level);
         level = decideEarlyWarning(earlyWarningVo, earlyWarning, parseData, level, data, evnType, nodeVo.getSiteType(),nodeVo);
-        log.info("处理后预警等级："+level);
+        log.error("处理后预警等级："+level);
         return level;
 
     }
@@ -1017,13 +1017,13 @@ public class MaintainDataHandler {
 
             String principal = "";
             //如果是仓间
-            if (splits.length-1 == 4) {
+            if (splits.length-2 == 4) {
                 nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
                 //获取位置负责人
                 Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
                 //设置负责人
                 principal = sitePrincipal.get("username").toString();
-            } else if(splits.length-1 == 5) {
+            } else if(splits.length-2 == 5) {
                 nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
                 //获取养护计划负责人
                 principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
