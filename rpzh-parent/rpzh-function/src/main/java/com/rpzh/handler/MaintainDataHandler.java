@@ -184,6 +184,7 @@ public class MaintainDataHandler {
                         earlyWarningDao.insertWarning(tempWarning);
                     }
                 }else {
+                    tempWarning.setNodeType("03");
                     //如果数据库该位置存在预警
                     earlyWarningDao.updateWarning(tempWarning);
                 }
@@ -197,6 +198,7 @@ public class MaintainDataHandler {
                         Map map = addTask(siteRoute, "11", humidityWarning.getPrincipalName(),airConditionDtos.get(0).getTagCN());
                         //预警设置任务id
                         humidityWarning.setTaskId(Integer.parseInt(map.get("id").toString()));
+                        humidityWarning.setNodeType("03");
                         //生成预警
                         earlyWarningDao.insertWarning(humidityWarning);
                     }
