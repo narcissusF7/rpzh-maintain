@@ -18,7 +18,6 @@ import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.service.impl.WarehouseServiceImpl;
-import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -1010,9 +1009,13 @@ public class MaintainDataHandler {
         //查询该垛位、仓间下该类型任务是否存在
         Map selectTaskMap = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(), type);
         if (ToolUtil.isEmpty(selectTaskMap)) {
-            int siteType = nodeVo.getSiteRoute().split(",").length - 1;
-            nodeVo.setSiteId(SiteRouteUtil.getSiteId(nodeVo.getSiteRoute(), "0" + siteType));
-            if (siteType == 4) {
+            String[] splits = nodeVo.getSiteRoute().split(":");
+            String str = splits[splits.length-1];
+            String siteId = str.substring(0,str.length()-1);
+            //设置位置id
+            nodeVo.setSiteId(Integer.parseInt(siteId));
+            //如果是仓间
+            if (splits.length-1 == 4) {
                 nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
             } else {
                 nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
