@@ -1014,17 +1014,20 @@ public class MaintainDataHandler {
             String siteId = str.substring(0,str.length()-1);
             //设置位置id
             nodeVo.setSiteId(Integer.parseInt(siteId));
+
+            String principal = "";
             //如果是仓间
             if (splits.length-1 == 4) {
                 nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
-            } else {
+                //获取位置负责人
+                Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
+                //设置负责人
+                principal = sitePrincipal.get("username").toString();
+            } else if(splits.length-1 == 5) {
                 nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
+                //获取养护计划负责人
+                principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
             }
-
-            String principal = "";
-
-            principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
-
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, nodeVo, principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);
             taskDto.setCreatedUser("系统生成");
