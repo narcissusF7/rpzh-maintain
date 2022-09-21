@@ -529,43 +529,46 @@ public class MaintainDataHandler {
 
         String warningType = WarningTypeConstant.getWarningType(NodeConstant.NODE_WARE_AREA, NodeConstant.HUMITURE_NODE_TYPE_VALUE, evnType);
         //如果不存在
-        if (ToolUtil.isEmpty(earlyWarningVo)&&level>0){
-            //判断当前的预警pojo是不是为空
-            if (ToolUtil.isEmpty(earlyWarning.getWarningVal())){
-                earlyWarning.setWarningType(warningType);
-                earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
-                //获取位置路由
-                String siteRoute = airConditionVo.getSiteRoute();
-                //去掉位置路由的最后一个] ，然后截取:
-                String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[5];
-                earlyWarning.setAreaId(Integer.parseInt(siteId));
-                //获取位置负责人
-                Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
-                //设置负责人
-                String principal = sitePrincipal.get("username").toString();
-                earlyWarning.setPrincipalName(principal);
+        if (ToolUtil.isEmpty(earlyWarningVo)){
+            if(level>0){
+                //判断当前的预警pojo是不是为空
+                if (ToolUtil.isEmpty(earlyWarning.getWarningVal())){
+                    earlyWarning.setWarningType(warningType);
+                    earlyWarning.setNodeId(airConditionVo.getAirConditionCode());
+                    //获取位置路由
+                    String siteRoute = airConditionVo.getSiteRoute();
+                    //去掉位置路由的最后一个] ，然后截取:
+                    String siteId = airConditionVo.getSiteRoute().substring(0, siteRoute.length() - 1).split(":")[5];
+                    earlyWarning.setAreaId(Integer.parseInt(siteId));
+                    //获取位置负责人
+                    Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
+                    //设置负责人
+                    String principal = sitePrincipal.get("username").toString();
+                    earlyWarning.setPrincipalName(principal);
 
-                //判断是哪个类型的预警
-                //设置预警值  及对应预警等级的预警值
-                setLevel(earlyWarning,level,data);
+                    //判断是哪个类型的预警
+                    //设置预警值  及对应预警等级的预警值
+                    setLevel(earlyWarning,level,data);
 
-            }else {
-                //数据库不存在预警  但这批数据中前几条出现预警
-                earlyWarning.setWarningVal(earlyWarning.getWarningVal() + "," + data);
-                earlyWarning.setNodeId(earlyWarning.getNodeId() + "," + airConditionVo.getAirConditionCode());
-                earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
-                //判断哪一等级的预警
-                if (ToolUtil.isEmpty(earlyWarning.getWarningValOne()) && level == 1) {
-                    earlyWarning.setWarningValOne(data.doubleValue());
-                } else if (ToolUtil.isEmpty(earlyWarning.getWarningValTwo()) && level == 2) {
-                    earlyWarning.setWarningValTwo(data.doubleValue());
-                } else if (ToolUtil.isEmpty(earlyWarning.getWarningValThree()) && level == 3) {
-                    earlyWarning.setWarningValThree(data.doubleValue());
+                }else {
+                    //数据库不存在预警  但这批数据中前几条出现预警
+                    earlyWarning.setWarningVal(earlyWarning.getWarningVal() + "," + data);
+                    earlyWarning.setNodeId(earlyWarning.getNodeId() + "," + airConditionVo.getAirConditionCode());
+                    earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
+                    //判断哪一等级的预警
+                    if (ToolUtil.isEmpty(earlyWarning.getWarningValOne()) && level == 1) {
+                        earlyWarning.setWarningValOne(data.doubleValue());
+                    } else if (ToolUtil.isEmpty(earlyWarning.getWarningValTwo()) && level == 2) {
+                        earlyWarning.setWarningValTwo(data.doubleValue());
+                    } else if (ToolUtil.isEmpty(earlyWarning.getWarningValThree()) && level == 3) {
+                        earlyWarning.setWarningValThree(data.doubleValue());
+                    }
                 }
             }
 
         }else{
             //如果存在未处理的预警
+            earlyWarning.setId(earlyWarningVo.getId());
             //获取nodeIds
             String[] nodeIds = earlyWarningVo.getNodeId().split(",");
             //获取预警值
@@ -629,8 +632,6 @@ public class MaintainDataHandler {
                         //判断是那一级预警
                         setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
-                        //更新数据
-//                            earlyWarningDao.updateWarning(earlyWarning);
                     }
                     if (level == 3) {
                         //达到3级 不用连续预警
@@ -645,15 +646,12 @@ public class MaintainDataHandler {
             //当前位置存在预警但不包含当前设备id
             if (unContains) {
                 if (level > 0) {
-                    earlyWarning.setId(earlyWarningVo.getId());
                     earlyWarning.setWarningVal(earlyWarningVo.getWarningVal() + "," + data);
                     earlyWarning.setNodeId(earlyWarningVo.getNodeId() + "," + airConditionVo.getAirConditionCode());
                     earlyWarning.setWarningGrade(earlyWarning.getWarningGrade() + "," + level);
                     //判断哪一等级的预警
                     setEarlyLevel(earlyWarning, level, earlyWarningVo, data);
 
-                    //更新数据
-//                        earlyWarningDao.updateWarning(earlyWarning);
                 }
             }
         }
