@@ -776,7 +776,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         map.put("warningCount",earlyWarningDao.findAppCount());
         List<Map> warningTypeCount = new ArrayList<>();
         warningTypeCount.add(earlyWarningDao.findAppDeviceFault());
-        List<String> names = Arrays.asList("垛内虫数预警", "仓间甲虫预警", "垛内氧气预警","仓间氧气预警","垛内温度预警","仓间温度预警","垛内湿度预警",
+        List<String> names = Arrays.asList("垛内甲虫预警", "仓间甲虫预警", "垛内氧气预警","仓间氧气预警","垛内温度预警","仓间温度预警","垛内湿度预警",
                 "仓间湿度预警", "包芯温度预警", "平均包芯高于环境预警", "仓间粉螟预警", "平均包芯低于环境预警");
         List<String> types = Arrays.asList("04","05","06","07","08","09","10","11","12","13","14","19");
         for (int i = 0; i < types.size(); i++) {
@@ -797,7 +797,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Override
     public Map findAppWarningInfoByWarningType(String warningType, String warningGrade){
         Map<String, Object> map = new HashMap<>();
-        if("04".equals(warningGrade)){
+        if("4".equals(warningGrade)){
             warningGrade = null;
         }
         String appCount;
@@ -831,7 +831,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     Double coreTemp = 0d;
                     for (String nodeId : coreNodeIds) {
                         log.info(nodeId);
-                        System.out.println(nodeId);
                         Double nodeNode = nodeDao.findNodeNode("temp", "tb_node_temp_core_chip_history", nodeId);
                         if(ToolUtil.isNotEmpty(nodeNode)) {
                             coreTemp = coreTemp + nodeNode;
@@ -904,8 +903,40 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         return username;
     }
     @Override
-    public Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
+    public Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nodeType,String id){
         Map map = new HashMap();
+        Map baseMap = new HashMap();
+        baseMap.put("siteName",getSiteName(siteRoute));
+        Map warningInfo = earlyWarningDao.findAppWarningInfo(id);
+        baseMap.put("warningTime",warningInfo.get("warningTime"));
+        if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
+            List<String> nodeIds = earlyWarningDao.findAppFaultNodeId(siteRoute, warningType, nodeType);
+            String nodeId = null;
+            for (String nId : nodeIds) {
+                if(ToolUtil.isEmpty(nodeId)){
+                    nodeId = nId;
+                }else{
+                    nodeId = nodeId + "," + nId;
+                }
+            }
+            baseMap.put("nodeId",warningInfo.get("nodeId"));
+            List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeIds.subList(0,1));
+            baseMap.put("siteX",maps.get(0).get("siteX"));
+            baseMap.put("siteY",maps.get(0).get("siteY"));
+            baseMap.put("siteZ",maps.get(0).get("siteZ"));
+        }else{
+            baseMap.put("warningGrade",warningGrade);
+            baseMap.put("warningVal",warningInfo.get("warningVal"));
+            if("12".equals(warningType)){
+                List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
+                int i = Arrays.asList(warningInfo.get("warningGrade").toString().split(",")).indexOf(warningGrade);
+                List<String> nodeId = Arrays.asList(nodeIds.get(i).split(",")[0]);
+                List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeId);
+                baseMap.put("siteX",maps.get(0).get("siteX"));
+                baseMap.put("siteY",maps.get(0).get("siteY"));
+                baseMap.put("siteZ",maps.get(0).get("siteZ"));
+            }
+        }
         String principal = earlyWarningDao.findAppPrincipalById(id);
         List<String> principals = Arrays.asList(principal.split(","));
         List<Map> userMap = new ArrayList<>();
@@ -916,51 +947,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             userMap.add(userName);
         }
         map.put("userBase",userMap);
-        Map warningMap = new HashMap();
-        Map baseMap = new HashMap();
-        baseMap.put("siteName",getSiteName(siteRoute));
-        baseMap.put("warningTime",warningTime);
-        if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
-            baseMap.put("nodeName",getNodeType(nodeType));
-            List<String> nodeIds = earlyWarningDao.findAppFaultNodeId(siteRoute, warningType, nodeType);
-            String nodeId = null;
-            for (String nId : nodeIds) {
-                if(ToolUtil.isEmpty(nodeId)){
-                    nodeId = nId;
-                }else{
-                    nodeId = nodeId + "," + nId;
-                }
-            }
-            baseMap.put("nodeId",nodeId);
-            List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeIds.subList(0,1));
-            baseMap.put("siteX",maps.get(0).get("siteX"));
-            baseMap.put("siteY",maps.get(0).get("siteY"));
-            baseMap.put("siteZ",maps.get(0).get("siteZ"));
-            warningMap = getWarningInfo(warningType);
-        }
-
-
-
-
-        baseMap.put("warningGrade",warningGrade);
-        baseMap.put("warningVal",warningVal);
-        baseMap.put("warningTime",warningTime);
-        map.put("base",baseMap);
-        warningMap.put("nowData",nowData);
-        Map<String, String> color = earlyWarningDao.findColor();
-        Integer stackId = null;
-        if(siteRoute.contains("05")){
-            stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
-        }
-        EarlyWarningVo earlyWarningVo = getEarlyWarningVo(warningType, siteRoute, stackId);
-        warningMap.put("earlyWarningOne",earlyWarningVo.getUpperOne());
-        warningMap.put("oneColor",color.get("oneColor"));
-        warningMap.put("earlyWarningTwo",earlyWarningVo.getUpperTwo());
-        warningMap.put("twoColor",color.get("twoColor"));
-        warningMap.put("earlyWarningThree",earlyWarningVo.getUpperThree());
-        warningMap.put("threeColor",color.get("threeColor"));
-        warningMap.put("earlyWarningLow",earlyWarningVo.getLower());
-        map.put("warningMap", warningMap);
+        map.put("baseMap",baseMap);
         return map;
     }
 }

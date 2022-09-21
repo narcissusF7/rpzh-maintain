@@ -135,4 +135,6 @@ public interface EarlyWarningDao {
 
     @DS("clickhouse")
     Double findAirHumitureData(@Param("nodeId")String nodeId);
+
+    Map findAppWarningInfo(@Param("id")String id);
 }

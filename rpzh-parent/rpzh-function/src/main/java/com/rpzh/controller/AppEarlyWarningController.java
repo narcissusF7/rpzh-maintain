@@ -78,14 +78,11 @@ public class AppEarlyWarningController {
                     "07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警，19:平均包芯低于环境预警", required = true,dataType = "String"),
             @ApiImplicitParam(name = "warningGrade", value = "预警等级:1:一级等级,2:二级等级,3:三级等级", dataType = "String",required = true),
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", required = true,dataType = "String"),
-            @ApiImplicitParam(name = "nowData", value = "当前值", dataType = "String",required = true),
-            @ApiImplicitParam(name = "warningTime", value = "预警时间", dataType = "String",required = true),
-            @ApiImplicitParam(name = "warningVal", value = "预警值", dataType = "String",required = true),
             @ApiImplicitParam(name = "nodeType", value = "设备类型", dataType = "String",required = true),
             @ApiImplicitParam(name = "id", value = "预警id", dataType = "String",required = true)
     })
-    public Result findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
-        Map mapInfos = earlyWarningService.findAppWarningInfoBySiteRoute(siteRoute, warningType, warningGrade, nowData, warningVal, nodeType, warningTime, id);
+    public Result findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nodeType,String id){
+        Map mapInfos = earlyWarningService.findAppWarningInfoBySiteRoute(siteRoute, warningType, warningGrade, nodeType,  id);
         return new Result<>(true, StatusCode.OK, "查询成功",mapInfos);
     }
 }
