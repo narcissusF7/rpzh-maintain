@@ -858,8 +858,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                         }
                     }else{
                         warningInfo.put("nodeId",null);
-                        //预警类型:01:设备电量故障,02:设备信号强度故障,03:设备丢包故障,04:垛内甲虫预警,05:仓间甲虫预警,06:垛内氧气预警,
-                        // 07:仓间氧气预警,08:垛内温度预警,09:仓间温度预警,10:垛内湿度预警,11:仓间湿度预警,12:包芯温度预警,13:平均包芯高于环境预警,14:仓间粉螟预警,19平均包芯低于环境预警
                         if("06".equals(warningType) || "07".equals(warningType)){
                             warningInfo.put("nowData",earlyWarningDao.findOxygenData(nodeId));
                         }else if("12".equals(warningType)){

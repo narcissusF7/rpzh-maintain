@@ -328,6 +328,6 @@
         select humiture from tb_air_conditioner_history where transfer_time in (select max(transfer_time) from tb_air_conditioner_history where node_id = #{nodeId}) and node_id = #{nodeId}
     </select>
     <select id="findAppWarningInfo" resultType="java.util.Map">
-        select warning_time as "warningTime",warning_val as "warningTime",node_id as "nodeId",warning_grade as "warningGrade" from tb_early_warning where id = #{id}
+        select to_char(warning_time,'SYYYY-MM-DD HH24:MI:SS') as "warningTime",warning_val as "warning_val",node_id as "nodeId",warning_grade as "warningGrade" from tb_early_warning where id = #{id}
     </select>
 </mapper>
