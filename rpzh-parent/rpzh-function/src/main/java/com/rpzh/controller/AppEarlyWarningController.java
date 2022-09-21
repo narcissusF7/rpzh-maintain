@@ -84,7 +84,8 @@ public class AppEarlyWarningController {
             @ApiImplicitParam(name = "nodeType", value = "设备类型", dataType = "String",required = true),
             @ApiImplicitParam(name = "id", value = "预警id", dataType = "String",required = true)
     })
-    public Map findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
-        return null;
+    public Result findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nowData,String warningVal,String nodeType,String warningTime,String id){
+        Map mapInfos = earlyWarningService.findAppWarningInfoBySiteRoute(siteRoute, warningType, warningGrade, nowData, warningVal, nodeType, warningTime, id);
+        return new Result<>(true, StatusCode.OK, "查询成功",mapInfos);
     }
 }
