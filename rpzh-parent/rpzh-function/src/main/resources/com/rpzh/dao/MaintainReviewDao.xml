@@ -21,6 +21,9 @@
     <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle != ''">and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
     <if test="maintainPlanDto.phases != null and maintainPlanDto.phases != ''">and t2.phases = #{maintainPlanDto.phases}</if>
 </select>
+    <select id="" resultType="com.rpzh.vo.EnterHouseExamineVo">
+
+    </select>
 <select id="findMaintainBaseInfo" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t1.id AS id,

@@ -309,9 +309,10 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         String pidRoute = earlyWarningDto.getPidRoute();
         Integer stackId = 0;
         Map<String, Object> map = new HashMap<>();
+        MaintainPlanVo maintainPlanVo= new MaintainPlanVo();
         if(pidRoute.contains("05")){
             stackId = Integer.parseInt(pidRoute.split("05:")[1].split("]")[0]);
-            MaintainPlanVo maintainPlanVo = maintainPlanDao.findMaintainPlanNow(stackId);
+            maintainPlanVo = maintainPlanDao.findMaintainPlanNow(stackId);
             if(ToolUtil.isNotEmpty(maintainPlanVo)) {
                 List<String> usernames = Arrays.asList(maintainPlanVo.getPrincipalName().split(","));
                 String userNames = "";
@@ -323,16 +324,16 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     }
                 }
                 maintainPlanVo.setPrincipalName(userNames);
-            }else{
-                maintainPlanVo = new MaintainPlanVo();
-                maintainPlanVo.setMaintenceStyle("---");
-                maintainPlanVo.setMaterialCode("---");
-                maintainPlanVo.setPhases("---");
-                maintainPlanVo.setPrincipalName("---");
-                maintainPlanVo.setStackName("---");
             }
-            map.put("maintainPlanVo", maintainPlanVo);
+        }else{
+            maintainPlanVo = new MaintainPlanVo();
+            maintainPlanVo.setMaintenceStyle("---");
+            maintainPlanVo.setMaterialCode("---");
+            maintainPlanVo.setPhases("---");
+            maintainPlanVo.setPrincipalName("---");
+            maintainPlanVo.setStackName("---");
         }
+        map.put("maintainPlanVo", maintainPlanVo);
         String nodeId = earlyWarningDto.getNodeId();
         EarlyWarningVo earlyWarningVo = getEarlyWarningVo(warningType,pidRoute,stackId);
         Map<String,Object> earlyWarning = new HashMap<>();
@@ -513,7 +514,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         List<EarlyWarningVo> earlyWarningVos = new ArrayList<>();
         Map<String,Object> map1 = new HashMap<>();
         if(ToolUtil.isEmpty(warningType) || ToolUtil.isEmpty(isAffirm)){
-            return new Result<>(false, StatusCode.ERROR, "预警类型或处理状态不能为空",earlyWarningVos);
+            return new Result<>(false, StatusCode.ERROR, "预警类型或处理状态不能为空");
         }
         //设置开始时间和结束时间
         Map<String, String> time = GetBetweenDayUtils.get(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
@@ -844,11 +845,11 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                             temp = temp + nodeNode;
                         }
                     }
-                    warningInfo.put("nowData",coreTemp/coreNodeIds.size() - temp/envNodeIds.size());
+                    warningInfo.put("nowData",String.format("%.2f",coreTemp/coreNodeIds.size() - temp/envNodeIds.size()));
                 } else {
                     List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
                     int i = Arrays.asList(warningInfo.get("grade").toString().split(",")).indexOf(warningInfo.get("warningGrade"));
-                    String nodeId = nodeIds.get(i);
+                    String nodeId = nodeIds.get(i).split(",")[0];
                     if("04".equals(warningType) || "05".equals(warningType) || "14".equals(warningType)){
                         Map pestCount = earlyWarningDao.findPestCount(nodeId);
                         if("04".equals(warningType) || "05".equals(warningType)){
@@ -858,7 +859,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                         }
                     }else{
                         warningInfo.put("nodeId",null);
+                        
                         if("06".equals(warningType) || "07".equals(warningType) || "12".equals(warningType)){
+
                             warningInfo.put("nowData",redisUtil.hget("MAINTAIN_NODE_NEW",nodeId));
                         }else if("08".equals(warningType) || "09".equals(warningType)){
                             warningInfo.put("nowData",redisUtil.hget("MAINTAIN_NODE_NEW",nodeId+"01"));

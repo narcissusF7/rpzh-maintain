@@ -296,7 +296,7 @@
         <if test="warningType!='' and warningType!=null"> and warning_type =#{warningType}</if>
     </select>
     <select id="findPestCount" resultType="java.util.Map">
-        select beetle_count as "beetle",mealworm_count as "mealworm"  from tb_pest_data_history where pest_board_id = #{nodeId} order by id desc limit 1
+        select id,beetle_count as "beetle",mealworm_count as "mealworm"  from tb_pest_data_history where id IN (SELECT max(id) from tb_pest_data_history WHERE pest_board_id = #{nodeId})
     </select>
     <select id="findAppPrincipalById" resultType="java.lang.String">
         select principal from tb_early_warning where id = #{id}
