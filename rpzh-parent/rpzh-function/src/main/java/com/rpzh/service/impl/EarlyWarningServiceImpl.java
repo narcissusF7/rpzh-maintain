@@ -845,6 +845,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                         }
                     }
                     warningInfo.put("nowData",String.format("%.2f",coreTemp/coreNodeIds.size() - temp/envNodeIds.size()));
+                    redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,String.format("%.2f",coreTemp/coreNodeIds.size() - temp/envNodeIds.size()));
                 } else {
                     List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
                     int i = Arrays.asList(warningInfo.get("grade").toString().split(",")).indexOf(warningInfo.get("warningGrade"));
@@ -853,8 +854,10 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                         Map pestCount = earlyWarningDao.findPestCount(nodeId);
                         if("04".equals(warningType) || "05".equals(warningType)){
                             warningInfo.put("nowData",pestCount.get("beetle"));
+                            redisUtil.hset("MAINTAIN_NODE_NEW",nodeId,pestCount.get("beetle"));
                         }else{
                             warningInfo.put("nowData",pestCount.get("mealworm"));
+                            redisUtil.hset("MAINTAIN_NODE_NEW",nodeId,pestCount.get("mealworm"));
                         }
                     }else{
                         warningInfo.put("nodeId",null);
@@ -906,6 +909,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         Map baseMap = new HashMap();
         baseMap.put("siteName",getSiteName(siteRoute));
         Map warningInfo = earlyWarningDao.findAppWarningInfo(id);
+        Map warningMap = new HashMap();
         baseMap.put("warningTime",warningInfo.get("warningTime"));
         if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
             List<String> nodeIds = earlyWarningDao.findAppFaultNodeId(siteRoute, warningType, nodeType);
@@ -922,7 +926,12 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             baseMap.put("siteX",maps.get(0).get("siteX"));
             baseMap.put("siteY",maps.get(0).get("siteY"));
             baseMap.put("siteZ",maps.get(0).get("siteZ"));
+            warningMap = getWarningInfo(warningType);
         }else{
+            Integer stackId = null;
+            if(siteRoute.contains("05")){
+                stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
+            }
             baseMap.put("warningGrade",warningGrade);
             baseMap.put("warningVal",warningInfo.get("warningVal"));
             if("12".equals(warningType)){
@@ -934,6 +943,10 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 baseMap.put("siteY",maps.get(0).get("siteY"));
                 baseMap.put("siteZ",maps.get(0).get("siteZ"));
             }
+            EarlyWarningVo earlyWarningVo = getEarlyWarningVo(warningType, siteRoute, stackId);
+            warningMap.put("oneWarningVal",earlyWarningVo.getUpperOne());
+            warningMap.put("twoWarningVal",earlyWarningVo.getUpperTwo());
+            warningMap.put("threeWarningVal",earlyWarningVo.getUpperThree());
         }
         String principal = earlyWarningDao.findAppPrincipalById(id);
         List<String> principals = Arrays.asList(principal.split(","));
@@ -944,6 +957,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             userName.put("roleName", (String)redisUtil.hget("USER_"+name,"roleName"));
             userMap.add(userName);
         }
+        map.put("warningMap",warningMap);
         map.put("userBase",userMap);
         map.put("baseMap",baseMap);
         return map;
