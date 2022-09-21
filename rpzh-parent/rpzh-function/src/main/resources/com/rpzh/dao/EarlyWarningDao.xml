@@ -309,4 +309,22 @@
     <select id="findAppFaultNodeId" resultType="java.lang.String">
         select node_id from tb_early_warning where site_route =#{siteRoute} and is_affirm = '2' and warning_type = #{warningType} and node_type = #{nodeType}
     </select>
+    <select id="findOxygenData" resultType="java.lang.Double">
+        select oxygen from tb_node_o2_history where transfer_time in (select max(transfer_time) from tb_node_o2_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
+    <select id="findTempData" resultType="java.lang.Double">
+        select temp from tb_node_temp_core_chip_history where transfer_time in (select max(transfer_time) from tb_node_temp_core_chip_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
+    <select id="findEnvTempData" resultType="java.lang.Double">
+        select temp from tb_node_env_history where transfer_time in (select max(transfer_time) from tb_node_env_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
+    <select id="findAirTempData" resultType="java.lang.Double">
+        select temp from tb_air_conditioner_history where transfer_time in (select max(transfer_time) from tb_air_conditioner_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
+    <select id="findEnvHumitureData" resultType="java.lang.Double">
+        select humiture from tb_node_env_history where transfer_time in (select max(transfer_time) from tb_node_env_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
+    <select id="findAirHumitureData" resultType="java.lang.Double">
+        select humiture from tb_air_conditioner_history where transfer_time in (select max(transfer_time) from tb_air_conditioner_history where node_id = #{nodeId}) and node_id = #{nodeId}
+    </select>
 </mapper>

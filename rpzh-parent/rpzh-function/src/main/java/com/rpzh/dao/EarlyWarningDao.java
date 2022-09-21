@@ -117,4 +117,22 @@ public interface EarlyWarningDao {
     String findAppPrincipalById(@Param("id")String id);
 
     List<String> findAppFaultNodeId(@Param("siteRoute")String siteRoute,@Param("warningType")String warningType,@Param("nodeType")String nodeType);
+
+    @DS("clickhouse")
+    Double findOxygenData(@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    Double findTempData(@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    Double findEnvTempData(@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    Double findAirTempData(@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    Double findEnvHumitureData(@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    Double findAirHumitureData(@Param("nodeId")String nodeId);
 }
