@@ -695,7 +695,7 @@
         </where>
     </select>
     <select id="findNodeIds" resultType="java.lang.String">
-        select node_id from tb_node where stack_id = #{stackId}
+        select node_id from tb_node where stack_id = #{stackId}  <if test="nodeType != null and nodeType != ''"> and node_type = #{nodeType}</if>
     </select>
 
     <select id="findNodeVos" resultType="com.rpzh.dto.NodeDto">
@@ -755,12 +755,17 @@
         select ${column} from ${table} where transfer_time in (select max(transfer_time) from ${table} where node_id = #{nodeId}) limit 1
     </select>
     <select id="findAppNodeData" resultType="com.rpzh.pojo.NodeData">
-        select *
-        from (select ${tableColumn}    as node,
-                     transfer_time     as transferTime
-              from ${tableName}
-              where node_id = #{nodeId}
-             order by transfer_time Desc limit 5)
-        order by transferTime asc
+    select ${tableColumn}    as node,
+          transfer_time     as transferTime
+          from ${tableName}
+          where node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">#{nodeId}</foreach>
+          order by transfer_time Desc limit #{size}
+    </select>
+    <select id="findAppData" resultType="com.rpzh.pojo.NodeData">
+        select ${tableColumn}    as node,
+        transfer_time as "transferTime"
+        from ${tableName}
+        where node_id = #{nodeId}
+        order by transfer_time Desc limit 5
     </select>
 </mapper>

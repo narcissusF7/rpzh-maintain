@@ -494,7 +494,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         if(count>0){
             return new Result(false, StatusCode.ERROR, "所选的养护计划存在未处理的任务,请先处理在转段");
         }
-        nodeDao.findNodeIds(stackId).forEach(nodeId -> {
+        nodeDao.findNodeIds(stackId,null).forEach(nodeId -> {
             if(ToolUtil.isNotEmpty(redisTemplate.opsForValue().get("MAINTAIN_CACHE_NODE_"+nodeId))){
                 //删除redis缓存中的设备数据
                 redisTemplate.delete("MAINTAIN_CACHE_NODE_"+nodeId);

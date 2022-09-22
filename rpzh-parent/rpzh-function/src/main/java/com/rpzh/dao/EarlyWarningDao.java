@@ -137,4 +137,6 @@ public interface EarlyWarningDao {
     Double findAirHumitureData(@Param("nodeId")String nodeId);
 
     Map findAppWarningInfo(@Param("id")String id);
+
+    List<Map> findAppPestInfos(@Param("tableColumn")String tableColumn,@Param("nodeId")String nodeId);
 }

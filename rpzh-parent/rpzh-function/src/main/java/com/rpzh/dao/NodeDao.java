@@ -247,7 +247,7 @@ public interface NodeDao {
     @DS("clickhouse")
     List<Map> findStatistics(@Param("array") List<String> pidRoutes, @Param("tableName") String tableName,@Param("dateType")String dateType,@Param("beginTime")String beginTime,@Param("endTime")String endTime);
 
-    List<String> findNodeIds(@Param("stackId")Integer stackId);
+    List<String> findNodeIds(@Param("stackId")Integer stackId,@Param("nodeType")String nodeType);
 
     int nodeOPS(@Param("nodeIds") String[] nodeIds);
 
@@ -269,6 +269,8 @@ public interface NodeDao {
     Double findNodeNode(@Param("column")String column,@Param("table")String table,@Param("nodeId")String nodeId);
 
     @DS("clickhouse")
-    List<NodeData> findAppNodeData(@Param("nodeId") String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+    List<NodeData> findAppNodeData(@Param("nodeIds") List<String> nodeIds, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn,@Param("size") Integer size);
 
+    @DS("clickhouse")
+    List<NodeData> findAppData(@Param("nodeId")String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
 }

@@ -362,7 +362,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             }
         }else{
             if("13".equals(warningType) || "19".equals(warningType)){
-                List<String> nodeIds = nodeDao.findNodeIds(stackId);
+                List<String> nodeIds = nodeDao.findNodeIds(stackId,"04");
                 List<List<NodeData>> nodeList  = new ArrayList<>();
                 int size = 0;
                 int a = 0;
@@ -927,17 +927,16 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
         }
         baseMap.put("warningTime",warningInfo.get("warningTime"));
+        String nodeId = null;
+        if(ToolUtil.isNotEmpty(warningInfo.get("nodeId"))){
+            List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
+            int i = Arrays.asList(warningInfo.get("warningGrade").toString().split(",")).indexOf(warningGrade);
+            nodeId = nodeIds.get(i);
+        }
         if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
             List<String> nodeIds = earlyWarningDao.findAppFaultNodeId(siteRoute, warningType, nodeType);
-            String nodeId = null;
-            for (String nId : nodeIds) {
-                if(ToolUtil.isEmpty(nodeId)){
-                    nodeId = nId;
-                }else{
-                    nodeId = nodeId + "," + nId;
-                }
-            }
-            baseMap.put("nodeId",warningInfo.get("nodeId"));
+            nodeId = nodeIds.get(0);
+            baseMap.put("nodeId", nodeId);
             List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeIds.subList(0,1));
             baseMap.put("siteX",maps.get(0).get("siteX"));
             baseMap.put("siteY",maps.get(0).get("siteY"));
@@ -946,11 +945,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         }else{
             baseMap.put("warningGrade",warningGrade);
             baseMap.put("warningVal",warningInfo.get("warningVal"));
-            List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
-            int i = Arrays.asList(warningInfo.get("warningGrade").toString().split(",")).indexOf(warningGrade);
-            String nodeId = nodeIds.get(i).split(",")[0];
             if("12".equals(warningType)){
-                List<String> nodeids = Arrays.asList(nodeId);
+                List<String> nodeids = Arrays.asList(nodeId.split(",")[0]);
                 List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeids);
                 baseMap.put("siteX",maps.get(0).get("siteX"));
                 baseMap.put("siteY",maps.get(0).get("siteY"));
@@ -971,38 +967,73 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             userName.put("roleName", (String)redisUtil.hget("USER_"+name,"roleName"));
             userMap.add(userName);
         }
+        List<Map> mapList = new ArrayList<>();
+        Map dataMap = new HashMap();
         if("13".equals(warningType) || "19".equals(warningType)){
-            List<String> nodeIds = nodeDao.findNodeIds(stackId);
+            List<String> nodeIds = nodeDao.findNodeIds(stackId,"04");
             List<List<NodeData>> nodeList  = new ArrayList<>();
-            int size = 0;
-            int a = 0;
-            for (int i = 0; i < nodeIds.size(); i++) {
-                List<NodeData> node = nodeDao.findAppNodeData(nodeIds.get(i), "tb_node_temp_core_chip_history", "temp");
-                if(ToolUtil.isNotEmpty(node)) {
-                    nodeList.add(node);
-                }
-                if(size<node.size()){
-                    size = node.size();
-                    a = i;
-                }
-            }
-            for (int j = 0; j < size; j++) {
+            List<NodeData> node = new ArrayList<>(nodeDao.findAppNodeData(nodeIds, "tb_node_temp_core_chip_history", "temp",nodeIds.size() * 5));
+            nodeId = nodeDao.findNodeIds(stackId,"03").get(0);
+            List<NodeData> envData = nodeDao.findNodeData(nodeId, "tb_node_env_history", "temp");
+            for (int i = 1; i <= 5; i++) {
+                List<NodeData> nodeData = node.subList((i - 1) * nodeIds.size(), nodeIds.size() * i);
+                Map map1 = new HashMap();
+                map1.put("transferTime",nodeData.get(0).getTransferTime());
                 Double data = 0d;
-                for (int i = 0; i < nodeList.size(); i++) {
-                    if(j>nodeList.get(i).size()-1){
-                        data = data + 0;
-                    }else {
-                        data = data + nodeList.get(i).get(j).getNode();
-                    }
+                for (NodeData nodeDatum : nodeData) {
+                    data = data + nodeDatum.getNode();
                 }
-                NodeData nodeVo = new NodeData();
-                nodeVo.setTransferTime(nodeList.get(a).get(j).getTransferTime());
-                nodeVo.setNode(data / nodeList.size());
+                map1.put("coreTempData",String.format("%.2f",data/nodeData.size()));
+                if(i-1>envData.size()){
+                    map1.put("envTempData",0);
+                }else{
+                    map1.put("envTempData",envData.get(i-1).getNode());
+                }
+                mapList.add(map1);
             }
+            dataMap.put("nowCoreTempDate",mapList.get(0).get("coreTempData"));
+            dataMap.put("nowEnvTempDate",mapList.get(0).get("envTempData"));
+        }else if("14".equals(warningType) || "04".equals(warningType) || "05".equals(warningType)){
+            if("04".equals(warningType) || "05".equals(warningType)){
+                mapList = earlyWarningDao.findAppPestInfos("beetle_count", nodeId);
+            }else{
+                mapList = earlyWarningDao.findAppPestInfos("mealworm_count",nodeId);
+            }
+            dataMap.put("node",mapList.get(0).get("node"));
+        } else{
+            List<NodeData> nodeList = new ArrayList<>();
+            if("01".equals(nodeType)){
+                nodeList = nodeDao.findAppData(nodeId, "tb_node_o2_history", "oxygen");
+            }else if("03".equals(nodeType)){
+                if("08".equals(warningType)){
+                    nodeList = nodeDao.findAppData(nodeId, "tb_node_env_history", "temp");
+                }else if("09".equals(warningType)){
+                    nodeList = nodeDao.findAppData(nodeId, "tb_air_conditioner_history", "temp");
+                }else if("10".equals(warningType)){
+                    nodeList = nodeDao.findAppData(nodeId, "tb_node_env_history", "humiture");
+                }else{
+                    nodeList = nodeDao.findAppData(nodeId, "tb_air_conditioner_history", "humiture");
+                }
+            }else {
+                nodeList = nodeDao.findAppData(nodeId, "tb_node_temp_core_chip_history", "temp");
+            }
+            for (NodeData nodeData : nodeList) {
+                Map mapInfo = new HashMap();
+                mapInfo.put("transferTime",nodeData.getTransferTime());
+                mapInfo.put("node",nodeData.getNode());
+                mapList.add(mapInfo);
+            }
+            dataMap.put("node",mapList.get(0).get("node"));
         }
+        dataMap.put("transferTime",mapList.get(0).get("transferTime"));
+        mapList.sort((v1, v2) -> v1.get("transferTime").toString().compareTo(v2.get("transferTime").toString()));
+        dataMap.put("mapList",mapList);
+        map.put("dataMap",dataMap);
         map.put("warningMap",warningMap);
         map.put("userBase",userMap);
         map.put("baseMap",baseMap);
+        map.put("id",id);
+        map.put("taskId",warningInfo.get("taskId"));
         return map;
     }
 }
