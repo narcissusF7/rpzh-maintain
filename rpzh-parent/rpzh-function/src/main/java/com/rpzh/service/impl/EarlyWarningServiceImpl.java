@@ -862,17 +862,29 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                     }else{
                         warningInfo.put("nodeId",null);
                         if("06".equals(warningType) || "07".equals(warningType)){
-                            warningInfo.put("nowData",earlyWarningDao.findOxygenData(nodeId));
+                            Double oxygenData = earlyWarningDao.findOxygenData(nodeId);
+                            warningInfo.put("nowData", oxygenData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,oxygenData);
                         }else if("12".equals(warningType)){
-                            warningInfo.put("nowData",earlyWarningDao.findTempData(nodeId));
+                            Double tempData = earlyWarningDao.findTempData(nodeId);
+                            warningInfo.put("nowData", tempData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,tempData);
                         }else if("08".equals(warningType)){
-                            warningInfo.put("nowData",earlyWarningDao.findEnvTempData(nodeId));
+                            Double envTempData = earlyWarningDao.findEnvTempData(nodeId);
+                            warningInfo.put("nowData", envTempData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,envTempData);
                         }else if("09".equals(warningType)){
-                            warningInfo.put("nowData",earlyWarningDao.findAirTempData(nodeId));
+                            Double airTempData = earlyWarningDao.findAirTempData(nodeId);
+                            warningInfo.put("nowData", airTempData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,airTempData);
                         }else if("10".equals(warningType)){
-                            warningInfo.put("nowData",earlyWarningDao.findEnvHumitureData(nodeId));
+                            Double envHumitureData = earlyWarningDao.findEnvHumitureData(nodeId);
+                            warningInfo.put("nowData", envHumitureData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,envHumitureData);
                         }else{
-                            warningInfo.put("nowData",earlyWarningDao.findAirHumitureData(nodeId));
+                            Double airHumitureData = earlyWarningDao.findAirHumitureData(nodeId);
+                            warningInfo.put("nowData", airHumitureData);
+                            redisUtil.hset("MAINTAIN_NODE_NEW",warningInfo.get("siteRoute").toString()+"_"+warningType,airHumitureData);
                         }
                     }
                 }
@@ -910,6 +922,10 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         baseMap.put("siteName",getSiteName(siteRoute));
         Map warningInfo = earlyWarningDao.findAppWarningInfo(id);
         Map warningMap = new HashMap();
+        Integer stackId = null;
+        if(siteRoute.contains("05")){
+            stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
+        }
         baseMap.put("warningTime",warningInfo.get("warningTime"));
         if("01".equals(warningType) || "02".equals(warningType) || "03".equals(warningType)){
             List<String> nodeIds = earlyWarningDao.findAppFaultNodeId(siteRoute, warningType, nodeType);
@@ -928,17 +944,14 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             baseMap.put("siteZ",maps.get(0).get("siteZ"));
             warningMap = getWarningInfo(warningType);
         }else{
-            Integer stackId = null;
-            if(siteRoute.contains("05")){
-                stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
-            }
             baseMap.put("warningGrade",warningGrade);
             baseMap.put("warningVal",warningInfo.get("warningVal"));
+            List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
+            int i = Arrays.asList(warningInfo.get("warningGrade").toString().split(",")).indexOf(warningGrade);
+            String nodeId = nodeIds.get(i).split(",")[0];
             if("12".equals(warningType)){
-                List<String> nodeIds = Arrays.asList(warningInfo.get("nodeId").toString().split(","));
-                int i = Arrays.asList(warningInfo.get("warningGrade").toString().split(",")).indexOf(warningGrade);
-                List<String> nodeId = Arrays.asList(nodeIds.get(i).split(",")[0]);
-                List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeId);
+                List<String> nodeids = Arrays.asList(nodeId);
+                List<Map> maps = earlyWarningDao.findsiteXYZByNodeIds(nodeids);
                 baseMap.put("siteX",maps.get(0).get("siteX"));
                 baseMap.put("siteY",maps.get(0).get("siteY"));
                 baseMap.put("siteZ",maps.get(0).get("siteZ"));
@@ -947,6 +960,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             warningMap.put("oneWarningVal",earlyWarningVo.getUpperOne());
             warningMap.put("twoWarningVal",earlyWarningVo.getUpperTwo());
             warningMap.put("threeWarningVal",earlyWarningVo.getUpperThree());
+            warningMap.put("nowData", redisUtil.hget("MAINTAIN_NODE_NEW", siteRoute + "_" + warningType));
         }
         String principal = earlyWarningDao.findAppPrincipalById(id);
         List<String> principals = Arrays.asList(principal.split(","));
@@ -956,6 +970,35 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             userName.put("username", (String)redisUtil.hget("USER_"+name,"nickname") + "(" + name + ")");
             userName.put("roleName", (String)redisUtil.hget("USER_"+name,"roleName"));
             userMap.add(userName);
+        }
+        if("13".equals(warningType) || "19".equals(warningType)){
+            List<String> nodeIds = nodeDao.findNodeIds(stackId);
+            List<List<NodeData>> nodeList  = new ArrayList<>();
+            int size = 0;
+            int a = 0;
+            for (int i = 0; i < nodeIds.size(); i++) {
+                List<NodeData> node = nodeDao.findAppNodeData(nodeIds.get(i), "tb_node_temp_core_chip_history", "temp");
+                if(ToolUtil.isNotEmpty(node)) {
+                    nodeList.add(node);
+                }
+                if(size<node.size()){
+                    size = node.size();
+                    a = i;
+                }
+            }
+            for (int j = 0; j < size; j++) {
+                Double data = 0d;
+                for (int i = 0; i < nodeList.size(); i++) {
+                    if(j>nodeList.get(i).size()-1){
+                        data = data + 0;
+                    }else {
+                        data = data + nodeList.get(i).get(j).getNode();
+                    }
+                }
+                NodeData nodeVo = new NodeData();
+                nodeVo.setTransferTime(nodeList.get(a).get(j).getTransferTime());
+                nodeVo.setNode(data / nodeList.size());
+            }
         }
         map.put("warningMap",warningMap);
         map.put("userBase",userMap);

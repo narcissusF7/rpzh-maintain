@@ -23,10 +23,8 @@ public class RfIdNettyServerFilter extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline ph = socketChannel.pipeline();
-
         usermap.put(socketChannel.remoteAddress().getAddress().toString(),socketChannel);
-        log.info("设备连接");
-        log.info(socketChannel.remoteAddress().getAddress().toString());
+        log.info("设备连接:"+socketChannel.remoteAddress().getAddress());
         // 解码和编码，应和客户端一致
         ph.addLast("decoder", new MyDecoder());
         ph.addLast("encoder", new StringEncoder());

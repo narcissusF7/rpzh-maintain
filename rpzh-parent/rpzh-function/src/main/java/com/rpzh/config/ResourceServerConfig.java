@@ -84,7 +84,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         "/dataReport/export",
                         "/maintain/maintainPlan/export",
                         "/maintain/monitoringCenter/exportNodeHistory",
-                        "/maintain/pestMonitoring/downloadTemplate"
+                        "/maintain/pestMonitoring/downloadTemplate",
+                        "/rfid/findIps",
+                        "/rfid/updateStatus",
+                        "/issue"
 //                        ,"/*/**"
                 ). //配置地址放行,"/*/**"放行所有的路径
                 permitAll()

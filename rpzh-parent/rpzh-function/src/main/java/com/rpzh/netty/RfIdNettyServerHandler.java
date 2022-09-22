@@ -40,6 +40,12 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         //msg为接收到的客户端传递的数据   个人这边直接传的json 数据
+        if(RfIdNettyServerFilter.usermap.get("/" + "192.168.3.156") == null){
+            log.info("192.168.3.156");
+        }
+        if(RfIdNettyServerFilter.usermap.get("/" + "192.168.3.145") == null){
+            log.info("192.168.3.145");
+        }
         String str = msg.toString();
         log.info("原始数据" + str);
         String DEVSN = "";
@@ -158,9 +164,9 @@ public class RfIdNettyServerHandler extends ChannelInboundHandlerAdapter {
         if (obj instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) obj;
             if (IdleState.READER_IDLE.equals(event.state())) {//如果读通道处于空闲状态，说明没有接收到心跳命令
-                System.out.println("已经30秒没有接收到客户端的信息了");
+                log.info("已经30秒没有接收到客户端的信息了");
                 if (idle_count > 2) {
-                    System.out.println("关闭这个不活跃的channel");
+                    log.info("关闭这个不活跃的channel");
                     ctx.channel().close();
                 }
                 idle_count++;

@@ -267,4 +267,8 @@ public interface NodeDao {
 
     @DS("clickhouse")
     Double findNodeNode(@Param("column")String column,@Param("table")String table,@Param("nodeId")String nodeId);
+
+    @DS("clickhouse")
+    List<NodeData> findAppNodeData(@Param("nodeId") String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
 }

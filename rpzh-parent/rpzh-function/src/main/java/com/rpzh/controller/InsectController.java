@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Slf4j
 @Controller
-//@RequestMapping("/util")
 public class InsectController {
 
     @RequestMapping(value = "/issue")

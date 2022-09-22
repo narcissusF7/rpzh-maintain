@@ -754,4 +754,13 @@
     <select id="findNodeNode" resultType="java.lang.Double">
         select ${column} from ${table} where transfer_time in (select max(transfer_time) from ${table} where node_id = #{nodeId}) limit 1
     </select>
+    <select id="findAppNodeData" resultType="com.rpzh.pojo.NodeData">
+        select *
+        from (select ${tableColumn}    as node,
+                     transfer_time     as transferTime
+              from ${tableName}
+              where node_id = #{nodeId}
+             order by transfer_time Desc limit 5)
+        order by transferTime asc
+    </select>
 </mapper>
