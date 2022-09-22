@@ -1178,4 +1178,14 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseDao.findStackByRoute(siteRoute);
     }
 
+    /**
+     * 通过位置编码获取位置信息
+     * @param stackNo
+     * @return
+     */
+    @Override
+    public StackVo findStackInfoByStackNo(String stackNo) {
+        return warehouseDao.findStackInfoByStackNo(stackNo);
+    }
+
 }

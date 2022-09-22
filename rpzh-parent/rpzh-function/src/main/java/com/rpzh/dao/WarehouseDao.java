@@ -494,4 +494,11 @@ public interface WarehouseDao {
     int findStackNo(@Param("stackNo")String stackNo, @Param("id")Integer id);
 
     List<StackVo> findStackByRoute(@Param("siteRoute") String siteRoute);
+
+    /**
+     * 通过位置编号查询位置信息
+     * @param stackNo
+     * @return
+     */
+    StackVo findStackInfoByStackNo(@Param("stackNo") String stackNo);
 }

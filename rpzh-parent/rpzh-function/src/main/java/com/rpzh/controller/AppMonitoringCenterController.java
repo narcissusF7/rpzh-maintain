@@ -395,4 +395,15 @@ public class AppMonitoringCenterController {
         List<StackVo> list= warehouseService.findStackByRoute(siteRoute);
         return new Result<>(true, StatusCode.OK, "查询成功",list);
     }
+
+    @ApiOperation(value = "通过位置编号查询位置信息")
+    @ApiImplicitParam(name = "StackNo",value = "位置路由", dataType = "String", required = true)
+    @PostMapping({"/findStackInfoByStackNo"})
+    public Result<StackVo> findStackInfoByStackNo(String StackNo) {
+        if (ToolUtil.isEmpty(StackNo)) {
+            return new Result<>(false, StatusCode.ERROR, "位置编码不能为空");
+        }
+        StackVo stackVo= warehouseService.findStackInfoByStackNo(StackNo);
+        return new Result<>(true, StatusCode.OK, "查询成功",stackVo);
+    }
 }

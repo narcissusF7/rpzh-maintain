@@ -398,4 +398,6 @@ public interface WarehouseService {
     Map<String,Object> getSitePrincipal(Integer level , Integer siteId);
 
     List<StackVo> findStackByRoute(String siteRoute);
+
+    StackVo findStackInfoByStackNo(String stackNo);
 }
