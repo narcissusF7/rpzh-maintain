@@ -117,6 +117,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDto.getAlarmValueSettingId()+1);
         //插入到养护阶段表中
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
+        maintainPlanDao.insertMaintainEarlyTime(maintainPlanDto.getId());
         //更新养护计划表中的养护阶段id
         return maintainPlanDao.updateMaintainPlanStageId(maintainPlanDto.getId(),maintainPlanDto.getStageId()+1);
     }
@@ -223,6 +224,7 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDao.deleteMaintainCount(ids);
         //删除养护计划表信息
         maintainPlanDao.deleteMaintainPlanById(ids);
+        maintainPlanDao.deleteMaintainEarlyTimeById(ids);
         if(ToolUtil.isNotEmpty(alarmValueSettingIds)) {
             //删除预警表信息
             alarmValueSettingDao.deleteIds(alarmValueSettingIds);

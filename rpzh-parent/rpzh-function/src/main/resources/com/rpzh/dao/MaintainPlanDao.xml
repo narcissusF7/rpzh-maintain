@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.MaintainPlanDao">
+    <insert id="insertMaintainEarlyTime">
+        insert into tb_maintain_early_time
+        (maintain_plan_id,create_user)
+        values
+        (#{maintainPlanId},sysdate)
+    </insert>
+    <delete id="deleteMaintainEarlyTimeById" parameterType="java.lang.Integer">
+        delete
+        from tb_maintain_early_time
+        WHERE maintain_plan_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="findMaintainPlanInfo" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t1.id as id,
