@@ -25,6 +25,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -397,13 +398,19 @@ public class AppMonitoringCenterController {
     }
 
     @ApiOperation(value = "通过位置编号查询位置信息")
-    @ApiImplicitParam(name = "StackNo",value = "位置路由", dataType = "String", required = true)
+    @ApiImplicitParam(name = "stackNo",value = "位置路由", dataType = "String", required = true)
     @PostMapping({"/findStackInfoByStackNo"})
-    public Result<StackVo> findStackInfoByStackNo(String StackNo) {
-        if (ToolUtil.isEmpty(StackNo)) {
+    public Result<StackVo> findStackInfoByStackNo(String stackNo) {
+        if (ToolUtil.isEmpty(stackNo)) {
             return new Result<>(false, StatusCode.ERROR, "位置编码不能为空");
         }
-        StackVo stackVo= warehouseService.findStackInfoByStackNo(StackNo);
+        StackVo stackVo= warehouseService.findStackInfoByStackNo(stackNo);
         return new Result<>(true, StatusCode.OK, "查询成功",stackVo);
+    }
+
+    @ApiOperation(value = "查询树状目录")
+    @GetMapping("/locating")
+    public Result<T> locating(){
+        return new Result<>(true, StatusCode.OK, "查询目录成功", warehouseService.locating());
     }
 }
