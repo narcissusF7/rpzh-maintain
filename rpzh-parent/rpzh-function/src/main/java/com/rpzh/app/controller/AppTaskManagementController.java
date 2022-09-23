@@ -1,4 +1,4 @@
-package com.rpzh.controller;
+package com.rpzh.app.controller;
 
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
