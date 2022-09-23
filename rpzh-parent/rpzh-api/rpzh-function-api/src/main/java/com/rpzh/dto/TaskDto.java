@@ -18,6 +18,9 @@ public class TaskDto {
     //主键id
     private String id;
 
+    //任务id
+    private String taskId;
+
     //任务编号
     private String taskNum;
 

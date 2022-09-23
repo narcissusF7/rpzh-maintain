@@ -217,23 +217,18 @@
         WHERE
         id = #{nodeDto.id}
     </update>
-    <update id="nodeOPS">
-        UPDATE tb_node
-        SET status = '4',
-        stack = '--',
-        stack_id =null ,
-        site_id =null ,
-        site_x = '-',
-        site_y = '-',
-        site_z = '-',
-        gather_site = '--',
-        site_route = '',
-        case_no = ''
-        WHERE node_id in
-        <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")">
-            #{nodeId}
-        </foreach>
-    </update>
+    <select id="findXYZ" resultType="java.util.Map">
+        select site_x as "siteX",site_y as "siteY",site_z as "siteZ" from tb_node where node_id = #{nodeId}
+    </select>
+    <select id="nodeOPS" resultType="com.rpzh.vo.NodeVo">
+        select
+        node_type as nodeType,
+        stack as stack,
+        site_x as siteX,
+        site_y as siteY,
+        site_z as siteZ,
+        WHERE node_id = #{nodeId}
+    </select>
     <select id="findNodeIdCount" resultType="int">
         SELECT count(*)
         FROM tb_node

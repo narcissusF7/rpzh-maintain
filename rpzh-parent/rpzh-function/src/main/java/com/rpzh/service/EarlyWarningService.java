@@ -26,6 +26,8 @@ public interface EarlyWarningService {
 
     List<RepairDataVo> getRepairData(Integer stackId, Integer areaId);
 
+    List<RepairDataVo> getAppRepairData(String siteRoute);
+
     Result findNodeData(EarlyWarningDto earlyWarningDto);
 
     int updateRepairId(List<Map<String,String>> repairInfos);

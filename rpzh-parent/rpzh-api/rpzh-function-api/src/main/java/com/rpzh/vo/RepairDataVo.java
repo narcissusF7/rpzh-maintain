@@ -12,4 +12,9 @@ public class RepairDataVo {
     private String deviceId;
     private String deviceType;
     private String repairReason;
+    private String siteName;
+    private String nodeName;
+    private String siteX;
+    private String siteY;
+    private String siteZ;
 }

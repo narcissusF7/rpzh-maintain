@@ -39,6 +39,8 @@ public class NodeVo implements Serializable {
             "04：无线包芯温度传感器,05：无线包芯水分传感器，06：磷化氢传感器")
     private String nodeType;
 
+    private String nodeName;
+
     //采集位置
     @ApiModelProperty(notes = "采集位置")
     private String gatherSite;

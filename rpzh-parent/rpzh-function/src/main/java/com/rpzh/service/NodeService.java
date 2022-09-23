@@ -149,5 +149,5 @@ public interface NodeService {
      * @param nodeDto
      * @return
      */
-    int nodeOPS(NodeDto nodeDto);
+    NodeVo nodeOPS(String nodeId);
 }

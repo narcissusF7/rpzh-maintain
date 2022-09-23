@@ -249,7 +249,9 @@ public interface NodeDao {
 
     List<String> findNodeIds(@Param("stackId")Integer stackId,@Param("nodeType")String nodeType);
 
-    int nodeOPS(@Param("nodeIds") String[] nodeIds);
+    NodeVo nodeOPS(@Param("nodeId") String nodeId);
+
+    Map findXYZ(@Param("nodeId")String nodeId);
 
     List<NodeDto> findNodeVos(@Param("ids") Integer[] ids);
 

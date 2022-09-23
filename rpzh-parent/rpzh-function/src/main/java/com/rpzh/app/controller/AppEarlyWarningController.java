@@ -1,6 +1,5 @@
-package com.rpzh.controller;
+package com.rpzh.app.controller;
 
-import com.rpzh.dto.EarlyWarningDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
@@ -10,16 +9,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -84,5 +77,21 @@ public class AppEarlyWarningController {
     public Result findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nodeType,String id){
         Map mapInfos = earlyWarningService.findAppWarningInfoBySiteRoute(siteRoute, warningType, warningGrade, nodeType,  id);
         return new Result<>(true, StatusCode.OK, "查询成功",mapInfos);
+    }
+
+    @PostMapping("/getAppRepairData")
+    @ApiOperation(value = "设备维修时回显")
+    public Result<RepairDataVo> getRepairData(String siteRoute){
+        if(ToolUtil.isEmpty(siteRoute)){
+            return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
+        }
+        List<RepairDataVo> repairDataVos = earlyWarningService.getAppRepairData(siteRoute);
+        return new Result<>(true, StatusCode.OK, "查询成功",repairDataVos);
+    }
+
+    @PostMapping("/updateAppRepairId")
+    @ApiOperation(value = "去处理（故障），设备维修")
+    public void updateRepairId(@RequestBody List<Map<String,String>> repairInfos) {
+        earlyWarningService.updateRepairId(repairInfos);
     }
 }

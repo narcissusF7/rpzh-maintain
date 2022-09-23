@@ -288,8 +288,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             String[] pidRoutes = pidRoute.split(",");
             List<String> siteRoutes = Arrays.asList(pidRoute,pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3] + "," + pidRoutes[4],pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2] + "," + pidRoutes[3],pidRoutes[0] + "," + pidRoutes[1] + "," + pidRoutes[2],pidRoutes[0] + "," + pidRoutes[1]);
             for (String siteRoute : siteRoutes) {
-                if (ToolUtil.isEmpty(earlyWarningInfo)) {
-                    earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(siteRoute);
+                earlyWarningInfo = pestMonitoringDao.findPestStackMonitor(siteRoute);
+                if (ToolUtil.isNotEmpty(earlyWarningInfo)) {
                     break;
                 }
             }
@@ -758,6 +758,29 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         }
     }
 
+    @Override
+    public List<RepairDataVo> getAppRepairData(String siteRoute){
+        Integer stackId = null;
+        Integer areaId = null;
+        String siteName = getSiteName(siteRoute);
+        if(siteRoute.contains("05")){
+            stackId = Integer.parseInt(siteRoute.split("05:")[1].split("]")[0]);
+        }else{
+            areaId = Integer.parseInt(siteRoute.split("04:")[1].split("]")[0]);
+        }
+        List<RepairDataVo> repairDatas = earlyWarningDao.findRepairData(stackId, areaId);
+        for (RepairDataVo repairData : repairDatas) {
+            repairData.setSiteName(siteName);
+            repairData.setNodeName(getNodeType(repairData.getDeviceType()));
+            Map xyz = nodeDao.findXYZ(repairData.getDeviceId());
+            repairData.setSiteX(xyz.get("siteX").toString());
+            repairData.setSiteY(xyz.get("siteY").toString());
+            repairData.setSiteZ(xyz.get("siteZ").toString());
+        }
+
+        return repairDatas;
+    }
+
     public void get(String message,Map map,String number) {
         try {
             map.put("content", message);
@@ -1032,8 +1055,8 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         map.put("warningMap",warningMap);
         map.put("userBase",userMap);
         map.put("baseMap",baseMap);
-        map.put("id",id);
         map.put("taskId",warningInfo.get("taskId"));
+        //map.put("taskId",warningInfo.get("taskId"));
         return map;
     }
 }

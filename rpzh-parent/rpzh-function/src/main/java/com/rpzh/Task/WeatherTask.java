@@ -15,7 +15,7 @@ import springfox.documentation.spring.web.json.Json;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Component
+//@Component
 public class WeatherTask {
 
     @Autowired

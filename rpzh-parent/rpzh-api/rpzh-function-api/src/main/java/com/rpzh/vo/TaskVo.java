@@ -72,7 +72,7 @@ public class TaskVo {
     @ApiModelProperty(notes = "处理时间")
     private String dealTime;
 
-    @ApiModelProperty(notes = "处理方式")
+    @ApiModelProperty(notes = "处理措施。不为空时回显并可修改;为空时让用户自行输入")
     private String dealMethod;
 
     @ApiModelProperty(notes = "完成时间")

@@ -19,6 +19,7 @@ import com.rpzh.service.WarehouseService;
 import com.rpzh.util.ManuallyPageUtil;
 import com.rpzh.util.MonitorCondition;
 import com.rpzh.vo.NodeDataVo;
+import com.rpzh.vo.NodeVo;
 import com.rpzh.vo.PestDataVo;
 import com.rpzh.vo.StackVo;
 import io.swagger.annotations.Api;
@@ -364,19 +365,17 @@ public class AppMonitoringCenterController {
         return new Result<>(true, StatusCode.OK, "解垛成功");
     }
 
-    @ApiOperation(value = "设备运维")
+    @ApiOperation(value = "添加设备运维设备时根据设备id查询设备类型、位置、坐标")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ids",value = "id集", dataType = "Integer",allowMultiple = true, required = true),
-            @ApiImplicitParam(name = "nodeIds",value = "设备id集", dataType = "String",allowMultiple = true, required = true)
+            @ApiImplicitParam(name = "nodeId",value = "设备id集", dataType = "String", required = true)
     })
-    @PostMapping({"/nodeOPS"})
-    public Result nodeOPS(@ApiIgnore NodeDto nodeDto) {
-        String [] nodeIds = nodeDto.getNodeIds();
-        if (ToolUtil.isEmpty(nodeIds)) {
-            return new Result<>(false, StatusCode.ERROR, "请至少选择一个设备");
+    @PostMapping("/nodeOPS")
+    public Result nodeOPS(String nodeId) {
+        if (ToolUtil.isEmpty(nodeId)) {
+            return new Result<>(false, StatusCode.ERROR, "请选择设备");
         }
-        int updateFlag = nodeService.nodeOPS(nodeDto);
-        return new Result<>(true, StatusCode.OK, "运维成功");
+        NodeVo nodeVo = nodeService.nodeOPS(nodeId);
+        return new Result<>(true, StatusCode.OK, "查询成功",nodeVo);
     }
 
     @ApiOperation(value = "查询指定位置下的垛位")

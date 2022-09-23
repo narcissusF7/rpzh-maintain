@@ -563,7 +563,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public int nodeOPS(NodeDto nodeDto) {
-        return nodeDao.nodeOPS(nodeDto.getNodeIds());
+    public NodeVo nodeOPS(String nodeId) {
+        return nodeDao.nodeOPS(nodeId);
     }
 }
