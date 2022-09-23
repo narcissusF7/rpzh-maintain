@@ -425,7 +425,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 EarlyWarning earlyWarning = new EarlyWarning();
                 earlyWarning.setWarningType(repairInfo.get("warningType"));
                 earlyWarning.setNodeId(repairInfo.get("deviceId"));
-                earlyWarning.setPrincipalName(repairInfo.get("repairPrincipal"));
                 earlyWarnings.add(earlyWarning);
             }
             return earlyWarningDao.updateRepairId(earlyWarnings);

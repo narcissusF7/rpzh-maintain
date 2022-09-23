@@ -370,11 +370,11 @@ public class AppMonitoringCenterController {
             @ApiImplicitParam(name = "nodeId",value = "设备id集", dataType = "String", required = true)
     })
     @PostMapping("/nodeOPS")
-    public Result nodeOPS(String nodeId) {
-        if (ToolUtil.isEmpty(nodeId)) {
+    public Result nodeOPS(String deviceId) {
+        if (ToolUtil.isEmpty(deviceId)) {
             return new Result<>(false, StatusCode.ERROR, "请选择设备");
         }
-        NodeVo nodeVo = nodeService.nodeOPS(nodeId);
+        NodeVo nodeVo = nodeService.nodeOPS(deviceId);
         return new Result<>(true, StatusCode.OK, "查询成功",nodeVo);
     }
 

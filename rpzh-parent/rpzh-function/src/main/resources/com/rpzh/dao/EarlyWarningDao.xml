@@ -15,7 +15,7 @@
     <update id="updateRepairId" parameterType="java.util.List">
         <foreach collection="earlyWarnings" item="earlyWarning" index="index" separator=";" open="begin" close=";end;">
             update tb_early_warning
-            set is_affirm = '0',deal_time = sysdate,principal = #{earlyWarning.principalName}
+            set is_affirm = '0',deal_time = sysdate
             where node_id = #{earlyWarning.nodeId} and warning_type = #{earlyWarning.warningType} and is_affirm = '2'
         </foreach>
     </update>

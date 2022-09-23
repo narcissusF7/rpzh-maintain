@@ -134,6 +134,11 @@
         SET node_id = #{nodeDto.afterNodeId}
         WHERE node_id = #{nodeDto.nodeId}
     </update>
+    <update id="updateStatus">
+        UPDATE tb_node
+        SET status = #{status}
+        WHERE node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")"> #{nodeId} </foreach>
+    </update>
     <insert id="insertReplaceNodeIdLog">
         INSERT INTO tb_node_replace_history
         (before_node_id,

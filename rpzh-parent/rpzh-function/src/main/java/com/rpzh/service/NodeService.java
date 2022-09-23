@@ -67,6 +67,8 @@ public interface NodeService {
      */
     int replaceNodeId(NodeDto nodeDto);
 
+    int updateStatus(List<String> nodeIds,String status);
+
     /**
      * 设备替换日志查询
      * @param nodeDto

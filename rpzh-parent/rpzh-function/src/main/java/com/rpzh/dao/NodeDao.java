@@ -83,6 +83,8 @@ public interface NodeDao {
      */
     int replaceNodeId(@Param("nodeDto") NodeDto nodeDto);
 
+    int updateStatus(@Param("nodeIds") List<String> nodeIds,@Param("status")String status);
+
     /**
      * 设备替换日志插入
      *

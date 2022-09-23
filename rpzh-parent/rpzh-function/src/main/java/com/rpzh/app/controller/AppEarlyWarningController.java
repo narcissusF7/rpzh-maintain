@@ -4,6 +4,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.EarlyWarningService;
+import com.rpzh.service.NodeService;
 import com.rpzh.vo.RepairDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -28,6 +29,8 @@ import java.util.Map;
 public class AppEarlyWarningController {
     @Resource
     private EarlyWarningService earlyWarningService;
+    @Resource
+    private NodeService nodeService;
 
     @PostMapping("/findAppWarningIndex")
     @ApiOperation(value = "APP预警管理首页")
@@ -93,5 +96,10 @@ public class AppEarlyWarningController {
     @ApiOperation(value = "去处理（故障），设备维修")
     public void updateRepairId(@RequestBody List<Map<String,String>> repairInfos) {
         earlyWarningService.updateRepairId(repairInfos);
+    }
+
+    @PostMapping("/updateStatus")
+    public void updateStatus(@RequestBody List<String> nodeIds,@RequestParam("status") String status){
+        nodeService.updateStatus(nodeIds,status);
     }
 }

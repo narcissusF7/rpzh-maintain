@@ -195,6 +195,10 @@ public class NodeServiceImpl implements NodeService {
         return -1;
     }
 
+    @Override
+    public int updateStatus(List<String> nodeIds,String status){
+        return nodeDao.updateStatus(nodeIds,status);
+    }
     /**
      * 设备替换日志查询
      * @param nodeDto
