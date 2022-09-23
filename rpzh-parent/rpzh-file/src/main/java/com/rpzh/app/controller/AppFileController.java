@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 任务中心图片管理
- * @Author liubc
- * @create 2022-06-01 11:29
+ * app任务中心图片管理
+ * @Author zyq
+ * @create 2022-09-23 11:29
  * @Description: good good study,day day up
  */
 @RestController
