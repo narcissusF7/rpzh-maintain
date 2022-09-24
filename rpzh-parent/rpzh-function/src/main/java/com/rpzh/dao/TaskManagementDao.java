@@ -5,6 +5,7 @@ import com.rpzh.vo.TaskVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -451,5 +452,5 @@ public interface TaskManagementDao {
 
     List<String> findSystemType(@Param("ids") Long[] ids);
 
-    Map<String, Integer> findTaskCountByNow(@Param("username") String username);
+    Map<String, BigDecimal> findTaskCountByNow(@Param("username") String username);
 }

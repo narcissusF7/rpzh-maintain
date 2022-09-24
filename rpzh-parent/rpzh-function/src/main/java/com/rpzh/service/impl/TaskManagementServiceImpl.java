@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.sql.SQLOutput;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -1308,9 +1309,14 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //查看用户账号
         String username = userInfo.get("username");
-        Map<String, Integer> taskCountByNow = taskManagementDao.findTaskCountByNow(username);
-        Integer doneTask = taskCountByNow.get("allTask") - taskCountByNow.get("undoTask");
-        taskCountByNow.put("doneTask",doneTask);
-        return taskCountByNow;
+        Map<String, Integer> map = new HashMap<>();
+        Map<String, BigDecimal> taskCountByNow = taskManagementDao.findTaskCountByNow(username);
+        Integer allTask =  taskCountByNow.get("allTask").intValue();
+        Integer undoTask = taskCountByNow.get("undoTask").intValue();
+        Integer doneTask =allTask -undoTask;
+        map.put("allTask",allTask);
+        map.put("undoTask",undoTask);
+        map.put("doneTask",doneTask);
+        return map;
     }
 }
