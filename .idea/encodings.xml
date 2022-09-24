@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" addBOMForNewFiles="with NO BOM">
     <file url="file://$PROJECT_DIR$/rpzh-parent" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api" charset="UTF-8" />
@@ -11,6 +11,7 @@
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-job-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-job-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-log-api/src/main/java" charset="UTF-8" />
@@ -62,6 +63,7 @@
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-job" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-job/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-job/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/rpzh-parent/rpzh-log" charset="UTF-8" />

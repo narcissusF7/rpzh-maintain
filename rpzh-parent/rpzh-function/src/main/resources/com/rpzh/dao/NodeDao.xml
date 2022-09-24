@@ -231,7 +231,8 @@
         stack as stack,
         site_x as siteX,
         site_y as siteY,
-        site_z as siteZ,
+        site_z as siteZ
+        from tb_node
         WHERE node_id = #{nodeId}
     </select>
     <select id="findNodeIdCount" resultType="int">
