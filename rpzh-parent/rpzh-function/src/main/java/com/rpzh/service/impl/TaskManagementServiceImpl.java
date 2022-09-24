@@ -1279,16 +1279,18 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         long betweenMs = DateUtil.between(date1, date2, DateUnit.MS);
         //当前时间与结束时间相差的毫秒字符串
         String betweenMsStr = String.valueOf(betweenMs);
-        //  todo:任务过期
+        //随机生成任务编号
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        // 任务过期
         //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
-        /*rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
+        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws AmqpException {
                 //消息过期设置
                 message.getMessageProperties().setExpiration(betweenMsStr);
                 return message;
             }
-        });*/
+        });
         log.info("新建任务发送消息成功:" + taskDto.getTaskNum() + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;

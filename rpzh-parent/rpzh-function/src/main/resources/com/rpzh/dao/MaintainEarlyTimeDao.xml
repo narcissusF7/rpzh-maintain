@@ -2,4 +2,66 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.MaintainEarlyTimeDao">
 
+    <update id="updateMaintain">
+        update tb_maintain_early_time set
+            core_temp_max_early_time =#{maintainEarlyTime.coreTempMaxEarlyTime},
+            core_temp_all_early_time =#{maintainEarlyTime.coreTempAllEarlyTime},
+            oxygen_max_early_time =#{maintainEarlyTime.oxygenMaxEarlyTime},
+            oxygen_all_early_time =#{maintainEarlyTime.oxygenAllEarlyTime},
+            temp_max_early_time =#{maintainEarlyTime.tempMaxEarlyTime},
+            temp_all_early_time =#{maintainEarlyTime.tempAllEarlyTime},
+            humitidy_max_early_time =#{maintainEarlyTime.humidityMaxEarlyTime},
+            humitidy_all_early_time =#{maintainEarlyTime.humidityAllEarlyTime},
+            maintain_result = #{maintainEarlyTime.maintainResult}
+            where id = #{maintainEarlyTime.id}
+        <if test="maintainEarlyTime."></if>
+    </update>
+    <select id="findByMaintainPlanId" resultType="com.rpzh.pojo.MaintainEarlyTime">
+        select id,maintain_plan_id maintainPlanId, core_temp_max_early_time coreTempMaxEarlyTime
+                 , core_temp_all_early_time coreTempAllEarlyTime
+                 , oxygen_max_early_time oxygenMaxEarlyTime
+                 , oxygen_all_early_time oxygenAllEarlyTime
+                 , temp_max_early_time tempMaxEarlyTime
+                 , temp_all_early_time tempAllEarlyTime
+                 , humitidy_max_early_time tempMaxEarlyTime
+                 , humitidy_all_early_time humitidyAllEarlyTime
+                 , maintain_result maintainResult
+        from tb_maintain_early_time where maintain_plan_id = #{maintainPlanId}
+    </select>
+    <select id="findMaintainEarlyTimes" resultType="com.rpzh.vo.MaintainEarlyTimeVo">
+        select t1.id id , t1.maintain_plan_id maintainPlanId
+             , t3.name_cn stackName
+             , core_temp_max_early_time coreTempMaxEarlyTime
+             , core_temp_all_early_time coreTempAllEarlyTime
+             , oxygen_max_early_time oxygenMaxEarlyTime
+             , oxygen_all_early_time oxygenAllEarlyTime
+             , temp_max_early_time tempMaxEarlyTime
+             , temp_all_early_time tempAllEarlyTime
+             , humitidy_max_early_time tempMaxEarlyTime
+             , humitidy_all_early_time humitidyAllEarlyTime
+             , maintain_result maintainResult
+        from tb_maintain_early_time t1 , tb_maintain_plan t2 ,tb_stack t3
+        <where>
+            t1.maintain_plan_id = t2.id and t2.stack_id = t3.id
+            <if test="maintainEarlyTimeDto.siteRoute!=null and maintainEarlyTimeDto.siteRoute!=''">and pid_route like concat('%',concat(#{maintainEarlyTimeDto.siteRoute},'%'))</if>
+            <if test="maintainEarlyTimeDto.siteId!=null and maintainEarlyTimeDto.siteId!=''">and t3.id = #{maintainEarlyTimeDto.siteId}</if>
+            <if test="maintainEarlyTimeDto.coreTempAllEarlyTimeOne!=null and maintainEarlyTimeDto.coreTempAllEarlyTimeOne!=''">and core_temp_all_early_time &gt;= #{maintainEarlyTimeDto.coreTempAllEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.coreTempAllEarlyTimeTwo!=null and maintainEarlyTimeDto.coreTempAllEarlyTimeTwo!=''">and core_temp_all_early_time &lt;= #{maintainEarlyTimeDto.coreTempAllEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.coreTempMaxEarlyTimeOne!=null and maintainEarlyTimeDto.coreTempMaxEarlyTimeOne!=''">and core_temp_max_early_time &gt;= #{maintainEarlyTimeDto.coreTempMaxEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.coreTempMaxEarlyTimeOne!=null and maintainEarlyTimeDto.coreTempMaxEarlyTimeTwo!=''">and core_temp_max_early_time &lt;= #{maintainEarlyTimeDto.coreTempMaxEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.tempAllEarlyTimeOne!=null and maintainEarlyTimeDto.tempAllEarlyTimeOne!=''">and temp_all_early_time &gt;= #{maintainEarlyTimeDto.tempAllEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.tempAllEarlyTimeTwo!=null and maintainEarlyTimeDto.tempAllEarlyTimeTwo!=''">and temp_all_early_time &lt;= #{maintainEarlyTimeDto.tempAllEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.tempMaxEarlyTimeOne!=null and maintainEarlyTimeDto.tempMaxEarlyTimeOne!=''">and temp_max_early_time &gt;= #{maintainEarlyTimeDto.tempMaxEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.tempMaxEarlyTimeOne!=null and maintainEarlyTimeDto.tempMaxEarlyTimeTwo!=''">and temp_max_early_time &lt;= #{maintainEarlyTimeDto.tempMaxEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.oxygenAllEarlyTimeOne!=null and maintainEarlyTimeDto.oxygenAllEarlyTimeOne!=''">and oxygen_all_early_time &gt;= #{maintainEarlyTimeDto.oxygenAllEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.oxygenAllEarlyTimeTwo!=null and maintainEarlyTimeDto.oxygenAllEarlyTimeTwo!=''">and oxygen_all_early_time &lt;= #{maintainEarlyTimeDto.oxygenAllEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.oxygenMaxEarlyTimeOne!=null and maintainEarlyTimeDto.oxygenMaxEarlyTimeOne!=''">and oxygen_max_early_time &gt;= #{maintainEarlyTimeDto.oxygenMaxEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.oxygenMaxEarlyTimeTwo!=null and maintainEarlyTimeDto.oxygenMaxEarlyTimeTwo!=''">and oxygen_max_early_time &lt;= #{maintainEarlyTimeDto.oxygenMaxEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.humidityAllEarlyTimeOne!=null and maintainEarlyTimeDto.humidityAllEarlyTimeOne!=''">and humidity_all_early_time &gt;= #{maintainEarlyTimeDto.humidityAllEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.humidityAllEarlyTimeTwo!=null and maintainEarlyTimeDto.humidityAllEarlyTimeTwo!=''">and humidity_all_early_time &lt;= #{maintainEarlyTimeDto.humidityAllEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=null and maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=''">and humidity_max_early_time &gt;= #{maintainEarlyTimeDto.humidityMaxEarlyTimeOne}</if>
+            <if test="maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=null and maintainEarlyTimeDto.humidityMaxEarlyTimeTwo!=''">and humidity_max_early_time &lt;= #{maintainEarlyTimeDto.humidityMaxEarlyTimeTwo}</if>
+            <if test="maintainEarlyTimeDto.maintainResult!=null and maintainEarlyTimeDto.maintainResult!=''">and maintain_result = #{maintainEarlyTimeDto.maintainResult}</if>
+        </where>
+    </select>
 </mapper>

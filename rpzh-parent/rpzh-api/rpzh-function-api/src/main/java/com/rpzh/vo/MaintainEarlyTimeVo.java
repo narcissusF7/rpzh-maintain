@@ -20,37 +20,41 @@ public class MaintainEarlyTimeVo {
      */
     private Integer maintainPlanId;
     /**
+     * 垛位名称
+     */
+    private String stackName;
+    /**
      * 包芯温度连续预警时间
      */
-    private Integer coreTempMaxEarlyTime;
+    private Double coreTempMaxEarlyTime;
     /**
      * 包芯温度累计预警时间
      */
-    private Integer coreTempAllEarlyTime;
+    private Double coreTempAllEarlyTime;
     /**
      * 垛内氧气连续预警时间
      */
-    private Integer oxygenMaxEarlyTime;
+    private Double oxygenMaxEarlyTime;
     /**
      * 垛内氧气累计预警时间
      */
-    private Integer oxygenAllEarlyTime;
+    private Double oxygenAllEarlyTime;
     /**
      * 垛内温度连续预警时间
      */
-    private Integer tempMaxEarlyTime;
+    private Double tempMaxEarlyTime;
     /**
      * 垛内温度累计预警时间
      */
-    private Integer tempAllEarlyTime;
+    private Double tempAllEarlyTime;
     /**
      * 垛内湿度连续预警时间
      */
-    private Integer humidityMaxEarlyTime;
+    private Double humidityMaxEarlyTime;
     /**
      * 垛内湿度累计预警时间
      */
-    private Integer humidityAllEarlyTime;
+    private Double humidityAllEarlyTime;
     /**
      * 创建时间
      */
@@ -59,4 +63,8 @@ public class MaintainEarlyTimeVo {
      * 更新时间
      */
     private Date updateTime;
+    /**
+     * 养护结果
+     */
+    private Integer maintainResult;
 }

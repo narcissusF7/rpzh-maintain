@@ -13,7 +13,9 @@ import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.NodeTypeEnum;
 import com.rpzh.parse.ParseData;
 import com.rpzh.pojo.EarlyWarning;
+import com.rpzh.pojo.MaintainEarlyTime;
 import com.rpzh.pojo.NodeData;
+import com.rpzh.service.MaintainEarlyTimeService;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.service.WareAreaAlarmSettingService;
@@ -69,6 +71,9 @@ public class MaintainDataHandler {
     @Autowired
     TaskManagementService taskManagementService;
 
+    @Resource
+    MaintainEarlyTimeService maintainEarlyTimeService;
+
 
     @Autowired
     IdWorker idWorker;
@@ -84,6 +89,9 @@ public class MaintainDataHandler {
     public static String ALERT_NUM = "ALERT_NUM_";
     public static String MAINTAIN_CACHE_NODE = "MAINTAIN_CACHE_NODE_";
     public static String FAULT = "FAULT_";
+
+    //养护预警时间
+    private MaintainEarlyTime maintainEarlyTime = null;
 
     /**
      * 设备推送数据处理
@@ -312,6 +320,8 @@ public class MaintainDataHandler {
                 data = parseData.getData().get(i);
                 //判断当前数据所属等级
                 int tempLevel = decideValue(data, list);
+
+
                 tempLevel = tempLevel == -1 ? 1 : tempLevel;
                 //温度处理
                 tempLevel = earlyWarningHandle(nodeVo, tempLevel, parseData, data, "temp");
@@ -375,10 +385,18 @@ public class MaintainDataHandler {
                 for (String alarmColumn : alarmColumns) {
                     list.add((Double) redisTemplate.opsForHash().get(redisHashKey, alarmColumn));
                 }
-                //判断等级
-                int level = decideValue(v, list);
-                //处理
-                avgCoreHandle(nodeVo, level, parseData, v);
+
+                if (avg>0){
+                    //判断等级
+                    int level = decideValue(v, list);
+                    //处理
+                    avgCoreHandle(nodeVo, level, parseData, v);
+                }else if (avg+list.get(3)<0){
+                        avgCoreHandle(nodeVo, -1, parseData, v);
+
+                }
+
+
             }
 
         }
@@ -700,13 +718,20 @@ public class MaintainDataHandler {
      * @param data      数据值
      */
     public void avgCoreHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data) {
-        //查询数据库中该位置未处理的预警
-        EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
+        EarlyWarningVo earlyWarningVo;
+        String type = "13";
+        if (level==-1){
+            earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
+            type = "19";
+        }else {
+            //查询数据库中该位置未处理的预警
+            earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
+
+        }
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());
         earlyWarning.setStackId(nodeVo.getStackId());
-        NodeVo nodeVo1 = nodeDao.findByNodeId(nodeVo.getNodeId());
-        String siteRoute = nodeVo1.getSiteRoute();
+        String siteRoute = nodeVo.getSiteRoute();
         earlyWarning.setSiteRoute(siteRoute);
         //如果存在未处理的预警
         if (!ToolUtil.isEmpty(earlyWarningVo)) {
@@ -719,16 +744,16 @@ public class MaintainDataHandler {
 
                 earlyWarningDao.updateWarning(earlyWarning);
             }
-        } else if (level > 0) {
+        } else  {
             //如果不存在未处理的预警 且当前预警等级大于0则需要插入数据
-
             if (level == -1) {
+                level =1;
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_LOW_STACK_WARNING);
                 Map taskMap = addTask(nodeVo, "19");
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
                 earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
-                setLevel(earlyWarning, 1, data);
-            } else {
+                setLevel(earlyWarning, level, data);
+            } else if (level > 0){
                 earlyWarning.setWarningType(WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
                 Map taskMap = addTask(nodeVo, "13");
                 earlyWarning.setPrincipalName(taskMap.get("principal").toString());
@@ -806,8 +831,56 @@ public class MaintainDataHandler {
      * @param siteType
      */
     private Integer decideEarlyWarning(EarlyWarningVo earlyWarningVo, EarlyWarning earlyWarning, ParseData parseData, Integer level, Double data, String evnType, String siteType,NodeVo nodeVo) {
+
         if (level == 0) {
             redisTemplate.opsForHash().put(ALERT_NUM, parseData.getNodeId() + evnType, 0);
+        }else if (nodeVo.getSiteRoute().split(",").length==6){//如果是垛内设备
+
+            if (ToolUtil.isEmpty(maintainEarlyTime))
+            maintainEarlyTime = maintainEarlyTimeService.findByMaintainPlanId(nodeVo.getMaintainPlanId());
+            //信号发送间隔（小时）
+            Double time = Double.valueOf(String.format("%.2f",parseData.getFrequency()/3600.0+""));
+            //获取缓存中的连续预警次数
+            Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId() + evnType);
+            Integer count  =ToolUtil.isNotEmpty(o)? 0:Integer.parseInt(o.toString());
+            Double allTime =0.0;
+
+            //根据设备类型设置累计预警时间
+            if ("temp".equals(evnType)){
+                if (maintainEarlyTime.getTempMaxEarlyTime()<time*count){
+                    maintainEarlyTime.setTempMaxEarlyTime(time*count);
+                }
+                allTime = maintainEarlyTime.getTempAllEarlyTime()+time;
+                maintainEarlyTime.setTempAllEarlyTime(allTime);
+            }else if ("humidity".equals(evnType)){
+                if (maintainEarlyTime.getHumidityMaxEarlyTime()<time*count){
+                    maintainEarlyTime.setHumidityMaxEarlyTime(time*count);
+                }
+                allTime = maintainEarlyTime.getHumidityAllEarlyTime()+time;
+                maintainEarlyTime.setHumidityAllEarlyTime(allTime);
+            }else if (NodeConstant.OXYGEN_NODE_TYPE_VALUE.equals(nodeVo.getNodeType())){
+                if (maintainEarlyTime.getOxygenMaxEarlyTime()<time*count){
+                    maintainEarlyTime.setOxygenMaxEarlyTime(time*count);
+                }
+                allTime = maintainEarlyTime.getOxygenAllEarlyTime()+time;
+                maintainEarlyTime.setOxygenAllEarlyTime(allTime);
+            }else if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(nodeVo.getNodeType())){
+                if (maintainEarlyTime.getCoreTempMaxEarlyTime()<time*count){
+                    maintainEarlyTime.setCoreTempMaxEarlyTime(time*count);
+                }
+                allTime = maintainEarlyTime.getCoreTempAllEarlyTime()+time;
+                maintainEarlyTime.setCoreTempAllEarlyTime(allTime);
+            }
+            //累计预警超过20天 设为不合格
+            if (allTime>24*20){
+                maintainEarlyTime.setMaintainResult(0);
+            }
+
+            if (!"temp".equals(evnType)){
+               Integer updateFlag = maintainEarlyTimeService.updateMaintain(maintainEarlyTime);
+               maintainEarlyTime = null;
+            }
+
         }
         //如果存在未处理的预警
         if (ToolUtil.isNotEmpty(earlyWarningVo)) {

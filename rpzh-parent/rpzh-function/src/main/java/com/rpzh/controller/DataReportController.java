@@ -4,14 +4,18 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.github.pagehelper.PageInfo;
 import com.rpzh.dao.DataReportDao;
 import com.rpzh.dto.DataReportDto;
+import com.rpzh.dto.MaintainEarlyTimeDto;
 import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.DataReportService;
+import com.rpzh.service.MaintainEarlyTimeService;
 import com.rpzh.util.EscapeToolBox;
 import com.rpzh.vo.DataReportVo;
+import com.rpzh.vo.MaintainEarlyTimeVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.EscapedErrors;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +44,9 @@ public class DataReportController {
 
     @Resource
     private DataReportDao dataReportDao;
+
+    @Resource
+    MaintainEarlyTimeService maintainEarlyTimeService;
 
 
     /**
@@ -545,5 +552,12 @@ public class DataReportController {
             routes.add("[00"+split[i]);
         }
         dataReportService.exportComparisonData(routes,comparisonType,exportType,acquisitionTimeOne,acquisitionTimeTwo, response);
+    }
+
+    @ApiOperation(value = "导出数据")
+    @GetMapping("findMaintainEarlyTimes")
+    public Result<List<MaintainEarlyTimeVo>> findMaintainEarlyTimes(MaintainEarlyTimeDto maintainEarlyTimeDto){
+        List<MaintainEarlyTimeVo> list = maintainEarlyTimeService.findMaintainEarlyTimes(maintainEarlyTimeDto);
+        return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(list));
     }
 }
