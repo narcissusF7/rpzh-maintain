@@ -1301,4 +1301,16 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         List<String> list = taskManagementDao.findSystemType(ids);
         return list;
     }
+
+    @Override
+    public Map<String, Integer> findTaskCountByNow() {
+        //获取登录用户信息
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //查看用户账号
+        String username = userInfo.get("username");
+        Map<String, Integer> taskCountByNow = taskManagementDao.findTaskCountByNow(username);
+        Integer doneTask = taskCountByNow.get("allTask") - taskCountByNow.get("undoTask");
+        taskCountByNow.put("doneTask",doneTask);
+        return taskCountByNow;
+    }
 }

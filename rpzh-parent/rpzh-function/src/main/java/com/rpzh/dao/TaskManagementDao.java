@@ -450,4 +450,6 @@ public interface TaskManagementDao {
     int findMaintainPlan(@Param("siteId") String siteId);
 
     List<String> findSystemType(@Param("ids") Long[] ids);
+
+    Map<String, Integer> findTaskCountByNow(@Param("username") String username);
 }

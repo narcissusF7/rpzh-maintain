@@ -648,4 +648,9 @@
         </foreach>
         and create_type = 2
     </select>
+    <select id="findTaskCountByNow" resultType="java.util.Map">
+        select count(case when( SYSDATE between create_time and end_time) then 1 else null end ) "allTask" ,
+               count(case when status = 0 and SYSDATE between create_time and end_time  then 1 else null end ) "undoTask"
+        from TB_TASk where PRINCIPAL like concat('%',concat(#{username},'%'))
+    </select>
 </mapper>

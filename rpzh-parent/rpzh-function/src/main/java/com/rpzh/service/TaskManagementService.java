@@ -197,4 +197,6 @@ public interface TaskManagementService {
     int addDataHandTask(TaskDto taskDto);
 
     List<String> findSystemType(@Param("ids") Long[] ids);
+
+    Map<String, Integer> findTaskCountByNow();
 }

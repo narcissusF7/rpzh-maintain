@@ -90,7 +90,7 @@ public class AppTaskManagementController {
 
     /**
      * 根据任务主键Id查询任务图片路径信息
-     * @param taskDto
+     * @param taskId
      * @return
      */
     @ApiOperation(value = "上传图片后回显,根据任务主键Id查询任务图片路径信息", tags = "任务管理中心")
@@ -105,5 +105,16 @@ public class AppTaskManagementController {
         List<TaskVo> list = taskManagementService.findPicMes(taskId);
         return new Result<TaskVo>(true, StatusCode.OK, "查询成功",list);
     }
+
+    /**
+     * 查询今日任务数量 已完成数据 为完成数
+
+     */
+    @ApiOperation(value = "查询今日任务数量 已完成数据 为完成数")
+    public Result<Map<String,Integer>> findTaskCountByNow(){
+        Map<String,Integer> map = taskManagementService.findTaskCountByNow();
+        return new Result(true, StatusCode.OK, "查询成功",map);
+    }
+
 
 }
