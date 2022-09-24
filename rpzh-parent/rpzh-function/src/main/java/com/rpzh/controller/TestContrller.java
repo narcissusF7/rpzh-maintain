@@ -421,6 +421,7 @@ public class TestContrller{
         return new Result<>(true, StatusCode.OK, "测试空调数据流程");
     }
 
+
     @PostMapping("handleAirConditionerData")
     public Result handleAirConditionerData() {
         List<AirConditionVo> list = airConditioningDao.findAllAirCondition();
