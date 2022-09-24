@@ -111,6 +111,7 @@ public class AppTaskManagementController {
 
      */
     @ApiOperation(value = "查询今日任务数量 已完成数据 为完成数")
+    @PostMapping("/findTaskCountByNow")
     public Result<Map<String,Integer>> findTaskCountByNow(){
         Map<String,Integer> map = taskManagementService.findTaskCountByNow();
         return new Result(true, StatusCode.OK, "查询成功",map);
