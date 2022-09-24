@@ -132,6 +132,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         //虫情预警值 预警颜色修改
         Integer updateFlag = pestMonitoringDao.updatePestMonitor(pestMonitoringRuleDto);
 
+        redisTemplate.delete("GENERAL_PEST_WARNING_VALUE");
         putValueToCache();
 
         //虫情板替换周期修改  该值在通用表中
@@ -139,6 +140,7 @@ public class PestMonitoringServiceImpl implements PestMonitoringService {
         generalSetting.setSettingName("replacePeriod");
         generalSetting.setSettingValue(pestMonitoringRuleDto.getReplacePeriod() + "");
         generalSettingDao.updateGeneralSetting(generalSetting);
+
         //虫情巡查时间修改
         Integer[] weekPatrol = pestMonitoringRuleDto.getWeekPatrol();
         Map<String, Integer> map = new HashMap<>();
