@@ -270,6 +270,7 @@
       remark as remark,
       created_time as createdTime,
       pid_route as pidRoute,
+      building_id as buildingId,
       floor_name as floorName,
       site_name as siteName,principal_id as principalId , principal_name as principalName
     FROM tb_floor

@@ -203,7 +203,7 @@ public interface NodeDao {
     List<NodeData> findDataNode(@Param("tableName") String tableName, @Param("column") String column, @Param("siteRoutes") List<String> pidRoutes,@Param("size")Integer size);
 
     @DS("clickhouse")
-    List<NodeData> findDataContrast(@Param("tableName") String tableName, @Param("column") String column, @Param("siteRoutes") List<String> pidRoutes,@Param("size")Integer size);
+    List<NodeData> findDataContrast(@Param("tableName") String tableName, @Param("column") String column, @Param("siteRoutes") List<String> pidRoutes,@Param("size")Integer size,@Param("siteType")String siteType);
 
     List<Map<String, String>> findEnterStack();
 
@@ -239,7 +239,7 @@ public interface NodeDao {
 
     String findSiteRouteByNodeId(@Param("nodeId")String nodeId);
 
-    Integer findCountByCaseNo(@Param("caseNo") String caseNo);
+    String findCountByCaseNo(@Param("nodeId") String nodeId);
 
     String findNodeTypeByNodeId(@Param("id") Integer id, @Param("nodeId") String nodeId);
 

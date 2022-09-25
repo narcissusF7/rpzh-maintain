@@ -113,16 +113,16 @@ public class DataContrastServiceImpl implements DataContrastService {
             data = nodeDao.findDataNode("tb_node_env_history", "humiture", siteRoutes,siteRoutes.size());
         }else if("05".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "垛内平均包芯温度";
-            data = nodeDao.findDataContrast("tb_node_temp_core_chip_history", "avg(temp) as temp", siteRoutes,siteRoutes.size());
+            data = nodeDao.findDataContrast("tb_node_temp_core_chip_history", "avg(temp) as temp,any(material_code) as materialCode", siteRoutes,siteRoutes.size(),"05");
         } else if("06".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均氧气";
-            data = nodeDao.findDataContrast("tb_node_o2_history", "avg(oxygen) as oxygen", siteRoutes,siteRoutes.size());
+            data = nodeDao.findDataContrast("tb_node_o2_history", "avg(oxygen) as oxygen", siteRoutes,siteRoutes.size(),"04");
         }else if("07".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均温度";
-            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(temp) as temp", siteRoutes,siteRoutes.size());
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(temp) as temp", siteRoutes,siteRoutes.size(),"04");
         }else if("08".equals(nodeType) && "02".equals(contrastType)) {
             nodeName = "仓间平均湿度";
-            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(humiture) as humiture", siteRoutes,siteRoutes.size());
+            data = nodeDao.findDataContrast("tb_air_conditioner_history", "avg(humiture) as humiture", siteRoutes,siteRoutes.size(),"04");
         }else {
             return new Result(false, StatusCode.ERROR, "设备类型出错了!");
         }

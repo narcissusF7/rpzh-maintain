@@ -33,6 +33,5 @@ public class RfIdNettyServerFilter extends ChannelInitializer<SocketChannel> {
         //3）allIdleTime：所有类型的超时时间;
         ph.addLast(new IdleStateHandler(60*10,0,0));
         ph.addLast("handler", serverHandler);// 服务端业务逻辑
-
     }
 }

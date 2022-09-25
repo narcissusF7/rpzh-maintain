@@ -43,10 +43,10 @@
         WHERE node_id = #{nodeId}
           and status = '4'
     </select>
-    <select id="findCountByCaseNo" resultType="java.lang.Integer">
-        SELECT count(*)
+    <select id="findCountByCaseNo" resultType="java.lang.String">
+        SELECT case_no
         FROM tb_node
-        WHERE case_no = #{caseNo}
+        WHERE node_id = #{nodeId}
     </select>
     <select id="findSiteRouteByNodeId" resultType="java.lang.String">
         select site_route
@@ -557,9 +557,9 @@
         group by node_id)
     </select>
     <select id="findDataContrast" resultType="com.rpzh.pojo.NodeData">
-        select ${column},any(node_id) as nodeId,any(material_code) as materialCode,pid_route as siteRoute from
+        select ${column},pid_route as siteRoute from
         ${tableName} where (transfer_time,node_id) in
-        (select max(transfer_time),node_id from ${tableName} where site_type = '04'
+        (select max(transfer_time),node_id from ${tableName} where site_type = #{siteType}
         <if test="size!=0">and pid_route in
             <foreach collection="siteRoutes" item="siteRoute" open="(" separator="," close=")">
                 #{siteRoute}
