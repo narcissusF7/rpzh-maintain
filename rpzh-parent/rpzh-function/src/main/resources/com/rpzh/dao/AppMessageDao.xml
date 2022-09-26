@@ -37,7 +37,7 @@
     </update>
 
     <select id="findRecipientInfo" resultType="com.rpzh.vo.AppMessageVo">
-        select is_read as isRead,content as content,create_time as sendTime,send_name as sendName,
+        select is_read as isRead,content as content,create_time as sendTime,send_name as sendName,type as type,
         id as id from app_message where message_type = '2' and recipient_name = #{appMessageDto.recipientName}
     </select>
     <select id="findRecipientInfoById" resultType="com.rpzh.vo.AppMessageVo">
