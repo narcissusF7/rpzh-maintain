@@ -41,7 +41,7 @@
         id as id from app_message where message_type = '2' and recipient_name = #{appMessageDto.recipientName}
     </select>
     <select id="findRecipientInfoById" resultType="com.rpzh.vo.AppMessageVo">
-        select site_name as siteName,content as content,ip as ip,id as id,send_name as sendName,create_time as sendTime,is_close as isClose
+        select site_name as siteName,content as content,ip as ip,id as id,send_name as sendName,create_time as sendTime,is_close as isClose,type as type
         from app_message where id = #{id}
     </select>
     <update id="updateRead">
