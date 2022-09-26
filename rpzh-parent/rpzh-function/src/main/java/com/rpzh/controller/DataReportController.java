@@ -554,7 +554,7 @@ public class DataReportController {
         dataReportService.exportComparisonData(routes,comparisonType,exportType,acquisitionTimeOne,acquisitionTimeTwo, response);
     }
 
-    @ApiOperation(value = "查询预警超出数据")
+    @ApiOperation(value = "预警超出数据")
     @GetMapping("findMaintainEarlyTimes")
     public Result<List<MaintainEarlyTimeVo>> findMaintainEarlyTimes(MaintainEarlyTimeDto maintainEarlyTimeDto){
         List<MaintainEarlyTimeVo> list = maintainEarlyTimeService.findMaintainEarlyTimes(maintainEarlyTimeDto);
