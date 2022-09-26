@@ -193,7 +193,7 @@ public class MaintainDataHandler {
                         //生成预警
                         earlyWarningDao.insertWarning(tempWarning);
                     }
-                }else {
+                }else if (ToolUtil.isEmpty(tempWarning.getId())){
                     //如果数据库该位置存在预警
                     earlyWarningDao.updateWarning(tempWarning);
                 }
@@ -212,7 +212,7 @@ public class MaintainDataHandler {
                         //生成预警
                         earlyWarningDao.insertWarning(humidityWarning);
                     }
-                }else {
+                }else if (ToolUtil.isEmpty(humidityWarning.getId())){
                     //如果数据库该位置存在预警
                     earlyWarningDao.updateWarning(humidityWarning);
                 }
