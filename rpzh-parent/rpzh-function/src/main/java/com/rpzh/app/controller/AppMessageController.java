@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -159,5 +161,45 @@ public class AppMessageController {
         }
         appMessageService.updateDraftInfo(appMessageDto);
         return new Result<>(true, StatusCode.OK, "修改成功");
+    }
+
+    @PostMapping("/deleteDraft")
+    @ApiOperation(value = "删除草稿箱")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "主键id集合", dataType = "Integer", required = true)
+    })
+    public Result<AppMessageVo> deleteDraft(@RequestParam("ids") List<String> ids){
+        if(ToolUtil.isEmpty(ids)){
+            return new Result(false, StatusCode.ERROR, "id集合不能为空!");
+        }
+        appMessageService.deleteMessage(ids);
+        return new Result<>(true, StatusCode.OK, "删除草稿箱成功");
+    }
+
+    @PostMapping("/deleteSend")
+    @ApiOperation(value = "删除发信箱")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "主键id集合", dataType = "Integer", required = true)
+    })
+    public Result<AppMessageVo> deleteSend(@RequestParam("ids") List<String> ids){
+        if(ToolUtil.isEmpty(ids)){
+            return new Result(false, StatusCode.ERROR, "id集合不能为空!");
+        }
+        appMessageService.deleteMessage(ids);
+        return new Result<>(true, StatusCode.OK, "删除发信箱成功");
+    }
+
+    @PostMapping("/deleteRecipient")
+    @ApiOperation(value = "删除收信箱")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "主键id集合", dataType = "Integer", required = true)
+    })
+    public Result<AppMessageVo> deleteRecipient(String id){
+        if(ToolUtil.isEmpty(id)){
+            return new Result(false, StatusCode.ERROR, "id不能为空!");
+        }
+        List<String> ids = new ArrayList<>(Arrays.asList(id.split(",")));
+        appMessageService.deleteMessage(ids);
+        return new Result<>(true, StatusCode.OK, "删除收信箱成功");
     }
 }

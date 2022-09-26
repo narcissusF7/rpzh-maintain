@@ -21,4 +21,5 @@ public interface AppMessageService {
     AppMessageVo findSendInfoById(List<String> ids);
     AppMessageVo findDraftInfoById(List<String> ids);
     Integer updateDraftInfo(AppMessageDto appMessageDto);
+    Integer deleteMessage(List<String> ids);
 }

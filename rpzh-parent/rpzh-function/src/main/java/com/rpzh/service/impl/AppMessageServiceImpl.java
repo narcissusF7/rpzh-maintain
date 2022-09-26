@@ -155,4 +155,10 @@ public class AppMessageServiceImpl implements AppMessageService {
         }
         return i;
     }
+
+    @Override
+    public Integer deleteMessage(List<String> ids){
+        Integer result = appMessageDao.deleteMessage(ids);
+        return result;
+    }
 }
