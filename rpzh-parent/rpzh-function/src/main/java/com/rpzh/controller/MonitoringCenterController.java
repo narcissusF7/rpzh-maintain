@@ -396,6 +396,9 @@ public class MonitoringCenterController {
             monitorCondition.setStartTime(nodeDto.getStartTime()+" 00:00:00");
             monitorCondition.setEndTime(nodeDto.getEndTime()+" 23:59:59");
             List<WeatherDataVo> weatherData = monitoringCenterService.findWeatherData(monitorCondition);
+            if (weatherData.size()<1){
+                return;
+            }
             EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
             easyPoiUtil.t = new NodeDataVo();
             try {
@@ -427,6 +430,10 @@ public class MonitoringCenterController {
 
         }else {
             List<NodeDataVo> nodeHistory = nodeService.findNodeHistory(nodeDto);
+            if (nodeHistory.size()<1){
+                return;
+            }
+
             EasyPoiUtil<NodeDataVo> easyPoiUtil = new EasyPoiUtil();
             List<String> columns = new ArrayList<>();
             //把要导出的字段添加到集合中
