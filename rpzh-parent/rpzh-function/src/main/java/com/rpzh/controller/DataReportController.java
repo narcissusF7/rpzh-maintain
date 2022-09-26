@@ -555,7 +555,7 @@ public class DataReportController {
     }
 
     @ApiOperation(value = "预警超出数据")
-    @GetMapping("findMaintainEarlyTimes")
+    @PostMapping("findMaintainEarlyTimes")
     public Result<List<MaintainEarlyTimeVo>> findMaintainEarlyTimes(MaintainEarlyTimeDto maintainEarlyTimeDto){
         List<MaintainEarlyTimeVo> list = maintainEarlyTimeService.findMaintainEarlyTimes(maintainEarlyTimeDto);
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(list));

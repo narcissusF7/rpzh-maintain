@@ -3,6 +3,7 @@ package com.rpzh.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.rpzh.dao.MaintainEarlyTimeDao;
 import com.rpzh.dto.MaintainEarlyTimeDto;
+import com.rpzh.entity.ToolUtil;
 import com.rpzh.pojo.MaintainEarlyTime;
 import com.rpzh.service.MaintainEarlyTimeService;
 import com.rpzh.vo.MaintainEarlyTimeVo;
@@ -32,7 +33,7 @@ public class MaintainEarlyServiceImpl implements MaintainEarlyTimeService {
         String siteRoute = maintainEarlyTimeDto.getSiteRoute();
         if (siteRoute.split(",").length==5){
             maintainEarlyTimeDto.setSiteRoute(null);
-        }else {
+        }else if(ToolUtil.isNotEmpty(siteRoute)){
             maintainEarlyTimeDto.setSiteRoute(siteRoute+",[0"+siteRoute.split(",").length+":"+maintainEarlyTimeDto.getSiteId()+"]");
             maintainEarlyTimeDto.setSiteId(null);
         }

@@ -37,8 +37,8 @@
              , oxygen_all_early_time oxygenAllEarlyTime
              , temp_max_early_time tempMaxEarlyTime
              , temp_all_early_time tempAllEarlyTime
-             , humitidy_max_early_time tempMaxEarlyTime
-             , humitidy_all_early_time humitidyAllEarlyTime
+             , humitidy_max_early_time humidityMaxEarlyTime
+             , humitidy_all_early_time humidityAllEarlyTime
              , maintain_result maintainResult
         from tb_maintain_early_time t1 , tb_maintain_plan t2 ,tb_stack t3
         <where>
@@ -61,7 +61,7 @@
             <if test="maintainEarlyTimeDto.humidityAllEarlyTimeTwo!=null and maintainEarlyTimeDto.humidityAllEarlyTimeTwo!=''">and humidity_all_early_time &lt;= #{maintainEarlyTimeDto.humidityAllEarlyTimeTwo}</if>
             <if test="maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=null and maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=''">and humidity_max_early_time &gt;= #{maintainEarlyTimeDto.humidityMaxEarlyTimeOne}</if>
             <if test="maintainEarlyTimeDto.humidityMaxEarlyTimeOne!=null and maintainEarlyTimeDto.humidityMaxEarlyTimeTwo!=''">and humidity_max_early_time &lt;= #{maintainEarlyTimeDto.humidityMaxEarlyTimeTwo}</if>
-            <if test="maintainEarlyTimeDto.maintainResult!=null and maintainEarlyTimeDto.maintainResult!=''">and maintain_result = #{maintainEarlyTimeDto.maintainResult}</if>
+            <if test="maintainEarlyTimeDto.maintainResult!=-1">and maintain_result = #{maintainEarlyTimeDto.maintainResult}</if>
         </where>
     </select>
 </mapper>

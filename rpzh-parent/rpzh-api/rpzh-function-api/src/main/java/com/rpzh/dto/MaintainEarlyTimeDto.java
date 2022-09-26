@@ -111,7 +111,7 @@ public class MaintainEarlyTimeDto {
      * 养护结果
      */
     @ApiModelProperty("养护结果 1 合格 0 不合格")
-    private int maintainResult;
+    private int maintainResult =-1;
 
 
     private int page = 1;
