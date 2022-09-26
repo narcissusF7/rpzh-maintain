@@ -242,7 +242,8 @@ public class TaskManagementController {
      * @param taskDto
      * @return
      */
-    @ApiOperation(value = "工作任务菜单查询任务任务列表", tags = "任务管理中心")
+    //@ApiOperation(value = "工作任务菜单查询任务任务列表", tags = "任务管理中心")
+    @ApiOperation(value = "APP任务列表首页,未处理,处理中,已处理", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
                     "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
@@ -252,6 +253,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
             @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
             @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "createdUser", value = "创建人账号",required = false,dataType = "String"),
             @ApiImplicitParam(name = "page", value = "分页开始页",required = true,dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "分页每页显示",required = true,dataType = "Integer")
     })
@@ -266,6 +268,32 @@ public class TaskManagementController {
         PageInfo<TaskVo> pageInfo = taskManagementService.findTaskByUser(taskDto);
         return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
     }
+
+
+    /**
+     * App端我发起的任务
+     * @param taskDto
+     * @return
+     */
+    @ApiOperation(value = "APP任务列表首页,我发起的任务", tags = "任务管理中心")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "任务类型,01:虫情巡查任务,02:翻垛任务,03:移垛任务,04:垛内甲虫预警任务,05:仓间甲虫预警任务,06:垛内氧气预警任务,\" +\n" +
+                    "                    \"07:仓间氧气预警任务,08:垛内温度预警任务,09:仓间温度预警任务,10:垛内湿度预警任务,11:仓间湿度预警任务,12:包芯温度预警任务,\" +\n" +
+                    "                    \"13:平均包芯高于环境预警任务,14:仓间粉螟预警任务,15:仓库检查任务,16:其他任务", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "taskNum", value = "任务编号", required = false,dataType = "String"),
+            @ApiImplicitParam(name = "jwt", value = "令牌",required = true,dataType = "String"),
+            @ApiImplicitParam(name = "endStartTime", value = "结束开始时间",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "任务状态,0:未完成,1:完成,2:逾期",required = false,dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "分页开始页",required = true,dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "分页每页显示",required = true,dataType = "Integer")
+    })
+    @PostMapping("/findTeskByMyCreate")
+    public Result<PageInfo<TaskVo>> findTeskByMyCreate(@ApiIgnore TaskDto taskDto){
+        PageInfo<TaskVo> pageInfo = taskManagementService.findTeskByMyCreate(taskDto);
+        return new Result<>(true,StatusCode.OK,"查询成功",pageInfo);
+    }
+
 
 
     /**

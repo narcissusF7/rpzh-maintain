@@ -116,7 +116,7 @@
         select count(*) from tb_maintain_plan where is_end = '0' and stack_id = #{siteId}
     </select>
     <select id="findTask" resultMap="findTask">
-        SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,
+        SELECT id,task_num,type,task_detail,task_address,site_route,principal,created_user,end_time,create_time,status,deal_method,evaluate,
         deal_result,move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
         <where>
@@ -169,7 +169,7 @@
   where id = #{id}
 </select>
     <select id="findTaskByUser" resultMap="findTask">
-        SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,status,deal_method,evaluate,deal_result,
+        SELECT id,task_num,type,task_detail,task_address,site_route,principal,created_user,end_time,create_time,status,deal_method,evaluate,deal_result,
         move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
         <where>
@@ -187,6 +187,9 @@
             </if>
             <if test="taskDto.principal != null and taskDto.principal != ''">
                 AND principal like concat(concat('%',#{taskDto.principal}), '%')
+            </if>
+            <if test="taskDto.createdUser != null and taskDto.createdUser != ''">
+                AND created_user like concat(concat('%',#{taskDto.createdUser}), '%')
             </if>
             <if test="taskDto.endTime != null and taskDto.endTime != ''">
                 AND end_time &lt;= TO_DATE(#{taskDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )
@@ -653,4 +656,36 @@
                count(case when status = 0 and SYSDATE between create_time and end_time  then 1 else null end ) "undoTask"
         from TB_TASk where PRINCIPAL like concat('%',concat(#{username},'%'))
     </select>
+<select id="findTeskByMyCreate" resultMap="findTask">
+SELECT id,task_num,type,task_detail,task_address,site_route,principal,created_user,end_time,create_time,status,deal_method,evaluate,deal_result,
+        move_stack_target_siteroute,move_stack_target_name,target_siteid
+        FROM tb_task
+        <where>
+            <if test="taskDto.taskNum != null and taskDto.taskNum != ''">
+                AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
+            </if>
+            <if test="taskDto.siteRoute != null and taskDto.siteRoute != ''">
+                AND site_route like concat(concat('%',#{taskDto.siteRoute}),'%')
+            </if>
+            <if test="taskDto.status != null and taskDto.status != ''">
+                AND status = #{taskDto.status}
+            </if>
+            <if test="taskDto.type != null and taskDto.type != ''">
+                AND type = #{taskDto.type}
+            </if>
+            <if test="taskDto.principal != null and taskDto.principal != ''">
+                AND principal like concat(concat('%',#{taskDto.principal}), '%')
+            </if>
+            <if test="taskDto.createdUser != null and taskDto.createdUser != ''">
+                AND created_user like concat(concat('%',#{taskDto.createdUser}), '%')
+            </if>
+            <if test="taskDto.endTime != null and taskDto.endTime != ''">
+                AND end_time &lt;= TO_DATE(#{taskDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )
+            </if>
+            <if test="taskDto.endStartTime != null and taskDto.endStartTime != ''">
+                AND end_time &gt;= TO_DATE(#{taskDto.endStartTime}, 'SYYYY-MM-DD HH24:MI:SS' )
+            </if>
+        </where>
+        ORDER BY create_time DESC
+</select>
 </mapper>

@@ -199,4 +199,11 @@ public interface TaskManagementService {
     List<String> findSystemType(@Param("ids") Long[] ids);
 
     Map<String, Integer> findTaskCountByNow();
+
+    /**
+     * App首页我发起的任务
+     * @param taskDto
+     * @return
+     */
+    PageInfo<TaskVo> findTeskByMyCreate(TaskDto taskDto);
 }

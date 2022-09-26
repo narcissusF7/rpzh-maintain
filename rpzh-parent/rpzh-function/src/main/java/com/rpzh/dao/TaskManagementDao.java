@@ -453,4 +453,11 @@ public interface TaskManagementDao {
     List<String> findSystemType(@Param("ids") Long[] ids);
 
     Map<String, BigDecimal> findTaskCountByNow(@Param("username") String username);
+
+    /**
+     * App首页查看我发起的任务
+     * @param taskDto
+     * @return
+     */
+    List<TaskVo> findTeskByMyCreate(@Param("taskDto") TaskDto taskDto);
 }

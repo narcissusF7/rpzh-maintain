@@ -289,8 +289,60 @@ public class TaskManagementServiceImpl implements TaskManagementService {
 
             taskVo.setPrincipal(principal+"("+nickname.substring(1)+")");
         }
+        for (TaskVo taskVo : taskVoList) {
+            //这个是App端使用,根据创建人的账号获取创建人的名字
+            String createdUser = taskVo.getCreatedUser();
+            if ("系统生成".equals(createdUser)){
+                //如果发起人是系统生成的,不做处理
+            }else {
+                //如果不是系统生成的,获取用户的姓名
+                String nickname = (String) redisUtil.hget("USER_" + createdUser, "nickname");
+                taskVo.setCreatedUser(nickname);
+            }
+        }
         return new PageInfo<TaskVo>(taskVoList);
     }
+
+
+
+    /**
+     * App首页我发起的任务
+     *
+     * @param taskDto
+     * @return
+     */
+    @Override
+    public PageInfo<TaskVo> findTeskByMyCreate(TaskDto taskDto) {
+        //获取用户信息,只查询自己的任务
+        Map<String, String> userInfo = TokenDecode.getUserInfo();
+        //获取用户账号
+        String username = userInfo.get("username");
+        //设置创建人,只能看到自己创建的任务
+        taskDto.setCreatedUser(username);
+        int page = taskDto.getPage();
+        int size = taskDto.getSize();
+        //静态分页
+        PageHelper.startPage(page, size);
+        List<TaskVo> taskVoList = taskManagementDao.findTeskByMyCreate(taskDto);
+        for (TaskVo taskVo : taskVoList) {
+            //获取负责人,负责人可能会有多个
+            String principal = taskVo.getPrincipal();
+            String[] split = principal.split(",");
+            String nickname = "";
+            for (int i = 0; i < split.length; i++) {
+                String pri = split[i];
+                if (i == split.length - 1) {
+                    nickname = nickname + (String) redisUtil.hget("USER_" + pri, "nickname");
+                } else {
+                    nickname = nickname + (String) redisUtil.hget("USER_" + pri, "nickname") + ",";
+                }
+                taskVo.setPrincipal(nickname);
+            }
+        }
+        return new PageInfo<TaskVo>(taskVoList);
+    }
+
+
 
     /**
      * 任务处理
@@ -1319,4 +1371,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         map.put("doneTask",doneTask);
         return map;
     }
+
+
+
 }

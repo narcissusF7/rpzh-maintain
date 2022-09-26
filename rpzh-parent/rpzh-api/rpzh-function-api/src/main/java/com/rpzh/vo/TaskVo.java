@@ -78,7 +78,7 @@ public class TaskVo {
     @ApiModelProperty(notes = "完成时间")
     private String finishTime;
 
-    @ApiModelProperty(notes = "创建人")
+    @ApiModelProperty(notes = "创建人,发起人")
     private String createdUser;
 
     @ApiModelProperty(notes = "评价")
