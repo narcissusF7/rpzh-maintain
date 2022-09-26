@@ -201,7 +201,8 @@ public class TaskManagementController {
      * @param id
      * @return
      */
-    @ApiOperation(value = "发布任务菜单查询任务详情", tags = "任务管理中心")
+    //@ApiOperation(value = "发布任务菜单查询任务详情", tags = "任务管理中心")
+    @ApiOperation(value = "App端查询任务详情", tags = "任务管理中心")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "任务主键id",required = true,dataType = "Long")
     })
