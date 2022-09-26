@@ -557,6 +557,46 @@ public class DataReportController {
     @ApiOperation(value = "预警超出数据")
     @PostMapping("findMaintainEarlyTimes")
     public Result<List<MaintainEarlyTimeVo>> findMaintainEarlyTimes(MaintainEarlyTimeDto maintainEarlyTimeDto){
+
+
+        try {
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getCoreTempAllEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getCoreTempAllEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getCoreTempAllEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getCoreTempAllEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getCoreTempMaxEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getCoreTempMaxEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getCoreTempMaxEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getCoreTempMaxEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getHumidityAllEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getHumidityAllEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getHumidityAllEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getHumidityAllEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getHumidityMaxEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getHumidityMaxEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getHumidityMaxEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getHumidityMaxEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getOxygenAllEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getOxygenAllEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getOxygenAllEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getOxygenAllEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getOxygenMaxEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getOxygenMaxEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getOxygenMaxEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getOxygenMaxEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getTempAllEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getTempAllEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getTempAllEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getTempAllEarlyTimeTwo());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getTempMaxEarlyTimeOne()))
+            Integer.parseInt(maintainEarlyTimeDto.getTempMaxEarlyTimeOne());
+            if (ToolUtil.isNotEmpty(maintainEarlyTimeDto.getTempMaxEarlyTimeTwo()))
+            Integer.parseInt(maintainEarlyTimeDto.getTempMaxEarlyTimeTwo());
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("只允许输入整数");
+        }
+
+
         List<MaintainEarlyTimeVo> list = maintainEarlyTimeService.findMaintainEarlyTimes(maintainEarlyTimeDto);
         return new Result<>(true,StatusCode.OK,"查询成功",new PageInfo<>(list));
     }

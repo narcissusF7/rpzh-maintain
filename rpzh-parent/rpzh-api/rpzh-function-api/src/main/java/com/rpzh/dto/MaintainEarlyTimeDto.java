@@ -16,7 +16,7 @@ public class MaintainEarlyTimeDto {
      * 养护计划id
      */
     @ApiModelProperty("养护计划id")
-    private Integer maIntegerainPlanId;
+    private Integer maStringainPlanId;
     /**
      * 位置路由
      */
@@ -31,82 +31,82 @@ public class MaintainEarlyTimeDto {
      * 包芯温度连续预警时间
      */
     @ApiModelProperty("包芯温度连续预警时间1")
-    private Integer coreTempMaxEarlyTimeOne;
+    private String coreTempMaxEarlyTimeOne;
     /**
      * 包芯温度累计预警时间
      */
     @ApiModelProperty("包芯温度累计预警时间1")
-    private Integer coreTempAllEarlyTimeOne;
+    private String coreTempAllEarlyTimeOne;
     /**
      * 垛内氧气连续预警时间
      */
     @ApiModelProperty("垛内氧气连续预警时间1")
-    private Integer oxygenMaxEarlyTimeOne;
+    private String oxygenMaxEarlyTimeOne;
     /**
      * 垛内氧气累计预警时间
      */
     @ApiModelProperty("垛内氧气累计预警时间1")
-    private Integer oxygenAllEarlyTimeOne;
+    private String oxygenAllEarlyTimeOne;
     /**
      * 垛内温度连续预警时间
      */
     @ApiModelProperty("垛内温度连续预警时间1")
-    private Integer tempMaxEarlyTimeOne;
+    private String tempMaxEarlyTimeOne;
     /**
      * 垛内温度累计预警时间
      */
     @ApiModelProperty("垛内温度累计预警时间1")
-    private Integer tempAllEarlyTimeOne;
+    private String tempAllEarlyTimeOne;
     /**
      * 垛内湿度连续预警时间
      */
     @ApiModelProperty("垛内湿度连续预警时间1")
-    private Integer humidityMaxEarlyTimeOne;
+    private String humidityMaxEarlyTimeOne;
     /**
      * 垛内湿度累计预警时间
      */
     @ApiModelProperty("垛内湿度累计预警时间1")
-    private Integer humidityAllEarlyTimeOne;
+    private String humidityAllEarlyTimeOne;
     /**
      * 包芯温度连续预警时间
      */
     @ApiModelProperty("包芯温度连续预警时间2")
-    private Integer coreTempMaxEarlyTimeTwo;
+    private String coreTempMaxEarlyTimeTwo;
     /**
      * 包芯温度累计预警时间
      */
     @ApiModelProperty("包芯温度累计预警时间2")
-    private Integer coreTempAllEarlyTimeTwo;
+    private String coreTempAllEarlyTimeTwo;
     /**
      * 垛内氧气连续预警时间
      */
     @ApiModelProperty("垛内氧气连续预警时间2")
-    private Integer oxygenMaxEarlyTimeTwo;
+    private String oxygenMaxEarlyTimeTwo;
     /**
      * 垛内氧气累计预警时间
      */
     @ApiModelProperty("垛内氧气累计预警时间2")
-    private Integer oxygenAllEarlyTimeTwo;
+    private String oxygenAllEarlyTimeTwo;
     /**
      * 垛内温度连续预警时间
      */
     @ApiModelProperty("垛内温度连续预警时间2")
-    private Integer tempMaxEarlyTimeTwo;
+    private String tempMaxEarlyTimeTwo;
     /**
      * 垛内温度累计预警时间
      */
     @ApiModelProperty("垛内温度累计预警时间2")
-    private Integer tempAllEarlyTimeTwo;
+    private String tempAllEarlyTimeTwo;
     /**
      * 垛内湿度连续预警时间
      */
     @ApiModelProperty("垛内湿度连续预警时间2")
-    private Integer humidityMaxEarlyTimeTwo;
+    private String humidityMaxEarlyTimeTwo;
     /**
      * 垛内湿度累计预警时间
      */
     @ApiModelProperty("垛内湿度累计预警时间2")
-    private Integer humidityAllEarlyTimeTwo;
+    private String humidityAllEarlyTimeTwo;
     /**
      * 养护结果
      */
