@@ -267,7 +267,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 column = "warehouse_oxygen_upper_one as upperOne,warehouse_oxygen_upper_two as upperTwo,warehouse_oxygen_upper_three as upperThree,warehouse_oxygen_lower as lower";
                 warningName = "仓间氧气";
             }else if(warningType.equals("09")){
-                column = "warehouse_temp_upper_one as upperOne,warehouse_temp_upper_two as upperThree,warehouse_temp_upper_three as upperThree,warehouse_temp_lower as lower";
+                column = "warehouse_temp_upper_one as upperOne,warehouse_temp_upper_two as upperTwo,warehouse_temp_upper_three as upperThree,warehouse_temp_lower as lower";
                 warningName = "仓间温度";
             }else if(warningType.equals("11")){
                 column = "warehouse_moisture_upper_one as upperOne,warehouse_moisture_upper_two as upperTwo,warehouse_moisture_upper_three as upperThree,warehouse_moisture_lower as lower";
@@ -364,31 +364,17 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             if("13".equals(warningType) || "19".equals(warningType)){
                 List<String> nodeIds = nodeDao.findNodeIds(stackId,"04");
                 List<List<NodeData>> nodeList  = new ArrayList<>();
-                int size = 0;
-                int a = 0;
-                for (int i = 0; i < nodeIds.size(); i++) {
-                    List<NodeData> node = nodeDao.findNodeData(nodeIds.get(i), "tb_node_temp_core_chip_history", "temp");
-                    if(ToolUtil.isNotEmpty(node)) {
-                        nodeList.add(node);
-                    }
-                    if(size<node.size()){
-                        size = node.size();
-                        a = i;
-                    }
-                }
-                for (int j = 0; j < size; j++) {
+                List<NodeData> node = new ArrayList<>(nodeDao.findAppNodeData(nodeIds, "tb_node_temp_core_chip_history", "temp",nodeIds.size() * 10));
+                for (int i = 1; i <= 10; i++) {
+                    NodeData nodeData1 = new NodeData();
+                    List<NodeData> nodeVo = node.subList((i - 1) * nodeIds.size(), nodeIds.size() * i);
                     Double data = 0d;
-                    for (int i = 0; i < nodeList.size(); i++) {
-                        if(j>nodeList.get(i).size()-1){
-                            data = data + 0;
-                        }else {
-                            data = data + nodeList.get(i).get(j).getNode();
-                        }
+                    for (NodeData nodeDatum : nodeVo) {
+                        data = data + nodeDatum.getNode();
                     }
-                    NodeData nodeVo = new NodeData();
-                    nodeVo.setTransferTime(nodeList.get(a).get(j).getTransferTime());
-                    nodeVo.setNode(data / nodeList.size());
-                    nodeData.add(nodeVo);
+                    nodeData1.setNode(Double.parseDouble(String.format("%.2f",data/nodeVo.size())));
+                    nodeData1.setTransferTime(nodeVo.get(0).getTransferTime());
+                    nodeData.add(nodeData1);
                 }
             }else {
                 nodeData = nodeDao.findNodeData(nodeId, "tb_node_temp_core_chip_history", "temp");
@@ -397,7 +383,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         map.put("type",getNodeType(nodeType));
         if(ToolUtil.isEmpty(nodeData)){
             map.put("nodeData", new ArrayList<>());
-            map.put("maintainPlanVo", new MaintainPlanVo());
+            map.put("maintainPlanVo", maintainPlanVo);
             return new Result<>(true, StatusCode.OK, "查询成功", map);
         }
         List<Map> node = new ArrayList<>();
@@ -1055,7 +1041,6 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         map.put("userBase",userMap);
         map.put("baseMap",baseMap);
         map.put("taskId",warningInfo.get("taskId"));
-        //map.put("taskId",warningInfo.get("taskId"));
         return map;
     }
 }
