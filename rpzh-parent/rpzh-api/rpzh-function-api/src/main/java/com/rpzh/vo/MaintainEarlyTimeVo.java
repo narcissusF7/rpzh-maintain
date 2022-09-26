@@ -30,7 +30,7 @@ public class MaintainEarlyTimeVo {
     /**
      * 包芯温度累计预警时间
      */
-    private Double coreTempAllEarlyTime;
+    private Integer coreTempAllEarlyTime;
     /**
      * 垛内氧气连续预警时间
      */
@@ -38,7 +38,7 @@ public class MaintainEarlyTimeVo {
     /**
      * 垛内氧气累计预警时间
      */
-    private Double oxygenAllEarlyTime;
+    private Integer oxygenAllEarlyTime;
     /**
      * 垛内温度连续预警时间
      */
@@ -46,7 +46,7 @@ public class MaintainEarlyTimeVo {
     /**
      * 垛内温度累计预警时间
      */
-    private Double tempAllEarlyTime;
+    private Integer tempAllEarlyTime;
     /**
      * 垛内湿度连续预警时间
      */
@@ -54,7 +54,7 @@ public class MaintainEarlyTimeVo {
     /**
      * 垛内湿度累计预警时间
      */
-    private Double humidityAllEarlyTime;
+    private Integer humidityAllEarlyTime;
     /**
      * 创建时间
      */

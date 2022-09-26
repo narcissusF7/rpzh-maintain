@@ -44,10 +44,10 @@ public class MaintainEarlyServiceImpl implements MaintainEarlyTimeService {
 
         //把累计时间换算成天
         list.forEach(maintainEarlyTimeVo -> {
-            Double tempAllEarlyTime = maintainEarlyTimeVo.getTempAllEarlyTime();
-            Double coreTempAllEarlyTime = maintainEarlyTimeVo.getCoreTempAllEarlyTime();
-            Double humidityAllEarlyTime = maintainEarlyTimeVo.getHumidityAllEarlyTime();
-            Double oxygenAllEarlyTime = maintainEarlyTimeVo.getOxygenAllEarlyTime();
+            Integer tempAllEarlyTime = maintainEarlyTimeVo.getTempAllEarlyTime().intValue();
+            Integer coreTempAllEarlyTime = maintainEarlyTimeVo.getCoreTempAllEarlyTime().intValue();
+            Integer humidityAllEarlyTime = maintainEarlyTimeVo.getHumidityAllEarlyTime().intValue();
+            Integer oxygenAllEarlyTime = maintainEarlyTimeVo.getOxygenAllEarlyTime().intValue();
             maintainEarlyTimeVo.setCoreTempAllEarlyTime(coreTempAllEarlyTime%24 ==0?coreTempAllEarlyTime/24:coreTempAllEarlyTime/24+1);
             maintainEarlyTimeVo.setTempAllEarlyTime(tempAllEarlyTime%24 ==0?tempAllEarlyTime/24:tempAllEarlyTime/24+1);
             maintainEarlyTimeVo.setOxygenAllEarlyTime(oxygenAllEarlyTime%24 ==0?oxygenAllEarlyTime/24:oxygenAllEarlyTime/24+1);
