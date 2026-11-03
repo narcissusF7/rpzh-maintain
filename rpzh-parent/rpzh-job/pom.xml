@@ -115,12 +115,7 @@
             <version>2.1.0</version>
         </dependency>
 
-        <!--RabbitMq-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-
+        <!--延时任务消息使用 RocketMQ（原 RabbitMQ 已移除）-->
         <!--feign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

@@ -82,12 +82,7 @@
             <version>3.16</version>
         </dependency>
 
-        <!--RabbitMq-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-
+        <!--延时任务消息使用 RocketMQ（原 RabbitMQ 已移除）-->
         <dependency>
             <groupId>com.rpzh</groupId>
             <artifactId>rpzh-common-db</artifactId>

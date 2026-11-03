@@ -12,6 +12,7 @@ import com.rpzh.dao.WarehouseDao;
 import com.rpzh.dto.TaskDto;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.enums.WarehouseNodeType;
+import com.rpzh.mq.TaskExpireProducer;
 import com.rpzh.service.PestMonitoringService;
 import com.rpzh.service.TaskManagementService;
 import com.rpzh.util.RedisUtil;
@@ -23,10 +24,6 @@ import com.rpzh.vo.TaskVo;
 import com.rpzh.vo.WareAreaVo;
 import com.sun.xml.bind.v2.model.core.ID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -62,7 +59,7 @@ public class TaskManagementServiceImpl implements TaskManagementService {
     private EarlyWarningDao earlyWarningDao;
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private TaskExpireProducer taskExpireProducer;
 
     @Autowired
     private PestMonitoringService pestMonitoringService;
@@ -123,26 +120,13 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         //获取当前时间
         String nowDayTime = DateUtil.dateNew(new Date()).toString();
         taskDto.setCreatedTime(nowDayTime);
-        //获取结束时间,用于计算时间差
+        //获取结束时间,用于计算任务到期时间
         String endTime = taskDto.getEndTime();
-        Date date1 = DateUtil.parse(endTime);
-        //设置当前时间,用于计算时间差
-        Date date2 = DateUtil.parse(nowDayTime);
-        //当前时间与结束时间相差的毫秒数
-        long betweenMs = DateUtil.between(date1, date2, DateUnit.MS);
-        //当前时间与结束时间相差的毫秒字符串
-        String betweenMsStr = String.valueOf(betweenMs);
+        Date endDate = DateUtil.parse(endTime);
         //  todo:任务过期
-        //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
-        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
-            @Override
-            public Message postProcessMessage(Message message) throws AmqpException {
-                //消息过期设置
-                message.getMessageProperties().setExpiration(betweenMsStr);
-                return message;
-            }
-        });
-        log.info("新建任务发送消息成功:" + uuid + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
+        //向RocketMQ投递延时消息,当任务到期时候未处理,修改任务的状态(原RabbitMQ TTL+死信队列方案)
+        taskExpireProducer.sendTaskExpire(uuid, endDate);
+        log.info("新建任务发送到期消息成功:" + uuid + ":结束时间:" + endTime);
         //发送短信提醒
         if ("M".equals(pushWay) || "Q".equals(pushWay)) {
             //M:短信,Q:全部,发送短信,提醒有新的任务
@@ -1331,28 +1315,15 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         String nowDayTime = DateUtil.dateNew(new Date()).toString();
         taskDto.setPushWay("A");
         taskDto.setCreatedTime(nowDayTime);
-        //获取结束时间,用于计算时间差
+        //获取结束时间,用于计算任务到期时间
         String endTime = taskDto.getEndTime();
-        Date date1 = DateUtil.parse(endTime);
-        //设置当前时间,用于计算时间差
-        Date date2 = DateUtil.parse(nowDayTime);
-        //当前时间与结束时间相差的毫秒数
-        long betweenMs = DateUtil.between(date1, date2, DateUnit.MS);
-        //当前时间与结束时间相差的毫秒字符串
-        String betweenMsStr = String.valueOf(betweenMs);
+        Date endDate = DateUtil.parse(endTime);
         //随机生成任务编号
         String uuid = UUID.randomUUID().toString().replace("-", "");
         // 任务过期
-        //向mq中丢一条消息,当任务到期时候未处理,修改任务的状态
-        rabbitTemplate.convertAndSend("queue1", (Object) uuid, new MessagePostProcessor() {
-            @Override
-            public Message postProcessMessage(Message message) throws AmqpException {
-                //消息过期设置
-                message.getMessageProperties().setExpiration(betweenMsStr);
-                return message;
-            }
-        });
-        log.info("新建任务发送消息成功:" + taskDto.getTaskNum() + ":结束时间:" + endTime + ":相差时间为:" + betweenMsStr);
+        //向RocketMQ投递延时消息,当任务到期时候未处理,修改任务的状态(原RabbitMQ TTL+死信队列方案)
+        taskExpireProducer.sendTaskExpire(uuid, endDate);
+        log.info("新建任务发送到期消息成功:" + taskDto.getTaskNum() + ":结束时间:" + endTime);
         int addFlag = taskManagementDao.addTask(taskDto);
         return addFlag;
     }
