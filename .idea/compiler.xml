@@ -35,38 +35,5 @@
         <module name="rpzh-common-db" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="rpzh-api" target="1.8" />
-      <module name="rpzh-auth" target="1.8" />
-      <module name="rpzh-carbon" target="1.8" />
-      <module name="rpzh-carbon-api" target="1.8" />
-      <module name="rpzh-common" target="1.8" />
-      <module name="rpzh-common-core" target="1.8" />
-      <module name="rpzh-common-db" target="1.8" />
-      <module name="rpzh-common-log" target="1.8" />
-      <module name="rpzh-device" target="1.8" />
-      <module name="rpzh-file" target="1.8" />
-      <module name="rpzh-file-api" target="1.8" />
-      <module name="rpzh-function" target="1.8" />
-      <module name="rpzh-function-api" target="1.8" />
-      <module name="rpzh-gateway" target="1.8" />
-      <module name="rpzh-gateway-a" target="1.8" />
-      <module name="rpzh-gateway-b" target="1.8" />
-      <module name="rpzh-gateway-c" target="1.8" />
-      <module name="rpzh-humiture" target="1.8" />
-      <module name="rpzh-humiture-api" target="1.8" />
-      <module name="rpzh-job" target="1.8" />
-      <module name="rpzh-job-api" target="1.8" />
-      <module name="rpzh-log" target="1.8" />
-      <module name="rpzh-log-api" target="1.8" />
-      <module name="rpzh-moisture" target="1.8" />
-      <module name="rpzh-oxygen" target="1.8" />
-      <module name="rpzh-oxygen-api" target="1.8" />
-      <module name="rpzh-parent" target="1.8" />
-      <module name="rpzh-system" target="1.8" />
-      <module name="rpzh-system-api" target="1.8" />
-      <module name="rpzh-temp" target="1.8" />
-      <module name="rpzh-temp-api" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

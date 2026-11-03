@@ -102,7 +102,7 @@ mqtt:
   username: admin
   password: admin1234.
 rocketmq:
-  name-server: 192.168.3.36:9876
+  name-server: 127.0.0.1:9876 # 本机 Docker RocketMQ (rmqnamesrv)
   topic: messageTopic # mq主题
   producer:
     group: MessageGroup

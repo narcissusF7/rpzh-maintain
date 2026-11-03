@@ -8,16 +8,16 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: 127.0.0.1:8866
+        server-addr: 127.0.0.1:8848
       config: # 配置中心地址
-        server-addr: 127.0.0.1:8866
+        server-addr: 127.0.0.1:8848
         # 配置文件格式
         file-extension: yml
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/rpzh-system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
-    password: root
+    password: qwer1234.
 logging:
   level:
     root: info
@@ -41,8 +41,8 @@ hystrix:
           thread:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
-rocketmq:
-  name-server: 192.168.3.36:9876
+RocketMQ:
+  name-server: 127.0.0.1:9876
   topic: UserManageTopic # mq主题
   producer:
     group: springBootGroup

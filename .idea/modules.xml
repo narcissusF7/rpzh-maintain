@@ -2,20 +2,16 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/rpzh-auth.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/rpzh-carbon.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/rpzh-carbon.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/rpzh-carbon-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/rpzh-carbon-api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/rpzh-common-core.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-core/rpzh-common-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-db/rpzh-common-db.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-db/rpzh-common-db.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/rpzh-common-log.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/rpzh-common-log.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-device.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-device.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-file/rpzh-file.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-file/rpzh-file.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-file-api/rpzh-file-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-file-api/rpzh-file-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/rpzh-function.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-function/rpzh-function.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/rpzh-function-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/rpzh-function-api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/rpzh-gateway-a.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/rpzh-gateway-a.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/rpzh-gateway-b.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/rpzh-gateway-b.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/rpzh-gateway-c.iml" />
@@ -29,7 +25,6 @@
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/rpzh-moisture.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/rpzh-moisture.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/rpzh-oxygen.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/rpzh-oxygen.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/rpzh-oxygen-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/rpzh-oxygen-api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-parent.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-system/rpzh-system.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-system/rpzh-system.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/rpzh-system-api.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/rpzh-system-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/rpzh-temp.iml" filepath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/rpzh-temp.iml" />
