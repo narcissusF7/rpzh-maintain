@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <description>养护系统api父工程</description>
     <modules>
+        <module>rpzh-common-api</module>
         <module>rpzh-system-api</module>
         <module>rpzh-log-api</module>
         <module>rpzh-carbon-api</module>

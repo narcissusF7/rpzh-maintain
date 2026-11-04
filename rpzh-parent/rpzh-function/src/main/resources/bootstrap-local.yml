@@ -14,7 +14,7 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-    password:
+    password: redis123
     jedis:
       pool:
         max-active: 32
@@ -22,9 +22,6 @@ spring:
         min-idle: 0
   main:
     allow-bean-definition-overriding: true
-  #将druid自动配置剔除
-  autoconfigure:
-    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     dynamic:
       #默认这里选择默认数据
@@ -33,9 +30,9 @@ spring:
       datasource:
         #可以配置多个
         mysql:
-          url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+          url: jdbc:mysql://127.0.0.1:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
           username: root
-          password: root
+          password: root123
           driver-class-name: com.mysql.jdbc.Driver
         clickhouse:
           url: jdbc:clickhouse://183.250.89.188:8123/default
@@ -60,7 +57,7 @@ spring:
       filters: config,stat
   #  datasource:
   #    driver-class-name: com.mysql.jdbc.Driver
-  #    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+  #    url: jdbc:mysql://127.0.0.1:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
   #    username: root
   #    password: root
 logging:

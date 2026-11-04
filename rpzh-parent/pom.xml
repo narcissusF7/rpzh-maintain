@@ -47,11 +47,20 @@
         <poi.version>4.1.2</poi.version>
         <common-pool.version>2.6.2</common-pool.version>
         <knife4j.version>2.0.2</knife4j.version>
+        <pagehelper.version>5.3.0</pagehelper.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- Lombok 全局注入(provided)，所有子模块直接可用。
+             修复：版本收口到 provided 后不再传递，原先依赖 api 模块 compile 传递的模块(如 rpzh-function)
+             会丢失 lombok，导致 @Data/@Slf4j 找不到。此处全局兜底，避免依赖脆弱的传递链。 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
     <!-- 依赖声明 -->
@@ -135,8 +144,26 @@
             <!-- excel工具 -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
+            </dependency>
+            <!-- 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- 文件上传工具类 -->

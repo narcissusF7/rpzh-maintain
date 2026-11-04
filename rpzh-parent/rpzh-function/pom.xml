@@ -69,17 +69,15 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <!--报表导出-->
+        <!--报表导出（版本由父 pom 统一管理为 4.1.2，避免与 poi-ooxml 冲突）-->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.16</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.16</version>
         </dependency>
 
         <!--延时任务消息使用 RocketMQ（原 RabbitMQ 已移除）-->
@@ -103,6 +101,23 @@
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.3</version>
+        </dependency>
+
+        <!--以下数据源/驱动原误置于 rpzh-function-api，现归位到应用模块（避免强加给所有引用方）-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>3.2.0</version>
         </dependency>
 
         <!--文档api-->
@@ -138,17 +153,9 @@
             <artifactId>spring-cloud-starter-oauth2</artifactId>
         </dependency>
 
-
-        <dependency>
-            <groupId>com.rpzh</groupId>
-            <artifactId>rpzh-function-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
-            <version>5.3.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -156,14 +163,6 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.9.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

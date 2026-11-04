@@ -5,7 +5,7 @@ import com.rpzh.dao.*;
 import com.rpzh.dto.*;
 import com.rpzh.entity.*;
 import com.rpzh.enums.*;
-import com.rpzh.feign.UserFeign;
+import com.rpzh.feign.UserPhoneFeign;
 import com.rpzh.pojo.*;
 import com.rpzh.service.EarlyWarningService;
 import com.rpzh.util.*;
@@ -54,7 +54,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     @Resource
     private RedisUtil redisUtil;
     @Resource
-    private UserFeign userFeign;
+    private UserPhoneFeign userFeign;
     @Resource
     private TaskManagementDao taskManagementDao;
 

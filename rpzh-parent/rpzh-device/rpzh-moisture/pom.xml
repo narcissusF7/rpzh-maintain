@@ -12,6 +12,13 @@
     <artifactId>rpzh-moisture</artifactId>
     <description>养护系统包芯水分微服务</description>
     <dependencies>
+        <!--设备模块公共组件（ResourceServerConfig/Redis/MQTT 共享配置）-->
+        <dependency>
+            <groupId>com.rpzh</groupId>
+            <artifactId>rpzh-device-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!--注册nacos-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

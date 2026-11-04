@@ -13,6 +13,7 @@
         <module name="rpzh-system" />
         <module name="rpzh-moisture" />
         <module name="rpzh-log" />
+        <module name="rpzh-device-common" />
         <module name="rpzh-function" />
         <module name="rpzh-job" />
         <module name="rpzh-carbon-api" />
@@ -27,6 +28,7 @@
         <module name="rpzh-gateway-b" />
         <module name="rpzh-gateway-c" />
         <module name="rpzh-job-api" />
+        <module name="rpzh-common-api" />
         <module name="rpzh-system-api" />
         <module name="rpzh-humiture-api" />
         <module name="rpzh-common-log" />

@@ -7,21 +7,71 @@
     <bookmark url="file://$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/MonitoringCenterServiceImpl.java" line="73" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2a376d1-7dfb-4308-a961-04ff5258e0bb" name="Default Changelist" comment="----">
+    <list default="true" id="f2a376d1-7dfb-4308-a961-04ff5258e0bb" name="Default Changelist" comment="代码重构">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/src/main/java/com/rpzh/enums/WarehouseNodeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-carbon-api/src/main/java/com/rpzh/pojo/BasePojo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/enums/WarehouseNodeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/feign/UserFeign.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/feign/impl/RfidFeignImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/feign/impl/RfidFeignImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/feign/impl/UserFeignImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-function-api/src/main/java/com/rpzh/pojo/BasePojo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/src/main/java/com/rpzh/enums/WarehouseNodeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-humiture-api/src/main/java/com/rpzh/pojo/BasePojo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/src/main/java/com/rpzh/enums/WarehouseNodeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-oxygen-api/src/main/java/com/rpzh/pojo/BasePojo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-system-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-temp-api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-temp-api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-temp-api/src/main/java/com/rpzh/enums/WarehouseNodeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-api/rpzh-temp-api/src/main/java/com/rpzh/pojo/BasePojo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-auth/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-common/rpzh-common-log/src/main/java/com/rpzh/util/SpringContextHolder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/src/main/java/com/rpzh/config/ResourceServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-carbon/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/java/com/rpzh/config/MqttConfigurationOut.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/java/com/rpzh/config/MyRedisTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/java/com/rpzh/config/ResourceServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/java/com/rpzh/properties/MqttProperties.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-humiture/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/src/main/java/com/rpzh/config/ResourceServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-moisture/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/java/com/rpzh/config/MqttConfigurationOut.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/java/com/rpzh/config/MyRedisTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/java/com/rpzh/config/ResourceServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/java/com/rpzh/properties/MqttProperties.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-oxygen/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/java/com/rpzh/config/MqttConfigurationOut.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/java/com/rpzh/config/MyRedisTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/java/com/rpzh/config/ResourceServerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/java/com/rpzh/properties/MqttProperties.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-device/rpzh-temp/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-file/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-file/src/main/resources/bootstrap-local.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/Task/MqTaskListener.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/config/DelayConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/TaskManagementServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/TaskManagementServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/EarlyWarningServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/service/impl/EarlyWarningServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/java/com/rpzh/util/SpringContextHolder.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-local.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-nbtest.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-nbtest.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oracledev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oracledev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oraclelocal.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oraclelocal.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oraclepro.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oraclepro.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oracletest.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap-oracletest.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-function/src/main/resources/bootstrap.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-job/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-job/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-job/src/main/java/com/rpzh/config/DelayConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-a/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-b/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-gateway/rpzh-gateway-c/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-job/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-job/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/java/com/rpzh/util/SpringContextHolder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-log/src/main/resources/bootstrap-local.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/resources/bootstrap-local.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rpzh-parent/rpzh-system/src/main/resources/bootstrap-local.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,15 +143,20 @@
     </dirStrings>
   </component>
   <component name="Git.Settings">
-    <option name="PATH_TO_GIT" value="D:\Program Files\Git\bin\git.exe" />
+    <option name="PATH_TO_GIT" value="D:\Git\bin\git.exe" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "narcissusF7"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;narcissusF7&quot;
   }
-}]]></component>
+}</component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
       <filtered-out-file-type name="LOCAL_BRANCH" />
@@ -113,12 +168,12 @@
   <component name="GitToolBoxStore">
     <option name="projectConfigVersion" value="2" />
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/narcissusF7/rpzh-maintain.git",
-    "accountId": "4f61c2d5-bc3f-4892-b348-39079dbb240e"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/narcissusF7/rpzh-maintain.git&quot;,
+    &quot;accountId&quot;: &quot;b11a2d28-9436-484c-aa6b-5adfe7cf802c&quot;
   }
-}]]></component>
+}</component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -496,16 +551,16 @@
     "Spring Boot.RpzhGatewayApplicationC.executor": "Debug",
     "Spring Boot.RpzhSystemApplication.executor": "Debug",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "dev",
+    "git-widget-placeholder": "local",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "E:/idea-workspace/rpzh-maintain",
+    "last_opened_file_path": "E:/workSpace/rpzh-maintain",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "模块",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "vcs.Git",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -560,7 +615,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.RpzhGatewayApplicationC">
+  <component name="RunManager" selected="Spring Boot.RpzhSystemApplication">
     <configuration name="Demo01" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.rpzh.Demo01" />
       <module name="rpzh-system" />
@@ -720,8 +775,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Spring Boot.RpzhGatewayApplicationC" />
         <item itemvalue="Spring Boot.RpzhSystemApplication" />
+        <item itemvalue="Spring Boot.RpzhGatewayApplicationC" />
         <item itemvalue="Spring Boot.RpzhFileApplication" />
       </list>
     </recent_temporary>
@@ -851,7 +906,15 @@
       <workItem from="1793662223462" duration="732000" />
       <workItem from="1793662972967" duration="1731000" />
       <workItem from="1793666281362" duration="47000" />
-      <workItem from="1793666782824" duration="7334000" />
+      <workItem from="1793666782824" duration="7560000" />
+      <workItem from="1793696459554" duration="1468000" />
+      <workItem from="1793712646366" duration="1547000" />
+      <workItem from="1793726067933" duration="308000" />
+      <workItem from="1793726382668" duration="63000" />
+      <workItem from="1793726453057" duration="34000" />
+      <workItem from="1793729098284" duration="34000" />
+      <workItem from="1793731919352" duration="4690000" />
+      <workItem from="1793756542337" duration="1446000" />
     </task>
     <task id="LOCAL-00001" summary="日志">
       <created>1642736129921</created>
@@ -1148,7 +1211,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793681584203</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="删除rabbitmq  采用rocketmq">
+      <option name="closed" value="true" />
+      <created>1793695432513</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1793695432513</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -1220,6 +1291,24 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework.security:spring-security-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.validation:jakarta.validation-api" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.integration:spring-integration-core" />
+    <option featureType="dependencySupport" implementationName="java:io.projectreactor:reactor-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.data:spring-data-commons" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.cloud:spring-cloud-context" />
+    <option featureType="dependencySupport" implementationName="java:org.hibernate.validator:hibernate-validator" />
+    <option featureType="dependencySupport" implementationName="java:javax.validation:validation-api" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+    <option featureType="dependencySupport" implementationName="java:org.projectlombok:lombok" />
+    <option featureType="dependencySupport" implementationName="java:junit:junit" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="RECENT_FILTERS">
       <map>
@@ -1258,8 +1347,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="0609 ljj 日常提交 刚才提交的时间应为0609" />
-    <MESSAGE value="0614 ljj 常规提交 虫情监控基本完成" />
     <MESSAGE value="0610 ljj 虫情监控 虫情板配置" />
     <MESSAGE value="0615 ljj 常规提交" />
     <MESSAGE value="移垛任务处理" />
@@ -1283,7 +1370,9 @@
     <MESSAGE value="zyq" />
     <MESSAGE value="0923 zyq app端运维提交" />
     <MESSAGE value="----" />
-    <option name="LAST_COMMIT_MESSAGE" value="----" />
+    <MESSAGE value="删除rabbitmq  采用rocketmq" />
+    <MESSAGE value="代码重构" />
+    <option name="LAST_COMMIT_MESSAGE" value="代码重构" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
   <component name="XDebuggerManager">

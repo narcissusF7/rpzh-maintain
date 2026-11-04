@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <description>养护系统设备父工程</description>
     <modules>
+        <module>rpzh-device-common</module>
         <module>rpzh-carbon</module>
         <module>rpzh-oxygen</module>
         <module>rpzh-humiture</module>

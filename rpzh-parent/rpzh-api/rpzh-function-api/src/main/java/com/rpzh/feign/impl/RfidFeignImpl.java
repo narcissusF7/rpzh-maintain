@@ -2,13 +2,12 @@ package com.rpzh.feign.impl;
 
 import com.rpzh.entity.Result;
 import com.rpzh.feign.RfidFeign;
-import com.rpzh.feign.UserFeign;
 
 import java.util.List;
 
 /**
- * @Author: zyq
- * @Date: 2022/05/23/11:47
+ * &#064;Author:  zyq
+ * &#064;Date:  2022/05/23/11:47
  * @Description: 功能
  */
 public class RfidFeignImpl implements RfidFeign {

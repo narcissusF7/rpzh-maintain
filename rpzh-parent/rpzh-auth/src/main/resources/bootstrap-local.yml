@@ -6,7 +6,7 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-    password:
+    password: redis123
     jedis:
       pool:
         max-active: 8
@@ -14,9 +14,9 @@ spring:
         min-idle: 0
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://192.168.3.36:3306/tabac_maintenance_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/tabac_maintenance_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
-    password: root
+    password: root123
     #hikari:
     #max-lifetime: 500000   seata-test:测试事务数据库    rpzh-system
   main:
@@ -24,9 +24,9 @@ spring:
   cloud:
     nacos:  # 注册中心地址
       discovery:
-        server-addr: 127.0.0.1:8877
+        server-addr: 127.0.0.1:8848
       config: # 配置中心地址
-        server-addr: 127.0.0.1:8877
+        server-addr: 127.0.0.1:8848
         # 配置文件格式
         file-extension: yml
       #alibaba:
