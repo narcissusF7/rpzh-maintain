@@ -88,22 +88,13 @@
         </dependency>
 
         <!--db2数据库驱动（Maven Central 官方坐标，替代旧的 db2jcc4 + db2jcc_license_cu 私有坐标）-->
-        <dependency>
-            <groupId>com.ibm.db2</groupId>
-            <artifactId>jcc</artifactId>
-            <version>11.1.4.4</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.ibm.db2</groupId>-->
+<!--            <artifactId>jcc</artifactId>-->
+<!--            <version>11.1.4.4</version>-->
+<!--        </dependency>-->
 
-
-
-        <!--oracle数据库-->
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
-        </dependency>
-
-        <!--以下数据源/驱动原误置于 rpzh-function-api，现归位到应用模块（避免强加给所有引用方）-->
+<!--        以下数据源/驱动原误置于 rpzh-function-api，现归位到应用模块（避免强加给所有引用方）-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
