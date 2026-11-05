@@ -1,6 +1,5 @@
 package com.rpzh.Task;
 
-import com.rpzh.entity.Result;
 import com.rpzh.feign.RfidFeign;
 import com.rpzh.netty.RfIdNettyServerFilter;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,8 +9,8 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * @Author: zyq
- * @Date: 2022/09/21/20:37
+ * &#064;Author:  zyq
+ * &#064;Date:  2022/09/21/20:37
  * @Description: 功能
  */
 @Component
@@ -22,7 +21,7 @@ public class RFIDNettyTask {
     @Scheduled(cron="0 0/30 * * * ?")
     void updateRfidStatus() {
         List<String> ips = rfidFeign.findIps();
-        if(ips.size()>0){
+        if(!ips.isEmpty()){
             //,0:禁用,1:启用
             for (String ip : ips) {
                 if(RfIdNettyServerFilter.usermap.get("/" + ip) != null){

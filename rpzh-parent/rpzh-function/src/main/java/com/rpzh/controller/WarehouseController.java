@@ -546,7 +546,7 @@ public class WarehouseController {
      * @return
      */
     @PostMapping("/warehouseTree")
-    public Result warehouseTree(Integer warehouseNodeId, String warehouseNodeType) {
+    public Result warehouseTree(@RequestParam("warehouseNodeId") Integer warehouseNodeId, @RequestParam("warehouseNodeType") String warehouseNodeType) {
         if (ToolUtil.isEmpty(warehouseNodeId)) {
             return new Result(false, StatusCode.ERROR, "仓库节点id不能为空");
         }
@@ -582,7 +582,7 @@ public class WarehouseController {
      */
     @PreAuthorize("hasAnyAuthority('p:w:f')")
     @PostMapping("/warehouseInfo")
-    public Result warehouseInfo(Integer warehouseNodeId, String warehouseNodeType) {
+    public Result warehouseInfo(@RequestParam("warehouseNodeId") Integer warehouseNodeId, @RequestParam("warehouseNodeType") String warehouseNodeType) {
         if (ToolUtil.isEmpty(warehouseNodeId)) {
             return new Result(false, StatusCode.ERROR, "仓库id不能为空");
         }
@@ -625,6 +625,16 @@ public class WarehouseController {
     @PostMapping("/locatingMaintain")
     public Result<T> locatingMaintain(){
         return warehouseService.locatingMaintain();
+    }
+
+    /**
+     * 查询所有库区。
+     * 养护计划新建时垛位下拉需要按库区逐个拉取垛位，原先前端把库区 id 写死成 201~205，
+     * 页面新建的库区不会出现在下拉里；这里提供全量库区供前端动态获取。
+     */
+    @PostMapping("/getAllWareArea")
+    public Result<List<WareAreaVo>> getAllWareArea() {
+        return new Result<>(true, StatusCode.OK, "查询成功", warehouseService.findAllWareArea(null));
     }
 
 }

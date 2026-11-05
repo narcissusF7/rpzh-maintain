@@ -2,9 +2,21 @@ server:
   port: 16883
 spring:
   application:
-    name: rpzh-maintain-system
+    name: rpzh-system
   main:
     allow-bean-definition-overriding: true
+  # Redis：本机容器带 requirepass，缺这段会导致 NOAUTH，用户缓存/ACCOUNT_ID 全部写不进去
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: redis123
+    jedis:
+      pool:
+        max-active: 32
+        max-idle: 32
+        min-idle: 0
+        max-wait: -1
+    timeout: 10000
   cloud:
     nacos:  # 注册中心地址
       discovery:

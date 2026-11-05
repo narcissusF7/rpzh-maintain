@@ -30,7 +30,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     #hikari:
     #max-lifetime: 1800000       #在连接池中的存活时间  Yl123456
-    url: jdbc:mysql://127.0.0.1:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://127.0.0.1:3306/rpzh-system?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
     username: root
     password: root123
 logging:
@@ -51,6 +51,6 @@ hystrix:
             timeoutInMilliseconds: 6000   #连接超时时间
           strategy: SEMAPHORE              #线程池隔离采用信号量隔离
 fastdfs:
-  ip: 120.24.91.199:8080
+  ip: 127.0.0.1:8888
 
 

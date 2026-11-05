@@ -26,6 +26,8 @@ public class MaintainPlanDto {
     private String pidRoute;
     //垛位id
     private Integer stackId;
+    /** 列表查询：传 "1" 表示只查已结束（已完成养护）的计划；不传则维持原口径只查进行中 */
+    private String isEnd;
     //仓间id
     private Integer areaId;
     //楼层id
@@ -156,8 +158,8 @@ public class MaintainPlanDto {
     private Double coreTempLowEnvTemp=0d;
     //预警规则名称
     private String earlyWarningRuleName;
-    //该养护计划下的所有设备
-    List<String> nodeDtoList;
+    //该养护计划下的所有设备（前端以单个 JSON 数组字符串传入，避免 Spring 对 List<String> 的逗号拆分破坏 JSON）
+    String nodeDtoList;
 
     public MaintainPlanDto(){}
 

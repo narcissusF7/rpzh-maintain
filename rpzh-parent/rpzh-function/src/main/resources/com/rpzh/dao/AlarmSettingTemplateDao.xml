@@ -5,7 +5,9 @@
         select count(*) from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName}
     </select>
     <select id="findCountByName" resultType="java.lang.Integer">
-        select id from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName} and rownum = 1
+        select id from tb_alarm_setting_template where early_warning_rule_name = #{earlyWarningRuleName} 
+    
+        LIMIT 1
     </select>
     <select id="findAlarmSettingTemplateList" resultType="java.lang.String">
         select early_warning_rule_name from tb_alarm_setting_template group  by early_warning_rule_name
@@ -36,9 +38,11 @@
         t2.early_warning_rule_name as earlyWarningRuleName
         from tb_setting_template_stage t1
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
-        where rownum = 1
+        where 1=1
         <if test="earlyWarningRuleName != null and earlyWarningRuleName != ''">and t2.early_warning_rule_name = #{earlyWarningRuleName}</if>
         <if test="phases != null and phases != ''">and t1.phases = #{phases}</if>
+    
+        LIMIT 1
     </select>
     <select id="findAlarmSettingTemplateTable" resultType="com.rpzh.vo.AlarmValueSettingVo">
         SELECT
@@ -75,9 +79,7 @@
         </foreach>
     </delete>
     <insert id="insertAlarmSettingTemplate">
-        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="alarmValueSettingDto.alarmValueSettingId">
-            SELECT SEIINGTEMPLATE.NEXTVAL  from DUAL
-        </selectKey>
+        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="alarmValueSettingDto.alarmValueSettingId">SELECT IFNULL(MAX(id),0)+1 FROM tb_alarm_setting_template</selectKey>
         insert into tb_alarm_setting_template
         (
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name,</if>
@@ -90,7 +92,7 @@
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">#{alarmValueSettingDto.earlyWarningRuleName},</if>
         <if test="alarmValueSettingDto.materialCode != null and alarmValueSettingDto.materialCode != ''">#{alarmValueSettingDto.materialCode},</if>
         <if test="alarmValueSettingDto.maintenceStyle != null and alarmValueSettingDto.maintenceStyle != ''">#{alarmValueSettingDto.maintenceStyle},</if>
-        #{alarmValueSettingDto.flag},sysdate,#{alarmValueSettingDto.createUser},SEIINGTEMPLATE.CURRVAL
+        #{alarmValueSettingDto.flag},NOW(),#{alarmValueSettingDto.createUser},#{alarmValueSettingDto.alarmValueSettingId}
         )
     </insert>
     <insert id="insertAlarmSettingTemplateStage">
@@ -144,7 +146,7 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.phases != null and alarmValueSettingDto.phases != ''">#{alarmValueSettingDto.phases},</if>
         <if test="alarmValueSettingDto.alarmValueSettingId != null and alarmValueSettingDto.alarmValueSettingId != ''">#{alarmValueSettingDto.alarmValueSettingId},</if>
-        sysdate,#{alarmValueSettingDto.updateUser}
+        NOW(),#{alarmValueSettingDto.updateUser}
         )
     </insert>
     <select id = "findColorAndAlertUpgradeDay" resultType="com.rpzh.vo.SettingColorAndDayVo">
@@ -154,8 +156,10 @@ SELECT
 (SELECT setting_value FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'one') colorOne,
 (SELECT setting_value  FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'two') colorTwo,
 (SELECT setting_value FROM tb_general_setting WHERE setting_key = 'color' AND setting_name = 'three') colorThree
-FROM tb_general_setting where rownum = 1
-</select>
+FROM tb_general_setting where 1=1
+
+        LIMIT 1
+    </select>
     <update id="updateColorAndAlertUpgradeDay">
         update tb_general_setting set setting_value = #{settingValue} where setting_key = #{settingKey} AND setting_name = #{settingName}
     </update>

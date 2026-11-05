@@ -66,7 +66,7 @@ public class DataContrastController {
             @ApiImplicitParam(name = "finishTime", value = "对比的结束时间", required = false, dataType = "String"),
             @ApiImplicitParam(name = "gatherType", value = "时间类型 1:天  2:周  3:月  4:年    默认月", required = false, dataType = "String")
     })
-    public Result getNodeDateList(String dataContrasts, String gatherType, Date startTime,Date endTime,Date beginTime,Date finishTime){
+    public Result getNodeDateList(@RequestParam("dataContrasts") String dataContrasts, @RequestParam("gatherType") String gatherType, @RequestParam("startTime") Date startTime,@RequestParam("endTime") Date endTime,@RequestParam("beginTime") Date beginTime,@RequestParam("finishTime") Date finishTime){
         return dataContrastService.getNodeDateList(dataContrasts,gatherType,startTime,endTime,beginTime,finishTime);
     }
 

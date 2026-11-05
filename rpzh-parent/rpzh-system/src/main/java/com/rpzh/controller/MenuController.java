@@ -92,7 +92,7 @@ public class MenuController {
     @GetMapping("/deleteMenu")
     @ApiOperation(value = "删除菜单")
     @OperationLog(mapper = MenuService.class, businessType = BusinessType.DELETE, title = "菜单管理")
-    public Result deleteMenu(Long menuId){
+    public Result deleteMenu(@RequestParam("menuId") Long menuId){
         //查询是否存在子菜单
         Integer menuCount = menuService.findSonMenu(menuId);
         if (menuCount > 0){
@@ -183,7 +183,7 @@ public class MenuController {
      */
     @RequestMapping("/getOneRouters")
     @ApiOperation(value = "修改菜单时返回")
-    public Result getOneRouters(String roleId){
+    public Result getOneRouters(@RequestParam("roleId") String roleId){
         List<Integer> menuIdList = menuService.getOneRouters(roleId);
         return new Result(true, StatusCode.OK, "查询菜单列表成功",menuIdList);
     }

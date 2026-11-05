@@ -3,10 +3,7 @@
 <mapper namespace="com.rpzh.dao.NodeOperationDao">
 
     <insert id="bulkInsert">
-
-        INSERT ALL
-        <foreach collection="nodeOperationDtos" item="nodeOperationDto">
-        INTO tb_node_operation_history (
+        INSERT INTO tb_node_operation_history (
         node_id,
         node_type,
         site_id,
@@ -19,6 +16,7 @@
         created_time
         )
         VALUES
+        <foreach collection="nodeOperationDtos" item="nodeOperationDto" separator=",">
         (
             #{nodeOperationDto.nodeId},
             #{nodeOperationDto.nodeType},
@@ -29,10 +27,9 @@
             #{nodeOperationDto.operationType},
             #{nodeOperationDto.operationDetails},
             #{nodeOperationDto.createdUser},
-            sysdate
-            )
+            NOW()
+        )
         </foreach>
-        SELECT 1 FROM DUAL
     </insert>
     <update id="updateNodeId">
         update tb_node_operation_history set  node_id = #{nodeDto.afterNodeId}  where node_id = #{nodeDto.nodeId}

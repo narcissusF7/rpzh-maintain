@@ -2,6 +2,7 @@ package com.rpzh.dto;
 
 import com.rpzh.pojo.BasePojo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 仓库前端传参
@@ -10,6 +11,7 @@ import lombok.Data;
  * @Description: good good study,day day up
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class WarehouseDto extends BasePojo {
 
 }

@@ -165,7 +165,7 @@ public class PestMonitoringController {
     @ApiOperation("虫情导入模板下载")
     @GetMapping("/downloadTemplate")
     @ApiImplicitParam(name = "siteType", value = "位置类型仓间04 垛内05", dataType = "String", required = true)
-    public Result downloadStackTemplate(HttpServletResponse response,String siteType) {
+    public Result downloadStackTemplate(HttpServletResponse response,@RequestParam("siteType") String siteType) {
         if (ToolUtil.isEmpty(siteType)) {
             return new Result<>(false, StatusCode.ERROR, "位置类型不能为空");
         }
@@ -189,7 +189,7 @@ public class PestMonitoringController {
     })
     @PostMapping("/exportPestData")
     @PreAuthorize("hasAnyAuthority('f:p:fp')")
-    public Result exportPestData(MultipartFile file,String siteType){
+    public Result exportPestData(MultipartFile file,@RequestParam("siteType") String siteType){
         if (ToolUtil.isEmpty(file)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个文件");
         }
@@ -299,7 +299,7 @@ public class PestMonitoringController {
     @ApiOperation("通过rfid查询虫情板数据")
     @GetMapping("/findPestBoardByRfid")
     @ApiImplicitParam(name = "rfid", value = "rfid", dataType = "String", required = true)
-    public Result findPestBoardByRfid(String rfid){
+    public Result findPestBoardByRfid(@RequestParam("rfid") String rfid){
         if (ToolUtil.isEmpty(rfid)){
             return new Result(false,StatusCode.ERROR,"rfid不能为空");
         }
@@ -310,7 +310,7 @@ public class PestMonitoringController {
     @ApiOperation("查询虫情点位预警值")
     @GetMapping("/findPestWarningValue")
     @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String", required = true)
-    public Result<Map<String,Object>> findPestWarningValue(String pestBoardId){
+    public Result<Map<String,Object>> findPestWarningValue(@RequestParam("pestBoardId") String pestBoardId){
         if (ToolUtil.isEmpty(pestBoardId)){
             return new Result(false,StatusCode.ERROR,"虫情点位id不能为空");
         }

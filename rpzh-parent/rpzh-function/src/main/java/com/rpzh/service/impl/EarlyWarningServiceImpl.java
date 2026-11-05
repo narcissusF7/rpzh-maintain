@@ -84,7 +84,13 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
                 //查询仓间名称
                 earlyWarningInfo.setSiteName(warehouseDao.findWareArea(earlyWarningInfo.getAreaId()).getSiteName());
             }
-            earlyWarningInfo.setPrincipalName((String)redisUtil.hget("USER_"+earlyWarningInfo.getPrincipalName(),"nickname") + "(" + earlyWarningInfo.getPrincipalName() + ")");
+            // principal 存的是账号（可逗号分隔多人）：优先显示缓存里的姓名，取不到就原样返回账号，
+            // 不能再拼 "null(账号)"（缓存过期时前端只能显示一串 null，且无法与用户列表对上）
+            String principal = earlyWarningInfo.getPrincipalName();
+            if (ToolUtil.isNotEmpty(principal)) {
+                Object nickname = redisUtil.hget("USER_" + principal, "nickname");
+                earlyWarningInfo.setPrincipalName(nickname == null ? principal : nickname.toString());
+            }
         }
         return new PageInfo<>(earlyWarningInfos);
     }
@@ -103,7 +109,7 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         //获取时间类型
         Integer dayType = earlyWarningDto.getDayType();
         // 时间类型,1:日,2:周,3:月,4:年
-        if(dayType!=1 && dayType != 2 && dayType !=3 && dayType != 4){
+        if(dayType == null || (dayType != 1 && dayType != 2 && dayType != 3 && dayType != 4)){
             return new Result(false, StatusCode.ERROR, "时间类型错误!");
         }
         //根据位置路由和位置id拼接完整的位置路由
@@ -130,17 +136,17 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
         //查询出来无数据时处理
         if(ToolUtil.isEmpty(ids)){
             //初始化预警类型统计   百分比
-            warningTypeCount.add(getMap(Arrays.asList("warningType,sum".split(",")),Arrays.asList("0,0".split(","))));
+            warningTypeCount.add(getMap(Arrays.asList("warningType", "sum"), Arrays.<Object>asList("0", "0")));
             //初始化预警类型统计   个数(预警类型全部显示)
             for (String type : types) {
                 warningTypeNumber.add(getMap(Arrays.asList("sum", "warningType"), Arrays.asList(0,type)));
             }
             //初始化预警总数量统计
-            warningCount.add(getMap(Arrays.asList("day,sum".split(",")),Arrays.asList("0,0".split(","))));
+            warningCount.add(getMap(Arrays.asList("day", "sum"), Arrays.<Object>asList("0", "0")));
             //初始化预警响应率统计
-            isDealCount.add(getMap(Arrays.asList("day,sum,deal,treatmentRate,noDeal".split(",")),Arrays.asList("0,0,0,0,0".split(","))));
+            isDealCount.add(getMap(Arrays.asList("day", "sum", "deal", "treatmentRate", "noDeal"), Arrays.<Object>asList("0", "0", "0", "0", "0")));
             //报警类型统计 各种类型所占总数
-            isDeal = getMap(Arrays.asList("ratioDeal,sumDeal,sumNotDeal,ratioNotDeal".split(",")),Arrays.asList("0,0,0,0".split(",")));
+            isDeal = getMap(Arrays.asList("ratioDeal", "sumDeal", "sumNotDeal", "ratioNotDeal"), Arrays.<Object>asList("0", "0", "0", "0"));
             values = Arrays.asList(0,warningTypeCount,warningTypeNumber,warningCount,isDealCount,isDeal);
         }else {
             //查询预警总数量
@@ -192,19 +198,21 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             if (dayType == 1) {
                 //日统计
                 betweenDays = GetBetweenDayUtils.getBetweenDays(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());//对获取日期排序
-                dateType = "to_char(warning_time, 'YYYY-MM-DD')";
+                // MySQL 方言（原来这里还是 Oracle 的 to_char）
+                dateType = "DATE_FORMAT(warning_time, '%Y-%m-%d')";
             } else if (dayType == 2) {
                 //周统计
                 betweenDays = GetBetweenDayUtils.getBetweenWeek(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "to_char(NEXT_DAY(trunc(warning_time),'星期一')，'YYYY-MM-DD')";
+                // 周一为一周起点：WEEKDAY() 周一=0
+                dateType = "DATE_FORMAT(DATE_SUB(warning_time, INTERVAL WEEKDAY(warning_time) DAY), '%Y-%m-%d')";
             } else if (dayType == 3) {
                 //月统计
                 betweenDays = GetBetweenDayUtils.getMonthBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "to_char(warning_time , 'YYYY-MM')";
+                dateType = "DATE_FORMAT(warning_time, '%Y-%m')";
             } else if (dayType == 4) {
                 //年统计
                 betweenDays = GetBetweenDayUtils.getYearBetweenDate(earlyWarningDto.getBeginTime(), earlyWarningDto.getFinishTime());
-                dateType = "to_char(warning_time , 'YYYY')";
+                dateType = "DATE_FORMAT(warning_time, '%Y')";
             }
             //报警数量统计
             warningCount = earlyWarningDao.findWarningCountByDay(ids, dateType);
@@ -485,6 +493,24 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
             });
         }
         return new Result<>(true, StatusCode.OK, "查询成功",earlyWarningVos);
+    }
+
+    @Override
+    public Result findCurrentWarningList(EarlyWarningDto earlyWarningDto) {
+        // 当前预警逐条列表：is_affirm in ('1','2')，并带出 task_id / node_id / site_route，供「预警→对应任务」跳转
+        // 必须分页：该表随时间只增不减，无 LIMIT 的全表查询会拖垮列表接口
+        int page = earlyWarningDto.getPage() <= 0 ? 1 : earlyWarningDto.getPage();
+        int size = earlyWarningDto.getSize() <= 0 ? 10 : Math.min(earlyWarningDto.getSize(), 200);
+        earlyWarningDto.setPage(page);
+        earlyWarningDto.setSize(size);
+        int total = earlyWarningDao.countCurrentWarning(earlyWarningDto);
+        List<EarlyWarningVo> list = total == 0
+                ? new ArrayList<>()
+                : earlyWarningDao.findCurrentWarningList(earlyWarningDto, (page - 1) * size, size);
+        Map<String, Object> data = new HashMap<>();
+        data.put("total", total);
+        data.put("list", list);
+        return new Result<>(true, StatusCode.OK, "查询成功", data);
     }
 
     @Override

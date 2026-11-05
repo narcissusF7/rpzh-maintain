@@ -15,7 +15,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     #hikari:
     #max-lifetime: 1800000       #在连接池中的存活时间  Yl123456
-    url: jdbc:mysql://127.0.0.1:3306/rpzh-co2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+    url: jdbc:mysql://127.0.0.1:3306/rpzh-device?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8&allowMultiQueries=true
     username: root
     password: root123
   redis:
@@ -27,13 +27,16 @@ logging:
     io.swagger.models.parameters.AbstractSerializableParameter: error
 # mqtt 连接配置
 mqtt:
-  host: tcp://183.250.89.188
-  port: 7426
+  # 本机 Docker Mosquitto（原外网 183.250.89.188:7426 不可达）
+  host: tcp://127.0.0.1
+  port: 1883
   qos: 0
   timeout: 2000
   keepalive: 20
-  rx-topic: carbon/#
+  # 与 rpzh-function 对齐，便于本机联调；设备侧入站 Handler 暂为注释状态，只建立连接与订阅
+  rx-topic: maintain/#
   tx-topic: applicationserver/#
-  client-id: rpiot-client-co2
+  # 各 device 子模块 local 原本都用 rpiot-client-co2，同 broker 会互相踢线，这里用唯一 id
+  client-id: rpiot-device-humiture
   username: admin
   password: admin1234.

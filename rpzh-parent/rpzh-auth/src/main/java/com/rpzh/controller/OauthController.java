@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @Author liubc
@@ -131,7 +132,7 @@ public class OauthController {
      * @return
      */
     @RequestMapping("/maintainLogin")
-    public Result maintainLogin(String username, String password) {
+    public Result maintainLogin(@RequestParam("username") String username, @RequestParam("password") String password) {
         AuthToken authToken = null;
         Map<String, String> map = new HashMap<>();
         map.put("username",username);
@@ -176,7 +177,7 @@ public class OauthController {
      * @param res
      */
     @RequestMapping("/verification")
-    public void showValidateCodePic(String uuidCode, HttpServletRequest req, HttpServletResponse res){
+    public void showValidateCodePic(@RequestParam("uuidCode") String uuidCode, HttpServletRequest req, HttpServletResponse res){
         if (ToolUtil.isEmpty(uuidCode)){
             throw new RuntimeException("uuidCode不能为空");
         }
@@ -204,7 +205,7 @@ public class OauthController {
      * @return
      */
     @GetMapping("/changePassWord")
-    public Result editPassWord(String username, String password, String newpassWord, String notarizePassword){
+    public Result editPassWord(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("newpassWord") String newpassWord, @RequestParam("notarizePassword") String notarizePassword){
         AuthToken authToken = null;
         try {
             authToken = oauthService.login(username, password, clientId, clientSecret);

@@ -130,7 +130,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true,dataType = "String")
     })
     @ApiOperation(value = "新建时在点击下一阶段后再点上一步时回显/修改时预警设置各个阶段回显")
-    public Result<AlarmValueSettingVo> findAlarmValueSetting(String materialCode, String earlyWarningRuleName,String phases) {
+    public Result<AlarmValueSettingVo> findAlarmValueSetting(@RequestParam("materialCode") String materialCode, @RequestParam("earlyWarningRuleName") String earlyWarningRuleName,@RequestParam("phases") String phases) {
         return alarmSettingTemplateService.findAlarmSettingTemplateByMaterialCode(materialCode,earlyWarningRuleName,phases);
     }
 
@@ -139,7 +139,7 @@ public class AlarmSettingTemplateController {
             @ApiImplicitParam(name = "id", value = "预警设置表主键id", required = false,dataType = "int")
     })
     @ApiOperation(value = "修改时属性设置回显")
-    public Result<AlarmValueSettingVo> beforeAlarmValueSetting(Integer id) {
+    public Result<AlarmValueSettingVo> beforeAlarmValueSetting(@RequestParam("id") Integer id) {
         AlarmValueSettingVo alarmValueSettingVo = alarmSettingTemplateService.findAlarmSettingTemplate(id);
         return new Result<>(true, StatusCode.OK, "预警设置修改前回显成功!",alarmValueSettingVo);
     }

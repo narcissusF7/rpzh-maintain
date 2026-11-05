@@ -18,6 +18,11 @@
 *.zip
 *.tar.gz
 *.rar
+*.sql
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Maven 构建产物：忽略所有模块下的 target 目录及其全部内容
+target/
+**/target/

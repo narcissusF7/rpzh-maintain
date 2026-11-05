@@ -3,6 +3,7 @@ package com.rpzh.dto;
 import com.rpzh.pojo.BasePojo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  * @Description: good good study,day day up
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class WarehouseDto extends BasePojo {
     //主键ID
     @ApiModelProperty("仓库ID")

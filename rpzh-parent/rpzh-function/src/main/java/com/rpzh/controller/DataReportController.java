@@ -543,7 +543,7 @@ public class DataReportController {
             allowMultiple = true
     )})
     @GetMapping("export")
-    public void export(String pidRoutes, String comparisonType , Integer exportType, String acquisitionTimeOne, String acquisitionTimeTwo, HttpServletResponse response){
+    public void export(@RequestParam("pidRoutes") String pidRoutes, @RequestParam("comparisonType") String comparisonType , @RequestParam("exportType") Integer exportType, @RequestParam("acquisitionTimeOne") String acquisitionTimeOne, @RequestParam("acquisitionTimeTwo") String acquisitionTimeTwo, HttpServletResponse response){
         String routesString = EscapeToolBox.unescape(pidRoutes);
         String[] split = routesString.split(",\\[00");
         List<String> routes = new ArrayList<>();

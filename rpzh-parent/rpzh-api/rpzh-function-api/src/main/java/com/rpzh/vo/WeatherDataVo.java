@@ -5,8 +5,10 @@ import com.rpzh.pojo.NodeData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @ApiModel(description = "天气返回类")
 public class WeatherDataVo extends NodeDataVo {
     @Excel(

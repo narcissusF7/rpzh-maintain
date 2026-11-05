@@ -49,6 +49,10 @@
         <knife4j.version>2.0.2</knife4j.version>
         <pagehelper.version>5.3.0</pagehelper.version>
         <lombok.version>1.18.20</lombok.version>
+        <hutool.version>5.7.15</hutool.version>
+        <fastdfs.version>1.27.0.0</fastdfs.version>
+        <rocketmq.starter.version>2.1.0</rocketmq.starter.version>
+        <aspectj.version>1.9.6</aspectj.version>
     </properties>
     <dependencies>
         <dependency>
@@ -200,10 +204,56 @@
                 <artifactId>druid</artifactId>
                 <version>${druid.version}</version>
             </dependency>
+
+            <!-- Hutool 工具类：原先 common-core/function-api/job-api 写 5.6.5，
+                 common-log/humiture-api/log 写 5.7.15，统一收口到 5.7.15 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- FastDFS 客户端：rpzh-file 与 rpzh-file-api 重复写死同一版本 -->
+            <dependency>
+                <groupId>net.oschina.zcx7878</groupId>
+                <artifactId>fastdfs-client-java</artifactId>
+                <version>${fastdfs.version}</version>
+            </dependency>
+
+            <!-- RocketMQ：rpzh-function/job/system 三处重复写死同一版本 -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.starter.version}</version>
+            </dependency>
+
+            <!-- AspectJ：rpzh-function 写死 1.9.6，其余模块依赖 Boot BOM，统一显式管理 -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <build>
+        <!-- 统一固定插件版本：父 pom 未继承 spring-boot-starter-parent，
+             插件不写 version 会让 Maven 去元数据里猜版本（会挑到 4.x beta / Boot 4.x 插件），
+             既产生大量 "plugin.version is missing" 告警，也可能用错版本的插件打包。 -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -212,6 +262,9 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- 保留方法参数名：大量 Controller 使用裸参数（未写 @RequestParam），
+                         依赖参数名解析；不加这个参数一旦编译方式变化（如手工 javac）就会 400/500 -->
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
         </plugins>

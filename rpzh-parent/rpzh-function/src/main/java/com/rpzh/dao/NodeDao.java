@@ -277,4 +277,7 @@ public interface NodeDao {
 
     @DS("clickhouse")
     List<NodeData> findAppData(@Param("nodeId")String nodeId, @Param("tableName") String tableName, @Param("tableColumn") String tableColumn);
+
+    /** 按状态查询设备 id，用于异常状态恢复扫描 */
+    List<String> findNodeIdsByStatus(@Param("status") String status);
 }

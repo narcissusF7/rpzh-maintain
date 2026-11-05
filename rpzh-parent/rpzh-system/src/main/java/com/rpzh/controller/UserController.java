@@ -152,7 +152,7 @@ public class UserController {
     //@OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.PASSWORD)
     @GetMapping("/editPassWord")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
-    public Result editPassWord(String username, String newpassWord, String notarizePassword) {
+    public Result editPassWord(@RequestParam("username") String username, @RequestParam("newpassWord") String newpassWord, @RequestParam("notarizePassword") String notarizePassword) {
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord) || ToolUtil.isEmpty(notarizePassword)) {
             return new Result(false, StatusCode.ERROR, "请输入账号密码");
         }
@@ -187,7 +187,7 @@ public class UserController {
     //@OperationUserLog(title = "超级管理员修改密码", businessUserType = BesinessUserType.ADMINPASSWORD)
     @GetMapping("/adminUpdatePassWord")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
-    public Result adminUpdatePassWord(String username, String newpassWord) {
+    public Result adminUpdatePassWord(@RequestParam("username") String username, @RequestParam("newpassWord") String newpassWord) {
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord)) {
             return new Result(false, StatusCode.ERROR, "请输入密码");
         }
@@ -204,9 +204,42 @@ public class UserController {
      */
     @ApiOperation(value = "修改用户时返回用户信息", tags = "用户管理")
     @RequestMapping("/findUserByUpdate")
-    public Result findUserByUpdate(Long userId) {
+    public Result findUserByUpdate(@RequestParam("userId") Long userId) {
         List<Integer> roidList = userService.findUserByUpdate(userId);
         return new Result(true, StatusCode.OK, "查询用户角色成功", roidList);
+    }
+
+    /**
+     * 预热单个用户的 Redis 缓存（USER_账号 / MAINTIAN_USER_ID_USERNAME）
+     * <p>
+     * 正常登录时会自动预热，此接口用于排查和人工补偿。
+     *
+     * @param username 用户账号
+     * @return
+     */
+    @ApiOperation(value = "预热单个用户缓存", tags = "用户管理")
+    @GetMapping("/warmUpUserCache")
+    public Result warmUpUserCache(@RequestParam("username") String username) {
+        if (ToolUtil.isEmpty(username)) {
+            return new Result(false, StatusCode.ERROR, "用户账号不能为空");
+        }
+        boolean success = userService.warmUpUserCache(username);
+        if (!success) {
+            return new Result(false, StatusCode.ERROR, "缓存预热失败,用户不存在或已删除");
+        }
+        return new Result(true, StatusCode.OK, "缓存预热成功");
+    }
+
+    /**
+     * 全量预热所有有效用户的 Redis 缓存，用于存量用户一次性补齐
+     *
+     * @return
+     */
+    @ApiOperation(value = "全量预热用户缓存", tags = "用户管理")
+    @GetMapping("/warmUpAllUserCache")
+    public Result warmUpAllUserCache() {
+        int count = userService.warmUpAllUserCache();
+        return new Result(true, StatusCode.OK, "缓存预热完成,成功 " + count + " 个用户", count);
     }
 
     /**

@@ -11,7 +11,6 @@ import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.TaskVo;
 //import com.sun.org.apache.regexp.internal.RE;
-import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -22,9 +21,9 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -207,7 +206,7 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "id", value = "任务主键id",required = true,dataType = "Long")
     })
     @PostMapping("/findTaskDetail")
-    public Result<TaskVo> findTaskDetail(Long id){
+    public Result<TaskVo> findTaskDetail(@RequestParam("id") Long id){
         if (ToolUtil.isEmpty(id)){
             return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
         }
@@ -227,7 +226,9 @@ public class TaskManagementController {
             @ApiImplicitParam(name = "type", value = "任务类型",required = true,dataType = "String")
     })
     @PostMapping("/findTaskDetailBySiteId")
-    public Result<TaskVo> findTaskDetailBySiteId(Integer stackId,Integer areaId,String type){
+    public Result<TaskVo> findTaskDetailBySiteId(@RequestParam(value = "stackId", required = false) Integer stackId,
+                                                 @RequestParam(value = "areaId", required = false) Integer areaId,
+                                                 @RequestParam("type") String type){
         if (ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(areaId)){
             return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
         }
@@ -334,7 +335,7 @@ public class TaskManagementController {
     })
     @PostMapping("/pestTaskDeal")
     @PreAuthorize("hasAnyAuthority('f:t:td')")
-    public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id,String siteRoute){
+    public Result pestTaskDeal(@ApiIgnore String pestData,@ApiIgnore String dealResult,@ApiIgnore String id,@RequestParam("siteRoute") String siteRoute){
         if (ToolUtil.isEmpty(pestData)){
             return new Result(false, StatusCode.ERROR, "请输入虫情数据");
         }

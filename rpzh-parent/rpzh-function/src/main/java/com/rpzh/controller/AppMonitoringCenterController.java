@@ -161,7 +161,7 @@ public class AppMonitoringCenterController {
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String", required = true),
             @ApiImplicitParam(name = "nodeType", value = "设备类型  01氧气 03温湿度 04 包芯氧气 P1垛内虫情 P2仓间虫情", dataType = "String", required = true)})
     @PostMapping("findTaskFromMonitored")
-    public Result findTask(String siteRoute,String nodeType){
+    public Result findTask(@RequestParam("siteRoute") String siteRoute,@RequestParam("nodeType") String nodeType){
         return nodeService.findTask(siteRoute,nodeType);
     }
 
@@ -230,7 +230,7 @@ public class AppMonitoringCenterController {
     @ApiOperation("查询虫情点位预警值")
     @GetMapping("/findPestWarningValue")
     @ApiImplicitParam(name = "pestBoardId", value = "虫情点位id", dataType = "String", required = true)
-    public Result<Map<String,Object>> findPestWarningValue(String pestBoardId){
+    public Result<Map<String,Object>> findPestWarningValue(@RequestParam("pestBoardId") String pestBoardId){
         if (ToolUtil.isEmpty(pestBoardId)){
             return new Result(false,StatusCode.ERROR,"虫情点位id不能为空");
         }
@@ -243,7 +243,7 @@ public class AppMonitoringCenterController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "siteId", value = "位置id", dataType = "Integer", required = true),
             @ApiImplicitParam(name = "pidRoute", value = "位置路由 ", dataType = "String", required = true)})
-    public Result<Map<String, Object>> findSitePrincipal(String pidRoute,Integer siteId){
+    public Result<Map<String, Object>> findSitePrincipal(@RequestParam("pidRoute") String pidRoute,@RequestParam("siteId") Integer siteId){
         if (ToolUtil.isEmpty(pidRoute)){
             return new Result(false,StatusCode.ERROR,"位置路由不能为空");
         }
@@ -262,7 +262,7 @@ public class AppMonitoringCenterController {
             dataType = "String"
     )
     @PostMapping("/enterStack")
-    public Result enterStack(String data) {
+    public Result enterStack(@RequestParam("data") String data) {
         if (ToolUtil.isEmpty(data)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
@@ -370,7 +370,7 @@ public class AppMonitoringCenterController {
             @ApiImplicitParam(name = "nodeId",value = "设备id集", dataType = "String", required = true)
     })
     @PostMapping("/nodeOPS")
-    public Result nodeOPS(String deviceId) {
+    public Result nodeOPS(@RequestParam("deviceId") String deviceId) {
         if (ToolUtil.isEmpty(deviceId)) {
             return new Result<>(false, StatusCode.ERROR, "请选择设备");
         }
@@ -384,7 +384,7 @@ public class AppMonitoringCenterController {
             @ApiImplicitParam(name = "siteId",value = "所选的位置id", dataType = "String", required = true)
     })
     @PostMapping({"/findStacks"})
-    public Result<List<StackVo>> findStacks(String pidRoute, String siteId) {
+    public Result<List<StackVo>> findStacks(@RequestParam("pidRoute") String pidRoute, @RequestParam("siteId") String siteId) {
         if (ToolUtil.isEmpty(pidRoute)) {
             return new Result<>(false, StatusCode.ERROR, "位置路由不能为空");
         }
@@ -399,7 +399,7 @@ public class AppMonitoringCenterController {
     @ApiOperation(value = "通过位置编号查询位置信息")
     @ApiImplicitParam(name = "stackNo",value = "位置路由", dataType = "String", required = true)
     @PostMapping({"/findStackInfoByStackNo"})
-    public Result<StackVo> findStackInfoByStackNo(String stackNo) {
+    public Result<StackVo> findStackInfoByStackNo(@RequestParam("stackNo") String stackNo) {
         if (ToolUtil.isEmpty(stackNo)) {
             return new Result<>(false, StatusCode.ERROR, "位置编码不能为空");
         }

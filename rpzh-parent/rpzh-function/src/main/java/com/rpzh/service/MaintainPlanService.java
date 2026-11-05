@@ -22,6 +22,13 @@ public interface MaintainPlanService {
     AlarmValueSettingVo findAlarmSettingTemplate(String earlyWarningRuleName,String phases);
 
     Integer isExistStackId(Integer stackId);
+
+    /**
+     * 查询所有「已有未完成养护计划」的垛位 id（is_end = '0'）。
+     * 供前端新建养护计划时筛掉已占用垛位，与 insert 的 isExistStackId 校验口径一致。
+     */
+    List<Integer> findOccupiedStackIds();
+
     /**
      * 查询养护计划
      * @param maintainPlanDto 养护计划信息
@@ -65,7 +72,7 @@ public interface MaintainPlanService {
 
     PageInfo<MaintainPlanVo> findMaintainHistoryCollect(MaintainPlanDto maintainPlanDto);
 
- /*   Result moveStack(MaintainPlanDto maintainPlanDto);*/
+    Result moveStack(MaintainPlanDto maintainPlanDto);
 
     Map<String,Object> findMaintainCountReport(MaintainCountDto maintainPlanDto);
 

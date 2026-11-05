@@ -14,6 +14,13 @@ import java.util.Map;
 public interface EarlyWarningDao {
     List<EarlyWarningVo> findEarlyWarningByWarningType(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
+    /** 当前预警逐条列表（分页，禁止无界全表扫描） */
+    List<EarlyWarningVo> findCurrentWarningList(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto,
+                                                @Param("offset") int offset,
+                                                @Param("limit") int limit);
+
+    int countCurrentWarning(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
+
     List<EarlyWarningVo> findEarlyWarningByWarningFault(@Param("earlyWarningDto") EarlyWarningDto earlyWarningDto);
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
@@ -139,4 +146,10 @@ public interface EarlyWarningDao {
     Map findAppWarningInfo(@Param("id")String id);
 
     List<Map> findAppPestInfos(@Param("tableColumn")String tableColumn,@Param("nodeId")String nodeId);
+
+    /** 读取通用配置表 tb_general_setting 的单值，用于设备异常判定阈值覆盖 */
+    String findSettingValue(@Param("settingKey") String settingKey, @Param("settingName") String settingName);
+
+    /** 统计设备仍未处置的故障类预警数（01 电量/02 信号/03 丢包），用于异常状态恢复判断 */
+    Integer countUndoFaultWarning(@Param("nodeId") String nodeId);
 }

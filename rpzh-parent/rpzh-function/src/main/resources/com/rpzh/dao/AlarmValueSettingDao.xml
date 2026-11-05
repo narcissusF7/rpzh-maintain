@@ -41,14 +41,12 @@
             <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">core_temp_low_env_temp = #{alarmValueSettingDto.coreTempLowEnvTemp},</if>
             <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">early_warning_rule_name=#{alarmValueSettingDto.earlyWarningRuleName},</if>
             <if test="alarmValueSettingDto.updateUser != null and alarmValueSettingDto.updateUser != ''">update_user=#{alarmValueSettingDto.updateUser},</if>
-            updated_time=sysdate
+            updated_time=NOW()
         </set>
         where id = #{alarmValueSettingDto.alarmValueSettingId}
     </update>
     <insert id="insertAlarmValueSetting">
-        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="alarmValueSettingDto.alarmValueSettingId">
-            SELECT VALUESETTING.NEXTVAL from DUAL
-        </selectKey>
+        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="alarmValueSettingDto.alarmValueSettingId">SELECT IFNULL(MAX(id),0)+1 FROM tb_alarm_value_setting</selectKey>
         insert into tb_alarm_value_setting
         (
         <if test="alarmValueSettingDto.stackOxygenUpperOne>=0">stack_oxygen_upper_one,</if>
@@ -99,7 +97,7 @@
         <if test="alarmValueSettingDto.coreTempLowEnvTemp>=0">#{alarmValueSettingDto.coreTempLowEnvTemp},</if>
         <if test="alarmValueSettingDto.earlyWarningRuleName != null and alarmValueSettingDto.earlyWarningRuleName != ''">#{alarmValueSettingDto.earlyWarningRuleName},</if>
         <if test="alarmValueSettingDto.createUser != null and alarmValueSettingDto.createUser != ''">#{alarmValueSettingDto.createUser},</if>
-        sysdate,VALUESETTING.CURRVAL
+        NOW(),#{alarmValueSettingDto.alarmValueSettingId}
         )
     </insert>
     <delete id="deleteIds">
@@ -166,6 +164,6 @@
         left join tb_alarm_setting_template t2 on t2.id = t1.alarm_template_stage_id
         where t1.phases = #{alarmValueSettingDto.phases} and t2.maintence_style = #{alarmValueSettingDto.maintenceStyle}
         <if test="alarmValueSettingDto.earlyWarningRuleName != '' and alarmValueSettingDto.earlyWarningRuleName != null">and t2.early_warning_rule_name = #{alarmValueSettingDto.earlyWarningRuleName}</if>
-        <if test="alarmValueSettingDto.materialCode != '' and alarmValueSettingDto.materialCode != null">and t2.material_code like concat(concat('%',#{alarmValueSettingDto.materialCode}),'%') and rownum = 1</if>
+        <if test="alarmValueSettingDto.materialCode != '' and alarmValueSettingDto.materialCode != null">and t2.material_code like concat(concat('%',#{alarmValueSettingDto.materialCode}),'%') </if>
     </select>
 </mapper>

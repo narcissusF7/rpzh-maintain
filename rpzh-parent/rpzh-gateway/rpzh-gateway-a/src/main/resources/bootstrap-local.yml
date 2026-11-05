@@ -53,11 +53,23 @@ spring:
                 key-resolver: "#{@ipKeyResolver}"            #与启动类ipKeyResolver对应,不可更改,用户身份识别唯一标识符
                 redis-rate-limiter.replenishRate: 10          #每秒的请求数量
                 redis-rate-limiter.burstCapacity: 50          #允许的并发数量
+        #文件微服务（必须放在功能微服务之前：/api/maintain/file/** 精度更高，先匹配）
+        - id: rpzh-file-routes
+          uri: lb://rpzh-file
+          predicates:
+            - Path=/api/maintain/file/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@ipKeyResolver}"
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 50
         #功能微服务
         - id: rpzh-function-routes
           uri: lb://rpzh-function   #负载均衡调用功能微服务
           predicates:
-            - Path=/api/maintain/warehouse/**,/api/node/**,/api/maintain/maintainPlan/**,/api/maintain/material/**,/api/maintain/alarmValueSetting/**
+            - Path=/api/maintain/**,/api/dataReport/**,/api/issue/**,/api/node/**
           filters: #将请求中的路径第一个去除,用于隐藏真实的路径
             - StripPrefix=1        #对齐
             - name: RequestRateLimiter      #局部限流过滤器,请求数量限流,名字不能更改

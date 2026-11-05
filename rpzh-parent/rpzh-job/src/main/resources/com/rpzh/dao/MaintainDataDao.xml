@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.MaintainDataDao">
     <select id="findBySiteRoute" resultType="java.util.Map">
-        select distinct site_route as "route",principal as "principal",stack_id as "stackId",area_id as "areaId" from tb_early_warning where is_affirm = '2'
+        select distinct site_route AS `route`,principal AS `principal`,stack_id AS `stackId`,area_id AS `areaId` from tb_early_warning where is_affirm = '2'
     </select>
     <select id="findStackById" resultType="java.lang.String">
     SELECT site_name  FROM tb_stack where id = #{stackId}
@@ -11,11 +11,11 @@
     select site_name from tb_ware_area where id = #{areaId}
   </select>
     <select id="findWarningInfoBySiteRoute" resultType="java.util.Map">
-        select warning_type as "warningType",node_id as "nodeId",
+        select warning_type AS `warningType`,node_id AS `nodeId`,
         CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END as "warningVal",
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END AS `warningVal`,
         CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS "warningGrade"
+        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS `warningGrade`
         from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
 </mapper>

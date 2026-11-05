@@ -49,8 +49,8 @@
     </update>
 
     <select id="findSendInfo" resultType="com.rpzh.vo.AppMessageVo">
-        select content as content,create_time as sendTime,LISTAGG(to_char(recipient_name), '/') WITHIN GROUP(ORDER BY recipient_name) as recipientName,
-        LISTAGG(id, ',') WITHIN GROUP(ORDER BY id) as id from app_message where message_type = '2' and send_name = #{appMessageDto.sendName} group by content,create_time
+        select content as content,create_time as sendTime,GROUP_CONCAT(CAST(recipient_name AS CHAR) ORDER BY recipient_name SEPARATOR '/') as recipientName,
+        GROUP_CONCAT(id ORDER BY id SEPARATOR ',') as id from app_message where message_type = '2' and send_name = #{appMessageDto.sendName} group by content,create_time
     </select>
     <select id="findSendInfoById" resultType="com.rpzh.vo.AppMessageVo">
         select content as content,create_time as sendTime,send_name as sendName from app_message where id = #{id}
@@ -60,8 +60,8 @@
         where id in <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
     </select>
     <select id="findDraftInfo" resultType="com.rpzh.vo.AppMessageVo">
-        select content as content,LISTAGG(to_char(recipient_name), '/') WITHIN GROUP(ORDER BY recipient_name) as recipientName,
-        LISTAGG(id, ',') WITHIN GROUP(ORDER BY id) as id from app_message where send_name = #{appMessageDto.sendName} and message_type = '1' group by content,create_time
+        select content as content,GROUP_CONCAT(CAST(recipient_name AS CHAR) ORDER BY recipient_name SEPARATOR '/') as recipientName,
+        GROUP_CONCAT(id ORDER BY id SEPARATOR ',') as id from app_message where send_name = #{appMessageDto.sendName} and message_type = '1' group by content,create_time
     </select>
     <select id="findDraftInfoById" resultType="com.rpzh.vo.AppMessageVo">
         select content as content from app_message where id = #{id}

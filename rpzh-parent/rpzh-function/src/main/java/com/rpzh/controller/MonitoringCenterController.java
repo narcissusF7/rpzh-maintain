@@ -4,6 +4,7 @@ package com.rpzh.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.config.NodeAbnormalConfig;
 import com.rpzh.constant.NodeConstant;
 import com.rpzh.dto.NodeDto;
 import com.rpzh.entity.Result;
@@ -47,6 +48,8 @@ public class MonitoringCenterController {
     MonitoringCenterService monitoringCenterService;
     @Resource
     NodeService nodeService;
+    @Resource
+    NodeAbnormalConfig nodeAbnormalConfig;
 
     SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -124,6 +127,16 @@ public class MonitoringCenterController {
         return thresholdMap.size() > 0 ? new Result(true, StatusCode.OK, "查询成功", thresholdMap) : new Result(false, StatusCode.ERROR, "查询失败");
     }
 
+    @ApiOperation(value = "查询设备异常状态判定阈值（yml + tb_general_setting 覆盖后的最终生效值）")
+    @GetMapping({"/findNodeAbnormalConfig"})
+    public Result findNodeAbnormalConfig() {
+        Map<String, Object> config = new HashMap<>();
+        config.put("enabled", nodeAbnormalConfig.isEnabled());
+        config.put("timeoutHours", nodeAbnormalConfig.getTimeoutHours());
+        config.put("maxErrorCount", nodeAbnormalConfig.getMaxErrorCount());
+        return new Result(true, StatusCode.OK, "查询成功", config);
+    }
+
 
     @ApiOperation(
             value = "查询设备的预警阈值"
@@ -144,7 +157,7 @@ public class MonitoringCenterController {
             required = true
     )})
     @PostMapping("/findAlarmValue")
-    public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData,String pidRoute){
+    public Result<Map<String,String>> findAlarmValue(@ApiIgnore NodeData nodeData,@RequestParam("pidRoute") String pidRoute){
         if (ToolUtil.isEmpty(nodeData.getType())){
             return new Result<>(false, StatusCode.ERROR, "设备类型不能为空");
         }
@@ -482,7 +495,7 @@ public class MonitoringCenterController {
             required = true
     )})
     @PostMapping("findTaskFromMonitored")
-    public Result findTask(String siteRoute,String nodeType){
+    public Result findTask(@RequestParam("siteRoute") String siteRoute,@RequestParam("nodeType") String nodeType){
         return nodeService.findTask(siteRoute,nodeType);
     }
 }

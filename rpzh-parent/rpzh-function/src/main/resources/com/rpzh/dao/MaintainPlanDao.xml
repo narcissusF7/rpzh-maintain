@@ -5,7 +5,7 @@
         insert into tb_maintain_early_time
         (maintain_plan_id,create_user)
         values
-        (#{maintainPlanId},sysdate)
+        (#{maintainPlanId},NOW())
     </insert>
     <delete id="deleteMaintainEarlyTimeById" parameterType="java.lang.Integer">
         delete
@@ -18,6 +18,7 @@
     <select id="findMaintainPlanInfo" resultType="com.rpzh.vo.MaintainPlanVo">
         select
         t1.id as id,
+        t1.is_end as isEnd,
         t1.material_code as materialCode,
         t3.site_name as stackName,
         t1.maintence_style as maintenceStyle,
@@ -28,10 +29,20 @@
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
         inner join (select id,site_name from tb_stack where 1=1
         <if test="size !=0">and id in  <foreach collection="stackIds" item="id" open="(" separator="," close=")">#{id}</foreach> </if>) t3 on t3.id = t1.stack_id
-        where t1.is_end = '0' and t2.aftercare_date_end >= sysdate
+        where 1 = 1
+        <choose>
+            <!-- 已完成（开垛）计划：全链路统计的唯一入口。不能用「阶段未过期」过滤，
+                 否则完成后计划会从列表里彻底消失，之后再也无法查看统计。 -->
+            <when test="maintainPlanDto.isEnd != null">
+                and t1.is_end = '1'
+            </when>
+            <otherwise>
+                and t1.is_end = '0' and t2.aftercare_date_end >= NOW()
+            </otherwise>
+        </choose>
         <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
-        <if test="maintainPlanDto.startTime !=null">and t2.created_time >= TO_DATE(#{maintainPlanDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainPlanDto.endTime !=null">and t2.created_time &lt;= TO_DATE(#{maintainPlanDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainPlanDto.startTime !=null">and t2.created_time >= STR_TO_DATE(#{maintainPlanDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainPlanDto.endTime !=null">and t2.created_time &lt;= STR_TO_DATE(#{maintainPlanDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
         <if test="maintainPlanDto.phases !=null and maintainPlanDto.phases !=''">and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle !=null and maintainPlanDto.maintenceStyle != ''">and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         order by created_time desc
@@ -76,14 +87,14 @@
         update tb_maintain_plan_stage
         <set>
             <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">maintain_days = #{maintainPlanDto.maintainDays},</if>
-            <if test="maintainPlanDto.aftercareDateStart != null">aftercare_date_start = TO_DATE(#{maintainPlanDto.aftercareDateStart}, 'SYYYY-MM-DD HH24:MI:SS' ),</if>
+            <if test="maintainPlanDto.aftercareDateStart != null">aftercare_date_start = STR_TO_DATE(#{maintainPlanDto.aftercareDateStart}, '%Y-%m-%d %H:%i:%s'),</if>
             <if test="maintainPlanDto.aftercareDateEnd != null">aftercare_date_end = #{maintainPlanDto.aftercareDateEnd},</if>
             <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">maintain_count = #{maintainPlanDto.maintainCount},</if>
             <if test="maintainPlanDto.oxygenReductionTime != null and maintainPlanDto.oxygenReductionTime != ''">oxygen_reduction_day = #{maintainPlanDto.oxygenReductionTime},</if>
-            <if test="maintainPlanDto.expireTime != null">expire_time = TO_DATE(#{maintainPlanDto.expireTime}, 'SYYYY-MM-DD HH24:MI:SS' ),</if>
+            <if test="maintainPlanDto.expireTime != null">expire_time = STR_TO_DATE(#{maintainPlanDto.expireTime}, '%Y-%m-%d %H:%i:%s'),</if>
             <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">phases=#{maintainPlanDto.phases},</if>
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">update_user = #{maintainPlanDto.updateUser},</if>
-            updated_time = sysdate
+            updated_time = NOW()
         </set>
         where maintain_plan_id = #{maintainPlanDto.id} and is_change = '0'
     </update>
@@ -97,14 +108,12 @@
             <if test="maintainPlanDto.updateUser != null and maintainPlanDto.updateUser !=''">update_user = #{maintainPlanDto.updateUser},</if>
             <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">maintain_days = #{maintainPlanDto.maintainDays},</if>
             <if test="maintainPlanDto.aftercareDateEnd != null">aftercare_date_end = #{maintainPlanDto.aftercareDateEnd},</if>
-            updated_time = sysdate,is_change = '1'
+            updated_time = NOW(),is_change = '1'
         </set>
         where id in (select stage_id from tb_maintain_plan where id = #{maintainPlanDto.id})
     </update>
     <insert id="insertMaintainPlan">
-        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="maintainPlanDto.id">
-            SELECT MAINTAINPLAN.NEXTVAL as "id" from DUAL
-        </selectKey>
+        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="maintainPlanDto.id">SELECT IFNULL(MAX(id),0)+1 AS `id` FROM tb_maintain_plan</selectKey>
         insert into tb_maintain_plan
         (
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">material_code,</if>
@@ -117,13 +126,11 @@
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode !=''">#{maintainPlanDto.materialCode},</if>
         <if test="maintainPlanDto.principalName != null and maintainPlanDto.principalName !=''">#{maintainPlanDto.principalName},</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''">#{maintainPlanDto.maintenceStyle},</if>
-        #{maintainPlanDto.stackId},MAINTAINPLAN.CURRVAL
+        #{maintainPlanDto.stackId},#{maintainPlanDto.id}
         )
     </insert>
     <insert id="insertMaintainStage">
-        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="maintainPlanDto.stageId">
-            SELECT MAINTAINPLANSTAGE.NEXTVAL from DUAL
-        </selectKey>
+        <selectKey resultType="java.lang.Integer" order="BEFORE" keyProperty="maintainPlanDto.stageId">SELECT IFNULL(MAX(id),0)+1 FROM tb_maintain_plan_stage</selectKey>
         insert into tb_maintain_plan_stage
         (
         <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">maintain_days,</if>
@@ -140,15 +147,15 @@
         values
         (
         <if test="maintainPlanDto.maintainDays != null and maintainPlanDto.maintainDays !=''">#{maintainPlanDto.maintainDays},</if>
-        <if test="maintainPlanDto.aftercareDateStart != null">TO_DATE(#{maintainPlanDto.aftercareDateStart}, 'SYYYY-MM-DD HH24:MI:SS' ),</if>
+        <if test="maintainPlanDto.aftercareDateStart != null">STR_TO_DATE(#{maintainPlanDto.aftercareDateStart}, '%Y-%m-%d %H:%i:%s'),</if>
         <if test="maintainPlanDto.aftercareDateEnd != null">#{maintainPlanDto.aftercareDateEnd},</if>
         <if test="maintainPlanDto.oxygenReductionTime != null and maintainPlanDto.oxygenReductionTime != ''">#{maintainPlanDto.oxygenReductionTime},</if>
-        <if test="maintainPlanDto.expireTime != null">TO_DATE(#{maintainPlanDto.expireTime}, 'SYYYY-MM-DD HH24:MI:SS' ),</if>
+        <if test="maintainPlanDto.expireTime != null">STR_TO_DATE(#{maintainPlanDto.expireTime}, '%Y-%m-%d %H:%i:%s'),</if>
         <if test="maintainPlanDto.maintainCount != null and maintainPlanDto.maintainCount !=''">#{maintainPlanDto.maintainCount},</if>
         <if test="maintainPlanDto.alarmValueSettingId != null and maintainPlanDto.alarmValueSettingId !=''">#{maintainPlanDto.alarmValueSettingId},</if>
         <if test="maintainPlanDto.id != null and maintainPlanDto.id !=''">#{maintainPlanDto.id},</if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''">#{maintainPlanDto.phases},</if>
-        #{maintainPlanDto.createUser},sysdate,#{maintainPlanDto.createUser},sysdate,#{maintainPlanDto.version},MAINTAINPLANSTAGE.CURRVAL
+        #{maintainPlanDto.createUser},NOW(),#{maintainPlanDto.createUser},NOW(),#{maintainPlanDto.version},#{maintainPlanDto.stageId}
         )
     </insert>
     <select id="findStageIdById" resultType="com.rpzh.vo.MaintainPlanVo">
@@ -165,7 +172,7 @@
         t1.maintence_style as maintenceStyle,
         t2.phases as phases,
         t3.site_name as stackName,
-        to_char(t2.created_time, 'YYYY-MM-DD') as sealStackTime
+        DATE_FORMAT(t2.created_time, '%Y-%m-%d') as sealStackTime
         from tb_maintain_plan t1 left join tb_maintain_plan_stage t2 on t1.id = t2.maintain_plan_id
         inner join
         (select id,site_name from tb_stack where 1=1 <if test="size !=0">and id in  <foreach collection="stackIds" item="id" open="(" separator="," close=")">#{id}</foreach> </if>
@@ -174,8 +181,8 @@
         <if test="maintainPlanDto.materialCode != null and maintainPlanDto.materialCode != ''"> and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
-        <if test="maintainPlanDto.startTime !=null">and t2.created_time >= TO_DATE(#{maintainPlanDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainPlanDto.endTime !=null">and t2.created_time &lt;= TO_DATE(#{maintainPlanDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainPlanDto.startTime !=null">and t2.created_time >= STR_TO_DATE(#{maintainPlanDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainPlanDto.endTime !=null">and t2.created_time &lt;= STR_TO_DATE(#{maintainPlanDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
         ORDER BY sealStackTime DESC,stack_id
     </select>
     <select id="findMaintainDays" resultType="java.lang.Integer">
@@ -195,8 +202,8 @@
         <if test="maintainPlanDto.phases != null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
         <if test="maintainPlanDto.maintenceStyle != null and maintainPlanDto.maintenceStyle !=''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
-        <if test="maintainPlanDto.startTime !=null">and t2.updated_time >= TO_DATE(#{maintainPlanDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainPlanDto.endTime !=null">and t2.updated_time &lt;= TO_DATE(#{maintainPlanDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainPlanDto.startTime !=null">and t2.updated_time >= STR_TO_DATE(#{maintainPlanDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainPlanDto.endTime !=null">and t2.updated_time &lt;= STR_TO_DATE(#{maintainPlanDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
         ORDER BY t2.id
     </select>
     <select id="findMaintainHistoryById" resultType="com.rpzh.vo.MaintainPlanVo">
@@ -214,13 +221,13 @@
         UPDATE tb_maintain_plan set is_end = '1' where id = #{maintainPlanId}
     </update>
     <update id="endMaintainPlanStage">
-        UPDATE tb_maintain_plan_stage set maintain_days = #{maintainDays},updated_time = sysdate,update_user = #{updateUser} where id in (select stage_id from tb_maintain_plan where id = #{maintainPlanId})
+        UPDATE tb_maintain_plan_stage set maintain_days = #{maintainDays},updated_time = NOW(),update_user = #{updateUser} where id in (select stage_id from tb_maintain_plan where id = #{maintainPlanId})
     </update>
     <select id="findCreatedTime" resultType="java.util.Date">
-        select TO_DATE(to_char(created_time, 'YYYY-MM-DD'), 'SYYYY-MM-DD HH24:MI:SS' ) from tb_maintain_plan_stage t2 inner join tb_maintain_plan t1 on t1.stage_id = t2.id where t1.id = #{maintainPlanId}
+        select STR_TO_DATE(DATE_FORMAT(created_time, '%Y-%m-%d'), '%Y-%m-%d %H:%i:%s') from tb_maintain_plan_stage t2 inner join tb_maintain_plan t1 on t1.stage_id = t2.id where t1.id = #{maintainPlanId}
     </select>
     <select id="findAlarmValueSettingId" resultType="java.util.Map">
-        select id as "id",alarm_value_setting_id as "alarmValueSettingId" from tb_maintain_plan_stage
+        select id AS `id`,alarm_value_setting_id AS `alarmValueSettingId` from tb_maintain_plan_stage
         WHERE maintain_plan_id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}
@@ -269,11 +276,11 @@
         from tb_maintain_plan t1
         left join tb_maintain_plan_stage t2 on t1.stage_id = t2.id
         inner join (select id,site_name from tb_stack where 1=1 <if test="size !=0">and id in  <foreach collection="stackIds" item="id" open="(" separator="," close=")">#{id}</foreach> </if>) t3 on t3.id = t1.stack_id
-        where t1.is_end = '0' and t2.aftercare_date_end &lt; sysdate
+        where t1.is_end = '0' and t2.aftercare_date_end &lt; NOW()
             <if test="maintainPlanDto.materialCode!=null and maintainPlanDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainPlanDto.materialCode}),'%')</if>
             <if test="maintainPlanDto.maintainCount!=null and maintainPlanDto.maintainCount!=''">and t2.maintain_count = #{maintainPlanDto.maintainCount}</if>
-            <if test="maintainPlanDto.startTime !=null">and t2.aftercare_date_end >= TO_DATE(#{maintainPlanDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-            <if test="maintainPlanDto.endTime !=null">and t2.aftercare_date_end &lt;= TO_DATE(#{maintainPlanDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+            <if test="maintainPlanDto.startTime !=null">and t2.aftercare_date_end >= STR_TO_DATE(#{maintainPlanDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+            <if test="maintainPlanDto.endTime !=null">and t2.aftercare_date_end &lt;= STR_TO_DATE(#{maintainPlanDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
             <if test="maintainPlanDto.phases !=null and maintainPlanDto.phases !=''"> and t2.phases = #{maintainPlanDto.phases}</if>
             <if test="maintainPlanDto.maintenceStyle !=null and maintainPlanDto.maintenceStyle != ''"> and t1.maintence_style = #{maintainPlanDto.maintenceStyle}</if>
         order by created_time desc
@@ -301,7 +308,9 @@
         LEFT JOIN tb_maintain_plan_stage t2 ON t.stage_id = t2.id
         WHERE
             stack_id = #{stackId} AND
-        	is_end = 0 AND ROWNUM =1
+        	is_end = 0 
+    
+        LIMIT 1
     </select>
     <insert id="insertMaintainCount">
         insert into tb_maintain_count(
@@ -310,7 +319,7 @@
         (
         <foreach collection="maintainPlanDtos" index="" item="maintainPlanDto" separator="union all">
             select #{maintainPlanDto.materialCode},#{maintainPlanDto.maintainCount},#{maintainPlanDto.maintainPlanId},
-            #{maintainPlanDto.maintenceStyle},#{maintainPlanDto.phases},sysdate,#{maintainPlanDto.stackId},
+            #{maintainPlanDto.maintenceStyle},#{maintainPlanDto.phases},NOW(),#{maintainPlanDto.stackId},
             #{maintainPlanDto.areaId},#{maintainPlanDto.floorId},#{maintainPlanDto.buildingId},#{maintainPlanDto.warehouseId}
             from dual
         </foreach>
@@ -332,25 +341,25 @@
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!= ''">and material_code like concat(concat('%',#{maintainCountDto.materialCode}),'%')</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime !=null">and created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainCountDto.endTime !=null">and created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainCountDto.startTime !=null">and created_time >= STR_TO_DATE(#{maintainCountDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainCountDto.endTime !=null">and created_time &lt;= STR_TO_DATE(#{maintainCountDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
     </select>
     <select id="findFirst" resultType="com.rpzh.vo.MaintainCountVo">
         SELECT t.material_code as materialCode,SUM(t.maintain_count) as maintainCount,a.site_name as stackName,t.warehouse_id as warehouseId,
-        CASE when instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) end AS id,
-        CASE when instr(LISTAGG(t.buliding_id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.buliding_id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.buliding_id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.buliding_id, ',') WITHIN GROUP(ORDER BY t.id) end AS buildingId
+        CASE when instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') end AS id,
+        CASE when instr(GROUP_CONCAT(t.buliding_id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.buliding_id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.buliding_id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.buliding_id ORDER BY t.id SEPARATOR ',') end AS buildingId
         FROM (select * from tb_maintain_count where id  in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach>) t
         inner join tb_warehouse a on a.id = t.warehouse_id
         GROUP BY t.material_code,t.warehouse_id,a.site_name order by t.material_code,t.warehouse_id
     </select>
     <select id="findTwo" resultType="com.rpzh.vo.MaintainCountVo">
         SELECT t.material_code as materialCode,SUM(t.maintain_count) as maintainCount,t.buliding_id as buildingId,t.warehouse_id as warehouseId,a.site_name as stackName,
-        CASE when instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) end AS id,
-        CASE when instr(LISTAGG(t.floor_id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.floor_id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.floor_id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.floor_id, ',') WITHIN GROUP(ORDER BY t.id) end AS floorId
+        CASE when instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') end AS id,
+        CASE when instr(GROUP_CONCAT(t.floor_id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.floor_id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.floor_id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.floor_id ORDER BY t.id SEPARATOR ',') end AS floorId
         FROM (select * from tb_maintain_count where id  in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach>) t
         inner join tb_building a on a.id = t.buliding_id
         WHERE 1=1
@@ -359,10 +368,10 @@
     </select>
     <select id="findThree" resultType="com.rpzh.vo.MaintainCountVo">
         SELECT t.material_code as materialCode,SUM(t.maintain_count) as maintainCount,a.site_name as stackName, t.floor_id as floorId,t.buliding_id as buildingId,
-        CASE when instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) end AS id,
-        CASE when instr(LISTAGG(t.area_id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.area_id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.area_id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.area_id, ',') WITHIN GROUP(ORDER BY t.id) end AS areaId
+        CASE when instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') end AS id,
+        CASE when instr(GROUP_CONCAT(t.area_id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.area_id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.area_id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.area_id ORDER BY t.id SEPARATOR ',') end AS areaId
         FROM tb_maintain_count t
         inner join tb_floor a on a.id = t.floor_id
         WHERE 1=1
@@ -371,27 +380,26 @@
     </select>
     <select id="findFour" resultType="com.rpzh.vo.MaintainCountVo">
         SELECT t.material_code as materialCode,SUM(t.maintain_count) as maintainCount,a.site_name as stackName,t.area_id as areaId,t.floor_id as floorId,
-        CASE when instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) end AS id,
-        CASE when instr(LISTAGG(t.stack_id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.stack_id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.stack_id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.stack_id, ',') WITHIN GROUP(ORDER BY t.id) end AS stackId
+        CASE when instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') end AS id,
+        CASE when instr(GROUP_CONCAT(t.stack_id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.stack_id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.stack_id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.stack_id ORDER BY t.id SEPARATOR ',') end AS stackId
         FROM (select * from tb_maintain_count where id  in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach>) t inner join tb_ware_area a on a.id = t.area_id
         WHERE 1=1 <if test="siteIds!=null">and t.area_id in <foreach collection="siteIds" item="id" open="(" separator="," close=")"> #{id} </foreach> </if>
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,a.site_name order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id
     </select>
     <select id="findFive" resultType="com.rpzh.vo.MaintainCountVo">
         SELECT t.material_code as materialCode,SUM(t.maintain_count) as maintainCount,a.site_name as stackName,
-        CASE when instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) end AS id,
-        CASE when instr(LISTAGG(TO_char(t.created_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t.id),',') > 0 THEN substr(LISTAGG(TO_char(t.created_time,'SYYYY-MM-DD HH24:MI:SS'), ',')
-        WITHIN GROUP(ORDER BY t.id), 1, instr(LISTAGG(TO_char(t.created_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1)
-        ELSE LISTAGG(TO_char(t.created_time,'SYYYY-MM-DD HH24:MI:SS'), ',') WITHIN GROUP(ORDER BY t.id) end AS createdTime,
-        CASE when instr(LISTAGG(TO_CHAR(t.maintence_style), ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t.maintence_style), ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(TO_CHAR(t.maintence_style), ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(TO_CHAR(t.maintence_style), ',') WITHIN GROUP(ORDER BY t.id) end AS maintenceStyle,
-        CASE when instr(LISTAGG(TO_CHAR(t.phases), ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(TO_CHAR(t.phases), ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(TO_CHAR(t.phases), ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(TO_CHAR(t.phases), ',') WITHIN GROUP(ORDER BY t.id) end AS phases,
-        CASE when instr(LISTAGG(t.BULIDING_ID, ',') WITHIN GROUP(ORDER BY t.id),',') != 0 THEN substr(LISTAGG(t.BULIDING_ID, ',') WITHIN GROUP(ORDER BY t.id), 1,
-        instr(LISTAGG(t.BULIDING_ID, ',') WITHIN GROUP(ORDER BY t.id), ',',1,1)-1) ELSE LISTAGG(t.BULIDING_ID, ',') WITHIN GROUP(ORDER BY t.id) end AS t,
+        CASE when instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') end AS id,
+        CASE when instr(GROUP_CONCAT(DATE_FORMAT(t.created_time, '%Y-%m-%d %H:%i:%s') ORDER BY t.id SEPARATOR ','),',') > 0 THEN substr(GROUP_CONCAT(DATE_FORMAT(t.created_time, '%Y-%m-%d %H:%i:%s') ORDER BY t.id SEPARATOR ','), 1, instr(GROUP_CONCAT(DATE_FORMAT(t.created_time, '%Y-%m-%d %H:%i:%s') ORDER BY t.id SEPARATOR ','), ',',1,1)-1)
+        ELSE GROUP_CONCAT(DATE_FORMAT(t.created_time, '%Y-%m-%d %H:%i:%s') ORDER BY t.id SEPARATOR ',') end AS createdTime,
+        CASE when instr(GROUP_CONCAT(CAST(t.maintence_style AS CHAR) ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(CAST(t.maintence_style AS CHAR) ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(CAST(t.maintence_style AS CHAR) ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(CAST(t.maintence_style AS CHAR) ORDER BY t.id SEPARATOR ',') end AS maintenceStyle,
+        CASE when instr(GROUP_CONCAT(CAST(t.phases AS CHAR) ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(CAST(t.phases AS CHAR) ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(CAST(t.phases AS CHAR) ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(CAST(t.phases AS CHAR) ORDER BY t.id SEPARATOR ',') end AS phases,
+        CASE when instr(GROUP_CONCAT(t.BULIDING_ID ORDER BY t.id SEPARATOR ','),',') != 0 THEN substr(GROUP_CONCAT(t.BULIDING_ID ORDER BY t.id SEPARATOR ','), 1,
+        instr(GROUP_CONCAT(t.BULIDING_ID ORDER BY t.id SEPARATOR ','), ',',1,1)-1) ELSE GROUP_CONCAT(t.BULIDING_ID ORDER BY t.id SEPARATOR ',') end AS t,
         t.area_id as areaId,t.stack_id as stackId FROM (select * from tb_maintain_count where id  in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach>) t inner join tb_stack a on a.id = t.stack_id WHERE 1=1
         <if test="siteIds!=null">and t.stack_id in <foreach collection="siteIds" item="id" open="(" separator="," close=")"> #{id} </foreach> </if>
         GROUP BY t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id,a.site_name order by t.material_code,t.warehouse_id,t.buliding_id,t.floor_id,t.area_id,t.stack_id
@@ -417,16 +425,16 @@
         <if test="maintainCountDto.stackId!=null and maintainCountDto.stackId!= ''"> and ${tableColumn} = #{maintainCountDto.stackId}</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t1.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t1.phases = #{maintainCountDto.phases}</if>
-        <if test="maintainCountDto.startTime !=null">and t1.created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainCountDto.startTime !=null">and t1.created_time >= STR_TO_DATE(#{maintainCountDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= STR_TO_DATE(#{maintainCountDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
         order by t1.warehouse_id,t1.buliding_id,t1.floor_id,t1.area_id,t1.stack_id
     </select>
     <select id="findCount" resultType="java.lang.Double">
         select sum(t1.maintain_count) from tb_maintain_count t1
         WHERE 1=1
         <if test="maintainCountDto.materialCode!=null and maintainCountDto.materialCode!=''">and t1.material_code like concat(concat('%',#{maintainCountDto.materialCode}),'%')</if>
-        <if test="maintainCountDto.startTime !=null">and t1.created_time >= TO_DATE(#{maintainCountDto.startTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= TO_DATE(#{maintainCountDto.endTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        <if test="maintainCountDto.startTime !=null">and t1.created_time >= STR_TO_DATE(#{maintainCountDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="maintainCountDto.endTime !=null">and t1.created_time &lt;= STR_TO_DATE(#{maintainCountDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
         <if test="maintainCountDto.pidRoute!=null and maintainCountDto.pidRoute!= ''"> and ${tableColumn} = #{maintainCountDto.stackId}</if>
         <if test="maintainCountDto.maintenceStyle!=null and maintainCountDto.maintenceStyle!= ''"> and t1.maintence_style = #{maintainCountDto.maintenceStyle}</if>
         <if test="maintainCountDto.phases!=null and maintainCountDto.phases!= ''"> and t1.phases = #{maintainCountDto.phases}</if>

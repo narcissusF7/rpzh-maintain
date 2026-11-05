@@ -19,6 +19,10 @@ public class MaintainPlanVo {
     @ApiModelProperty(notes = "养护计划id")
     private Integer id;
 
+    /** 是否已完成养护：1=已结束（可查看全链路统计），0=进行中 */
+    @ApiModelProperty(notes = "是否已完成养护 1=是 0=否")
+    private String isEnd;
+
     @ApiModelProperty(notes = "养护阶段id")
     private Integer stageId;
 

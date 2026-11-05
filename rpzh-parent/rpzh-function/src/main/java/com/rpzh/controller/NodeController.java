@@ -346,7 +346,7 @@ public class NodeController {
     )
     @PostMapping("/enterStack")
     @PreAuthorize("hasAnyAuthority('f:n:es')")
-    public Result enterStack(String data) {
+    public Result enterStack(@RequestParam("data") String data) {
         if (ToolUtil.isEmpty(data)) {
             return new Result<>(false, StatusCode.ERROR, "请选择一个设备");
         }
@@ -413,8 +413,9 @@ public class NodeController {
 
                 nodeDto.setSiteRoute(map.get("pidRoute").toString()+",[05:"+map.get("stackId")+"]");
 
-                //如果是包芯设备
-                if (NodeConstant.TEMPERATURE_CORE_CHIP_NODE_TYPE_VALUE.equals(map.get("nodeType").toString())) {
+                // 设备箱号是入垛时录入的数据，前端入垛 / 修改位置表单对所有设备类型都提供该字段。
+                // 旧实现只对包芯设备写入，导致其它设备入垛时箱号丢失、改位置时也无法更新。
+                if (!ToolUtil.isEmpty(map.get("caseNo"))) {
                     nodeDto.setCaseNo(map.get("caseNo").toString());
                 }
 
@@ -473,7 +474,7 @@ public class NodeController {
     )})
     @PostMapping("/exportNode")
     @PreAuthorize("hasAnyAuthority('f:n:en')")
-    public Result exportNode(MultipartFile file, String nodeType) {
+    public Result exportNode(MultipartFile file, @RequestParam("nodeType") String nodeType) {
         if (ToolUtil.isEmpty(nodeType)) {
             return new Result<>(false, StatusCode.ERROR, "节点类型不能为空");
         }
@@ -562,7 +563,7 @@ public class NodeController {
             dataType = "Integer"
     )
     @GetMapping({"/findNodeByStackId"})
-    public Result<List<NodeVo>> findNodeByStackId(Integer stackId) {
+    public Result<List<NodeVo>> findNodeByStackId(@RequestParam("stackId") Integer stackId) {
         List<NodeVo> nodeVoList = nodeService.findNodeByStackId(stackId);
         return new Result(true, StatusCode.OK, "查询成功", nodeVoList);
     }

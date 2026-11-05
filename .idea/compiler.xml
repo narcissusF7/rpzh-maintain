@@ -38,4 +38,41 @@
       </profile>
     </annotationProcessing>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="rpzh-api" options="-parameters" />
+      <module name="rpzh-auth" options="-parameters" />
+      <module name="rpzh-carbon" options="-parameters" />
+      <module name="rpzh-carbon-api" options="-parameters" />
+      <module name="rpzh-common" options="-parameters" />
+      <module name="rpzh-common-api" options="-parameters" />
+      <module name="rpzh-common-core" options="-parameters" />
+      <module name="rpzh-common-db" options="-parameters" />
+      <module name="rpzh-common-log" options="-parameters" />
+      <module name="rpzh-device" options="-parameters" />
+      <module name="rpzh-device-common" options="-parameters" />
+      <module name="rpzh-file" options="-parameters" />
+      <module name="rpzh-file-api" options="-parameters" />
+      <module name="rpzh-function" options="-parameters" />
+      <module name="rpzh-function-api" options="-parameters" />
+      <module name="rpzh-gateway" options="-parameters" />
+      <module name="rpzh-gateway-a" options="-parameters" />
+      <module name="rpzh-gateway-b" options="-parameters" />
+      <module name="rpzh-gateway-c" options="-parameters" />
+      <module name="rpzh-humiture" options="-parameters" />
+      <module name="rpzh-humiture-api" options="-parameters" />
+      <module name="rpzh-job" options="-parameters" />
+      <module name="rpzh-job-api" options="-parameters" />
+      <module name="rpzh-log" options="-parameters" />
+      <module name="rpzh-log-api" options="-parameters" />
+      <module name="rpzh-moisture" options="-parameters" />
+      <module name="rpzh-oxygen" options="-parameters" />
+      <module name="rpzh-oxygen-api" options="-parameters" />
+      <module name="rpzh-parent" options="-parameters" />
+      <module name="rpzh-system" options="-parameters" />
+      <module name="rpzh-system-api" options="-parameters" />
+      <module name="rpzh-temp" options="-parameters" />
+      <module name="rpzh-temp-api" options="-parameters" />
+    </option>
+  </component>
 </project>

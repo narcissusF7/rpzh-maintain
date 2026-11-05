@@ -3,7 +3,9 @@ package com.rpzh.handler;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.rpzh.config.NodeAbnormalConfig;
 import com.rpzh.constant.NodeConstant;
+import com.rpzh.constant.NodeStatusConstant;
 import com.rpzh.constant.WarningTypeConstant;
 import com.rpzh.dao.*;
 import com.rpzh.dto.AirConditionDto;
@@ -55,6 +57,9 @@ public class MaintainDataHandler {
 
     @Autowired
     NodeDao nodeDao;
+
+    @Autowired
+    NodeAbnormalConfig nodeAbnormalConfig;
 
     @Autowired
     MonitoringCenterService monitoringCenterService;
@@ -236,8 +241,8 @@ public class MaintainDataHandler {
         if (ToolUtil.isEmpty(cacheNodeData)) {
             //从数据库中获取
             nodeVo = nodeDao.findNodeByOne(parseData.getNodeId());
-            //如果设备处于是解垛状态  数据不做任何处理
-            if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
+            //解垛/故障/运维中设备的数据不处理；异常设备仍在垛内，必须继续接收数据以便自动恢复
+            if (ToolUtil.isEmpty(nodeVo) || !NodeStatusConstant.inStack(nodeVo.getStatus())) {
                 return;
             }
             if (ToolUtil.isNotEmpty(nodeVo.getStackId())){
@@ -253,17 +258,28 @@ public class MaintainDataHandler {
         } else {
             nodeVo = JSON.parseObject(cacheNodeData.toString(), NodeVo.class);
         }
-        //如果设备处于是解垛状态  数据不做任何处理
-        if (ToolUtil.isEmpty(nodeVo) || !"1".equals(nodeVo.getStatus())) {
+        //解垛/故障/运维中设备的数据不处理；异常设备仍在垛内，继续接收数据
+        if (ToolUtil.isEmpty(nodeVo) || !NodeStatusConstant.inStack(nodeVo.getStatus())) {
             return;
+        }
+
+        //异常设备重新上报数据，且已无未处置的故障预警 -> 实时恢复为已入垛，
+        //避免只依赖定时任务（历史库不可用时也能恢复）
+        if (NodeStatusConstant.isAbnormal(nodeVo.getStatus())) {
+            Integer undo = earlyWarningDao.countUndoFaultWarning(nodeVo.getNodeId());
+            if (undo == null || undo <= 0) {
+                nodeDao.updateStatus(Collections.singletonList(nodeVo.getNodeId()), NodeStatusConstant.ENTERED);
+                redisTemplate.delete(MAINTAIN_CACHE_NODE + nodeVo.getNodeId());
+            }
         }
 
         warningType = "";
         //判断电量
         decideFault(parseData.getVoltage(), voltage, WarningTypeConstant.NODE_LOW_BATTERY_BREAKDOWN, parseData);
 
-        //判断信号强度
-        // decideFault(parseData.getSignalStrength().doubleValue(),signalStrength.doubleValue(),WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN,parseData);
+        //判断信号强度（snr 越小信号越差，低于阈值且连续达到次数后生成 02 信号强度故障预警）
+        decideFault(parseData.getSignalStrength().doubleValue(), signalStrength.doubleValue(),
+                WarningTypeConstant.NODE_SIGNAL_STRENGTH_BREAKDOWN, parseData);
 
         //该设备需要预警的字段
         String[] alarmColumns = AlarmValueSettingVo.getColumn(nodeVo.getNodeType(), nodeVo.getSiteType());
@@ -464,27 +480,28 @@ public class MaintainDataHandler {
         //查询该设备在预警记录表中该类型的预警记录是否存在
         Integer count = earlyWarningDao.findUndoCount(parseData.getNodeId(), warningType);
         if (count < 1) {
-            //获取缓存中该设备该预警类型的次数
+            //本次是该设备连续第几次发出异常数据
             Object o = redisTemplate.opsForHash().get(FAULT + warningType, parseData.getNodeId());
+            int times = 1;
             if (!ToolUtil.isEmpty(o)) {
-                //如果缓存中存在次数
-                if ((Integer) o == 2) {
-                    //达到3次新增一条数据
-                    NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
-                    EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne + "", "1", nodeVo.getSiteRoute(), nodeVo.getSiteType(), nodeVo.getSiteId());
-                    Map taskMap = addTask(nodeVo, "20");
-                    earlyWarning.setPrincipalName(taskMap.get("principal").toString());
-                    earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
-                    earlyWarningDao.insertWarning(earlyWarning);
-                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), 0);
-                } else {
-                    //否则次数加1
-                    redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), (Integer) o + 1);
-                }
-            } else {
-                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), 1);
+                int cached = o instanceof Number ? ((Number) o).intValue() : Integer.parseInt(o.toString());
+                times = cached + 1;
             }
-
+            if (times >= nodeAbnormalConfig.getMaxErrorCount()) {
+                //达到阈值：生成故障预警，并把设备状态标记为异常
+                NodeVo nodeVo = nodeDao.findByNodeId(parseData.getNodeId());
+                EarlyWarning earlyWarning = new EarlyWarning(warningType, parseData.getNodeId(), parseData.getNodeType(), warningValOne + "", "1", nodeVo.getSiteRoute(), nodeVo.getSiteType(), nodeVo.getSiteId());
+                Map taskMap = addTask(nodeVo, "20");
+                earlyWarning.setPrincipalName(taskMap.get("principal").toString());
+                earlyWarning.setTaskId(Integer.parseInt(taskMap.get("id").toString()));
+                earlyWarningDao.insertWarning(earlyWarning);
+                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), 0);
+                nodeDao.updateStatus(Collections.singletonList(parseData.getNodeId()), NodeStatusConstant.ABNORMAL);
+                //清掉节点缓存，避免 handlerData 仍按旧的"已入垛"状态处理
+                redisTemplate.delete(MAINTAIN_CACHE_NODE + parseData.getNodeId());
+            } else {
+                redisTemplate.opsForHash().put(FAULT + warningType, parseData.getNodeId(), times);
+            }
         }
     }
 
@@ -777,18 +794,36 @@ public class MaintainDataHandler {
      * @return
      */
     public List<String> getHashKeys(String siteRoute) {
-        //将位置路由转成键值对 键:(垛 区 层 楼 仓库) 值 键对应的id
-        Map<String, String> map = new HashMap<>();
-        String[] strings = siteRoute.split(",");
-        for (int i = 0; i < strings.length; i++) {
-            String strip = StringUtils.strip(strings[i], "[]");
-            map.put(strip.split(":")[0], strip.split(":")[1]);
-        }
+        // 按路径顺序（粗 -> 细）生成层级 key，如 011 / 0211 / 03101 / 04202 / 05303。
+        // putAlarmValueToCache 从末尾倒序遍历做"向上查找"，因此顺序必须稳定，
+        // 不能用 HashMap 遍历（迭代顺序不确定，会破坏逐级向上查询）。
+        // 兼容两种历史格式：[04:201][05:303] 与纯数字 0,1,11,101,202,303（下标即层级）。
         List<String> hashKeys = new ArrayList<>();
-        map.forEach((k, v) -> {
-            hashKeys.add(k + v);
-        });
-
+        if (siteRoute == null || siteRoute.trim().isEmpty()) {
+            return hashKeys;
+        }
+        String[] tokens = siteRoute.split(",");
+        for (int i = 0; i < tokens.length; i++) {
+            String token = StringUtils.strip(tokens[i], "[]").trim();
+            if (token.isEmpty()) {
+                continue;
+            }
+            String level;
+            String id;
+            if (token.contains(":")) {
+                String[] kv = token.split(":");
+                level = kv[0];
+                id = kv[1];
+            } else {
+                // 纯数字路径：下标即层级编号（0=根，1=01仓库 ... 4=04仓间，5=05垛位）
+                if (i == 0) {
+                    continue; // 根节点不参与阈值查找
+                }
+                level = String.format("%02d", i);
+                id = token;
+            }
+            hashKeys.add(level + id);
+        }
         return hashKeys;
     }
 
@@ -838,11 +873,17 @@ public class MaintainDataHandler {
 
             if (ToolUtil.isEmpty(maintainEarlyTime))
             maintainEarlyTime = maintainEarlyTimeService.findByMaintainPlanId(nodeVo.getMaintainPlanId());
-            //信号发送间隔（小时）
-            Double time = Double.valueOf(String.format("%.2f",parseData.getFrequency()/3600.0+""));
-            //获取缓存中的连续预警次数
+
+            //没有累计预警时间配置时只跳过这段统计，不能中断后面的预警生成/更新主链路
+            if (ToolUtil.isEmpty(maintainEarlyTime)) {
+                log.warn("养护计划 {} 未配置 tb_maintain_early_time 记录，跳过累计预警时间统计",
+                        nodeVo.getMaintainPlanId());
+            } else {
+            //信号发送间隔（小时）；%.2f 要求数值入参，不能把 double 拼成字符串
+            Double time = Double.valueOf(String.format("%.2f", parseData.getFrequency() / 3600.0));
+            //获取缓存中的连续预警次数：有值用缓存值，无值从 0 开始
             Object o = redisTemplate.opsForHash().get(ALERT_NUM, parseData.getNodeId() + evnType);
-            Integer count  =ToolUtil.isNotEmpty(o)? 0:Integer.parseInt(o.toString());
+            Integer count = ToolUtil.isNotEmpty(o) ? Integer.parseInt(o.toString()) : 0;
             Double allTime =0.0;
 
             //根据设备类型设置累计预警时间
@@ -879,6 +920,7 @@ public class MaintainDataHandler {
             if (!"temp".equals(evnType)){
                Integer updateFlag = maintainEarlyTimeService.updateMaintain(maintainEarlyTime);
                maintainEarlyTime = null;
+            }
             }
 
         }
@@ -1031,6 +1073,8 @@ public class MaintainDataHandler {
             nodeMalfunction(parseData, type, v1);
 
         } else {
+            //数据恢复正常：清掉连续异常计数，避免偶发异常跨很长周期被累计成"多次异常"
+            redisTemplate.opsForHash().delete(FAULT + type, parseData.getNodeId());
             //获取缓存的该设备数据
             Object cacheNodeData = redisTemplate.opsForValue().get(MAINTAIN + parseData.getNodeId());
             if (!ToolUtil.isEmpty(cacheNodeData)) {
@@ -1079,24 +1123,41 @@ public class MaintainDataHandler {
         //查询该垛位、仓间下该类型任务是否存在
         Map selectTaskMap = taskManagementService.findTaskBySiteRoute(nodeVo.getSiteRoute(), type);
         if (ToolUtil.isEmpty(selectTaskMap)) {
-            String[] splits = nodeVo.getSiteRoute().split(":");
-            String str = splits[splits.length-1];
-            String siteId = str.substring(0,str.length()-1);
+            // pid_route 有两种历史格式：
+            //  1) [01:x]...[05:303]     —— 末段带 [类型:id] 标记
+            //  2) 0,1,11,101,202,303   —— 纯 id 逗号分隔（初始化数据）
+            // 优先用节点已绑定的 stackId；否则解析末段，避免 split(":") 对纯数字路径越界
+            String route = nodeVo.getSiteRoute();
+            Integer siteId = nodeVo.getStackId();
+            if (siteId == null && route != null && !route.trim().isEmpty()) {
+                String[] tokens = route.split(",");
+                String last = tokens[tokens.length - 1].trim();
+                if (last.startsWith("[") && last.contains(":")) {
+                    String inner = last.substring(1, last.indexOf(']'));
+                    siteId = Integer.parseInt(inner.split(":")[1]);
+                } else {
+                    siteId = Integer.parseInt(last);
+                }
+            }
+            if (siteId == null) {
+                throw new IllegalStateException("无法从位置路径解析位置id：" + route);
+            }
             //设置位置id
-            nodeVo.setSiteId(Integer.parseInt(siteId));
+            nodeVo.setSiteId(siteId);
 
             String principal = "";
-            //如果是仓间
-            if (splits.length-2 == 4) {
-                nodeVo.setGatherSite(warehouseService.findWareAreaByOne(nodeVo.getSiteId()).getSiteName());
-                //获取位置负责人
-                Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, Integer.parseInt(siteId));
-                //设置负责人
-                principal = sitePrincipal.get("username").toString();
-            } else if(splits.length-2 == 5) {
-                nodeVo.setGatherSite(warehouseService.findStackById(nodeVo.getSiteId()).getSiteName());
-                //获取养护计划负责人
+            //仓间 / 垛内按 siteType 判断，不再依赖路径分段数量
+            if (NodeConstant.NODE_WARE_AREA.equals(nodeVo.getSiteType())) {
+                Map<String, Object> sitePrincipal = warehouseService.getSitePrincipal(4, siteId);
+                if (!ToolUtil.isEmpty(sitePrincipal) && sitePrincipal.get("username") != null) {
+                    principal = sitePrincipal.get("username").toString();
+                }
+            } else {
+                //垛内设备：负责人取养护计划
                 principal = maintainPlanDao.findPrincipalById(nodeVo.getMaintainPlanId());
+            }
+            if (principal == null) {
+                principal = "";
             }
             TaskDto taskDto = new TaskDto(UUID.randomUUID().toString().replace("-", ""), type, nodeVo, principal, DateUtil.offsetDay(DateUtil.date(), 3).toString());
             taskDto.setCreateType(2);

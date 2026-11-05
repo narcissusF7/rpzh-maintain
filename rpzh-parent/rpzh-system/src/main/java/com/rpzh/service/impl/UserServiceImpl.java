@@ -13,6 +13,7 @@ import com.rpzh.service.UserService;
 import com.rpzh.util.RedisUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.UserVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
  * @Author liubc
  * @create 2021/3/30 16:32
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -38,6 +40,12 @@ public class UserServiceImpl implements UserService {
 
     private final String accountId = "ACCOUNT_ID_";
 
+    /** 下游 function/job 模块读取用户昵称、手机号等信息的 hash key 前缀 */
+    private static final String USER_KEY_PREFIX = "USER_";
+    /** userId -> 账号 的反查映射 key（与 function 模块保持一致） */
+    private static final String USER_ID_USERNAME_KEY = "MAINTIAN_USER_ID_USERNAME";
+    private static final String USER_ID_FIELD_PREFIX = "USER_ID_";
+
 
     /**
      * 用户登录
@@ -48,8 +56,114 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(String id) {
         User user = userDao.findById(id);
-        redisUtil.set(accountId + user.getUsername(), user.getNickname() + "(" + user.getUsername() + ")");
+        if (user == null) {
+            return null;
+        }
+        // 登录链路（auth 的 UserDetailsServiceImpl 必调本方法）顺带预热用户缓存；
+        // 缓存写入失败绝不能影响登录，整段兜住异常。
+        try {
+            redisUtil.set(accountId + user.getUsername(), user.getNickname() + "(" + user.getUsername() + ")");
+            warmUpUserCache(user.getUsername());
+        } catch (Exception e) {
+            log.warn("用户缓存预热失败, username={}", id, e);
+        }
         return user;
+    }
+
+    /**
+     * 预热单个用户的 Redis 缓存。
+     * <p>
+     * 写入 USER_账号 的 hash（nickname / phonenumber / userId / deptname / roleName）以及
+     * MAINTIAN_USER_ID_USERNAME 中 userId -> 账号 的反查映射，保证下游按账号取昵称、
+     * 按负责人 id 还原账号时不再大面积落空。
+     *
+     * @param username 用户账号
+     * @return 是否写入成功
+     */
+    @Override
+    public boolean warmUpUserCache(String username) {
+        if (ToolUtil.isEmpty(username)) {
+            return false;
+        }
+        UserVo info = userDao.findUserCache(username);
+        if (info == null) {
+            log.warn("用户缓存预热跳过, 用户不存在或已删除, username={}", username);
+            return false;
+        }
+        Map<String, Object> cache = new LinkedHashMap<>();
+        cache.put("userId", info.getUserId());
+        cache.put("nickname", info.getNickname());
+        cache.put("phonenumber", info.getPhonenumber());
+        cache.put("deptname", info.getDeptname());
+        cache.put("roleName", joinRoleName(username));
+        boolean ok = redisUtil.hmset(USER_KEY_PREFIX + username, cache);
+        if (info.getUserId() != null) {
+            redisUtil.hset(USER_ID_USERNAME_KEY, USER_ID_FIELD_PREFIX + info.getUserId(), username);
+        }
+        return ok;
+    }
+
+    /**
+     * 全量预热所有有效用户的缓存（存量用户无需逐个登录即可补齐 USER_ 键）
+     *
+     * @return 成功预热的用户数
+     */
+    @Override
+    public int warmUpAllUserCache() {
+        List<String> usernames = userDao.findAllValidUsername();
+        if (ToolUtil.isEmpty(usernames)) {
+            return 0;
+        }
+        int success = 0;
+        for (String username : usernames) {
+            try {
+                if (warmUpUserCache(username)) {
+                    success++;
+                }
+            } catch (Exception e) {
+                log.warn("用户缓存预热失败, username={}", username, e);
+            }
+        }
+        log.info("用户缓存全量预热完成, 成功 {}/{}", success, usernames.size());
+        return success;
+    }
+
+    /**
+     * 按用户 id 刷新缓存（用户信息被管理员修改后调用，避免旧昵称残留在列表里）
+     */
+    private void refreshUserCacheById(Long userId) {
+        if (ToolUtil.isEmpty(userId)) {
+            return;
+        }
+        try {
+            String username = userDao.findUsernameById(userId);
+            if (!ToolUtil.isEmpty(username)) {
+                warmUpUserCache(username);
+            }
+        } catch (Exception e) {
+            log.warn("用户缓存刷新失败, userId={}", userId, e);
+        }
+    }
+
+    /**
+     * 拼接用户的角色名称，多个用逗号分隔（与 function 模块读取 roleName 的口径一致）
+     */
+    private String joinRoleName(String username) {
+        List<String> roleNames = userDao.findRoleNameList(username);
+        if (ToolUtil.isEmpty(roleNames)) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (String roleName : roleNames) {
+            if (ToolUtil.isEmpty(roleName)) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(",");
+            }
+            builder.append(roleName);
+        }
+        return builder.toString();
     }
 
     /**
@@ -133,6 +247,8 @@ public class UserServiceImpl implements UserService {
         if (ToolUtil.isNotEmpty(roleIds)) {
             Integer userRoleFlag = userDao.insertUserRole(userId, roleIds);
         }
+        // 新增用户后立即预热，避免新用户在列表里显示成账号
+        warmUpUserCache(userName);
         return insertUserFlag;
     }
 
@@ -208,6 +324,7 @@ public class UserServiceImpl implements UserService {
             if (ToolUtil.isNotEmpty(userDto.getDeptId())) {
                 Integer addUserDeptFlag = userDao.addUserDept(userDto);
             }
+            refreshUserCacheById(userId);
             return updateAdminFlag;
 
         } else {
@@ -230,6 +347,7 @@ public class UserServiceImpl implements UserService {
             Long[] roleIds = userDto.getRoleIds();
             //添加用户角色关联表
             Integer addUserRoleFlag = userDao.addUserRole(userId, roleIds);
+            refreshUserCacheById(userId);
             return updateCommonUserFlag;
         }
     }
@@ -405,6 +523,8 @@ public class UserServiceImpl implements UserService {
             userDto.setUserName(username);
         }
         Integer changeFlag = userDao.changeUserMessage(userDto);
+        // 个人资料变更后刷新缓存，保证其他模块立刻看到新昵称/手机号
+        warmUpUserCache(userDto.getUserName());
         return changeFlag;
     }
 

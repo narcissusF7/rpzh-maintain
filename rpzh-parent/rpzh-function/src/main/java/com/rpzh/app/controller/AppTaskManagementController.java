@@ -11,7 +11,6 @@ import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.TaskVo;
 //import com.sun.org.apache.regexp.internal.RE;
-import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -24,10 +23,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * app养护任务中心
@@ -56,7 +55,7 @@ public class AppTaskManagementController {
             @ApiImplicitParam(name = "taskId", value = "任务主键id",required = true,dataType = "Long")
     })
     @PostMapping("/findAppTaskDetail")
-    public Result<TaskVo> findTaskDetail(Long taskId){
+    public Result<TaskVo> findTaskDetail(@RequestParam("taskId") Long taskId){
         if (ToolUtil.isEmpty(taskId)){
             return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
         }
@@ -98,7 +97,7 @@ public class AppTaskManagementController {
             @ApiImplicitParam(name = "taskId", value = "任务id", required = true,dataType = "String")
     })
     @PostMapping("/findAppPicUrlByTaskId")
-    public Result<TaskVo> findPicUrlByTaskId(String taskId){
+    public Result<TaskVo> findPicUrlByTaskId(@RequestParam("taskId") String taskId){
         if (ToolUtil.isEmpty(taskId)){
             return new Result<>(false, StatusCode.ERROR, "请选择一个任务");
         }

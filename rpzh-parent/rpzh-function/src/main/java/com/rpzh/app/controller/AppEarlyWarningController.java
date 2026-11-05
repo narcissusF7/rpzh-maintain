@@ -59,7 +59,7 @@ public class AppEarlyWarningController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
     })
-    public Result appMisreport(Integer id){
+    public Result appMisreport(@RequestParam("id") Integer id){
         if(ToolUtil.isEmpty(id)){
             return new Result<>(false, StatusCode.ERROR, "预警id不能为空");
         }
@@ -77,14 +77,14 @@ public class AppEarlyWarningController {
             @ApiImplicitParam(name = "nodeType", value = "设备类型", dataType = "String",required = true),
             @ApiImplicitParam(name = "id", value = "预警id", dataType = "String",required = true)
     })
-    public Result findAppWarningInfoBySiteRoute(String siteRoute,String warningType,String warningGrade,String nodeType,String id){
+    public Result findAppWarningInfoBySiteRoute(@RequestParam("siteRoute") String siteRoute,@RequestParam("warningType") String warningType,@RequestParam("warningGrade") String warningGrade,@RequestParam("nodeType") String nodeType,@RequestParam("id") String id){
         Map mapInfos = earlyWarningService.findAppWarningInfoBySiteRoute(siteRoute, warningType, warningGrade, nodeType,  id);
         return new Result<>(true, StatusCode.OK, "查询成功",mapInfos);
     }
 
     @PostMapping("/getAppRepairData")
     @ApiOperation(value = "设备维修时回显")
-    public Result<RepairDataVo> getRepairData(String siteRoute){
+    public Result<RepairDataVo> getRepairData(@RequestParam("siteRoute") String siteRoute){
         if(ToolUtil.isEmpty(siteRoute)){
             return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
         }

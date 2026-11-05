@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>rpzh-api</artifactId>
+        <groupId>com.rpzh</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>rpzh-common-api</artifactId>
+    <description>各业务 api 共享的纯契约（BasePojo、WarehouseNodeType 等；仅依赖 lombok 与 swagger 注解，保持轻量）</description>
+
+    <!--
+      不声明依赖：
+      - lombok 由父 pom <dependencies> 全局注入(provided)
+      - io.swagger.annotations 由父 pom 全局 knife4j-spring-boot-starter 传递
+      本模块只承载无业务逻辑的 POJO/枚举，供各 api 子模块依赖，避免复制粘贴不一致。
+    -->
+</project>

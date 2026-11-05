@@ -101,9 +101,23 @@ public class NodeServiceImpl implements NodeService {
         String username = userInfo.get("username");
         //最后更新人
         nodeDto.setLastUpdatedUser(username);
-        String siteType = nodeDto.getSiteRoute().split(",").length ==4? "04":"05";
-        nodeDto.setSiteType(siteType);
-        nodeDto.setSiteRoute(nodeDto.getSiteRoute()+",["+siteType+":"+nodeDto.getSiteId()+"]");
+        // 位置路径：保留原始值，仅在确为「纯 ID 路径」时按层级补上标记段；
+        // 已带 [xx:id] 标记或路径为空时直接沿用，避免重复追加或 NPE。
+        String route = nodeDto.getSiteRoute();
+        if (ToolUtil.isNotEmpty(route)) {
+            if (route.contains("05")) {
+                nodeDto.setSiteType("05");
+            } else if (route.contains("04")) {
+                nodeDto.setSiteType("04");
+            } else {
+                String siteType = route.split(",").length == 4 ? "04" : "05";
+                nodeDto.setSiteType(siteType);
+                nodeDto.setSiteRoute(route + ",[" + siteType + ":" + nodeDto.getSiteId() + "]");
+            }
+        } else {
+            nodeDto.setSiteType("05");
+            nodeDto.setSiteRoute("");
+        }
         if ("".equals(nodeDto.getSiteX())){
             nodeDto.setSiteX("-");
         }
@@ -417,9 +431,9 @@ public class NodeServiceImpl implements NodeService {
     }
     @Override
     public Result flipStack(MaintainPlanDto maintainPlanDto) {
-        List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
-        nodeDtoList.forEach(nodeDtostr ->
-                nodeDao.updateNode(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
+        List<NodeDto> nodeDtos = JSONObject.parseArray(maintainPlanDto.getNodeDtoList(), NodeDto.class);
+        nodeDtos.forEach(nodeDto ->
+                nodeDao.updateNode(nodeDto));
         return new Result(true,StatusCode.OK,"翻垛成功");
     }
 

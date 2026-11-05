@@ -28,6 +28,19 @@ public interface UserService {
     User logFindById(String id);
 
     /**
+     * 预热单个用户的 Redis 缓存（USER_账号 / MAINTIAN_USER_ID_USERNAME）
+     * @param username 用户账号
+     * @return 是否成功
+     */
+    boolean warmUpUserCache(String username);
+
+    /**
+     * 全量预热所有有效用户的 Redis 缓存
+     * @return 成功预热的用户数
+     */
+    int warmUpAllUserCache();
+
+    /**
      * 添加用户
      * @param userDto
      * @return

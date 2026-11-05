@@ -22,6 +22,9 @@ spring:
         min-idle: 0
   main:
     allow-bean-definition-overriding: true
+  autoconfigure:
+    # 使用 dynamic-datasource 管理多数据源，排除 Druid 的 DataSource 自动配置（否则会因缺少 spring.datasource.url 启动失败）
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:
     dynamic:
       #默认这里选择默认数据
@@ -30,12 +33,12 @@ spring:
       datasource:
         #可以配置多个
         mysql:
-          url: jdbc:mysql://127.0.0.1:3306/tabac_maintenance_function?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
+          url: jdbc:mysql://127.0.0.1:3306/rpzh-system?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT%2B8
           username: root
           password: root123
           driver-class-name: com.mysql.jdbc.Driver
         clickhouse:
-          url: jdbc:clickhouse://183.250.89.188:8123/default
+          url: jdbc:clickhouse://127.0.0.1:8123/default
           username: default
           password:
           driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
@@ -83,7 +86,7 @@ ribbon:
   ConnectTimeout: 30000
 # mqtt 连接配置
 mqtt:
-  host: tcp://192.168.3.99
+  host: tcp://127.0.0.1 # 本机 Docker Mosquitto（原 192.168.3.99 局域网设备，本机不可达）
   port: 1883
   qos: 0
   timeout: 2000
@@ -98,3 +101,11 @@ rocketmq:
   topic: messageTopic # mq主题
   producer:
     group: MessageGroup
+
+# 设备异常状态判定（也可在 tb_general_setting 中以 setting_key=nodeAbnormal 覆盖，改库即生效）
+node:
+  abnormal:
+    enabled: true
+    cron: "0 0/10 * * * ?"   # 每 10 分钟扫描一次
+    timeout-hours: 48         # 超过 48 小时未收到已入垛设备的数据 -> 异常
+    max-error-count: 3        # 设备连续发出异常数据满 3 次 -> 异常

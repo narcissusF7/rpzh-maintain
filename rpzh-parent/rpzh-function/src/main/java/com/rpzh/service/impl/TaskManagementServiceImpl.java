@@ -1,7 +1,5 @@
 package com.rpzh.service.impl;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -19,10 +17,7 @@ import com.rpzh.util.RedisUtil;
 import com.rpzh.util.SiteRouteUtil;
 import com.rpzh.util.TimeUtils;
 import com.rpzh.util.TokenDecode;
-import com.rpzh.vo.StackVo;
 import com.rpzh.vo.TaskVo;
-import com.rpzh.vo.WareAreaVo;
-import com.sun.xml.bind.v2.model.core.ID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -153,6 +148,30 @@ public class TaskManagementServiceImpl implements TaskManagementService {
      * @param taskDto
      * @return
      */
+
+    /**
+     * 负责人账号（可逗号分隔多人）转显示名：优先取缓存里的姓名，取不到用账号本身。
+     * 历史实现直接拼 nickname，缓存失效时会得到 "null(账号)"，前端无法还原。
+     */
+    private String principalDisplay(String principal) {
+        if (ToolUtil.isEmpty(principal)) {
+            return principal;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String token : principal.split(",")) {
+            String account = token.trim();
+            if (account.isEmpty()) {
+                continue;
+            }
+            Object nickname = redisUtil.hget("USER_" + account, "nickname");
+            if (sb.length() > 0) {
+                sb.append("、");
+            }
+            sb.append(nickname == null ? account : nickname.toString());
+        }
+        return sb.length() == 0 ? principal : sb.toString();
+    }
+
     @Override
     public PageInfo<TaskVo> findTask(TaskDto taskDto) {
         int page = taskDto.getPage();
@@ -161,16 +180,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
         PageHelper.startPage(page, size);
         List<TaskVo> taskVoList = taskManagementDao.findTask(taskDto);
         for (TaskVo taskVo : taskVoList) {
-            //获取负责人账号
-            String principal = taskVo.getPrincipal();
-            //获取负责人名字
-            String[] split = taskVo.getPrincipal().split(",");
-            String nickname = "";
-            for (int i = 0; i < split.length; i++) {
-                nickname = nickname + "," + (String) redisUtil.hget("USER_" + split[i], "nickname");
-            }
-
-            taskVo.setPrincipal(nickname.substring(1) + "(" + principal + ")");
+            //负责人显示姓名：缓存里取不到就退回账号，避免出现 "null(账号)" 这种残缺值
+            taskVo.setPrincipal(principalDisplay(taskVo.getPrincipal()));
         }
         return new PageInfo<TaskVo>(taskVoList);
     }
@@ -272,16 +283,8 @@ public class TaskManagementServiceImpl implements TaskManagementService {
             return false;
         });
         for (TaskVo taskVo : taskVoList) {
-            //获取负责人账号
-            String principal = taskVo.getPrincipal();
-            String[] split = taskVo.getPrincipal().split(",");
-            String nickname = "";
-            for (int i = 0; i < split.length; i++) {
-                nickname = nickname + "," + (String) redisUtil.hget("USER_" + principal, "nickname");
-            }
-            //获取负责人名字
-
-            taskVo.setPrincipal(principal + "(" + nickname.substring(1) + ")");
+            //负责人显示姓名：缓存里取不到就退回账号
+            taskVo.setPrincipal(principalDisplay(taskVo.getPrincipal()));
         }
         for (TaskVo taskVo : taskVoList) {
             //这个是App端使用,根据创建人的账号获取创建人的名字

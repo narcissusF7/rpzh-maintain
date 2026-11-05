@@ -334,4 +334,33 @@
     </set>
   WHERE username = #{userDto.userName}
 </update>
+
+<!-- 缓存预热：一次取齐 nickname / phonenumber / userId / deptname -->
+<select id="findUserCache" resultType="com.rpzh.vo.UserVo">
+    SELECT t1.user_id     as userId,
+           t1.username    as username,
+           t1.nick_name   as nickname,
+           t1.phonenumber as phonenumber,
+           t3.dept_name   as deptname
+    FROM tb_user t1
+             LEFT JOIN tb_user_dept t2 on t1.user_id = t2.user_id
+             LEFT JOIN tb_dept t3 on t2.dept_id = t3.dept_id
+    WHERE t1.username = #{username}
+    LIMIT 1
+</select>
+
+<!-- 全量预热：全部有效（未删除、启用）用户账号 -->
+<select id="findAllValidUsername" resultType="java.lang.String">
+    SELECT username
+    FROM tb_user
+    WHERE del_flag = 1
+      AND status = 1
+</select>
+
+<!-- 用户信息变更后按 id 反查账号，用于刷新缓存 -->
+<select id="findUsernameById" resultType="java.lang.String">
+    SELECT username
+    FROM tb_user
+    WHERE user_id = #{userId}
+</select>
 </mapper>

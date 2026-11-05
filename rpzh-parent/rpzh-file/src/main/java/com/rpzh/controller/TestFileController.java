@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @Author liubc
@@ -36,7 +37,7 @@ public class TestFileController {
      * @return
      */
     @RequestMapping("/testredis")
-    public String test2(String username){
+    public String test2(@RequestParam("username") String username){
 //        redisTemplate.opsForHash().put("USER_"+"rpzh","nickname","超级管理员");
 //        redisTemplate.opsForHash().put("USER_"+"rpzh","phonenumber","13156555668");
         String nickname1 = (String) redisTemplate.opsForHash().get("USER_"+username, "nickname");

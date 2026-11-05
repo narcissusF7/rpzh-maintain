@@ -42,8 +42,8 @@
         <if test="pestBoardDto.createdUserId!='' and pestBoardDto.createdUserId!=null">#{pestBoardDto.createdUserId},</if>
         <if test="pestBoardDto.lastUpdatedUserId!='' and pestBoardDto.lastUpdatedUserId!=null">#{pestBoardDto.lastUpdatedUserId},</if>
         <if test="pestBoardDto.remark!='' and pestBoardDto.remark!=null">#{pestBoardDto.remark},</if>
-        sysdate,
-        sysdate
+        NOW(),
+        NOW()
         )
     </insert>
     <update id="updatePestMonitor">
@@ -86,7 +86,9 @@
                thursday   "thursday",
                friday     "friday",
                saturday   "saturday",
-               sunday     "sunday" from tb_pest_patrol where rownum =  1
+               sunday     "sunday" from tb_pest_patrol where 1=1
+    
+        LIMIT 1
     </select>
     <select id="findPestMonitorValue" resultType="java.util.Map">
         select  prewarning_value_one   "valueOne",
@@ -98,7 +100,7 @@
         from tb_pest_monitor
     </select>
     <select id="findSpecialSite" resultType="java.util.Map">
-        select  id as "id",
+        select  id AS `id`,
                 site_route "pidRoute",
                 site_name "siteName",
                 prewarning_value_one   "little",
@@ -182,7 +184,7 @@
             </if>
             )
             VALUES
-            ( #{pestData.pestBoardId},#{pestData.gatherSite},SYSDATE,#{pestData.beetleCount},#{pestData.alertLevel},#{pestData.siteRoute}
+            ( #{pestData.pestBoardId},#{pestData.gatherSite},NOW(),#{pestData.beetleCount},#{pestData.alertLevel},#{pestData.siteRoute}
             <if test="siteType=='04'">
                 ,#{pestData.mealwormCount}
             </if>
@@ -196,7 +198,7 @@
             ,mealworm_count
         </if>
         )VALUES(
-        #{pestDataDto.pestBoardId},#{pestDataDto.gatherSite},sysdate,#{pestDataDto.beetleCount},#{pestDataDto.alertLevel}
+        #{pestDataDto.pestBoardId},#{pestDataDto.gatherSite},NOW(),#{pestDataDto.beetleCount},#{pestDataDto.alertLevel}
         <if test="pestDataDto.mealwormCount!='' and pestDataDto.mealwormCount!=null">
             ,#{pestDataDto.mealwormCount}
         </if>
@@ -210,10 +212,10 @@
         </if>
         alert_level alertLevel from tb_pest_data_history where pest_board_id = #{pestDataDto.pestBoardId}
         <if test="pestDataDto.startTime!='' and pestDataDto.startTime!=null">
-            and gather_time >= to_date(#{pestDataDto.startTime},'yyyy-mm-dd hh24:mi:ss')
+            and gather_time >= STR_TO_DATE(#{pestDataDto.startTime}, '%Y-%m-%d %H:%i:%s')
         </if>
         <if test="pestDataDto.endTime!='' and pestDataDto.endTime!=null">
-            and gather_time  &lt;= to_date(#{pestDataDto.endTime},'yyyy-mm-dd hh24:mi:ss')
+            and gather_time  &lt;= STR_TO_DATE(#{pestDataDto.endTime}, '%Y-%m-%d %H:%i:%s')
         </if>
     </select>
     <select id="findPestBoardCount" resultType="java.lang.Integer">
@@ -250,7 +252,9 @@
                prewarning_value_two "valueTwo",
                prewarning_color_two "colorTwo",
                prewarning_value_three "valueThree",
-               prewarning_color_three "colorThree" from tb_pest_monitor where rownum =  1
+               prewarning_color_three "colorThree" from tb_pest_monitor where 1=1
+    
+        LIMIT 1
     </select>
 
     <select id="findPestStackMonitor" resultType="com.rpzh.vo.EarlyWarningVo">

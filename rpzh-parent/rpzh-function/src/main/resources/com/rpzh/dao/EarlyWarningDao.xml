@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rpzh.dao.EarlyWarningDao">
+    <!--
+      warning_grade 是历史遗留的多值字符串（如 '1,2,3'），业务上按「最高等级」判定，
+      于是 SELECT 和 WHERE 里到处重复三段 instr 判断。这里抽成片段统一维护：
+      引用时用 <property name="a" value="t."/> 指定表别名前缀（无别名传空串）。
+    -->
+    <sql id="isGrade3">instr(${a}warning_grade, '3') &gt; 0</sql>
+    <sql id="isGrade2">instr(${a}warning_grade, '2') &gt; 0 and instr(${a}warning_grade, '3') = 0</sql>
+    <sql id="isGrade1">instr(${a}warning_grade, '1') &gt; 0 and instr(${a}warning_grade, '2') = 0 and instr(${a}warning_grade, '3') = 0</sql>
+    <sql id="warningGradeCase">CASE WHEN <include refid="isGrade3"/> THEN '3' WHEN <include refid="isGrade2"/> THEN '2' WHEN <include refid="isGrade1"/> THEN '1' END</sql>
+    <sql id="warningValCase">CASE WHEN <include refid="isGrade3"/> THEN ${a}warning_val_three WHEN <include refid="isGrade2"/> THEN ${a}warning_val_two WHEN <include refid="isGrade1"/> THEN ${a}warning_val_one END</sql>
+    <sql id="warningTimeCase">CASE WHEN <include refid="isGrade3"/> THEN ${a}warning_time_three WHEN <include refid="isGrade2"/> THEN ${a}warning_time_two WHEN <include refid="isGrade1"/> THEN ${a}warning_time_one END</sql>
     <select id="findRepairData" resultType="com.rpzh.vo.RepairDataVo">
         select node_id as deviceId,node_type as deviceType,case when warning_type = '01' then '设备电量低' when warning_type = '02' then '设备信号强度差' when warning_type = '03' then '设备丢包' end as repairReason
         from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03')
@@ -9,13 +20,13 @@
     </select>
     <update id="updateTackId">
         UPDATE tb_early_warning
-        SET is_affirm = #{affirm},principal = #{principal}<if test="dealTime!=null and dealTime!=''">,deal_time = TO_DATE(#{dealTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
+        SET is_affirm = #{affirm},principal = #{principal}<if test="dealTime!=null and dealTime!=''">,deal_time = STR_TO_DATE(#{dealTime}, '%Y-%m-%d %H:%i:%s')</if>
         WHERE task_id = #{taskId}
     </update>
     <update id="updateRepairId" parameterType="java.util.List">
         <foreach collection="earlyWarnings" item="earlyWarning" index="index" separator=";" open="begin" close=";end;">
             update tb_early_warning
-            set is_affirm = '0',deal_time = sysdate
+            set is_affirm = '0',deal_time = NOW()
             where node_id = #{earlyWarning.nodeId} and warning_type = #{earlyWarning.warningType} and is_affirm = '2'
         </foreach>
     </update>
@@ -26,23 +37,25 @@
         select node_id from tb_early_warning where repair_id = #{id}
     </select>
     <select id="findUndoEarlyWarningByNodeId" resultType="com.rpzh.vo.EarlyWarningVo">
-        select id,warning_grade warningGrade,warning_type warningType,is_affirm affirm,node_id nodeId from tb_early_warning where node_id like concat('%',concat(#{nodeId},'%')) and is_affirm in (1,2) and rownum = 1
+        select id,warning_grade warningGrade,warning_type warningType,is_affirm affirm,node_id nodeId from tb_early_warning where node_id like concat('%',concat(#{nodeId},'%')) and is_affirm in (1,2) 
         <if test="warningType!='' and warningType!=null"> and warning_type =#{warningType}</if>
+    
+        LIMIT 1
     </select>
     <select id="findWarningThreshold" resultType="java.lang.String">
         select setting_value from tb_general_setting where setting_key = #{settingKey} order by id
     </select>
     <select id="findEarlyWarningCountByWarningType" resultType="com.rpzh.vo.WarningCountVo">
         select DISTINCT
-        (SELECT count(*) FROM tb_early_warning where instr(warning_grade, '3') > 0
+        (SELECT count(*) FROM tb_early_warning where <include refid="isGrade3"><property name="a" value=""/></include>
         <if test="size!=0">and id in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach></if>) AS threeWarningCount,
-        (SELECT count(*) FROM tb_early_warning where instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0
+        (SELECT count(*) FROM tb_early_warning where <include refid="isGrade2"><property name="a" value=""/></include>
         <if test="size!=0">and id in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach></if>) AS twoWarningCount,
-        (SELECT count(*) FROM tb_early_warning where instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0
+        (SELECT count(*) FROM tb_early_warning where <include refid="isGrade1"><property name="a" value=""/></include>
         <if test="size!=0">and id in <foreach collection="ids" item="id" open="(" separator="," close=")"> #{id} </foreach></if>) AS oneWarningCount from tb_early_warning
     </select>
     <select id="findIdsByWarning" resultType="java.util.Map">
-        select id as "id",warning_type as "warningType" from tb_early_warning where is_affirm in ('1','2')
+        select id AS `id`,warning_type AS `warningType` from tb_early_warning where is_affirm in ('1','2')
         <if test="earlyWarningDto.warningType !='' and earlyWarningDto.warningType != null"><if test="earlyWarningDto.warningType==01">and warning_type in ('01','02','03')</if><if test="earlyWarningDto.warningType != 01"> and warning_type = #{earlyWarningDto.warningType}</if></if>
         <if test="earlyWarningDto.principalName != '' and earlyWarningDto.principalName != null"> and principal = #{earlyWarningDto.principalName} </if>
         <if test="earlyWarningDto.startTime != null"> and warning_time >= #{earlyWarningDto.startTime}</if>
@@ -64,10 +77,8 @@
     <select id="findEarlyWarningByWarningType" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT id AS id, area_id AS areaId, stack_id AS stackId, is_affirm AS affirm,warning_type AS warningType,node_type AS nodeType,
         site_route as siteRoute,warning_time AS warningTime,warning_type as warningType,
-        CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS warningGrade,
-        CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END AS warningVal,
+        <include refid="warningGradeCase"><property name="a" value=""/></include> AS warningGrade,
+        <include refid="warningValCase"><property name="a" value=""/></include> AS warningVal,
         case when is_affirm = '1' then '正在处理' when is_affirm = '2' then '未处理' end as affirmName
         FROM tb_early_warning where is_affirm in ('01','02')
         <if test="earlyWarningDto.warningType !='' and earlyWarningDto.warningType != null">and warning_type = #{earlyWarningDto.warningType}</if>
@@ -76,24 +87,49 @@
         <if test="earlyWarningDto.endTime != null"> and warning_time &lt;= #{earlyWarningDto.endTime}</if>
         ORDER BY is_affirm DESC
     </select>
+    <sql id="currentWarningWhere">
+        WHERE t.is_affirm IN ('1','2')
+        <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">AND t.node_id LIKE concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
+        <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">AND t.warning_type = #{earlyWarningDto.warningType}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">AND <include refid="warningGradeCase"><property name="a" value="t."/></include> = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">AND t.principal LIKE concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
+        <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">AND t.site_route LIKE concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
+    </sql>
+    <select id="countCurrentWarning" resultType="java.lang.Integer">
+        SELECT count(1) FROM tb_early_warning t
+        <include refid="currentWarningWhere"/>
+    </select>
+    <select id="findCurrentWarningList" resultType="com.rpzh.vo.EarlyWarningVo">
+        SELECT t.id AS id, t.node_id AS nodeId, t.warning_type AS warningType, t.warning_val AS warningVal,
+        t.principal AS principalName, t.site_route AS siteRoute, t.node_type AS nodeType,
+        t.stack_id AS stackId, t.area_id AS areaId, t.is_affirm AS affirm,
+        t.task_id AS taskId, t.warning_time AS warningTime, st.site_name AS siteName,
+        <include refid="warningGradeCase"><property name="a" value="t."/></include> AS warningGrade
+        FROM tb_early_warning t
+        LEFT JOIN tb_stack st ON st.id = t.stack_id
+        <include refid="currentWarningWhere"/>
+        ORDER BY t.warning_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
     <select id="findNewTime" resultType="java.util.Map">
-        select to_char(warning_time,'SYYYY-MM-DD HH24:MI:SS') as "time",principal as "principal" from tb_early_warning
-        where is_affirm = #{affirm} and <if test="warningType==01">warning_type in ('01','02','03')</if><if test="warningType!=01"> warning_type = #{warningType}</if> and site_route = #{siteRoute} and rownum = 1 order by warning_time
+        select DATE_FORMAT(warning_time, '%Y-%m-%d %H:%i:%s') AS `time`,principal AS `principal` from tb_early_warning
+        where is_affirm = #{affirm} and <if test="warningType==01">warning_type in ('01','02','03')</if><if test="warningType!=01"> warning_type = #{warningType}</if> and site_route = #{siteRoute}  order by warning_time
+        LIMIT 1
     </select>
     <select id="findWarningDataWarningType" resultType="java.util.Map">
-        SELECT id as "id",site_route as "pidRoute",node_id as "nodeId",node_type as "nodeType",warning_type as "warningType",
-        warning_val as "warningVal",stack_id as "stackId",area_id as "areaId" FROM tb_early_warning
+        SELECT id AS `id`,site_route AS `pidRoute`,node_id AS `nodeId`,node_type AS `nodeType`,warning_type AS `warningType`,
+        warning_val AS `warningVal`,stack_id AS `stackId`,area_id AS `areaId` FROM tb_early_warning
         WHERE is_affirm = #{affirm} and site_route = #{siteRoute} AND node_type = #{nodeType}
         <if test="warningType !='' and warningType != null"><if test="warningType==01">and warning_type in ('01','02','03')</if><if test="warningType != 01"> and warning_type = #{warningType}</if></if>
     </select>
     <select id="findsiteXYZByNodeIds" resultType="java.util.Map">
-        select site_x as "siteX",site_y as "siteY",site_z as "siteZ" from tb_node where node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")"> #{nodeId} </foreach>
+        select site_x AS `siteX`,site_y AS `siteY`,site_z AS `siteZ` from tb_node where node_id in <foreach collection="nodeIds" item="nodeId" open="(" separator="," close=")"> #{nodeId} </foreach>
     </select>
     <select id="findWarningDataWarningTypeIsNotOne" resultType="java.util.Map">
         SELECT
-        t.id as "id",t.site_route as "pidRoute",t.node_id as "nodeId",t.warning_grade as "warningGrade",t.node_type as "nodeType",t.warning_type as "warningType",
-        t.warning_val as "warningVal",t2.site_x as "siteX",t2.site_y as "siteY",
-        t2.site_z as "siteZ" FROM tb_early_warning t left JOIN tb_node t2  ON t.node_id =t2.node_id WHERE warning_type = #{warningType}
+        t.id AS `id`,t.site_route AS `pidRoute`,t.node_id AS `nodeId`,t.warning_grade AS `warningGrade`,t.node_type AS `nodeType`,t.warning_type AS `warningType`,
+        t.warning_val AS `warningVal`,t2.site_x AS `siteX`,t2.site_y AS `siteY`,
+        t2.site_z AS `siteZ` FROM tb_early_warning t left JOIN tb_node t2  ON t.node_id =t2.node_id WHERE warning_type = #{warningType}
         AND is_affirm = #{affirm} and t.site_route = #{siteRoute}
     </select>
     <select id="findUndoCount" resultType="java.lang.Integer">
@@ -120,13 +156,13 @@
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null">#{earlyWarning.nodeId},</if>
         <if test="earlyWarning.nodeType != '' and earlyWarning.nodeType != null">#{earlyWarning.nodeType},</if>
         <if test="earlyWarning.warningVal != '' and earlyWarning.warningVal != null">
-            #{earlyWarning.warningVal},sysdate,</if>
+            #{earlyWarning.warningVal},NOW(),</if>
         <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">
-            #{earlyWarning.warningValOne},sysdate,</if>
+            #{earlyWarning.warningValOne},NOW(),</if>
         <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">
-            #{earlyWarning.warningValTwo},sysdate,</if>
+            #{earlyWarning.warningValTwo},NOW(),</if>
         <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">
-            #{earlyWarning.warningValThree},sysdate,</if>
+            #{earlyWarning.warningValThree},NOW(),</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">#{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.stackId != '' and earlyWarning.stackId != null">#{earlyWarning.stackId},</if>
         <if test="earlyWarning.areaId != '' and earlyWarning.areaId != null">#{earlyWarning.areaId},</if>
@@ -141,10 +177,10 @@
         <if test="earlyWarning.nodeId != '' and earlyWarning.nodeId != null">node_id = #{earlyWarning.nodeId},</if>
         <if test="earlyWarning.warningGrade != '' and earlyWarning.warningGrade != null">warning_grade = #{earlyWarning.warningGrade},</if>
         <if test="earlyWarning.warningVal != '' and earlyWarning.warningVal != null">warning_val = #{earlyWarning.warningVal},</if>
-        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one = #{earlyWarning.warningValOne},warning_time_one = sysdate,</if>
-        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_time_two = sysdate,</if>
-        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_time_three = sysdate,</if>
-        warning_time = sysdate
+        <if test="earlyWarning.warningValOne != '' and earlyWarning.warningValOne != null">warning_val_one = #{earlyWarning.warningValOne},warning_time_one = NOW(),</if>
+        <if test="earlyWarning.warningValTwo != '' and earlyWarning.warningValTwo != null">warning_val_two = #{earlyWarning.warningValTwo},warning_time_two = NOW(),</if>
+        <if test="earlyWarning.warningValThree != '' and earlyWarning.warningValThree != null">warning_val_three = #{earlyWarning.warningValThree},warning_time_three = NOW(),</if>
+        warning_time = NOW()
         where id = #{earlyWarning.id}
     </update>
     <select id="findTroubleNode" resultType="com.rpzh.vo.EarlyWarningVo">
@@ -152,15 +188,14 @@
     </select>
     <select id="findHistoryWarningData" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT
-        t.node_id as nodeId,t.warning_type as warningType,t.warning_val as warningVal,t.principal as principalName,t.deal_time as dealTime,
+        t.id as id,t.node_id as nodeId,t.warning_type as warningType,t.warning_val as warningVal,t.principal as principalName,t.deal_time as dealTime,
+        t.is_affirm as affirm,
         t.stack_id as stackId,t.area_id as areaId,a.deal_method as dealSuggestion,a.deal_result as remark,
-        CASE WHEN instr(t.warning_grade, '3') > 0 THEN '3' WHEN instr(t.warning_grade, '2') > 0 and instr(t.warning_grade, '3') = 0 THEN '2' WHEN
-        instr(t.warning_grade, '1') > 0 and instr(t.warning_grade, '2') = 0 and instr(t.warning_grade, '3') = 0 THEN '1' END as warningGrade FROM tb_early_warning t left join tb_task a on a.id = t.task_id
-        WHERE is_affirm = '0'
+        <include refid="warningGradeCase"><property name="a" value="t."/></include> as warningGrade FROM tb_early_warning t left join tb_task a on a.id = t.task_id
+        WHERE is_affirm in ('0','3')
         <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and t.site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%')</if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and t.warning_type = #{earlyWarningDto.warningType}</if>
-        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and CASE WHEN instr(t.warning_grade, '3') > 0 THEN '3' WHEN instr(t.warning_grade, '2') > 0 and instr(t.warning_grade, '3') = 0 THEN '2' WHEN
-            instr(t.warning_grade, '1') > 0 and instr(t.warning_grade, '2') = 0 and instr(t.warning_grade, '3') = 0 THEN '1' END = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and <include refid="warningGradeCase"><property name="a" value="t."/></include> = #{earlyWarningDto.warningGrade}</if>
         <if test="earlyWarningDto.nodeId != null and earlyWarningDto.nodeId != ''">and t.node_id like concat(concat('%',#{earlyWarningDto.nodeId}),'%')</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and t.principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
         <if test="earlyWarningDto.startTime != null">and t.deal_time >= #{earlyWarningDto.startTime}</if>
@@ -172,39 +207,38 @@
         <if test="earlyWarningDto.pidRoute != null and earlyWarningDto.pidRoute != ''">and site_route like concat(concat('%',#{earlyWarningDto.pidRoute}),'%') </if>
         <if test="earlyWarningDto.warningType != null and earlyWarningDto.warningType != ''">and warning_type = #{earlyWarningDto.warningType}</if>
         <if test="earlyWarningDto.principalName != null and earlyWarningDto.principalName != ''">and principal like concat(concat('%',#{earlyWarningDto.principalName}),'%')</if>
-        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= TO_DATE(#{earlyWarningDto.beginTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= TO_DATE(#{earlyWarningDto.finishTime}, 'SYYYY-MM-DD HH24:MI:SS' )</if>
-        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-            instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{earlyWarningDto.warningGrade}</if>
+        <if test="earlyWarningDto.beginTime != null and earlyWarningDto.beginTime != ''">and warning_time >= STR_TO_DATE(#{earlyWarningDto.beginTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="earlyWarningDto.finishTime != null and earlyWarningDto.finishTime != ''">and warning_time &lt;= STR_TO_DATE(#{earlyWarningDto.finishTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="earlyWarningDto.warningGrade != null and earlyWarningDto.warningGrade != ''">and <include refid="warningGradeCase"><property name="a" value=""/></include> = #{earlyWarningDto.warningGrade}</if>
     </select>
     <select id="findWarningCountByDay" resultType="java.util.Map">
-        SELECT count(is_affirm) as "sum",COALESCE(count(DECODE(TO_CHAR(is_affirm), '0' , 1, NULL)),0) AS "deal",count(is_affirm) - COALESCE(count(DECODE(TO_CHAR(is_affirm), '0' , 1, NULL)),0) AS "noDeal",
-        round(COALESCE(count(DECODE(TO_CHAR(is_affirm), '0' , 1, NULL)),0)/count(is_affirm),2) as "treatmentRate",
-        ${dateType} AS "day"
+        SELECT count(is_affirm) AS `sum`,COALESCE(count(IF(CAST(is_affirm AS CHAR) = '0', 1, NULL)),0) AS `deal`,count(is_affirm) - COALESCE(count(IF(CAST(is_affirm AS CHAR) = '0', 1, NULL)),0) AS `noDeal`,
+        round(COALESCE(count(IF(CAST(is_affirm AS CHAR) = '0', 1, NULL)),0)/count(is_affirm),2) AS `treatmentRate`,
+        ${dateType} AS `day`
         FROM tb_early_warning
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY ${dateType}
         ORDER BY ${dateType}
     </select>
     <select id="findWarningTypeCount" resultType="java.util.Map">
-        SELECT count(1) as "sum",warning_type AS "warningType"
+        SELECT count(1) AS `sum`,warning_type AS `warningType`
         FROM tb_early_warning
         WHERE 1=1 <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
         GROUP BY warning_type
         ORDER BY warning_type
     </select>
     <select id="findIsDeal" resultType="java.util.Map">
-        SELECT count(1) as "sumDeal",round(COUNT(1)/#{count},2) * 100 as "ratioDeal"
+        SELECT count(1) AS `sumDeal`,round(COUNT(1)/#{count},2) * 100 AS `ratioDeal`
         FROM tb_early_warning
         WHERE is_affirm = '0' <if test="ids != null and ids != ''">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach></if>
     </select>
     <select id="findById" resultType="java.util.Map">
-        select warning_val_one as "warningValOne",warning_val_two as "warningValTwo",warning_val_three as "warningValThree",to_char(warning_time_one,'SYYYY-MM-DD HH24:MI:SS') as "warningTimeOne",
-        to_char(warning_time_two,'SYYYY-MM-DD HH24:MI:SS') as "warningTimeTwo",to_char(warning_time_three,'SYYYY-MM-DD HH24:MI:SS') as "warningTimeThree" from  tb_early_warning where id= #{id}
+        select warning_val_one AS `warningValOne`,warning_val_two AS `warningValTwo`,warning_val_three AS `warningValThree`,DATE_FORMAT(warning_time_one, '%Y-%m-%d %H:%i:%s') AS `warningTimeOne`,
+        DATE_FORMAT(warning_time_two, '%Y-%m-%d %H:%i:%s') AS `warningTimeTwo`,DATE_FORMAT(warning_time_three, '%Y-%m-%d %H:%i:%s') AS `warningTimeThree` from  tb_early_warning where id= #{id}
     </select>
-    <delete id="misreport">
-        delete from tb_early_warning where id = #{id}
-    </delete>
+    <update id="misreport">
+        update tb_early_warning set is_affirm = '3', task_id = null where id = #{id}
+    </update>
     <select id="findTaskId" resultType="java.lang.Integer">
         select task_id from tb_early_warning where id = #{id}
     </select>
@@ -212,22 +246,26 @@
         select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm in (1,2)
     </select>
     <update id="updateWarningType">
-        update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} and rownum = 1
+        update tb_early_warning set is_affirm = 2 where node_id = #{nodeId} and warning_type = #{warningType} 
+    
+        LIMIT 1
     </update>
     <select id="findColor" resultType="java.util.Map">
-        select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') as "oneColor",
-        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') as "twoColor",
-        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') as "threeColor"
-        from tb_general_setting where rownum =1
+        select (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'one') AS `oneColor`,
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'two') AS `twoColor`,
+        (select setting_value from tb_general_setting where setting_key = 'color' and  setting_name = 'three') AS `threeColor`
+        from tb_general_setting where 1=1
+    
+        LIMIT 1
     </select>
     <select id="findBySiteRoute" resultType="java.util.Map">
-        select distinct site_route as "route",principal as "principal",stack_id as "stackId",area_id as "areaId" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+        select distinct site_route AS `route`,principal AS `principal`,stack_id AS `stackId`,area_id AS `areaId` from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
     <select id="findSendBySiteRoute" resultType="java.util.Map">
-        select distinct site_route as "route",stack_id as "stackId",area_id as "areaId" from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
+        select distinct site_route AS `route`,stack_id AS `stackId`,area_id AS `areaId` from tb_early_warning where is_affirm = '2' and site_route = #{siteRoute}
     </select>
     <select id="findSiteRoute" resultType="java.util.Map">
-        select LISTAGG(t.id, ',') WITHIN GROUP(ORDER BY t.id) as "id",t.site_route as "siteRoute" from (select id,site_route from tb_early_warning where is_affirm = '2' and instr(warning_grade, '3') > 0
+        select GROUP_CONCAT(t.id ORDER BY t.id SEPARATOR ',') AS `id`,t.site_route AS `siteRoute` from (select id,site_route from tb_early_warning where is_affirm = '2' and <include refid="isGrade3"><property name="a" value=""/></include>
         union select id,site_route from tb_early_warning where is_affirm = '2' and  warning_type in ('01','02','03')) t group by t.site_route
     </select>
     <select id="findRoute" resultType="java.lang.String">
@@ -240,9 +278,8 @@
     select site_name from tb_ware_area where id = #{areaId}
   </select>
     <select id="findWarningInfoBySiteRoute" resultType="java.util.Map">
-        select warning_type as "warningType",node_id as "nodeId",
-        CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END as "warningVal"
+        select warning_type AS `warningType`,node_id AS `nodeId`,
+        <include refid="warningValCase"><property name="a" value=""/></include> AS `warningVal`
         from tb_early_warning where is_affirm = '2' <if test="size !=0">and id in  <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach> </if>
     </select>
     <select id="findPestWarningCount" resultType="java.lang.Integer">
@@ -250,17 +287,17 @@
         <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>)
     </select>
     <select id="findAppCount" resultType="java.util.Map">
-        select COALESCE(count(1),0) AS "count",
-        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' end, '1' , 1, NULL)),0) AS "oneWarningCount",
-        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' end, '2' , 1, NULL)),0) AS "twoWarningCount",
-        COALESCE(count(DECODE(CASE WHEN instr(warning_grade, '3') > 0 THEN '3' end, '3' , 1, NULL)),0) AS "threeWarningCount"
+        select COALESCE(count(1),0) AS `count`,
+        COALESCE(count(IF(<include refid="isGrade1"><property name="a" value=""/></include>, 1, NULL)),0) AS `oneWarningCount`,
+        COALESCE(count(IF(<include refid="isGrade2"><property name="a" value=""/></include>, 1, NULL)),0) AS `twoWarningCount`,
+        COALESCE(count(IF(<include refid="isGrade3"><property name="a" value=""/></include>, 1, NULL)),0) AS `threeWarningCount`
         from tb_early_warning where is_affirm in('1','2')
     </select>
     <select id="findAppDeviceFault" resultType="java.util.Map">
         select
-        '01' as "warningType",
-        '设备故障' as "warningName",
-        COALESCE(count(1),0) AS "warningTypeCount"
+        '01' AS `warningType`,
+        '设备故障' AS `warningName`,
+        COALESCE(count(1),0) AS `warningTypeCount`
         from tb_early_warning
         where is_affirm = '2' and warning_type in ('01','02','03')
     </select>
@@ -270,40 +307,37 @@
     <select id="findAppCountByWarningType" resultType="java.lang.String">
         select COALESCE(count(1),0) from tb_early_warning where is_affirm in('1','2')
         <if test="warningType != null and warningType != ''"><if test="warningType==01">and warning_type in ('01','02','03')</if><if test="warningType != 01"> and warning_type = #{warningType}</if></if>
-        <if test="warningGrade != null and warningGrade != ''">and CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-            instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{warningGrade}</if>
+        <if test="warningGrade != null and warningGrade != ''">and <include refid="warningGradeCase"><property name="a" value=""/></include> = #{warningGrade}</if>
         GROUP BY warning_type
     </select>
     <select id="findAppCountByWarningFault" resultType="java.lang.String">
         select COALESCE(count(1),0) from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03')
     </select>
     <select id="findAppWarningInfoByWarningType" resultType="java.util.Map">
-        select id as "id",node_type as "nodeType",area_id as "areaId",stack_id as "stackId",principal as "principal",site_route as "siteRoute",warning_grade as "grade",node_id as "nodeId",warning_type as "warningType",
-        CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END AS "warningGrade",
-        to_char(CASE WHEN instr(warning_grade, '3') > 0 THEN warning_val_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_val_two WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_val_one END,'FM999.00') AS "warningVal",
-        to_char(CASE WHEN instr(warning_grade, '3') > 0 THEN warning_time_three WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN warning_time_two WHEN
-        instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN warning_time_one END,'SYYYY-MM-DD HH24:MI:SS' ) AS "warningTime"
+        select id AS `id`,node_type AS `nodeType`,area_id AS `areaId`,stack_id AS `stackId`,principal AS `principal`,site_route AS `siteRoute`,warning_grade AS `grade`,node_id AS `nodeId`,warning_type AS `warningType`,
+        <include refid="warningGradeCase"><property name="a" value=""/></include> AS `warningGrade`,
+        DATE_FORMAT(<include refid="warningValCase"><property name="a" value=""/></include>, '%Y-%m-%d %H:%i:%s') AS `warningVal`,
+        DATE_FORMAT(<include refid="warningTimeCase"><property name="a" value=""/></include>, '%Y-%m-%d %H:%i:%s') AS `warningTime`
         from tb_early_warning where is_affirm in('1','2') and warning_type = #{warningType}
-        <if test="warningGrade != null and warningGrade != ''">and CASE WHEN instr(warning_grade, '3') > 0 THEN '3' WHEN instr(warning_grade, '2') > 0 and instr(warning_grade, '3') = 0 THEN '2' WHEN
-            instr(warning_grade, '1') > 0 and instr(warning_grade, '2') = 0 and instr(warning_grade, '3') = 0 THEN '1' END = #{warningGrade}</if>
+        <if test="warningGrade != null and warningGrade != ''">and <include refid="warningGradeCase"><property name="a" value=""/></include> = #{warningGrade}</if>
     </select>
     <select id="findUndoEarlyWarningBySiteRoute" resultType="com.rpzh.vo.EarlyWarningVo">
         SELECT id,node_id nodeId,warning_grade AS warningGrade,warning_type warningType,is_affirm affirm,
         warning_val warningVal,warning_val_one warningValOne,warning_val_two warningValTwo,warning_val_three warningValThree
-        FROM tb_early_warning where site_route =#{siteRoute} and is_affirm in (1,2) and rownum = 1
+        FROM tb_early_warning where site_route =#{siteRoute} and is_affirm in (1,2) 
         <if test="warningType!='' and warningType!=null"> and warning_type =#{warningType}</if>
+    
+        LIMIT 1
     </select>
     <select id="findPestCount" resultType="java.util.Map">
-        select id,beetle_count as "beetle",mealworm_count as "mealworm"  from tb_pest_data_history where id IN (SELECT max(id) from tb_pest_data_history WHERE pest_board_id = #{nodeId})
+        select id,beetle_count AS `beetle`,mealworm_count AS `mealworm`  from tb_pest_data_history where id IN (SELECT max(id) from tb_pest_data_history WHERE pest_board_id = #{nodeId})
     </select>
     <select id="findAppPrincipalById" resultType="java.lang.String">
         select principal from tb_early_warning where id = #{id}
     </select>
     <select id="findAppWarningInfoByWarningFault" resultType="java.util.Map">
-        SELECT id AS "id",area_id AS "areaId",stack_id AS "stackId",is_affirm AS "affirm",node_type AS "nodeType",principal as "principal",node_id as "nodeId",
-    warning_grade as "warningGrade",site_route as "siteRoute",to_char(warning_time_one,'SYYYY-MM-DD HH24:MI:SS') AS "warningTime",warning_type as "warningType" FROM tb_early_warning
+        SELECT id AS `id`,area_id AS `areaId`,stack_id AS `stackId`,is_affirm AS `affirm`,node_type AS `nodeType`,principal AS `principal`,node_id AS `nodeId`,
+    warning_grade AS `warningGrade`,site_route AS `siteRoute`,DATE_FORMAT(warning_time_one, '%Y-%m-%d %H:%i:%s') AS `warningTime`,warning_type AS `warningType` FROM tb_early_warning
     where id in (SELECT max(id) from tb_early_warning where is_affirm = '2' and warning_type in ('01','02','03') group by site_route,node_type,warning_type) ORDER BY is_affirm DESC
 </select>
     <select id="findAppFaultNodeId" resultType="java.lang.String">
@@ -328,10 +362,21 @@
         select humiture from tb_air_conditioner_history where transfer_time in (select max(transfer_time) from tb_air_conditioner_history where node_id = #{nodeId}) and node_id = #{nodeId}
     </select>
     <select id="findAppWarningInfo" resultType="java.util.Map">
-        select to_char(warning_time,'SYYYY-MM-DD HH24:MI:SS') as "warningTime",warning_val as "warningVal",node_id as "nodeId",warning_grade as "warningGrade",task_id as "taskId" from tb_early_warning where id = #{id}
+        select DATE_FORMAT(warning_time, '%Y-%m-%d %H:%i:%s') AS `warningTime`,warning_val AS `warningVal`,node_id AS `nodeId`,warning_grade AS `warningGrade`,task_id AS `taskId` from tb_early_warning where id = #{id}
     </select>
     <select id="findAppPestInfos" resultType="java.util.Map">
-        select to_char(gather_time,'SYYYY-MM-DD HH24:MI:SS') as "transferTime",${tableColumn} as "node" FROM (select gather_time,${tableColumn} from  tb_pest_data_history
-        where pest_board_id = #{nodeId} order by gather_time DESC) where rownum &lt;= 5
+        select DATE_FORMAT(gather_time, '%Y-%m-%d %H:%i:%s') AS `transferTime`,${tableColumn} AS `node` FROM (select gather_time,${tableColumn} from  tb_pest_data_history
+        where pest_board_id = #{nodeId} order by gather_time DESC) t LIMIT 5
+    </select>
+    <select id="findSettingValue" resultType="java.lang.String">
+        select setting_value from tb_general_setting
+        where setting_key = #{settingKey} and setting_name = #{settingName}
+        limit 1
+    </select>
+    <select id="countUndoFaultWarning" resultType="java.lang.Integer">
+        select count(*) from tb_early_warning
+        where node_id like concat('%', #{nodeId}, '%')
+          and warning_type in ('01','02','03')
+          and is_affirm in (1,2)
     </select>
 </mapper>

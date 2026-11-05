@@ -13,6 +13,7 @@ import com.rpzh.entity.Result;
 import com.rpzh.entity.StatusCode;
 import com.rpzh.entity.ToolUtil;
 import com.rpzh.service.MaintainPlanService;
+import com.rpzh.service.MaintainPlanStatisticsService;
 import com.rpzh.dto.MaintainPlanDto;
 import com.rpzh.util.GetBetweenDayUtils;
 import com.rpzh.util.StringUtils;
@@ -47,6 +48,9 @@ public class MaintainPlanController {
     @Resource
     private MaintainPlanService maintainPlanService;
 
+    @Resource
+    private MaintainPlanStatisticsService maintainPlanStatisticsService;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -61,7 +65,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警规则名称", required = true,dataType = "String"),
             @ApiImplicitParam(name = "phases", value = "养护阶段", required = true,dataType = "String")
     })
-    public Result<AlarmValueSettingVo> findAlarmSettingTemplate(String earlyWarningRuleName,String phases){
+    public Result<AlarmValueSettingVo> findAlarmSettingTemplate(@RequestParam("earlyWarningRuleName") String earlyWarningRuleName,@RequestParam("phases") String phases){
         AlarmValueSettingVo alarmSettingTemplate = maintainPlanService.findAlarmSettingTemplate(earlyWarningRuleName,phases);
         return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplate);
     }
@@ -71,6 +75,13 @@ public class MaintainPlanController {
     public Result findAlarmSettingTemplateList(){
         List<String> alarmSettingTemplateNames = maintainPlanService.findAlarmSettingTemplateList();
         return new Result<AlarmValueSettingVo>(true, StatusCode.OK, "查询成功",alarmSettingTemplateNames);
+    }
+
+    @PostMapping("/findOccupiedStackIds")
+    @ApiOperation(value = "查询已有未完成养护计划的垛位id列表")
+    public Result<List<Integer>> findOccupiedStackIds() {
+        List<Integer> stackIds = maintainPlanService.findOccupiedStackIds();
+        return new Result<List<Integer>>(true, StatusCode.OK, "查询成功", stackIds);
     }
 
     @PostMapping(value = "/insert")
@@ -168,6 +179,10 @@ public class MaintainPlanController {
     })
     @PreAuthorize("hasAnyAuthority('f:m:f')")
     public Result<MaintainPlanVo> findMaintainPlanInfo(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        // 只有显式传 isEnd=1 才查「已完成」列表；其它值（含空串）一律按进行中处理
+        if (!"1".equals(maintainPlanDto.getIsEnd())) {
+            maintainPlanDto.setIsEnd(null);
+        }
         if(StringUtils.isNotEmpty(maintainPlanDto.getEndTime())){
             maintainPlanDto.setEndTime(maintainPlanDto.getEndTime().replace("00:00:00", "23:59:59"));
         }
@@ -180,7 +195,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "earlyWarningRuleName", value = "预警名称", required = true, dataType = "String")
     })
-    public Result findCountByName(String earlyWarningRuleName){
+    public Result findCountByName(@RequestParam("earlyWarningRuleName") String earlyWarningRuleName){
         return maintainPlanService.findCountByName(earlyWarningRuleName);
     }
 
@@ -201,7 +216,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
     @PreAuthorize("hasAnyAuthority('f:m:f')")
-    public Result<MaintainPlanVo> findMaintainPlanById(Integer id) {
+    public Result<MaintainPlanVo> findMaintainPlanById(@RequestParam("id") Integer id) {
         MaintainPlanVo maintainPlan = maintainPlanService.findMaintainPlan(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询养护详情成功",maintainPlan);
     }
@@ -211,7 +226,7 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
-    public Result<MaintainPlanVo> beforeUpdateMaintainPlan(Integer id){
+    public Result<MaintainPlanVo> beforeUpdateMaintainPlan(@RequestParam("id") Integer id){
         MaintainPlanVo maintainPlan = maintainPlanService.beforeUpdateMaintainPlan(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "更改前回显成功",maintainPlan);
     }
@@ -222,7 +237,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
     @PreAuthorize("hasAnyAuthority('f:m:change')")
-    public Result<MaintainPlanVo> beforeChangeMaintainPlanStage(Integer id){
+    public Result<MaintainPlanVo> beforeChangeMaintainPlanStage(@RequestParam("id") Integer id){
         MaintainPlanVo maintainPlan = maintainPlanService.beforeChangeMaintainPlanStage(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "转段前回显成功",maintainPlan);
     }
@@ -296,9 +311,12 @@ public class MaintainPlanController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "maintenceStyle", value = "养护方式", required = true, dataType = "String")
     })
-    public Result getPhases(String maintenceStyle) {
+    public Result getPhases(@RequestParam("maintenceStyle") String maintenceStyle) {
         List<String> phases = new ArrayList<>(Arrays.asList("养护阶段","充氮杀虫阶段","磷化铝杀虫阶段"));
-        if(maintenceStyle.equals("机械调控方式")) {
+        // 前端 STYLES 传的是编码 01/02/03，旧代码只认中文「机械调控方式」，
+        // 导致第 4 个阶段永远不出现且传 null 会 NPE；这里同时兼容两种口径。
+        if ("机械调控方式".equals(maintenceStyle)
+                || "02".equals(maintenceStyle) || "03".equals(maintenceStyle)) {
             phases.add("充氮保质阶段");
         }
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
@@ -311,7 +329,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "stackId", value = "垛位id", required = true, dataType = "Integer")
     })
     @PreAuthorize("hasAnyAuthority('f:m:change')")
-    public Result beforeChangePhases(Integer stackId,String maintenceStyle){
+    public Result beforeChangePhases(@RequestParam("stackId") Integer stackId,@RequestParam("maintenceStyle") String maintenceStyle){
         List<String> phases = maintainPlanService.beforeChangePhases(stackId, maintenceStyle);
         return new Result<>(true, StatusCode.OK, "查询养护阶段成功",phases);
     }
@@ -385,7 +403,7 @@ public class MaintainPlanController {
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
     })
     @PreAuthorize("hasAnyAuthority('f:m:ctf')")
-    public Result<MaintainPlanVo> findEndMaintainPlanDetails(Integer id) {
+    public Result<MaintainPlanVo> findEndMaintainPlanDetails(@RequestParam("id") Integer id) {
         MaintainPlanVo maintainPlanVo = maintainPlanService.findEndMaintainPlanDetails(id);
         return new Result<MaintainPlanVo>(true, StatusCode.OK, "查询成功",maintainPlanVo);
     }
@@ -445,18 +463,27 @@ public class MaintainPlanController {
         return new Result(true, StatusCode.OK, "查询历史汇总单成功",maintainPlanVos);
     }
 
-    /*@ApiOperation(value = "移垛")
+    @ApiOperation(value = "移垛")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "养护计划id", dataType = "Integer",required = true),
-            @ApiImplicitParam(name = "stackId", value = "垛位id", dataType = "Integer",required = true),
-            @ApiImplicitParam(name = "nodeDtoList", value = "该养护计划下的所有垛位", required = true,allowMultiple = true,dataType = "String"),
-            @ApiImplicitParam(name = "pidRoute", value = "位置路由", dataType = "String"),
-            @ApiImplicitParam(name = "siteName", value = "位置名称",dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "养护计划id", dataType = "Integer", required = true),
+            @ApiImplicitParam(name = "stackId", value = "目标垛位id", dataType = "Integer", required = true),
+            @ApiImplicitParam(name = "nodeDtoList", value = "该养护计划下的所有设备(每个为JSON字符串)", required = true, allowMultiple = true, dataType = "String"),
+            @ApiImplicitParam(name = "pidRoute", value = "完整位置路由,含 [05:目标垛位id]", dataType = "String", required = true),
+            @ApiImplicitParam(name = "siteName", value = "目标位置名称", dataType = "String", required = true)
     })
-    @PostMapping({"/moveStack"})
-    public Result moveStack(MaintainPlanDto maintainPlanDto) {
+    @PostMapping("/moveStack")
+    public Result moveStack(@ApiIgnore MaintainPlanDto maintainPlanDto) {
         return maintainPlanService.moveStack(maintainPlanDto);
-    }*/
+    }
+
+    @ApiOperation(value = "养护计划全链路统计")
+    @ApiImplicitParam(name = "id", value = "养护计划id", required = true, dataType = "int")
+    @PostMapping("/findMaintainPlanStatistics")
+    @PreAuthorize("hasAnyAuthority('f:m:f')")
+    public Result findMaintainPlanStatistics(@ApiIgnore MaintainPlanDto maintainPlanDto) {
+        // 只读聚合：阶段转换时间线、预警次数/分类、虫害数量、养护结果与累计预警时长
+        return maintainPlanStatisticsService.statistics(maintainPlanDto.getId());
+    }
 
     @PostMapping(value = "/findMaintainCountReport")
     @ApiOperation(value = "养护数量")

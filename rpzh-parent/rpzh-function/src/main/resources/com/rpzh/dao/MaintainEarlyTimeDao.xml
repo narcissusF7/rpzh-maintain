@@ -14,19 +14,18 @@
             humidity_all_early_time =#{maintainEarlyTime.humidityAllEarlyTime},
             maintain_result = #{maintainEarlyTime.maintainResult}
             where id = #{maintainEarlyTime.id}
-        <if test="maintainEarlyTime."></if>
     </update>
     <select id="findByMaintainPlanId" resultType="com.rpzh.pojo.MaintainEarlyTime">
-        select id,maintain_plan_id maintainPlanId, core_temp_max_early_time coreTempMaxEarlyTime
-                 , core_temp_all_early_time coreTempAllEarlyTime
-                 , oxygen_max_early_time oxygenMaxEarlyTime
-                 , oxygen_all_early_time oxygenAllEarlyTime
-                 , temp_max_early_time tempMaxEarlyTime
-                 , temp_all_early_time tempAllEarlyTime
-                 , humidity_max_early_time tempMaxEarlyTime
-                 , humidity_all_early_time humidityAllEarlyTime
-                 , humidity_max_early_time humidityMaxEarlyTime
-                 , maintain_result maintainResult
+        select id,maintain_plan_id maintainPlanId,
+               ifnull(core_temp_max_early_time,0) coreTempMaxEarlyTime,
+               ifnull(core_temp_all_early_time,0) coreTempAllEarlyTime,
+               ifnull(oxygen_max_early_time,0) oxygenMaxEarlyTime,
+               ifnull(oxygen_all_early_time,0) oxygenAllEarlyTime,
+               ifnull(temp_max_early_time,0) tempMaxEarlyTime,
+               ifnull(temp_all_early_time,0) tempAllEarlyTime,
+               ifnull(humidity_max_early_time,0) humidityMaxEarlyTime,
+               ifnull(humidity_all_early_time,0) humidityAllEarlyTime,
+               maintain_result maintainResult
         from tb_maintain_early_time where maintain_plan_id = #{maintainPlanId}
     </select>
     <select id="findMaintainEarlyTimes" resultType="com.rpzh.vo.MaintainEarlyTimeVo">

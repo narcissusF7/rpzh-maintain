@@ -41,7 +41,7 @@ public class MaterialController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "stackId", value = "垛位Id", required = true, dataType = "Integer")
     })
-    public Result findMaterialInfo(Integer stackId){
+    public Result findMaterialInfo(@RequestParam("stackId") Integer stackId){
         if(ToolUtil.isEmpty(stackId)){
             return new Result(false, StatusCode.NULLERROR, "垛位id不能为空!");
         }

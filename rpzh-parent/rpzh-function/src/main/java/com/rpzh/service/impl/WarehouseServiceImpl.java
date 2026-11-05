@@ -78,7 +78,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         getUserInfo(warehouseDto.getPrincipalName(),map);
 
         //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"1_"+(warehouseDto.getId()+1), JSONObject.toJSONString(map));
+        redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"1_"+(warehouseDto.getId()), JSONObject.toJSONString(map));
 
         return addFlag;
     }
@@ -165,7 +165,7 @@ public class WarehouseServiceImpl implements WarehouseService {
             throw new RuntimeException("该仓库不存在,禁止添加");
         }
         buildingDto.setPidRoute(warehouseVo.getPidRoute() + ",[" + WarehouseNodeType.WAREHOUSE_NODE.getType() + ":" + warehouseVo.getId() + "]");
-        buildingDto.setSiteName(warehouseVo.getSiteName() + buildingDto.getBuildingName());
+        buildingDto.setSiteName(warehouseVo.getSiteName() + "/" + buildingDto.getBuildingName());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -185,7 +185,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addBuilding(buildingDto);
         if (!ToolUtil.isEmpty(principalName)){
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+(buildingDto.getId()+1), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,"2_"+(buildingDto.getId()), JSONObject.toJSONString(map));
 
         }
 
@@ -202,7 +202,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //查询仓库信息
         WarehouseVo warehouseVo = warehouseDao.findWarehouse(buildingDto.getWarehouseId());
         buildingDto.setPidRoute(warehouseVo.getPidRoute() + ",[" + WarehouseNodeType.WAREHOUSE_NODE.getType() + ":" + warehouseVo.getId() + "]");
-        buildingDto.setSiteName(warehouseVo.getSiteName() + buildingDto.getBuildingName());
+        buildingDto.setSiteName(warehouseVo.getSiteName() + "/" + buildingDto.getBuildingName());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -239,7 +239,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //获取楼栋信息
         BuildingVo buildingVo = warehouseDao.findBuilding(floorDto.getBuildingId());
         floorDto.setPidRoute(buildingVo.getPidRoute() + ",[" + WarehouseNodeType.BUILDING_NODE.getType() + ":" + buildingVo.getId() + "]");
-        floorDto.setSiteName(buildingVo.getSiteName() + floorDto.getFloorName());
+        floorDto.setSiteName(buildingVo.getSiteName() + "/" + floorDto.getFloorName());
 
         String principalName = floorDto.getPrincipalName();
         Map<String,Object> map = new HashMap<>();
@@ -253,7 +253,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "3_" + (floorDto.getId()+1), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "3_" + (floorDto.getId()), JSONObject.toJSONString(map));
         }
         return addFlag;
     }
@@ -274,7 +274,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //获取楼栋信息
         BuildingVo buildingVo = warehouseDao.findBuilding(floorDto.getBuildingId());
         floorDto.setPidRoute(buildingVo.getPidRoute() + ",[" + WarehouseNodeType.BUILDING_NODE.getType() + ":" + buildingVo.getId() + "]");
-        floorDto.setSiteName(buildingVo.getSiteName() + floorDto.getFloorName());
+        floorDto.setSiteName(buildingVo.getSiteName() + "/" + floorDto.getFloorName());
 
         String principalName = floorDto.getPrincipalName();
         if (ToolUtil.isNotEmpty(principalName)) {
@@ -300,7 +300,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //查询楼层信息
         FloorVo floorVo = warehouseDao.findFloor(wareAreaDto.getFloorId());
         wareAreaDto.setPidRoute(floorVo.getPidRoute() + ",[" + WarehouseNodeType.FLOOR_NODE.getType() + ":" + floorVo.getId() + "]");
-        wareAreaDto.setSiteName(floorVo.getSiteName() + wareAreaDto.getAreaName());
+        wareAreaDto.setSiteName(floorVo.getSiteName() + "/" + wareAreaDto.getAreaName());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -318,7 +318,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addWarearea(wareAreaDto);
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "4_" + (wareAreaDto.getId()+1), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "4_" + (wareAreaDto.getId()), JSONObject.toJSONString(map));
         }
         return addFlag;
     }
@@ -334,7 +334,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //查询楼层信息
         FloorVo floorVo = warehouseDao.findFloor(wareAreaDto.getFloorId());
         wareAreaDto.setPidRoute(floorVo.getPidRoute() + ",[" + WarehouseNodeType.FLOOR_NODE.getType() + ":" + floorVo.getId() + "]");
-        wareAreaDto.setSiteName(floorVo.getSiteName() + wareAreaDto.getAreaName());
+        wareAreaDto.setSiteName(floorVo.getSiteName() + "/" + wareAreaDto.getAreaName());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -366,7 +366,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //查询分区信息
         WareAreaVo wareAreaVo = warehouseDao.findWareArea(stackDto.getAreaId());
         stackDto.setPidRoute(wareAreaVo.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + wareAreaVo.getId() + "]");
-        stackDto.setSiteName(wareAreaVo.getSiteName() + stackDto.getNameCn());
+        stackDto.setSiteName(wareAreaVo.getSiteName() + "/" + stackDto.getNameCn());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -384,7 +384,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         int addFlag = warehouseDao.addStack(stackDto);
         if (!ToolUtil.isEmpty(principalName)) {
             //将该垛位的负责人 负责人id 负责人账号 手机号码放置到缓存中
-            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "5_" + (stackDto.getStackId()+1), JSONObject.toJSONString(map));
+            redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL, "5_" + (stackDto.getStackId()), JSONObject.toJSONString(map));
         }
         return addFlag;
     }
@@ -400,7 +400,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         //查询分区信息
         WareAreaVo wareAreaVo = warehouseDao.findWareArea(stackDto.getAreaId());
         stackDto.setPidRoute(wareAreaVo.getPidRoute() + ",[" + WarehouseNodeType.WAREAREA_NODE.getType() + ":" + wareAreaVo.getId() + "]");
-        stackDto.setSiteName(wareAreaVo.getSiteName() + stackDto.getNameCn());
+        stackDto.setSiteName(wareAreaVo.getSiteName() + "/" + stackDto.getNameCn());
         //获取用户信息
         Map<String, String> userInfo = TokenDecode.getUserInfo();
         //获取用户账号
@@ -593,12 +593,16 @@ public class WarehouseServiceImpl implements WarehouseService {
                 //通过位置路由获取上级负责人
                 map = sitePrincipalMap(stackVo.getPidRoute(), map);
                 //如果负责人不为空
-                if (ToolUtil.isNotEmpty(map)){
+                if (ToolUtil.isNotEmpty(map) && map.get("nickname") != null){
                     stackVo.setPrincipalName(map.get("nickname")+"("+map.get("username")+")");
                 }
             }else {
+                //库里的 principal_name 本身就是姓名，缓存能取到昵称时才拼「姓名(账号)」，
+                //否则原样返回，避免出现前端无法还原的 "null(姓名)"
                 Object nickname = redisTemplate.opsForHash().get("USER_" + stackVo.getPrincipalName(), "nickname");
-                stackVo.setPrincipalName(nickname+"("+stackVo.getPrincipalName()+")");
+                if (nickname != null){
+                    stackVo.setPrincipalName(nickname + "(" + stackVo.getPrincipalName() + ")");
+                }
             }
         });
         return new PageInfo<StackVo>(stackVoList);
@@ -1087,6 +1091,22 @@ public class WarehouseServiceImpl implements WarehouseService {
             map.put("userName", userName);
             return true;
         }
+        // 兜底：位置上的 principal_name 存的是姓名（不是账号），直接按账号查缓存必然落空，
+        // 这里按昵称反查账号，保证负责人缓存/通知链路不断。
+        // 用户量很小（个位数~几十），keys 扫描可以接受；用户规模上来后应改成 userId 直查。
+        Set<String> userKeys = redisTemplate.keys("USER_*");
+        if (userKeys != null) {
+            for (String key : userKeys) {
+                Object nickname = redisTemplate.opsForHash().get(key, "nickname");
+                if (nickname != null && userName.equals(nickname.toString())) {
+                    map.put("nickname", nickname);
+                    map.put("phonenumber", redisTemplate.opsForHash().get(key, "phonenumber"));
+                    map.put("userId", redisTemplate.opsForHash().get(key, "userId"));
+                    map.put("userName", key.substring("USER_".length()));
+                    return true;
+                }
+            }
+        }
         return false;
 
     }
@@ -1125,14 +1145,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
         if (!ToolUtil.isEmpty(principalName)){
             String[] strs =  pidRoute.split(",");
-            Object o = redisTemplate.opsForHash().get(WAREHOUSEPRINCIPAL, strs.length+"_" + siteId);
             Map<String,Object> map = new HashMap<>();
-            if (ToolUtil.isEmpty(o)){
+            // 显式指定了负责人就以它为准写缓存（原逻辑只在缓存已存在时才查用户，
+            // 首次设置负责人时会写成空 map，导致下级继承/通知拿不到人）
+            if (!getUserInfo(principalName, map)) {
                 map = sitePrincipalMap(pidRoute, map);
-
-            }else {
-//                map = JSONObject.parseObject(o+"",HashMap.class);
-                getUserInfo(principalName,map);
             }
             redisTemplate.opsForHash().put(WAREHOUSEPRINCIPAL,strs.length+"_" + siteId,JSONObject.toJSONString(map));
         }

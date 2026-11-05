@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rpzh.dao.MaintainPlanStatisticsDao">
+
+    <!-- 计划基础：垛位名与所属仓间 id 是预警/虫害关联的关键 -->
+    <select id="findPlanBase" resultType="java.util.HashMap">
+        select
+            p.id                                as `id`,
+            p.material_code                     as `materialCode`,
+            p.principal_name                    as `principalName`,
+            p.maintence_style                   as `maintenceStyle`,
+            p.stack_id                          as `stackId`,
+            p.stage_id                          as `stageId`,
+            p.is_end                            as `isEnd`,
+            s.site_name                         as `stackName`,
+            s.name_cn                           as `stackNameCn`,
+            s.area_id                           as `areaId`,
+            s.pid_route                         as `pidRoute`,
+            date_format(now(), '%Y-%m-%d %H:%i:%s') as `dbNow`
+        from tb_maintain_plan p
+        left join tb_stack s on s.id = p.stack_id
+        where p.id = #{id}
+    </select>
+
+    <!-- 每阶段一行，created_time 是计划落库时间，aftercare_date_* 是业务养护起止 -->
+    <select id="findStages" resultType="java.util.HashMap">
+        select
+            t.id                                                as `stageId`,
+            t.phases                                            as `phases`,
+            t.maintain_days                                     as `maintainDays`,
+            date_format(t.aftercare_date_start, '%Y-%m-%d %H:%i:%s') as `startTime`,
+            date_format(t.aftercare_date_end,   '%Y-%m-%d %H:%i:%s') as `endTime`,
+            ifnull(t.is_change, '0')                            as `isChange`,
+            date_format(t.created_time, '%Y-%m-%d %H:%i:%s')   as `createdTime`,
+            date_format(t.updated_time, '%Y-%m-%d %H:%i:%s')   as `updatedTime`,
+            t.content                                           as `content`
+        from tb_maintain_plan_stage t
+        where t.maintain_plan_id = #{id}
+        order by t.id
+    </select>
+
+    <!-- 垛位级预警 + 仓间级预警（甲虫/氧气/温度/湿度/粉螟，覆盖整个仓间） -->
+    <select id="findWarnings" resultType="java.util.HashMap">
+        select
+            w.id                                            as `id`,
+            w.warning_type                                  as `warningType`,
+            w.warning_grade                                 as `warningGrade`,
+            w.node_id                                       as `nodeId`,
+            w.node_type                                     as `nodeType`,
+            w.stack_id                                      as `stackId`,
+            w.area_id                                       as `areaId`,
+            w.is_affirm                                     as `isAffirm`,
+            w.task_id                                       as `taskId`,
+            date_format(w.warning_time, '%Y-%m-%d %H:%i:%s') as `warningTime`,
+            date_format(w.deal_time,    '%Y-%m-%d %H:%i:%s') as `dealTime`,
+            w.site_route                                    as `siteRoute`
+        from tb_early_warning w
+        where 1 = 1
+        <if test="beginTime != null and beginTime != ''">
+            and w.warning_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and w.warning_time &lt;= #{endTime}
+        </if>
+        <choose>
+            <when test="stackId != null and areaId != null">
+                and (w.stack_id = #{stackId}
+                     or (w.area_id = #{areaId}
+                         and w.warning_type in ('05','07','09','11','14')))
+            </when>
+            <when test="stackId != null">
+                and w.stack_id = #{stackId}
+            </when>
+            <when test="areaId != null">
+                and w.area_id = #{areaId}
+            </when>
+            <otherwise>
+                and 1 = 0
+            </otherwise>
+        </choose>
+        order by w.warning_time, w.id
+    </select>
+
+    <!-- 虫害采集：诱捕板挂在仓间，按板 site_id 或采集路由末段的仓间 id 关联 -->
+    <select id="findPests" resultType="java.util.HashMap">
+        select
+            h.id                                            as `id`,
+            h.pest_board_id                                 as `pestBoardId`,
+            h.gather_site                                   as `gatherSite`,
+            date_format(h.gather_time, '%Y-%m-%d %H:%i:%s') as `gatherTime`,
+            ifnull(h.beetle_count, 0)                       as `beetleCount`,
+            ifnull(h.mealworm_count, 0)                     as `mealwormCount`,
+            ifnull(h.alert_level, 0)                        as `alertLevel`,
+            h.site_route                                    as `siteRoute`,
+            b.site_name                                     as `boardSiteName`
+        from tb_pest_data_history h
+        left join tb_pest_board b on b.pest_board_id = h.pest_board_id
+        where 1 = 1
+        <if test="beginTime != null and beginTime != ''">
+            and h.gather_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and h.gather_time &lt;= #{endTime}
+        </if>
+        <if test="areaId != null">
+            and (b.site_id = #{areaId} or h.site_route like concat('%,', #{areaId}))
+        </if>
+        order by h.gather_time, h.id
+    </select>
+
+    <!-- 养护结果 1 合格 / 0 不合格 / null 未判定；8 个累计预警时长（小时） -->
+    <select id="findEarlyTime" resultType="java.util.HashMap">
+        select
+            e.id                                            as `id`,
+            e.maintain_plan_id                              as `maintainPlanId`,
+            e.maintain_result                               as `maintainResult`,
+            ifnull(e.core_temp_all_early_time, 0)           as `coreTempAllEarlyTime`,
+            ifnull(e.core_temp_max_early_time, 0)           as `coreTempMaxEarlyTime`,
+            ifnull(e.oxygen_all_early_time, 0)              as `oxygenAllEarlyTime`,
+            ifnull(e.oxygen_max_early_time, 0)              as `oxygenMaxEarlyTime`,
+            ifnull(e.temp_all_early_time, 0)                as `tempAllEarlyTime`,
+            ifnull(e.temp_max_early_time, 0)                as `tempMaxEarlyTime`,
+            ifnull(e.humidity_all_early_time, 0)            as `humidityAllEarlyTime`,
+            ifnull(e.humidity_max_early_time, 0)            as `humidityMaxEarlyTime`
+        from tb_maintain_early_time e
+        where e.maintain_plan_id = #{id}
+        order by e.id desc
+        limit 1
+    </select>
+</mapper>

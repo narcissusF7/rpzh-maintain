@@ -281,4 +281,24 @@ public interface UserDao {
      * @return
      */
     Integer mqUpdateUser(@Param("userDto") UserDto userDto);
+
+    /**
+     * 查询缓存预热所需的用户信息（账号、昵称、手机号、部门）
+     * @param username 用户账号
+     * @return
+     */
+    UserVo findUserCache(@Param("username") String username);
+
+    /**
+     * 查询全部有效用户账号，用于缓存全量预热
+     * @return
+     */
+    List<String> findAllValidUsername();
+
+    /**
+     * 按用户id查询账号，用于用户信息变更后刷新缓存
+     * @param userId
+     * @return
+     */
+    String findUsernameById(@Param("userId") Long userId);
 }

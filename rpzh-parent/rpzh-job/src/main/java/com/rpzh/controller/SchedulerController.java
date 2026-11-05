@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 定时任务管理
@@ -107,7 +108,7 @@ public class SchedulerController {
      * @return
      */
     @PostMapping("/changeJobStatus")
-    public Result changeJobStatus(Long jobId, String cmd){
+    public Result changeJobStatus(@RequestParam("jobId") Long jobId, @RequestParam("cmd") String cmd){
         if (ToolUtil.isEmpty(jobId) || ToolUtil.isEmpty(cmd)){
             return new Result(false, StatusCode.ERROR, "任务id和任务命令不能为空");
         }
@@ -125,7 +126,7 @@ public class SchedulerController {
      * @return
      */
     @PostMapping("/changeStatus")
-    public Result changeStatus(String status){
+    public Result changeStatus(@RequestParam("status") String status){
         if (!("0".equals(status) || "1".equals(status))){
             return new Result(false, StatusCode.ERROR, "状态错误,状态只能传0和1");
         }
@@ -145,7 +146,7 @@ public class SchedulerController {
      * @return
      */
     @PostMapping("/updateCron")
-    public Result updateCron(Long jobId, String cron){
+    public Result updateCron(@RequestParam("jobId") Long jobId, @RequestParam("cron") String cron){
         if (ToolUtil.isEmpty(jobId) || ToolUtil.isEmpty(cron)){
             return new Result(false, StatusCode.ERROR, "任务id和表达式不能为空");
         }

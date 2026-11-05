@@ -115,8 +115,6 @@ public class NodeOperateAspect {
 
             MaintainPlanDto maintainPlanDto;
 
-            List<String> nodeDtoList;
-
             List<NodeOperationDto> nodeOperationDtos = new ArrayList<>();
 
         /*
@@ -171,9 +169,8 @@ public class NodeOperateAspect {
 //                    break;
                 case NodeConstant.FLIP_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
-                    nodeDtoList = maintainPlanDto.getNodeDtoList();
-                    nodeDtoList.forEach(nodeDtostr ->{
-                        NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
+                    nodeDtos = JSONObject.parseArray(maintainPlanDto.getNodeDtoList(), NodeDto.class);
+                    nodeDtos.forEach(nodeDto1 ->{
                         setValue(type,nodeDto1,
                                 "垛位"+nodeDto1.getStack() +"翻垛，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
                     });
@@ -181,9 +178,8 @@ public class NodeOperateAspect {
                     break;
                 case NodeConstant.MOVE_STACK_NODE_OPERATE_NUMBER:
                     maintainPlanDto = (MaintainPlanDto) args[0];
-                    nodeDtoList = maintainPlanDto.getNodeDtoList();
-                    nodeDtoList.forEach(nodeDtostr ->{
-                        NodeDto nodeDto1 = JSONObject.parseObject(nodeDtostr,NodeDto.class);
+                    nodeDtos = JSONObject.parseArray(maintainPlanDto.getNodeDtoList(), NodeDto.class);
+                    nodeDtos.forEach(nodeDto1 ->{
                         setValue(type,nodeDto1,
                                 "养护计划"+maintainPlanDto.getId() +"移垛至垛位"+maintainPlanDto.getStackId()+"，设备"+nodeDto1.getNodeId()+"移动到"+nodeDto1.getSiteX()+","+nodeDto1.getSiteY()+","+nodeDto1.getSiteZ(),username,nodeOperationDtos);
                     });

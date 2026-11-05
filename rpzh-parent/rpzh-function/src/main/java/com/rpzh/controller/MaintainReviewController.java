@@ -50,7 +50,7 @@ public class MaintainReviewController {
             @ApiImplicitParam(name = "id", value = "用户计划id", required = true,dataType = "String")
     })
     @ApiOperation(value = "养护计划追溯列表")
-    public Result<MaintainPlanVo> findMaintainPlanReview(Integer id) {
+    public Result<MaintainPlanVo> findMaintainPlanReview(@RequestParam("id") Integer id) {
         List<MaintainPlanVo> maintainPlanVos = maintainReviewService.findMaintainPlanReview(id);
         return new Result(true, StatusCode.OK, "养护计划追溯查询成功!", maintainPlanVos);
     }
@@ -62,7 +62,7 @@ public class MaintainReviewController {
             @ApiImplicitParam(name = "size", value = "每页几页", required = true,dataType = "int")
     })
     @ApiOperation(value = "养护预警追溯列表")
-    public Result<EarlyWarningVo> findEarlyWarningReview(Integer id,Integer page,Integer size) {
+    public Result<EarlyWarningVo> findEarlyWarningReview(@RequestParam("id") Integer id,@RequestParam("page") Integer page,@RequestParam("size") Integer size) {
         PageHelper.startPage(page, size);
         List<EarlyWarningVo> maintainPlanVos = maintainReviewService.findEarlyWarningReview(id);
         return new Result(true, StatusCode.OK, "养护预警追溯查询成功!", new PageInfo<>(maintainPlanVos));
@@ -76,7 +76,7 @@ public class MaintainReviewController {
             @ApiImplicitParam(name = "endTime", value = "结束时间", required = true,dataType = "String")
     })
     @ApiOperation(value = "养护数据追溯列表")
-    public Result findDataReview(String tableType, Integer id, String startTime, String endTime) {
+    public Result findDataReview(@RequestParam("tableType") String tableType, @RequestParam("id") Integer id, @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         if(ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "养护计划id不能为空!");
         }
@@ -92,7 +92,7 @@ public class MaintainReviewController {
             @ApiImplicitParam(name = "id", value = "养护计划id", required = true,dataType = "int")
     })
     @ApiOperation(value = "养护追溯详情中的基础信息")
-    public Result<MaintainPlanVo> findMaintainBaseInfo(Integer id) {
+    public Result<MaintainPlanVo> findMaintainBaseInfo(@RequestParam("id") Integer id) {
         MaintainPlanVo maintainBaseInfo = maintainReviewService.findMaintainBaseInfo(id);
         return new Result(true, StatusCode.OK, "查询成功!", maintainBaseInfo);
     }

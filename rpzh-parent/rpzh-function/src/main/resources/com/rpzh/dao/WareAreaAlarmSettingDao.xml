@@ -62,7 +62,7 @@
         <if test="wareAreaAlarmSettingDto.stackId != null and wareAreaAlarmSettingDto.stackId != ''">#{wareAreaAlarmSettingDto.stackId},</if>
         <if test="wareAreaAlarmSettingDto.siteType != null and wareAreaAlarmSettingDto.siteType != ''">#{wareAreaAlarmSettingDto.siteType},</if>
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">#{wareAreaAlarmSettingDto.pidRoute},</if>
-        sysdate,#{wareAreaAlarmSettingDto.createUser},sysdate,#{wareAreaAlarmSettingDto.updateUser}
+        NOW(),#{wareAreaAlarmSettingDto.createUser},NOW(),#{wareAreaAlarmSettingDto.updateUser}
         )
     </insert>
     <delete id="deleteIds">
@@ -90,8 +90,8 @@
         where 1=1
         <if test="wareAreaAlarmSettingDto.pidRoute != null and wareAreaAlarmSettingDto.pidRoute != ''">and pid_route like concat(concat('%',#{wareAreaAlarmSettingDto.pidRoute}),'%')</if>
         <if test="wareAreaAlarmSettingDto.createUser != null and wareAreaAlarmSettingDto.createUser != ''">and create_user = #{wareAreaAlarmSettingDto.createUser}</if>
-        <if test="wareAreaAlarmSettingDto.startTime !=null and wareAreaAlarmSettingDto.startTime != ''">and updated_time >= to_date(#{wareAreaAlarmSettingDto.startTime},'yyyy-mm-dd hh24:mi:ss')</if>
-        <if test="wareAreaAlarmSettingDto.endTime !=null and wareAreaAlarmSettingDto.endTime != ''">and updated_time &lt;= to_date(#{wareAreaAlarmSettingDto.endTime},'yyyy-mm-dd hh24:mi:ss')</if>
+        <if test="wareAreaAlarmSettingDto.startTime !=null and wareAreaAlarmSettingDto.startTime != ''">and updated_time >= STR_TO_DATE(#{wareAreaAlarmSettingDto.startTime}, '%Y-%m-%d %H:%i:%s')</if>
+        <if test="wareAreaAlarmSettingDto.endTime !=null and wareAreaAlarmSettingDto.endTime != ''">and updated_time &lt;= STR_TO_DATE(#{wareAreaAlarmSettingDto.endTime}, '%Y-%m-%d %H:%i:%s')</if>
     </select>
     <select id="findWareAreaAlarmSettingById" resultType="com.rpzh.vo.WareAreaAlarmSettingVo">
         select
@@ -178,6 +178,8 @@
         	TB_WARE_AREA_ALARM_SETTING
         WHERE
               PID_ROUTE IN (#{siteRoute},#{siteRoute1},#{siteRoute2},#{siteRoute3}) order by PID_ROUTE desc) t
-        WHERE ROWNUM =1
+        where 1=1
+    
+        LIMIT 1
     </select>
 </mapper>

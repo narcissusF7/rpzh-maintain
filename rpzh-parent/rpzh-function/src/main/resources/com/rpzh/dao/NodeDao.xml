@@ -25,8 +25,8 @@
         <if test="nodeDto.stackId != null and nodeDto.stackId != ''">#{nodeDto.stackId},</if>
         <if test="nodeDto.createdUser != null and nodeDto.createdUser != ''">#{nodeDto.createdUser},</if>
         <if test="nodeDto.siteType != null and nodeDto.siteType != ''">#{nodeDto.siteType},</if>
-        sysdate,
-        sysdate
+        NOW(),
+        NOW()
         )
     </insert>
     <select id="findNodeID" resultType="java.lang.String">
@@ -34,7 +34,9 @@
         FROM tb_node
         WHERE node_id = #{nodeId}
           and id != #{id}
-          and rownum = 1
+          
+    
+        LIMIT 1
     </select>
 
     <select id="findCountByNodeID" resultType="java.lang.Integer">
@@ -71,7 +73,7 @@
             <if test="nodeDto.siteZ != null and nodeDto.siteZ != ''">site_z = #{nodeDto.siteZ},</if>
             <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
             <if test="nodeDto.siteRoute != null and nodeDto.siteRoute != ''">site_route = #{nodeDto.siteRoute},</if>
-            last_updated_time = sysdate
+            last_updated_time = NOW()
         </set>
         WHERE id = #{nodeDto.id}
     </update>
@@ -115,10 +117,10 @@
                 and status = #{nodeDto.status}
             </if>
             <if test="nodeDto.startTime != null and nodeDto.startTime != ''">
-                and into_stack_time >= to_date(#{nodeDto.startTime},'yyyy-mm-dd hh24:mi:ss')
+                and into_stack_time >= STR_TO_DATE(#{nodeDto.startTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             <if test="nodeDto.endTime != null and nodeDto.endTime != ''">
-                and into_stack_time &lt;= to_date(#{nodeDto.endTime},'yyyy-mm-dd hh24:mi:ss')
+                and into_stack_time &lt;= STR_TO_DATE(#{nodeDto.endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
         </where>
         order by created_time desc
@@ -156,7 +158,7 @@
         </if>
         #{nodeDto.lastUpdatedUser},
         #{nodeDto.id},
-        sysdate)
+        NOW())
     </insert>
     <select id="findNodeReplaceLog" resultType="com.rpzh.vo.NodeVo">
         SELECT id,
@@ -218,12 +220,12 @@
         <if test="nodeDto.siteType != null and nodeDto.siteType != ''">site_Type = #{nodeDto.siteType},</if>
         <if test="nodeDto.caseNo != null and nodeDto.caseNo != ''">case_no = #{nodeDto.caseNo},</if>
         STATUS = 1,
-        into_stack_time = sysdate
+        into_stack_time = NOW()
         WHERE
         id = #{nodeDto.id}
     </update>
     <select id="findXYZ" resultType="java.util.Map">
-        select site_x as "siteX",site_y as "siteY",site_z as "siteZ" from tb_node where node_id = #{nodeId}
+        select site_x AS `siteX`,site_y AS `siteY`,site_z AS `siteZ` from tb_node where node_id = #{nodeId}
     </select>
     <select id="nodeOPS" resultType="com.rpzh.vo.NodeVo">
         select
@@ -246,7 +248,7 @@
         INTO tb_node
         (node_id,node_type,created_time)
         VALUES
-            (#{nodeVo.nodeId},#{nodeVo.nodeType},sysdate)
+            (#{nodeVo.nodeId},#{nodeVo.nodeType},NOW())
         </foreach>
         select 1 from dual
     </insert>
@@ -255,7 +257,9 @@
         SELECT node_type as nodeType
         FROM tb_node
         WHERE node_id = #{nodeId}
-          AND ROWNUM = 1
+          
+    
+        LIMIT 1
     </select>
     <select id="findVagueNode" resultType="com.rpzh.vo.NodeVo">
         SELECT node_id as nodeId, id AS id
@@ -290,13 +294,13 @@
                 and node_type = #{nodeType}
             </if>
             <if test="createTime != null and createTime != ''">
-                and into_stack_time >= to_date(#{createTime},'yyyy-mm-dd hh24:mi:ss')
+                and into_stack_time >= STR_TO_DATE(#{createTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             <if test="startTime != null and startTime != ''">
-                and created_time >= to_date(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+                and created_time >= STR_TO_DATE(#{startTime}, '%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endTime != null and endTime != ''">
-                and created_time &lt;= to_date(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+                and created_time &lt;= STR_TO_DATE(#{endTime}, '%Y-%m-%d %H:%i:%s')
             </if>
         </where>
     </select>
@@ -426,7 +430,7 @@
         FROM tb_node tnode
                  left join tb_stack ts
                            on tnode.stack_id = ts.id
-        where node_id = #{nodeId})where ROWNUM = 1
+        where node_id = #{nodeId}) t LIMIT 1
     </select>
 
 
@@ -492,7 +496,7 @@
         where id = #{id}
     </select>
     <select id="findNodeIdBySiteType" resultType="com.rpzh.vo.NodeVo">
-        select node_type as "nodeType",node_id as "nodeId" from tb_node where site_type = #{siteType}
+        select node_type AS `nodeType`,node_id AS `nodeId` from tb_node where site_type = #{siteType}
         <if test="stackId != null and stackId != ''">and stack_id = #{stackId}</if>
         <if test="pidRoute != null and pidRoute != ''">and site_route = #{pidRoute}</if>
     </select>
@@ -680,11 +684,11 @@
         order by dateTime
     </select>
     <select id="findNodeAddress" resultType="java.util.Map">
-        select node_id as "nodeId",
-        gather_site as "gatherSite",
-        site_x as "siteX",
-        site_y as "siteY",
-        site_z as "siteZ"
+        select node_id AS `nodeId`,
+        gather_site AS `gatherSite`,
+        site_x AS `siteX`,
+        site_y AS `siteY`,
+        site_z AS `siteZ`
         from tb_node
         <where>
             <if test="deviceId!=null and deviceId!=''">
@@ -700,12 +704,12 @@
     </select>
 
     <select id="findNodeVos" resultType="com.rpzh.dto.NodeDto">
-        select node_id as "nodeId",
-        gather_site as "gatherSite",
-        node_type as "nodeType",
-        site_x as "siteX",
-        site_y as "siteY",
-        site_z as "siteZ"
+        select node_id AS `nodeId`,
+        gather_site AS `gatherSite`,
+        node_type AS `nodeType`,
+        site_x AS `siteX`,
+        site_y AS `siteY`,
+        site_z AS `siteZ`
         from tb_node
         where id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
@@ -768,5 +772,8 @@
         from ${tableName}
         where node_id = #{nodeId}
         order by transfer_time Desc limit 5
+    </select>
+    <select id="findNodeIdsByStatus" resultType="java.lang.String">
+        select node_id from tb_node where status = #{status}
     </select>
 </mapper>

@@ -99,8 +99,11 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingDto alarmValueSettingDto = new AlarmValueSettingDto(maintainPlanDto);
         //将预警数值插入到预警表中
         alarmValueSettingDao.insertAlarmValueSetting(alarmValueSettingDto);
-        //设置养护计划id
-        maintainPlanDto.setId(maintainPlanDto.getId()+1);
+        // insertMaintainPlan 的 selectKey(BEFORE) 已把真实插入的 id 写回 dto。
+        // 原 Oracle 序列时代这里会 +1 预分配下一段，但 MySQL 改成 MAX(id)+1 后会导致
+        // 阶段/数量/预警表全部关联到不存在的 plan_id，且 stage_id 更新影响 0 行，
+        // 新建的计划因列表 SQL 的 t1.stage_id = t2.id 关联不上而不显示。
+        // 这里保持 id 不变，让所有子表关联到同一条计划。
         //存储物料代码、养护数量、养护计划id、垛位id、仓间id、层id、楼栋id、仓库id的集合
         List<MaintainPlanDto> maintainPlanDtos = new ArrayList<>();
         //根据垛位编号查询各个物料代码的数量
@@ -111,15 +114,17 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
             maintainPlanDtos.add(maintainPlanDto1);
         }
-        //养护数量信息批次插入养护数量表中
-        maintainPlanDao.insertMaintainCount(maintainPlanDtos);
-        //设置预警规则id
-        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDto.getAlarmValueSettingId()+1);
+        //养护数量信息批次插入养护数量表中；物料表无记录时跳过，避免空 foreach 生成非法 SQL
+        if (maintainPlanDtos != null && !maintainPlanDtos.isEmpty()) {
+            maintainPlanDao.insertMaintainCount(maintainPlanDtos);
+        }
+        //设置预警规则id（selectKey 写回的就是真实 id，不再 +1）
+        maintainPlanDto.setAlarmValueSettingId(alarmValueSettingDto.getAlarmValueSettingId());
         //插入到养护阶段表中
         maintainPlanDao.insertMaintainStage(maintainPlanDto);
         maintainPlanDao.insertMaintainEarlyTime(maintainPlanDto.getId());
-        //更新养护计划表中的养护阶段id
-        return maintainPlanDao.updateMaintainPlanStageId(maintainPlanDto.getId(),maintainPlanDto.getStageId()+1);
+        //更新养护计划表中的养护阶段id（insertMaintainStage 的 selectKey 已写回真实 stage id）
+        return maintainPlanDao.updateMaintainPlanStageId(maintainPlanDto.getId(),maintainPlanDto.getStageId());
     }
 
     /*
@@ -162,6 +167,20 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     @Override
     public Integer isExistStackId(Integer stackId) {
         return maintainPlanDao.isExistStackId(stackId);
+    }
+
+    /**
+     * 新建养护计划时，垛位下拉需要排除已有计划（is_end = '0'）的垛位。
+     * 复用 MaintainPlanDao.findStackIds 中现成的 SQL，不再走 findMaintainPlanInfo
+     * ——列表 SQL 既不返回 stackId，又带有 aftercare_date_end >= NOW() 的额外过滤。
+     */
+    @Override
+    public List<Integer> findOccupiedStackIds() {
+        List<Integer> ids = maintainPlanDao.findStackIds();
+        if (ids == null) {
+            return Collections.emptyList();
+        }
+        return ids.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
     }
 
     /**
@@ -310,12 +329,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanVo.setMaterialCodes(materialDao.findMaterialCode(stackNo));
         //根据垛位id查询位置路由
         String pidRoute = warehouseDao.findPidRoute(stackId).getPidRoute();
-        //设置全位置路由
-        maintainPlanVo.setPidRoute(SiteRouteUtil.route(pidRoute,stackId+""));
+        //设置全位置路由（带 [类型:id] 标记）
+        String fullPidRoute = SiteRouteUtil.route(pidRoute, stackId + "");
+        maintainPlanVo.setPidRoute(fullPidRoute);
         //获取预警规则id
         Integer alarmValueSettingId = maintainPlanVo.getAlarmValueSettingId();
         AlarmValueSettingVo alarmValueSettingVo = alarmValueSettingDao.findAlarmValueSettingById(alarmValueSettingId);
-        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo,pidRoute);
+        //注意：这里必须传带标记的全路径，直接传 pidRoute 原值（0,1,11,101,201）会
+        //在 getAlarmValueSetting 里 split(":") 后取 route[1] 越界。
+        alarmValueSettingVo = getAlarmValueSetting(alarmValueSettingVo, fullPidRoute);
         maintainPlanVo.setAlarmValueSettingVo(alarmValueSettingVo);
         return maintainPlanVo;
     }
@@ -505,13 +527,17 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         AlarmValueSettingVo alarmValueSettingVo = new AlarmValueSettingVo();
         BeanUtils.copyProperties(maintainPlanDto,alarmValueSettingVo);//将养护计划Dto中的预警数值复制到预警规则Vo中的预警数值
         Field[] fields = AlarmValueSettingVo.class.getDeclaredFields();//获取 AlarmValueSettingVo中所有的字段
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                //修改redis缓存中的每个字段的值       对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
-                redisTemplate.opsForHash().put(MAINTAIN + maintainPlanDto.getStageId(), field.getName(), field.get(alarmValueSettingVo));
-            } catch (Exception e) {
-                e.printStackTrace();
+        // 转段时前端不传 stageId，旧代码会写出 MAINTAIN_null 脏键。
+        // 真正该挂缓存的是「新阶段 id」，在 insertMaintainStage 之后补写（见下方）。
+        if (maintainPlanDto.getStageId() != null) {
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true);
+                    //修改redis缓存中的每个字段的值       对象为MAINTAIN_加养护阶段id主键 ，key为字段名 value为字段值
+                    redisTemplate.opsForHash().put(MAINTAIN + maintainPlanDto.getStageId(), field.getName(), field.get(alarmValueSettingVo));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         //从redis中获取账号,并拼接负责人账号
@@ -537,6 +563,18 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         maintainPlanDto.setStageId(maintainPlanVo.getStageId());//上一阶段的养护阶段id
         long createdTime = maintainPlanVo.getCreatedTime().getTime();//上一阶段的创建时间
         maintainPlanDao.insertMaintainStage(maintainPlanDto);//将当前阶段的信息插入阶段表中
+        // selectKey 已把「新阶段行 id」写回 stageId。阈值缓存必须挂在这个新 id 上，
+        // 否则转段后设备数据处理按新阶段 id 读缓存时取不到本次设定的预警阈值。
+        if (maintainPlanDto.getStageId() != null) {
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true);
+                    redisTemplate.opsForHash().put(MAINTAIN + maintainPlanDto.getStageId(), field.getName(), field.get(alarmValueSettingVo));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         maintainPlanDto.setMaintainDays(new Long((new Date().getTime() - createdTime) / (1000 * 60 * 60 * 24)).intValue() + 1);//计算上一阶段的养护天数
         maintainPlanDto.setAftercareDateEnd(new Date());//设置上一阶段的转段时间
         String pidRoute = SiteRouteUtil.route(maintainPlanDto.getPidRoute(),stackId+"");//拼接全位置路由
@@ -551,10 +589,14 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
             MaintainPlanDto maintainPlanDto1 = new MaintainPlanDto(materialVo.getMaterialCode(),materialVo.getMaintainCount(),maintainPlanDto.getId(),stackId,maintainPlanDto.getPidRoute(),maintainPlanDto.getMaintenceStyle(),maintainPlanDto.getPhases());
             maintainPlanDtos.add(maintainPlanDto1);
         }
-        //养护数量信息批次插入养护数量表中
-        maintainPlanDao.insertMaintainCount(maintainPlanDtos);
+        //养护数量信息批次插入养护数量表中；物料表无记录时跳过，避免空 foreach 生成非法 SQL
+        if (maintainPlanDtos != null && !maintainPlanDtos.isEmpty()) {
+            maintainPlanDao.insertMaintainCount(maintainPlanDtos);
+        }
         maintainPlanDao.changeMaintainPlanStage(maintainPlanDto);//修改上一阶段的信息
-        maintainPlanDto.setStageId(maintainPlanDto.getStageId()+1);//设置当前的阶段id
+        // insertMaintainStage 的 selectKey(order=BEFORE, MAX(id)+1) 已把「新阶段行 id」
+        // 写回 maintainPlanDto.stageId。旧代码在这里再 +1，当阶段 id 不连续时会让
+        // tb_maintain_plan.stage_id 指向不存在的行，导致详情回显 / 修改计划全部失效。
         Integer result = maintainPlanDao.changeMaintainPlan(maintainPlanDto);//转段
         return new Result(true, StatusCode.OK, "转段成功!");
     }
@@ -666,52 +708,55 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
         return new PageInfo(maintainPlanVos);
     }
 
-    /*@Override
+    /**
+     * 移垛：把养护计划及其下所有设备整体迁移到目标垛位。
+     * 前端传入的 pidRoute 已是完整路径（含 [05:目标垛位id]），直接用于解析
+     * 仓间/层/楼栋/仓库 id 与节点 siteRoute，避免对纯数字历史路径做 split 导致越界。
+     */
+    @Override
     @Transactional
     public Result moveStack(MaintainPlanDto maintainPlanDto) {
-        List<String> nodeDtoList = maintainPlanDto.getNodeDtoList();
-        List<NodeDto> nodeDtos = new ArrayList<>();
-        nodeDtoList.forEach(nodeDtostr ->
-                nodeDtos.add(JSONObject.parseObject(nodeDtostr,NodeDto.class)));
-        if (maintainPlanDto.getStackId().equals(nodeDtos.get(0).getStackId())) {
-            return new Result(false, StatusCode.ERROR, "垛位没有移动!");
-        } else {
-            //新的垛位id
-            Integer stackId = maintainPlanDto.getStackId();
-            //新的位置路由
-            String siteRoute = maintainPlanDto.getPidRoute()+",[05:"+stackId+"]";
-            //新的位置名称
-            String siteName = maintainPlanDto.getSiteName();
-
-            //判断目标垛位是否存在养护计划
-            Integer count = maintainPlanDao.findStackCountByStackId(stackId);
-            if (count > 0) {
-                return new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!");
-            } else {
-                //修改养护计划
-                Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
-                if (flag > 0) {
-                    //修改养护数量表的垛位信息
-                    maintainPlanDto.setAreaId(Integer.parseInt(siteRoute.split("04:")[1].split("],\\[05")[0]));
-                    maintainPlanDto.setFloorId(Integer.parseInt(siteRoute.split("03:")[1].split("],\\[04")[0]));
-                    maintainPlanDto.setBuildingId(Integer.parseInt(siteRoute.split("02:")[1].split("],\\[03")[0]));
-                    maintainPlanDto.setWarehouseId(Integer.parseInt(siteRoute.split("01:")[1].split("],\\[02")[0]));
-                    maintainPlanDao.updateMaintainCount(maintainPlanDto);
-                    //修改垛位信息
-                    nodeDtos.forEach((nodeDto) -> {
-                        nodeDto.setSiteId(stackId);
-                        nodeDto.setStackId(stackId);
-                        nodeDto.setSiteRoute(siteRoute);
-                        nodeDto.setGatherSite(siteName);
-                        nodeDto.setStack(siteName);
-                        nodeDao.updateNode(nodeDto);
-                    });
-                    return new Result(true, StatusCode.OK, "移垛成功!");
-                }
-                return new Result(false, StatusCode.ERROR, "养护计划修改失败!");
-            }
+        String nodeDtoListStr = maintainPlanDto.getNodeDtoList();
+        if (nodeDtoListStr == null || nodeDtoListStr.isEmpty()) {
+            return new Result(false, StatusCode.ERROR, "该养护计划下的设备不能为空");
         }
-    }*/
+        List<NodeDto> nodeDtos = JSONObject.parseArray(nodeDtoListStr, NodeDto.class);
+        Integer stackId = maintainPlanDto.getStackId();
+        // 以设备当前所在垛位判断是否真的发生了移动
+        if (stackId == null || stackId.equals(nodeDtos.get(0).getStackId())) {
+            return new Result(false, StatusCode.ERROR, "垛位没有移动!");
+        }
+        // 完整位置路由（前端已拼好 [00:..]...[05:目标垛位id]）
+        String siteRoute = maintainPlanDto.getPidRoute();
+        String siteName = maintainPlanDto.getSiteName();
+
+        // 目标垛位是否已存在未完成养护计划，禁止迁入
+        Integer count = maintainPlanDao.findStackCountByStackId(stackId);
+        if (count > 0) {
+            return new Result<>(false, StatusCode.ERROR, "该垛位已有养护计划!");
+        }
+        // 修改养护计划所属垛位
+        Integer flag = maintainPlanDao.updateStackByStackId(maintainPlanDto.getId(), stackId);
+        if (flag > 0) {
+            // 同步养护数量表的位置信息
+            maintainPlanDto.setAreaId(SiteRouteUtil.getSiteId(siteRoute, "04"));
+            maintainPlanDto.setFloorId(SiteRouteUtil.getSiteId(siteRoute, "03"));
+            maintainPlanDto.setBuildingId(SiteRouteUtil.getSiteId(siteRoute, "02"));
+            maintainPlanDto.setWarehouseId(SiteRouteUtil.getSiteId(siteRoute, "01"));
+            maintainPlanDao.updateMaintainCount(maintainPlanDto);
+            // 迁移所有设备
+            nodeDtos.forEach((nodeDto) -> {
+                nodeDto.setSiteId(stackId);
+                nodeDto.setStackId(stackId);
+                nodeDto.setSiteRoute(siteRoute);
+                nodeDto.setGatherSite(siteName);
+                nodeDto.setStack(siteName);
+                nodeDao.updateNode(nodeDto);
+            });
+            return new Result(true, StatusCode.OK, "移垛成功!");
+        }
+        return new Result(false, StatusCode.ERROR, "养护计划修改失败!");
+    }
 
     /*
      * 养护数量
@@ -852,10 +897,15 @@ public class MaintainPlanServiceImpl implements MaintainPlanService {
     public AlarmValueSettingVo getAlarmValueSetting(AlarmValueSettingVo alarmValueSettingVo,String pidRoute){
         AlarmValueSettingVo alarmValueSettingVo1=null;
         //从下往上找
+        if (pidRoute == null || pidRoute.trim().isEmpty()) {
+            return alarmValueSettingVo;
+        }
         List<String> pidRoutes = Arrays.asList(pidRoute.split(","));
         for (int i = pidRoutes.size()-1; i >= 0; i--) {
             String[] route = org.apache.commons.lang3.StringUtils.strip(pidRoutes.get(i), "[]").split(":");
-            alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(route[0]+route[1]);
+            //兼容两种历史格式：[05:301]（带标记）与 301（纯 id，类型按层级下标推断）
+            String siteKey = route.length > 1 ? route[0] + route[1] : String.format("%02d", i) + route[0];
+            alarmValueSettingVo1 = wareAreaAlarmSettingDao.findBySite(siteKey);
             if(ToolUtil.isNotEmpty(alarmValueSettingVo1)) {
                 break;
             }

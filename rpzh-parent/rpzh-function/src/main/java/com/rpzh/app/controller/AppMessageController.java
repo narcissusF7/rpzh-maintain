@@ -80,7 +80,7 @@ public class AppMessageController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "主键id", dataType = "Integer", required = true)
     })
-    public Result<AppMessageVo> findRecipientInfoById(Integer id){
+    public Result<AppMessageVo> findRecipientInfoById(@RequestParam("id") Integer id){
         if(ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "id不能为空!");
         }
@@ -194,7 +194,7 @@ public class AppMessageController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ids", value = "主键id集合", dataType = "Integer", required = true)
     })
-    public Result<AppMessageVo> deleteRecipient(String id){
+    public Result<AppMessageVo> deleteRecipient(@RequestParam("id") String id){
         if(ToolUtil.isEmpty(id)){
             return new Result(false, StatusCode.ERROR, "id不能为空!");
         }

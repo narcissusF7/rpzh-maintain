@@ -73,6 +73,18 @@ public class EarlyWarningController {
         return earlyWarningService.findEarlyWarningByWarningType(earlyWarningDto);
     }
 
+    @PostMapping("/findCurrentWarningList")
+    @ApiOperation(value = "当前预警逐条列表（含关联任务ID）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "nodeId", value = "节点编号", dataType = "String", required = false),
+            @ApiImplicitParam(name = "warningType", value = "预警类型", dataType = "String", required = false),
+            @ApiImplicitParam(name = "warningGrade", value = "预警等级", dataType = "String", required = false),
+            @ApiImplicitParam(name = "principalName", value = "负责人", dataType = "String", required = false)
+    })
+    public Result findCurrentWarningList(@ApiIgnore EarlyWarningDto earlyWarningDto){
+        return earlyWarningService.findCurrentWarningList(earlyWarningDto);
+    }
+
     @PostMapping("/findEarlyWarningBySiteId")
     @ApiOperation(value = "预警设备详情")
     @ApiImplicitParams({
@@ -97,7 +109,7 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "id", value = "id",dataType = "int",required = true)
     })
     @PreAuthorize("hasAnyAuthority('f:e:mp')")
-    public Result misreport(Integer id){
+    public Result misreport(@RequestParam("id") Integer id){
         if(ToolUtil.isEmpty(id)){
             return new Result<>(false, StatusCode.ERROR, "预警id不能为空");
         }
@@ -120,7 +132,8 @@ public class EarlyWarningController {
 
     @PostMapping("/getRepairData")
     @ApiOperation(value = "设备维修时回显")
-    public Result<RepairDataVo> getRepairData(Integer stackId, Integer areaId){
+    public Result<RepairDataVo> getRepairData(@RequestParam(value = "stackId", required = false) Integer stackId,
+                                              @RequestParam(value = "areaId", required = false) Integer areaId){
         if(ToolUtil.isEmpty(stackId) && ToolUtil.isEmpty(areaId)){
             return new Result<>(false, StatusCode.ERROR, "位置id不能为空");
         }
@@ -142,7 +155,9 @@ public class EarlyWarningController {
             @ApiImplicitParam(name = "username", value = "用户名", required = true,dataType = "String"),
             @ApiImplicitParam(name = "siteRoute", value = "位置路由", dataType = "String",required = true)
     })
-    public Result warningSend(String number,String username,String siteRoute){
+    public Result warningSend(@RequestParam("number") String number,
+                              @RequestParam("username") String username,
+                              @RequestParam("siteRoute") String siteRoute){
         earlyWarningService.warningSend(number,username,siteRoute);
         return new Result<>(true, StatusCode.OK, "发送预警短信成功");
     }
