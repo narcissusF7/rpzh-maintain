@@ -42,6 +42,20 @@ public interface UserFeign {
     @GetMapping("/getUserRole")
     public String getUserRole(@RequestParam("username") String username);
 
+    /**
+     * 中台账号解析为本地账号（中台化改造）。
+     * 已绑定则返回本地账号；未绑定则按 defaultRoleKey 自动开户并绑定后返回本地账号。
+     *
+     * @param platformUid      中台用户唯一标识（sub/openid）
+     * @param platformUsername 中台登录账号/昵称
+     * @param defaultRoleKey   自动开户时赋予的本地默认角色 role_key
+     * @return 本地账号 username
+     */
+    @GetMapping("/resolvePlatformUser")
+    public Result<String> resolvePlatformUser(@RequestParam("platformUid") String platformUid,
+                                             @RequestParam("platformUsername") String platformUsername,
+                                             @RequestParam(value = "defaultRoleKey", defaultValue = "common") String defaultRoleKey);
+
 
     /**
      * seata分布式事务测试

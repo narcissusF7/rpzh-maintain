@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.rpzh.dao.PlatformBindDao;
 import com.rpzh.dao.UserDao;
 import com.rpzh.dto.UserDto;
 import com.rpzh.entity.ToolUtil;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -35,6 +37,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private PlatformBindDao platformBindDao;
     @Resource
     private RedisUtil redisUtil;
 
@@ -403,6 +407,67 @@ public class UserServiceImpl implements UserService {
             strRole = strRole.substring(0, strRole.length() - 1);
         }
         return strRole;
+    }
+
+    /**
+     * 中台账号解析为本地账号（中台化改造）。
+     * 已绑定：直接返回绑定本地账号；未绑定：自动开户（默认角色）并写入绑定关系后返回。
+     */
+    @Override
+    @Transactional
+    public String resolvePlatformUser(String platformUid, String platformUsername, String defaultRoleKey) {
+        if (!StringUtils.hasText(platformUid)) {
+            throw new RuntimeException("中台用户唯一标识(platformUid)为空");
+        }
+        // 1. 已绑定则直接返回本地账号
+        Long boundUserId = platformBindDao.selectLocalUserIdByUid(platformUid);
+        if (boundUserId != null) {
+            return userDao.findUsernameById(boundUserId);
+        }
+
+        // 2. 未绑定：自动开户
+        String username = buildUniqueUsername(platformUsername, platformUid);
+        UserDto dto = new UserDto();
+        dto.setUserName(username);
+        dto.setNickName(StringUtils.hasText(platformUsername) ? platformUsername : username);
+        // SSO 登录不依赖本地密码，写入随机密文避免空密码
+        dto.setPassword(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString().replace("-", "")));
+        dto.setStatus("1");
+        dto.setCreateBy("platform");
+        userDao.addUser(dto);
+
+        Long userId = userDao.findUserId(username);
+        if (userId == null) {
+            throw new RuntimeException("中台账号自动开户失败");
+        }
+
+        // 3. 赋予默认本地角色
+        if (StringUtils.hasText(defaultRoleKey)) {
+            Long roleId = userDao.findRoleIdByKey(defaultRoleKey);
+            if (roleId != null) {
+                userDao.addUserRole(userId, new Long[]{roleId});
+            }
+        }
+
+        // 4. 写入绑定关系
+        platformBindDao.insertBind(platformUid, platformUsername, userId);
+        return username;
+    }
+
+    /** 生成不与现有账号冲突的本地账号 */
+    private String buildUniqueUsername(String platformUsername, String platformUid) {
+        String base = StringUtils.hasText(platformUsername) ? platformUsername : platformUid;
+        // 仅保留字母数字与下划线，保证账号合法性
+        base = base.replaceAll("[^a-zA-Z0-9_]", "_");
+        if (!StringUtils.hasText(base)) {
+            base = "plat_user";
+        }
+        String candidate = base;
+        int i = 1;
+        while (userDao.findUserNameCount(candidate) > 0) {
+            candidate = base + "_" + i++;
+        }
+        return candidate;
     }
 
     /**

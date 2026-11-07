@@ -48,6 +48,18 @@
         >
           后端登录不可用？本地点一次进入
         </el-button>
+
+        <el-button
+          v-if="platformSsoEnabled"
+          type="success"
+          plain
+          size="large"
+          style="width: 100%; margin-top: 12px; margin-left: 0"
+          :loading="ssoLoading"
+          @click="platformSsoLogin"
+        >
+          中台账号登录
+        </el-button>
       </el-form>
 
       <div class="login-tip">
@@ -72,6 +84,8 @@ const userStore = useUserStore()
 const permissionStore = usePermissionStore()
 
 const demoEnabled = import.meta.env.VITE_ENABLE_DEMO_LOGIN === 'true'
+const platformSsoEnabled = import.meta.env.VITE_ENABLE_PLATFORM_SSO === 'true'
+const ssoLoading = ref(false)
 
 const formRef = ref()
 const loading = ref(false)
@@ -146,7 +160,31 @@ function demoLogin() {
   afterLogin()
 }
 
+/** 中台账号登录：整页跳转到后端 /user/sso/login，由后端重定向到中台授权页 */
+function platformSsoLogin() {
+  ssoLoading.value = true
+  const base = import.meta.env.VITE_API_BASE || '/api'
+  window.location.href = `${base}/user/sso/login`
+}
+
 onMounted(() => {
+  // 中台 SSO 回跳：URL 上携带 ?token=bearer xxx（或 ?error=...）
+  const q = route.query
+  if (typeof q.error === 'string' && q.error) {
+    ElMessage.error('中台登录失败，请重试或使用本地账号')
+    refreshCaptcha()
+    return
+  }
+  if (typeof q.token === 'string' && q.token) {
+    try {
+      userStore.ssoLogin(q.token)
+      ElMessage.success('中台登录成功')
+      afterLogin()
+      return
+    } catch (e) {
+      ElMessage.error('中台登录回跳处理失败')
+    }
+  }
   refreshCaptcha()
 })
 </script>

@@ -47,6 +47,20 @@ encrypt:
     secret: fjxmrpzh           #秘钥
     alias: fjxmrpzh           #证书的别名
     password: fjxmrpzh         #证书的密码
+# ============ 中台（统一身份认证 IdP）SSO 接入 ============
+platform:
+  sso:
+    enabled: false
+    authorize-uri: https://sso.example.com/oauth2/authorize
+    token-uri: https://sso.example.com/oauth2/token
+    user-info-uri: https://sso.example.com/oauth2/userinfo
+    client-id: rpzh-maintain
+    client-secret: changeMe
+    redirect-uri: http://dev-gateway.example.com/api/user/sso/callback
+    scope: openid profile
+    frontend-return-uri: https://maintain-dev.example.com/login
+    default-role-key: common
+    cookie-max-age: -1
 feign:  #开启feign熔断器,当feign调用失败时熔断
   hystrix:
     enabled: true

@@ -301,4 +301,11 @@ public interface UserDao {
      * @return
      */
     String findUsernameById(@Param("userId") Long userId);
+
+    /**
+     * 按角色 key 查询角色 id（中台自动开户时赋予默认角色用）
+     * @param roleKey tb_role.role_key
+     * @return 角色 id；不存在返回 null
+     */
+    Long findRoleIdByKey(@Param("roleKey") String roleKey);
 }

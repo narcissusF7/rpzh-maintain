@@ -363,4 +363,12 @@
     FROM tb_user
     WHERE user_id = #{userId}
 </select>
+
+<!-- 中台自动开户：按 role_key 取角色 id -->
+<select id="findRoleIdByKey" resultType="java.lang.Long">
+    SELECT role_id
+    FROM tb_role
+    WHERE role_key = #{roleKey}
+    LIMIT 1
+</select>
 </mapper>

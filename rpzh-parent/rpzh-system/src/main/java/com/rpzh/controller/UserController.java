@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -174,6 +175,20 @@ public class UserController {
     public String getUserRole(@ApiParam(name = "username", value = "用户账号") String username) {
         String roles = userService.getUserRole(username);
         return roles;
+    }
+
+    /**
+     * 中台账号解析为本地账号（中台化改造）。
+     * 已绑定返回本地账号；未绑定自动开户并绑定默认角色。
+     */
+    @ApiOperation(value = "中台账号解析为本地账号", tags = "用户管理")
+    @GetMapping("/resolvePlatformUser")
+    public Result<String> resolvePlatformUser(@ApiParam(name = "platformUid", value = "中台用户唯一标识") String platformUid,
+                                              @ApiParam(name = "platformUsername", value = "中台登录账号/昵称") String platformUsername,
+                                              @ApiParam(name = "defaultRoleKey", value = "自动开户默认角色") String defaultRoleKey) {
+        String username = userService.resolvePlatformUser(platformUid, platformUsername,
+                StringUtils.hasText(defaultRoleKey) ? defaultRoleKey : "common");
+        return new Result<>(true, StatusCode.OK, "ok", username);
     }
 
     /**

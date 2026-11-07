@@ -15,3 +15,17 @@ spring:
         file-extension: yml
         namespace: b8051268-881b-49ce-a431-dddf1ec3a212 # 开发环境  指定 具体的namespace
         group: DEFAULT_GROUP # 组
+# ============ 中台（统一身份认证 IdP）SSO 接入 ============
+platform:
+  sso:
+    enabled: false
+    authorize-uri: https://sso.example.com/oauth2/authorize
+    token-uri: https://sso.example.com/oauth2/token
+    user-info-uri: https://sso.example.com/oauth2/userinfo
+    client-id: rpzh-maintain
+    client-secret: changeMe
+    redirect-uri: https://gateway.example.com/api/user/sso/callback
+    scope: openid profile
+    frontend-return-uri: https://maintain.example.com/login
+    default-role-key: common
+    cookie-max-age: -1

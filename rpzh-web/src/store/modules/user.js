@@ -69,6 +69,24 @@ export const useUserStore = defineStore('user', {
       this.userInfo = {}
       this.demoMode = false
       clearAuth()
+    },
+
+    /**
+     * 中台单点登录回跳：后端已签发本地 JWT，这里直接写入并进入系统。
+     * token 形如 "bearer xxx"。
+     */
+    ssoLogin(token) {
+      if (!token) {
+        throw new Error('SSO 回跳缺少 token')
+      }
+      this.token = token
+      this.demoMode = false
+      setToken(token)
+      const user = { username: '' }
+      this.userInfo = user
+      setCachedUser(user)
+      this.loadProfile()
+      return token
     }
   }
 })

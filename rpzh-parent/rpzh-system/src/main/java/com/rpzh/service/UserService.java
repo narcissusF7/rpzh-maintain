@@ -84,6 +84,17 @@ public interface UserService {
     String getUserRole(String username);
 
     /**
+     * 中台账号解析为本地账号（中台化改造）。
+     * 已绑定则返回本地账号；未绑定则按 defaultRoleKey 自动开户并绑定后返回。
+     *
+     * @param platformUid      中台用户唯一标识（sub/openid）
+     * @param platformUsername 中台登录账号/昵称
+     * @param defaultRoleKey   自动开户时赋予的本地默认角色 role_key
+     * @return 本地账号 username
+     */
+    String resolvePlatformUser(String platformUid, String platformUsername, String defaultRoleKey);
+
+    /**
      * 超级管理员可以修改所有人密码
      * 仅仅admin用户可以操作
      * @param username

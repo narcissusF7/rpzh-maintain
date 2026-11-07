@@ -44,6 +44,25 @@ encrypt:
     secret: fjxmrpzh           #秘钥
     alias: fjxmrpzh           #证书的别名
     password: fjxmrpzh         #证书的密码
+# ============ 中台（统一身份认证 IdP）SSO 接入 ============
+# 启用后：登录页"中台账号登录"按钮跳转中台授权页；账号/权限来源切换为中台。
+# 关闭后：维持本地账号密码登录，完全不依赖中台（默认）。
+platform:
+  sso:
+    enabled: false
+    authorize-uri: https://sso.example.com/oauth2/authorize
+    token-uri: https://sso.example.com/oauth2/token
+    user-info-uri: https://sso.example.com/oauth2/userinfo
+    client-id: rpzh-maintain
+    client-secret: changeMe
+    # 必须等于在中台注册的 redirect_uri（经网关暴露，网关会剥离 /api 前缀）
+    redirect-uri: http://localhost:8080/api/user/sso/callback
+    scope: openid profile
+    # 登录成功回跳前端页面（token 以 ?token=bearer xxx 带回）
+    frontend-return-uri: http://localhost:5173/login
+    # 中台账号首次登录自动开户时赋予的本地默认角色（对应 tb_role.role_key）
+    default-role-key: common
+    cookie-max-age: -1
 feign:  #开启feign熔断器,当feign调用失败时熔断
   hystrix:
     enabled: true
