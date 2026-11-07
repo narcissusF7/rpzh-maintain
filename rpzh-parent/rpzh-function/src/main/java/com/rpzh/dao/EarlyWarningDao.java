@@ -25,6 +25,9 @@ public interface EarlyWarningDao {
 
     EarlyWarningVo findUndoEarlyWarningByNodeId(@Param("nodeId") String nodeId, @Param("warningType") String warningType);
 
+    /** 误报处理用：取预警的定位信息（设备/位置/类型），用于清连续计数与开冷却窗口 */
+    EarlyWarningVo findWarningForMisreport(@Param("id") Integer id);
+
     List<String> findWarningThreshold(@Param("settingKey") String settingKey);
 
     Integer insertWarning(@Param("earlyWarning") EarlyWarning earlyWarning);

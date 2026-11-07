@@ -75,12 +75,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        //所有请求必须认证通过
+        // 设备服务只做 MQTT 消费，HTTP 接口不再全量放行。
         http.authorizeRequests()
-                //下边的路径放行
-                .antMatchers("/*/**"). //配置地址放行,"/*/**"放行所有的路径
-                permitAll()
-                .anyRequest().
-                authenticated();    //其他地址需要认证授权
+                .antMatchers("/actuator/health").permitAll()
+                .anyRequest().authenticated();
     }
 }

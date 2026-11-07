@@ -71,12 +71,20 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        //所有请求必须认证通过
+        // 仅放行服务间 Feign 内部端点（调用方无用户令牌）与探活接口。
+        // 这些路径网关不对外路由，生产环境必须限制微服务端口仅内网可达。
         http.authorizeRequests()
-                //下边的路径放行
-                .antMatchers("/*/**"). //配置地址放行,"/*/**"放行所有的路径
-                permitAll()
-                .anyRequest().
-                authenticated();    //其他地址需要认证授权
+                .antMatchers("/actuator/health",
+                        "/username/findPhoneNumberById",
+                        "/rfid/findIps",
+                        "/rfid/updateStatus").permitAll()
+                // 角色/菜单/部门的写操作集中要求管理权限，读操作仍需认证
+                .antMatchers("/role/addRole", "/role/editRole", "/role/changeStatus", "/role/dataScope", "/role/delectRole",
+                        "/menu/addMenu", "/menu/editMenu", "/menu/changeMenuStatus", "/menu/deleteMenu",
+                        "/dept/addDept", "/dept/editDept", "/dept/changeDeptStutas", "/dept/deleteDept")
+                .hasAnyAuthority("admin",
+                        "system:role:edit", "system:menu:edit", "system:dept:edit",
+                        "system:role:remove", "system:menu:remove", "system:dept:remove")
+                .anyRequest().authenticated();
     }
 }

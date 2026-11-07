@@ -63,6 +63,11 @@ public interface TaskManagementDao {
     * */
     int delete(@Param("id") Integer id);
 
+    /*
+    * 点击误报时作废相关任务（保留记录便于追溯误报率，不物理删除）
+    * */
+    int voidTask(@Param("id") Integer id, @Param("reason") String reason);
+
     /**
      * 查询任务详情
      *

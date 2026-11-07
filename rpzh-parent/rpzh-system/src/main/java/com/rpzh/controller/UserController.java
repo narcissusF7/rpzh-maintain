@@ -11,6 +11,7 @@ import com.rpzh.enums.BesinessUserType;
 import com.rpzh.enums.BusinessType;
 import com.rpzh.pojo.User;
 import com.rpzh.service.UserService;
+import com.rpzh.util.TokenDecode;
 import com.rpzh.vo.UserVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,10 +19,15 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -49,6 +55,7 @@ public class UserController {
      */
     @ApiOperation(value = "查询用户信息,登录时查看用户密码", tags = "用户管理")
     @RequestMapping(value = {"/{id}"})
+    @PreAuthorize("hasAnyAuthority('system:user:query','admin')")
     public Result<User> findById(@PathVariable(value = "id") String id) {
         //调用UserService实现根据主键查询User
         User user = userService.findById(id);
@@ -64,6 +71,7 @@ public class UserController {
     @ApiOperation(value = "新增用户", tags = "用户管理")
     //@OperationUserLog(title = "新增用户", businessUserType = BesinessUserType.INSERT)
     @PostMapping("/addUser")
+    @PreAuthorize("hasAnyAuthority('system:user:add','admin')")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.INSERT, title = "用户管理")
     public Result addUser(UserDto userDto) {
         Long[] roleIds = userDto.getRoleIds();
@@ -110,6 +118,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/editUser")
+    @PreAuthorize("hasAnyAuthority('system:user:edit','admin')")
     //@OperationUserLog(title = "修改用户", businessUserType = BesinessUserType.UPDATE)
     @ApiOperation(value = "修改用户", tags = "用户管理")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
@@ -134,6 +143,7 @@ public class UserController {
     @ApiOperation(value = "删除用户", tags = "用户管理")
     //@OperationUserLog(title = "删除用户", businessUserType = BesinessUserType.DELETE)
     @PostMapping("/deleteUser")
+    @PreAuthorize("hasAnyAuthority('system:user:remove','admin')")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.DELETE, title = "用户管理")
     public Result deleteUser(UserDto userDto) {
         Long[] userId = userDto.getUserIds();
@@ -159,6 +169,28 @@ public class UserController {
         }
         if (!(newpassWord.equals(notarizePassword))) {
             return new Result(false, StatusCode.ERROR, "密码与确认密码不一致,请重新输入");
+        }
+        // 普通用户只能改自己的密码；管理员及内部服务令牌可代改（auth 服务已校验旧密码）
+        String loginName = null;
+        try {
+            Map<String, String> userInfo = TokenDecode.getUserInfo();
+            loginName = userInfo == null ? null : userInfo.get("username");
+        } catch (Exception e) {
+            LOG.warn("解析登录令牌失败", e);
+        }
+        boolean privileged = false;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getAuthorities() != null) {
+            for (GrantedAuthority authority : authentication.getAuthorities()) {
+                String granted = authority.getAuthority();
+                if ("admin".equals(granted) || "system:user:edit".equals(granted)) {
+                    privileged = true;
+                    break;
+                }
+            }
+        }
+        if (!privileged && (loginName == null || !loginName.equals(username))) {
+            return new Result(false, StatusCode.ERROR, "无权修改他人密码");
         }
         Integer updatePassWordFlag = userService.editPassWord(username, newpassWord);
         return new Result(true, StatusCode.OK, "修改成功");
@@ -201,6 +233,7 @@ public class UserController {
     @ApiOperation(value = "超级管理员可以修改所有人密码", tags = "用户管理")
     //@OperationUserLog(title = "超级管理员修改密码", businessUserType = BesinessUserType.ADMINPASSWORD)
     @GetMapping("/adminUpdatePassWord")
+    @PreAuthorize("hasAnyAuthority('system:user:edit','admin')")
     @OperationLog(mapper = UserService.class, businessType = BusinessType.UPDATE, title = "用户管理")
     public Result adminUpdatePassWord(@RequestParam("username") String username, @RequestParam("newpassWord") String newpassWord) {
         if (ToolUtil.isEmpty(username) || ToolUtil.isEmpty(newpassWord)) {

@@ -109,3 +109,9 @@ node:
     cron: "0 0/10 * * * ?"   # 每 10 分钟扫描一次
     timeout-hours: 48         # 超过 48 小时未收到已入垛设备的数据 -> 异常
     max-error-count: 3        # 设备连续发出异常数据满 3 次 -> 异常
+
+# 预警误报冷却（也可在 tb_general_setting 中以 setting_key=warningSuppress / setting_name=cooldownMinutes 覆盖，改库即生效）
+# 误报后同一位置 / 设备的同类型数据在该窗口内只落库、不再判定预警；数据恢复正常会提前解除
+warning:
+  suppress:
+    cooldown-minutes: 120

@@ -15,41 +15,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Author liubc
- * @create 2021/4/16 9:10
- * 生成临时令牌工具类
- * 服务间调用时生成临时令牌
+ * 服务间调用用的内部令牌生成器。
+ * 密钥库参数可用 JVM 参数覆盖，便于轮换证书时与 AuthorizationServerConfig 保持一致。
  */
 public class JwtToken {
-    /***
+
+    private static final String KEYSTORE = System.getProperty("rpzh.jwt.keystore", "fjxmrpzh.jks");
+    private static final String KEYSTORE_SECRET = System.getProperty("rpzh.jwt.keystore-secret", "fjxmrpzh");
+    private static final String KEYSTORE_ALIAS = System.getProperty("rpzh.jwt.keystore-alias", "fjxmrpzh");
+    private static final String KEY_PASSWORD = System.getProperty("rpzh.jwt.key-password", "fjxmrpzh");
+
+    private static volatile RsaSigner signer;
+
+    private JwtToken() {
+    }
+
+    /**
      * 获取管理员令牌
-     * @return
      */
-    public static String adminJwt(){
-        //秘钥->私钥
-        Resource resource = new ClassPathResource("fjxmrpzh.jks");
-
-        /***
-         * 加载证书,读取证书数据
-         * 1:证书对象
-         * 2:证书的密码
-         */
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(resource,"fjxmrpzh".toCharArray());
-
-        //把私钥信息当做秘钥
-        KeyPair keyPair = keyStoreKeyFactory.getKeyPair("fjxmrpzh","fjxmrpzh".toCharArray());
-        PrivateKey privateKey = keyPair.getPrivate();
-        RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) privateKey;
-        //并指定加密算法
-        RsaSigner rsaSigner = new RsaSigner(rsaPrivateKey);
-
-        //添加载荷数据 payload
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put("authorities",new String[]{"admin"});
-
-        //生成令牌 JwtHelper生成令牌/解析令牌
-        Jwt jwt = JwtHelper.encode(JSON.toJSONString(map), rsaSigner);
+    public static String adminJwt() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("authorities", new String[]{"admin"});
+        Jwt jwt = JwtHelper.encode(JSON.toJSONString(map), getSigner());
         return jwt.getEncoded();
     }
 
+    /** 每次 Feign 调用都重新加载 JKS 开销过大，这里全局复用签名器。 */
+    private static RsaSigner getSigner() {
+        if (signer == null) {
+            synchronized (JwtToken.class) {
+                if (signer == null) {
+                    Resource resource = new ClassPathResource(KEYSTORE);
+                    KeyStoreKeyFactory factory = new KeyStoreKeyFactory(resource, KEYSTORE_SECRET.toCharArray());
+                    KeyPair keyPair = factory.getKeyPair(KEYSTORE_ALIAS, KEY_PASSWORD.toCharArray());
+                    PrivateKey privateKey = keyPair.getPrivate();
+                    signer = new RsaSigner((RSAPrivateKey) privateKey);
+                }
+            }
+        }
+        return signer;
+    }
 }

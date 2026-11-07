@@ -20,6 +20,7 @@ import com.rpzh.pojo.NodeData;
 import com.rpzh.service.MaintainEarlyTimeService;
 import com.rpzh.service.MonitoringCenterService;
 import com.rpzh.service.TaskManagementService;
+import com.rpzh.service.WarningSuppressService;
 import com.rpzh.service.WareAreaAlarmSettingService;
 import com.rpzh.service.impl.WarehouseServiceImpl;
 import com.rpzh.vo.*;
@@ -63,6 +64,9 @@ public class MaintainDataHandler {
 
     @Autowired
     MonitoringCenterService monitoringCenterService;
+
+    @Autowired
+    WarningSuppressService warningSuppressService;
 
     @Autowired
     WareAreaAlarmSettingDao wareAreaAlarmSettingDao;
@@ -156,8 +160,15 @@ public class MaintainDataHandler {
                     int tempLevel = decideValue(tempVal, tempList);
                     tempLevel = tempLevel==-1 ? 1:tempLevel;
 
-                    //温度处理
-                    tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp",tempWarningVo,tempWarning);
+                    //温度处理（09 仓间温度预警；误报冷却期内只落库不判定）
+                    if (warningSuppressService.isSuppressed(siteRoute, "09")) {
+                        if (tempLevel == 0) {
+                            warningSuppressService.clearSuppress(siteRoute, "09");
+                        }
+                        tempLevel = 0;
+                    } else {
+                        tempLevel =earlyWarningHandle(tempLevel, airConditionVo,"temp",tempWarningVo,tempWarning);
+                    }
 
                     //湿度数据
                     Double humidityVal = airConditionVo.getHumidityVal();
@@ -165,8 +176,15 @@ public class MaintainDataHandler {
                     int humidityLevel = decideValue(humidityVal,humidityList);
                     humidityLevel = humidityLevel==-1 ? 1:humidityLevel;
 
-                    //湿度处理
-                    humidityLevel =earlyWarningHandle(humidityLevel, airConditionVo,"humidity",humidityWarningVo,humidityWarning);
+                    //湿度处理（11 仓间湿度预警；误报冷却期内只落库不判定）
+                    if (warningSuppressService.isSuppressed(siteRoute, "11")) {
+                        if (humidityLevel == 0) {
+                            warningSuppressService.clearSuppress(siteRoute, "11");
+                        }
+                        humidityLevel = 0;
+                    } else {
+                        humidityLevel =earlyWarningHandle(humidityLevel, airConditionVo,"humidity",humidityWarningVo,humidityWarning);
+                    }
 
 
                     //预警等级
@@ -477,6 +495,11 @@ public class MaintainDataHandler {
      * @param warningValOne 一级预警的值
      */
     public void nodeMalfunction(ParseData parseData, String warningType, Double warningValOne) {
+        //设备故障类预警（01 电量 / 02 信号 / 03 丢包）在误报冷却期内不再判定，避免反复建单。
+        //用设备维度 key 判断，不需要多查一次库。
+        if (warningSuppressService.isSuppressedByNode(parseData.getNodeId(), warningType)) {
+            return;
+        }
         //查询该设备在预警记录表中该类型的预警记录是否存在
         Integer count = earlyWarningDao.findUndoCount(parseData.getNodeId(), warningType);
         if (count < 1) {
@@ -706,6 +729,16 @@ public class MaintainDataHandler {
     public Integer earlyWarningHandle(NodeVo nodeVo, Integer level, ParseData parseData, Double data, String evnType) {
 
         String warningType = WarningTypeConstant.getWarningType(nodeVo.getSiteType(), nodeVo.getNodeType(), evnType);
+
+        //误报冷却窗口内：数据照常落库（调用方在此之后写历史），但不判定、不升级预警。
+        //数据恢复正常时提前解除抑制，避免白占窗口。
+        if (warningSuppressService.isSuppressed(nodeVo.getSiteRoute(), warningType)) {
+            if (level != null && level == 0) {
+                warningSuppressService.clearSuppress(nodeVo.getSiteRoute(), warningType);
+            }
+            return 0;
+        }
+
         //查询数据库中该位置未处理的预警
         EarlyWarningVo earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), warningType);
 
@@ -744,6 +777,14 @@ public class MaintainDataHandler {
             //查询数据库中该位置未处理的预警
             earlyWarningVo = earlyWarningDao.findUndoEarlyWarningBySiteRoute(nodeVo.getSiteRoute(), WarningTypeConstant.CORE_TEMP_OVERRUN_STACK_WARNING);
 
+        }
+
+        //误报冷却窗口内：不判定、不升级。注意 level==-1 是"包芯温度偏低"预警，不能当成恢复正常
+        if (warningSuppressService.isSuppressed(nodeVo.getSiteRoute(), type)) {
+            if (level != null && level == 0) {
+                warningSuppressService.clearSuppress(nodeVo.getSiteRoute(), type);
+            }
+            return;
         }
         EarlyWarning earlyWarning = new EarlyWarning();
         earlyWarning.setNodeType(parseData.getNodeType());

@@ -71,12 +71,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        //所有请求必须认证通过
+        // 日志写入由服务间 Feign 调用，无用户令牌；查询接口仍需认证。
         http.authorizeRequests()
-                //下边的路径放行
-                .antMatchers("/*/**"). //配置地址放行,"/*/**"放行所有的路径
-                permitAll()
-                .anyRequest().
-                authenticated();    //其他地址需要认证授权
+                .antMatchers("/actuator/health",
+                        "/loginlog",
+                        "/operationlog").permitAll()
+                .anyRequest().authenticated();
     }
 }

@@ -12,6 +12,7 @@
     <artifactId>rpzh-gateway</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>rpzh-gateway-core</module>
         <module>rpzh-gateway-a</module>
         <module>rpzh-gateway-b</module>
         <module>rpzh-gateway-c</module>

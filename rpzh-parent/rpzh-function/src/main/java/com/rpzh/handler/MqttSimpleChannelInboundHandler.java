@@ -43,7 +43,7 @@ public class MqttSimpleChannelInboundHandler implements MessageHandler {
     @SneakyThrows
     @Override
     @ServiceActivator(inputChannel = "mqttInputChannelMaintain")
-    @Async
+    @Async("taskExecutor")
     public void handleMessage(Message<?> message) throws MessagingException {
         MessageHeaders messageHeaders = message.getHeaders();
         List<String> mqttReceivedTopics = Arrays.asList(Objects.requireNonNull(messageHeaders.get("mqtt_receivedTopic")).

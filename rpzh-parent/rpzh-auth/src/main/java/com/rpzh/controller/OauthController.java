@@ -81,15 +81,13 @@ public class OauthController {
         AuthToken authToken = null;
         Map<String, String> map = new HashMap<>();
         map.put("username",username);
-        //获取redis中验证码
+        // 校验图形验证码：为空、过期或不匹配均拒绝；通过后立即删除，防止重放
         String redisCode = loginService.findRedisCode(uuidCode);
-       /* if (ToolUtil.isEmpty(verificationCode)){
-            return new Result(false, StatusCode.ERROR, "验证码不能为空",map);
-        }*/
-        //生产环境放开,仅仅测试使用
-        /*if (!(verificationCode.equals(redisCode))){
-            return new Result(false, StatusCode.ERROR, "验证码错误请重新输入",map);
-        }*/
+        if (ToolUtil.isEmpty(redisCode) || ToolUtil.isEmpty(verificationCode)
+                || !redisCode.equalsIgnoreCase(verificationCode.trim())) {
+            return new Result(false, StatusCode.ERROR, "验证码错误或已过期,请重新输入", map);
+        }
+        loginService.deleteCode(uuidCode);
         Integer checkErrorTimes = loginService.checkErrorTimes(username);
         if (ToolUtil.isEmpty(checkErrorTimes)){
             return new Result(false, StatusCode.ERROR, "用户名或密码错误",map);
@@ -189,7 +187,7 @@ public class OauthController {
         res.setContentType("image/jpeg");
         LineCaptcha lineCaptcha = CaptchaUtil.createLineCaptcha(299, 97);
         String code = lineCaptcha.getCode();
-        LOG.debug("图片验证码uuidCode={},code={}",uuidCode,code);
+        LOG.debug("生成图片验证码, uuidCode={}", uuidCode);
         loginService.saveCode(uuidCode,code);
         try {
             lineCaptcha.write(res.getOutputStream());

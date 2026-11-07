@@ -47,4 +47,10 @@ public interface LoginService {
      * @return
      */
     String findRedisCode(String uuidCode);
+
+    /**
+     * 校验通过后删除验证码，防止重放
+     * @param uuidCode
+     */
+    void deleteCode(String uuidCode);
 }

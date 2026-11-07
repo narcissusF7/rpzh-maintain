@@ -8,6 +8,7 @@ import com.rpzh.enums.*;
 import com.rpzh.feign.UserPhoneFeign;
 import com.rpzh.pojo.*;
 import com.rpzh.service.EarlyWarningService;
+import com.rpzh.service.WarningSuppressService;
 import com.rpzh.util.*;
 import com.rpzh.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
@@ -57,6 +59,9 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
     private UserPhoneFeign userFeign;
     @Resource
     private TaskManagementDao taskManagementDao;
+
+    @Resource
+    private WarningSuppressService warningSuppressService;
 
     //查询历史预警列表
     @Override
@@ -239,10 +244,35 @@ public class EarlyWarningServiceImpl implements EarlyWarningService {
 
     //误报
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer misreport(Integer id) {
+        EarlyWarningVo warning = earlyWarningDao.findWarningForMisreport(id);
+        if (ToolUtil.isEmpty(warning)) {
+            return 0;
+        }
+        String nodeId = warning.getNodeId();
+        String siteRoute = warning.getSiteRoute();
+        String warningType = warning.getWarningType();
+
+        //1. 关联任务改「作废」而非物理删除：保留派单与处置痕迹，便于统计误报率、追溯谁在何时派过
         Integer taskId = earlyWarningDao.findTaskId(id);
-        taskManagementDao.delete(taskId);//点击误报时删除相关任务
-        return earlyWarningDao.misreport(id);
+        if (taskId != null && taskId > 0) {
+            taskManagementDao.voidTask(taskId, "【误报作废】");
+        }
+
+        //2. 预警置为误报（先落库，后续统计"未处置故障预警"时才会排除本条）
+        Integer rows = earlyWarningDao.misreport(id);
+
+        //3. 清掉连续预警次数与连续异常次数。否则误报后下一帧数据会继承旧计数：
+        //   decideEarlyWarning 中 "oneToTwo / twoToThree 所需次数 - 累计次数 < 0" 直接成立，
+        //   新预警一出生就是 2 级甚至 3 级（运维感知为"标了误报，一来数据又被升级"）。
+        warningSuppressService.resetCounters(nodeId, warningType);
+
+        //4. 开启冷却窗口：窗口内同一位置/设备的同类型数据只落库、不再判定预警，
+        //   避免探头故障、瞬时抖动等干扰源反复触发；数据恢复正常会提前解除。
+        warningSuppressService.suppress(siteRoute, nodeId, warningType);
+
+        return rows;
     }
 
     @Resource

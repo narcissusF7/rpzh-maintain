@@ -98,4 +98,9 @@ public class LoginServiceImpl implements LoginService {
         String redisCode = (String)redisTemplate.opsForValue().get(key);
         return redisCode;
     }
+
+    @Override
+    public void deleteCode(String uuidCode) {
+        redisTemplate.delete(CACHE_KEY_RPZH_CODE + uuidCode);
+    }
 }

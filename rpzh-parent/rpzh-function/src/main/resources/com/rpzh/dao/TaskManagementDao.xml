@@ -118,6 +118,10 @@
         deal_result,move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
         <where>
+            <!-- 误报作废的任务（status=3）默认不出现在列表与统计中；显式按状态查询时仍可查 -->
+            <if test="taskDto.status == null or taskDto.status == ''">
+                AND (status IS NULL OR status &lt;&gt; '3')
+            </if>
             <if test="taskDto.taskNum != null and taskDto.taskNum != ''">
                 AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
             </if>
@@ -160,6 +164,14 @@
     <delete id="delete">
         DELETE FROM tb_task WHERE id = #{id}
     </delete>
+    <!-- 误报作废：保留任务行做审计（谁派过、派给谁），status=3 为已作废 -->
+    <update id="voidTask">
+        UPDATE tb_task
+        SET status = '3',
+            deal_result = CONCAT(IFNULL(deal_result, ''), #{reason})
+        WHERE id = #{id}
+          AND status IN ('0', '2')
+    </update>
     <select id="findTaskDetail" resultMap="findTask">
   SELECT id,task_num,type,task_detail,task_address,site_route,principal,end_time,create_time,created_user,status,
   deal_method,deal_result,evaluate,move_stack_target_siteroute,move_stack_target_name,target_siteid
@@ -171,6 +183,10 @@
         move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
         <where>
+            <!-- 误报作废的任务（status=3）默认不出现在列表与统计中；显式按状态查询时仍可查 -->
+            <if test="taskDto.status == null or taskDto.status == ''">
+                AND (status IS NULL OR status &lt;&gt; '3')
+            </if>
             <if test="taskDto.taskNum != null and taskDto.taskNum != ''">
                 AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
             </if>
@@ -663,6 +679,10 @@ SELECT id,task_num,type,task_detail,task_address,site_route,principal,created_us
         move_stack_target_siteroute,move_stack_target_name,target_siteid
         FROM tb_task
         <where>
+            <!-- 误报作废的任务（status=3）默认不出现在列表与统计中；显式按状态查询时仍可查 -->
+            <if test="taskDto.status == null or taskDto.status == ''">
+                AND (status IS NULL OR status &lt;&gt; '3')
+            </if>
             <if test="taskDto.taskNum != null and taskDto.taskNum != ''">
                 AND task_num like concat(concat('%', #{taskDto.taskNum}), '%')
             </if>

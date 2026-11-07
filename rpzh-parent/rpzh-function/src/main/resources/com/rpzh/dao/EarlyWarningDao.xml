@@ -242,6 +242,14 @@
     <select id="findTaskId" resultType="java.lang.Integer">
         select task_id from tb_early_warning where id = #{id}
     </select>
+
+    <!-- 误报处理：取定位信息，用于清连续计数（ALERT_NUM_/FAULT_）与开启冷却窗口 -->
+    <select id="findWarningForMisreport" resultType="com.rpzh.vo.EarlyWarningVo">
+        select id, node_id nodeId, site_route siteRoute, warning_type warningType,
+               warning_grade warningGrade, is_affirm affirm
+        from tb_early_warning
+        where id = #{id}
+    </select>
     <select id="findUndoStatusByNodeId" resultType="java.lang.Integer">
         select count(*) from tb_early_warning where node_id = #{nodeId} and is_affirm in (1,2)
     </select>
